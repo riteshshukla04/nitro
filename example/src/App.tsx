@@ -34,6 +34,7 @@ export default function App() {
             tabBarLabel: 'Tests',
             tabBarIcon: ({ size, focused }) => (
               <Image
+                testID="tests-screen-icon"
                 source={dna}
                 tintColor={focused ? undefined : 'grey'}
                 style={{ width: size * 1.2, height: size * 1.2 }}
@@ -44,6 +45,7 @@ export default function App() {
         <Tabs.Screen
           name="Benchmarks"
           component={BenchmarksScreen}
+
           options={{
             tabBarLabel: 'Benchmarks',
             tabBarIcon: ({ size, focused }) => (
@@ -62,6 +64,7 @@ export default function App() {
             tabBarLabel: 'View',
             tabBarIcon: ({ size, focused }) => (
               <Image
+                testID="view-screen-icon"
                 source={map}
                 tintColor={focused ? undefined : 'grey'}
                 style={{ width: size, height: size }}
@@ -77,6 +80,7 @@ export default function App() {
             tabBarIcon: ({ size, focused }) => (
               <Image
                 source={terminal}
+                testID="eval-screen-icon"
                 tintColor={focused ? undefined : 'grey'}
                 style={{ width: size, height: size }}
               />

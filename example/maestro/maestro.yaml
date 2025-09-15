@@ -1,0 +1,7 @@
+appId:  com.margelo.nitroexample
+---
+- clearState            # clears the state of the current app
+- launchApp
+- runFlow: ./EvalTest.yaml
+- runFlow: ./HybridObjectsTest.yaml
+- runFlow: ./ViewsTest.yaml

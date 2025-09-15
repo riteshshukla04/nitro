@@ -1,0 +1,28 @@
+appId:  com.margelo.nitroexample
+---
+# Run C++ tests
+- tapOn:
+    id: "hybrid-object-tests-screen-run-all-tests-button"
+
+- copyTextFrom:
+    id: "hybrid-object-tests-screen-status-text"
+
+- runScript: 
+    file: ./scripts/check-test-result.js    
+    env:
+        passThresholdFromEnv: 80 # 80% pass threshold . 80% test cases should pass.
+
+- tapOn:
+    text: "Kotlin"
+
+# Run Kotlin tests
+- tapOn:
+    id: "hybrid-object-tests-screen-run-all-tests-button"
+
+- copyTextFrom:
+    id: "hybrid-object-tests-screen-status-text"
+
+- runScript: 
+    file: ./scripts/check-test-result.js    
+    env:
+        passThresholdFromEnv: 80 # 80% pass threshold . 80% test cases should pass.

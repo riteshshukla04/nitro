@@ -1,0 +1,16 @@
+appId:  com.margelo.nitroexample
+---
+- tapOn:
+    id: "eval-screen-icon"
+
+- tapOn:
+    id: "eval-screen-text-input"
+
+- tapOn:
+    id: "eval-screen-run-button"
+
+- assertVisible: 
+   text: "Result: {\"__type\":\"NativeState<TestObjectCpp>\"}"
+
+
+    
