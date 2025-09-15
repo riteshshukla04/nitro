@@ -9,6 +9,10 @@ import { BenchmarksScreen } from './screens/BenchmarksScreen'
 import { ViewScreen } from './screens/ViewScreen'
 import { EvalScreen } from './screens/EvalScreen'
 
+import { LogBox } from 'react-native'
+
+LogBox.ignoreAllLogs()
+
 const dna = require('./img/dna.png')
 const rocket = require('./img/rocket.png')
 const map = require('./img/map.png')

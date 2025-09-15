@@ -31,16 +31,30 @@ async function stopRecording(pid, videoName, deviceVideoPath) {
 }
 
 async function main() {
+    let metroProcess = null
 	console.log('📱 Installing app...')
-	execSync('adb install ./android/app/build/outputs/apk/release/app-release.apk', {
+	execSync('adb install ./android/app/build/outputs/apk/debug/app-debug.apk', {
 		stdio: 'inherit',
 		env: process.env,
 	})
 
-	const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro')
-	const command = `maestro test maestro/maestro.yaml`
-	const deviceVideoPath = `/sdcard/maestro.mp4`
 
+    console.log('📱 Starting Metro Server...')
+    metroProcess = spawn('bun', ['start', '&'], {
+        stdio: 'ignore',
+        detached: true,
+      });
+    console.log('✅ Metro Server started')
+    await sleep(5000); // Wait for Metro Server to start
+    
+    execSync(`adb shell monkey -p com.margelo.nitroexample 1`, {stdio: 'ignore'});
+    console.log('✅ App started')
+    await sleep(60000); // Wait for app to start and sync with Metro Server
+
+
+    const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro')
+	const command = `${MAESTRO_PATH} test maestro/maestro.yaml`
+	const deviceVideoPath = `/sdcard/maestro.mp4`
 	// Start screen recording
 	const recording = spawn(
 		'adb',
@@ -51,11 +65,20 @@ async function main() {
 		},
 	)
 	const pid = recording.pid
-
-	console.log(`\n🔄 Starting test suite.`)
-	execSync(command, { stdio: 'inherit', env: process.env })
-
-	await stopRecording(pid, 'maestro.mp4', deviceVideoPath)
+    console.log('✅ Screen recording started')
+    try {
+        console.log(`\n🔄 Starting test suite.`)
+        execSync(command, { stdio: 'inherit', env: process.env })
+        console.log('✅ Maestro tests completed successfully')
+    } catch (error) {
+        console.error('❌ Error running Maestro tests:', error)
+        throw error
+    }finally {
+        if (metroProcess) {
+            process.kill(metroProcess.pid)
+        }
+        await stopRecording(pid, 'maestro.mp4', deviceVideoPath)
+    }
 }
 
 main().catch((err) => {
