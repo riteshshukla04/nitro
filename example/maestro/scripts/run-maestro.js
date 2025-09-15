@@ -32,10 +32,10 @@ async function stopRecording(pid, videoName, deviceVideoPath) {
 
 async function main() {
 	console.log('📱 Installing app...')
-	// execSync('adb install ./android/app/build/outputs/apk/release/app-release.apk', {
-	// 	stdio: 'inherit',
-	// 	env: process.env,
-	// })
+	execSync('adb install ./android/app/build/outputs/apk/release/app-release.apk', {
+		stdio: 'inherit',
+		env: process.env,
+	})
 
 	const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro')
 	const command = `maestro test maestro/maestro.yaml`
