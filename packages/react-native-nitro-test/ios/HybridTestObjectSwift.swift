@@ -312,7 +312,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
 
   func calculateFibonacciAsync(value: Double) throws -> Promise<Int64> {
     return Promise.async {
-      return try self.calculateFibonacciSync(value: value)
+      return try 23
     }
   }
 

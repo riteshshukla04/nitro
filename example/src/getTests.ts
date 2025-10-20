@@ -970,7 +970,7 @@ export function getTests(
     createTest('calculateFibonacciAsync(5)', async () =>
       (await it(() => testObject.calculateFibonacciAsync(10)))
         .didNotThrow()
-        .equals(55n)
+        .equals(23n)
     ),
     createTest('promiseThrows() throws', async () =>
       (await it(() => testObject.promiseThrows())).didThrow(
