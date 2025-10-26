@@ -35,7 +35,7 @@ on:
       - '**/*.podspec'
       - '**/react-native.config.js'
       - '**/nitro.json'
-
+  workflow_dispatch:
 env:
   USE_CCACHE: 1
 
@@ -68,8 +68,8 @@ jobs:
           bundler-cache: true
           working-directory: example
 
-      - name: Select Xcode 16.4
-        run: sudo xcode-select -s "/Applications/Xcode_16.4.app/Contents/Developer"
+      - name: Select Xcode 26
+        run: sudo xcode-select -s "/Applications/Xcode_26.app/Contents/Developer"
 
       - name: Restore Pods cache
         uses: actions/cache@v4
