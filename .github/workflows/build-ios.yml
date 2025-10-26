@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - xcode-26
     paths:
       - '.github/workflows/build-ios.yml'
       - 'example/ios/**'
@@ -61,15 +62,7 @@ jobs:
           working-directory: example
 
       - name: Select Xcode 16.4
-        run: sudo xcode-select -s "/Applications/Xcode_16.4.app/Contents/Developer"
-
-      - name: Restore Pods cache
-        uses: actions/cache@v4
-        with:
-          path: example/ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock', '**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
+        run: sudo xcode-select -s "/Applications/Xcode_26.0.app/Contents/Developer"
       - name: Install Pods
         working-directory: example
         run: bun pods
