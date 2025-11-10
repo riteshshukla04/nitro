@@ -78,7 +78,7 @@ open class HybridTestObjectSwiftKotlinSpec_cxx {
    */
   public func getCxxPart() -> bridge.std__shared_ptr_HybridTestObjectSwiftKotlinSpec_ {
     let cachedCxxPart = self.__cxxPart.lock()
-    if cachedCxxPart.__convertToBool() {
+    if Bool(fromCxx: cachedCxxPart) {
       return cachedCxxPart
     } else {
       let newCxxPart = bridge.create_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(self.toUnsafe())
@@ -554,6 +554,18 @@ open class HybridTestObjectSwiftKotlinSpec_cxx {
   }
   
   @inline(__always)
+  public final func bouncePartialStruct(person: PartialPerson) -> bridge.Result_PartialPerson_ {
+    do {
+      let __result = try self.__implementation.bouncePartialStruct(person: person)
+      let __resultCpp = __result
+      return bridge.create_Result_PartialPerson_(__resultCpp)
+    } catch (let __error) {
+      let __exceptionPtr = __error.toCpp()
+      return bridge.create_Result_PartialPerson_(__exceptionPtr)
+    }
+  }
+  
+  @inline(__always)
   public final func sumUpAllPassengers(cars: bridge.std__vector_Car_) -> bridge.Result_std__string_ {
     do {
       let __result = try self.__implementation.sumUpAllPassengers(cars: cars.map({ __item in __item }))
@@ -644,6 +656,30 @@ open class HybridTestObjectSwiftKotlinSpec_cxx {
     } catch (let __error) {
       let __exceptionPtr = __error.toCpp()
       return bridge.create_Result_std__vector_std__string__(__exceptionPtr)
+    }
+  }
+  
+  @inline(__always)
+  public final func mergeMaps(a: margelo.nitro.SharedAnyMap, b: margelo.nitro.SharedAnyMap) -> bridge.Result_std__shared_ptr_AnyMap__ {
+    do {
+      let __result = try self.__implementation.mergeMaps(a: AnyMap(withCppPart: a), b: AnyMap(withCppPart: b))
+      let __resultCpp = __result.cppPart
+      return bridge.create_Result_std__shared_ptr_AnyMap__(__resultCpp)
+    } catch (let __error) {
+      let __exceptionPtr = __error.toCpp()
+      return bridge.create_Result_std__shared_ptr_AnyMap__(__exceptionPtr)
+    }
+  }
+  
+  @inline(__always)
+  public final func copyAnyValues(map: margelo.nitro.SharedAnyMap) -> bridge.Result_std__shared_ptr_AnyMap__ {
+    do {
+      let __result = try self.__implementation.copyAnyValues(map: AnyMap(withCppPart: map))
+      let __resultCpp = __result.cppPart
+      return bridge.create_Result_std__shared_ptr_AnyMap__(__resultCpp)
+    } catch (let __error) {
+      let __exceptionPtr = __error.toCpp()
+      return bridge.create_Result_std__shared_ptr_AnyMap__(__exceptionPtr)
     }
   }
   
@@ -955,6 +991,25 @@ open class HybridTestObjectSwiftKotlinSpec_cxx {
     } catch (let __error) {
       let __exceptionPtr = __error.toCpp()
       return bridge.create_Result_std__shared_ptr_Promise_double___(__exceptionPtr)
+    }
+  }
+  
+  @inline(__always)
+  public final func promiseThatResolvesVoidInstantly() -> bridge.Result_std__shared_ptr_Promise_void___ {
+    do {
+      let __result = try self.__implementation.promiseThatResolvesVoidInstantly()
+      let __resultCpp = { () -> bridge.std__shared_ptr_Promise_void__ in
+        let __promise = bridge.create_std__shared_ptr_Promise_void__()
+        let __promiseHolder = bridge.wrap_std__shared_ptr_Promise_void__(__promise)
+        __result
+          .then({ __result in __promiseHolder.resolve() })
+          .catch({ __error in __promiseHolder.reject(__error.toCpp()) })
+        return __promise
+      }()
+      return bridge.create_Result_std__shared_ptr_Promise_void___(__resultCpp)
+    } catch (let __error) {
+      let __exceptionPtr = __error.toCpp()
+      return bridge.create_Result_std__shared_ptr_Promise_void___(__exceptionPtr)
     }
   }
   

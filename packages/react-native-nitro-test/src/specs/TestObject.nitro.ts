@@ -3,9 +3,12 @@ import {
   type AnyMap,
   type Sync,
   type CustomType,
+  type AnyHybridObject,
 } from 'react-native-nitro-modules'
 import type { TestView } from './TestView.nitro'
 import type { SomeExternalObject } from 'react-native-nitro-test-external'
+import type { Child } from './Child.nitro'
+import type { Base } from './Base.nitro'
 
 // Tuples become `std::tuple<...>` in C++.
 // In contrast to arrays, they are length-checked, and can have different types inside them.
@@ -95,6 +98,9 @@ type CoreTypesVariant =
   | Date
   | AnyMap
 
+// Prefer `interface` + `extends` over `type` so TS doesn't flatten it
+interface PartialPerson extends Partial<Person> {}
+
 // This is an `interface` we're going to use as a base in both of our `HybridObject`s later.
 // In this case, the `HybridObject`s will just flatten out and copy over all properties here.
 // There is no separate type for `SharedTestObjectProps` on the native side.
@@ -122,6 +128,7 @@ interface SharedTestObjectProps {
   bounceStrings(array: string[]): string[]
   bounceNumbers(array: number[]): number[]
   bounceStructs(array: Person[]): Person[]
+  bouncePartialStruct(person: PartialPerson): PartialPerson
   sumUpAllPassengers(cars: Car[]): string
   bounceEnums(array: Powertrain[]): Powertrain[]
   complexEnumCallback(
@@ -133,6 +140,8 @@ interface SharedTestObjectProps {
   createMap(): AnyMap
   mapRoundtrip(map: AnyMap): AnyMap
   getMapKeys(map: AnyMap): string[]
+  mergeMaps(a: AnyMap, b: AnyMap): AnyMap
+  copyAnyValues(map: AnyMap): AnyMap
 
   // Typed Maps (records)
   bounceMap(
@@ -165,6 +174,7 @@ interface SharedTestObjectProps {
   promiseThrows(): Promise<void>
   promiseReturnsInstantly(): Promise<number>
   promiseReturnsInstantlyAsync(): Promise<number>
+  promiseThatResolvesVoidInstantly(): Promise<void>
 
   // Complex Promises
   awaitAndGetPromise(promise: Promise<number>): Promise<number>
@@ -255,7 +265,7 @@ interface SharedTestObjectProps {
 // Since it inherited from the `SharedTestObjectProps` interface,
 // it will be flattened out and every property/method will be added here.
 export interface TestObjectCpp
-  extends HybridObject<{ ios: 'c++' }>,
+  extends HybridObject<{ ios: 'c++'; android: 'c++' }>,
     SharedTestObjectProps {
   // Complex Variants + Tuples
   getVariantTuple(variant: Float2 | Float3): Float2 | Float3
@@ -271,6 +281,10 @@ export interface TestObjectCpp
   optionalHybrid?: TestObjectCpp
   getVariantHybrid(variant: TestObjectCpp | Person): TestObjectCpp | Person
 
+  // Any HybridObject
+  bounceAnyHybrid(object: AnyHybridObject): AnyHybridObject
+
+  // Custom C++ JSI Converters
   bounceCustomType(value: CustomString): CustomString
 }
 
@@ -287,19 +301,4 @@ export interface TestObjectSwiftKotlin
   getVariantHybrid(
     variant: TestObjectSwiftKotlin | Person
   ): TestObjectSwiftKotlin | Person
-}
-
-// This is a simple `HybridObject` with just one value.
-export interface Base
-  extends HybridObject<{ ios: 'swift'; android: 'kotlin' }> {
-  readonly baseValue: number
-}
-
-// This is a `HybridObject` that actually inherits from a different `HybridObject`.
-// This will set up an inheritance chain on the native side.
-// The native `Child` Swift/Kotlin class will inherit from the `Base` Swift/Kotlin class.
-export interface Child extends Base {
-  readonly childValue: number
-  // tests if the same variant can be used in a different HybridObject
-  bounceVariant(variant: NamedVariant): NamedVariant
 }

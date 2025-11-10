@@ -13,7 +13,8 @@ import TabItem from '@theme/TabItem';
 <div className="side-by-side-block">
 
 ```ts title="Math.nitro.ts"
-interface Math extends HybridObject {
+interface Math
+  extends HybridObject<{ ios: 'swift' }> {
   readonly pi: number
   add(a: number, b: number): number
 }
@@ -303,7 +304,7 @@ Make sure `HybridMath` is default-constructible and scoped inside the correct na
   Then, to actually load and initialize the C++ part of your library (which calls `JNI_OnLoad` from above), call `initializeNative()` from your library's entry point (`*Package.kt`):
 
   ```kotlin title="NitroMathPackage.kt"
-  public class NitroMathPackage: TurboReactPackage() {
+  public class NitroMathPackage: BaseReactPackage() {
     // ...
     companion object {
       init {

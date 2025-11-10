@@ -8,6 +8,7 @@ import com.margelo.nitro.core.AnyMap
 import com.margelo.nitro.core.AnyValue
 import com.margelo.nitro.core.ArrayBuffer
 import com.margelo.nitro.core.Promise
+import com.margelo.nitro.core.resolved
 import com.margelo.nitro.test.external.HybridSomeExternalObjectSpec
 import kotlinx.coroutines.delay
 import java.math.BigDecimal
@@ -70,6 +71,10 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     return array
   }
 
+  override fun bouncePartialStruct(person: PartialPerson): PartialPerson {
+    return person
+  }
+
   override fun sumUpAllPassengers(cars: Array<Car>): String {
     val strings =
       cars.flatMap { car ->
@@ -127,6 +132,19 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
 
   override fun getMapKeys(map: AnyMap): Array<String> {
     return map.getAllKeys()
+  }
+
+  override fun mergeMaps(
+    a: AnyMap,
+    b: AnyMap,
+  ): AnyMap {
+    a.merge(b)
+    return a
+  }
+
+  override fun copyAnyValues(map: AnyMap): AnyMap {
+    val copy = map.toMap()
+    return AnyMap.fromMap(copy)
   }
 
   override fun mapRoundtrip(map: AnyMap): AnyMap {
@@ -218,6 +236,10 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     return Promise.async {
       return@async 55.0
     }
+  }
+
+  override fun promiseThatResolvesVoidInstantly(): Promise<Unit> {
+    return Promise.resolved()
   }
 
   override fun awaitAndGetPromise(promise: Promise<Double>): Promise<Double> {

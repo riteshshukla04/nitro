@@ -50,12 +50,15 @@ namespace margelo::nitro::test {
       prototype.registerHybridMethod("bounceStrings", &HybridTestObjectSwiftKotlinSpec::bounceStrings);
       prototype.registerHybridMethod("bounceNumbers", &HybridTestObjectSwiftKotlinSpec::bounceNumbers);
       prototype.registerHybridMethod("bounceStructs", &HybridTestObjectSwiftKotlinSpec::bounceStructs);
+      prototype.registerHybridMethod("bouncePartialStruct", &HybridTestObjectSwiftKotlinSpec::bouncePartialStruct);
       prototype.registerHybridMethod("sumUpAllPassengers", &HybridTestObjectSwiftKotlinSpec::sumUpAllPassengers);
       prototype.registerHybridMethod("bounceEnums", &HybridTestObjectSwiftKotlinSpec::bounceEnums);
       prototype.registerHybridMethod("complexEnumCallback", &HybridTestObjectSwiftKotlinSpec::complexEnumCallback);
       prototype.registerHybridMethod("createMap", &HybridTestObjectSwiftKotlinSpec::createMap);
       prototype.registerHybridMethod("mapRoundtrip", &HybridTestObjectSwiftKotlinSpec::mapRoundtrip);
       prototype.registerHybridMethod("getMapKeys", &HybridTestObjectSwiftKotlinSpec::getMapKeys);
+      prototype.registerHybridMethod("mergeMaps", &HybridTestObjectSwiftKotlinSpec::mergeMaps);
+      prototype.registerHybridMethod("copyAnyValues", &HybridTestObjectSwiftKotlinSpec::copyAnyValues);
       prototype.registerHybridMethod("bounceMap", &HybridTestObjectSwiftKotlinSpec::bounceMap);
       prototype.registerHybridMethod("extractMap", &HybridTestObjectSwiftKotlinSpec::extractMap);
       prototype.registerHybridMethod("funcThatThrows", &HybridTestObjectSwiftKotlinSpec::funcThatThrows);
@@ -73,6 +76,7 @@ namespace margelo::nitro::test {
       prototype.registerHybridMethod("promiseThrows", &HybridTestObjectSwiftKotlinSpec::promiseThrows);
       prototype.registerHybridMethod("promiseReturnsInstantly", &HybridTestObjectSwiftKotlinSpec::promiseReturnsInstantly);
       prototype.registerHybridMethod("promiseReturnsInstantlyAsync", &HybridTestObjectSwiftKotlinSpec::promiseReturnsInstantlyAsync);
+      prototype.registerHybridMethod("promiseThatResolvesVoidInstantly", &HybridTestObjectSwiftKotlinSpec::promiseThatResolvesVoidInstantly);
       prototype.registerHybridMethod("awaitAndGetPromise", &HybridTestObjectSwiftKotlinSpec::awaitAndGetPromise);
       prototype.registerHybridMethod("awaitAndGetComplexPromise", &HybridTestObjectSwiftKotlinSpec::awaitAndGetComplexPromise);
       prototype.registerHybridMethod("awaitPromise", &HybridTestObjectSwiftKotlinSpec::awaitPromise);

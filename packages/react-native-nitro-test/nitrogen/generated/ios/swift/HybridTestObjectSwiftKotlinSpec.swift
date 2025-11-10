@@ -38,12 +38,15 @@ public protocol HybridTestObjectSwiftKotlinSpec_protocol: HybridObject {
   func bounceStrings(array: [String]) throws -> [String]
   func bounceNumbers(array: [Double]) throws -> [Double]
   func bounceStructs(array: [Person]) throws -> [Person]
+  func bouncePartialStruct(person: PartialPerson) throws -> PartialPerson
   func sumUpAllPassengers(cars: [Car]) throws -> String
   func bounceEnums(array: [Powertrain]) throws -> [Powertrain]
   func complexEnumCallback(array: [Powertrain], callback: @escaping (_ array: [Powertrain]) -> Void) throws -> Void
   func createMap() throws -> AnyMap
   func mapRoundtrip(map: AnyMap) throws -> AnyMap
   func getMapKeys(map: AnyMap) throws -> [String]
+  func mergeMaps(a: AnyMap, b: AnyMap) throws -> AnyMap
+  func copyAnyValues(map: AnyMap) throws -> AnyMap
   func bounceMap(map: Dictionary<String, Variant_Bool_Double>) throws -> Dictionary<String, Variant_Bool_Double>
   func extractMap(mapWrapper: MapWrapper) throws -> Dictionary<String, String>
   func funcThatThrows() throws -> Double
@@ -61,6 +64,7 @@ public protocol HybridTestObjectSwiftKotlinSpec_protocol: HybridObject {
   func promiseThrows() throws -> Promise<Void>
   func promiseReturnsInstantly() throws -> Promise<Double>
   func promiseReturnsInstantlyAsync() throws -> Promise<Double>
+  func promiseThatResolvesVoidInstantly() throws -> Promise<Void>
   func awaitAndGetPromise(promise: Promise<Double>) throws -> Promise<Double>
   func awaitAndGetComplexPromise(promise: Promise<Car>) throws -> Promise<Car>
   func awaitPromise(promise: Promise<Void>) throws -> Promise<Void>

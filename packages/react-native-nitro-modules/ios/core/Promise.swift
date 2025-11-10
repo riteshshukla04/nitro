@@ -108,6 +108,7 @@ extension Promise {
   /**
    * Create a new `Promise<T>` that runs the given `run` function on a parallel Thread/`DispatchQueue`.
    */
+  @preconcurrency
   public static func parallel(
     _ queue: DispatchQueue = .global(),
     _ run: @escaping @Sendable () throws -> T
@@ -122,6 +123,22 @@ extension Promise {
       }
     }
     return promise
+  }
+}
+
+/// Void overloads to avoid typing out `()`
+extension Promise where T == Void {
+  /**
+   * Resolves this `Promise<Void>`.
+   */
+  public func resolve() {
+    return self.resolve(withResult: ())
+  }
+  /**
+   * Create an already resolved `Promise<Void>`.
+   */
+  public static func resolved() -> Promise {
+    return Self.resolved(withResult: ())
   }
 }
 

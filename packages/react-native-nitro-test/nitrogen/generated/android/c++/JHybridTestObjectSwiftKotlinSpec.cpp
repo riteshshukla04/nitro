@@ -15,6 +15,8 @@ namespace margelo::nitro::test { enum class Powertrain; }
 namespace margelo::nitro::test { enum class OldEnum; }
 // Forward declaration of `Person` to properly resolve imports.
 namespace margelo::nitro::test { struct Person; }
+// Forward declaration of `PartialPerson` to properly resolve imports.
+namespace margelo::nitro::test { struct PartialPerson; }
 // Forward declaration of `Car` to properly resolve imports.
 namespace margelo::nitro::test { struct Car; }
 // Forward declaration of `WrappedJsStruct` to properly resolve imports.
@@ -57,6 +59,8 @@ namespace margelo::nitro::test { class HybridTestViewSpec; }
 #include "Person.hpp"
 #include "JVariant_HybridTestObjectSwiftKotlinSpec_Person.hpp"
 #include "JPerson.hpp"
+#include "PartialPerson.hpp"
+#include "JPartialPerson.hpp"
 #include <NitroModules/AnyMap.hpp>
 #include <NitroModules/JAnyMap.hpp>
 #include <unordered_map>
@@ -378,6 +382,11 @@ namespace margelo::nitro::test {
       return __vector;
     }();
   }
+  PartialPerson JHybridTestObjectSwiftKotlinSpec::bouncePartialStruct(const PartialPerson& person) {
+    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPartialPerson>(jni::alias_ref<JPartialPerson> /* person */)>("bouncePartialStruct");
+    auto __result = method(_javaPart, JPartialPerson::fromCpp(person));
+    return __result->toCpp();
+  }
   std::string JHybridTestObjectSwiftKotlinSpec::sumUpAllPassengers(const std::vector<Car>& cars) {
     static const auto method = javaClassStatic()->getMethod<jni::local_ref<jni::JString>(jni::alias_ref<jni::JArrayClass<JCar>> /* cars */)>("sumUpAllPassengers");
     auto __result = method(_javaPart, [&]() {
@@ -448,6 +457,16 @@ namespace margelo::nitro::test {
       }
       return __vector;
     }();
+  }
+  std::shared_ptr<AnyMap> JHybridTestObjectSwiftKotlinSpec::mergeMaps(const std::shared_ptr<AnyMap>& a, const std::shared_ptr<AnyMap>& b) {
+    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JAnyMap::javaobject>(jni::alias_ref<JAnyMap::javaobject> /* a */, jni::alias_ref<JAnyMap::javaobject> /* b */)>("mergeMaps");
+    auto __result = method(_javaPart, JAnyMap::create(a), JAnyMap::create(b));
+    return __result->cthis()->getMap();
+  }
+  std::shared_ptr<AnyMap> JHybridTestObjectSwiftKotlinSpec::copyAnyValues(const std::shared_ptr<AnyMap>& map) {
+    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JAnyMap::javaobject>(jni::alias_ref<JAnyMap::javaobject> /* map */)>("copyAnyValues");
+    auto __result = method(_javaPart, JAnyMap::create(map));
+    return __result->cthis()->getMap();
   }
   std::unordered_map<std::string, std::variant<bool, double>> JHybridTestObjectSwiftKotlinSpec::bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map) {
     static const auto method = javaClassStatic()->getMethod<jni::local_ref<jni::JMap<jni::JString, JVariant_Boolean_Double>>(jni::alias_ref<jni::JMap<jni::JString, JVariant_Boolean_Double>> /* map */)>("bounceMap");
@@ -608,6 +627,21 @@ namespace margelo::nitro::test {
       __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
         auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
         __promise->resolve(__result->value());
+      });
+      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
+        jni::JniException __jniError(__throwable);
+        __promise->reject(std::make_exception_ptr(__jniError));
+      });
+      return __promise;
+    }();
+  }
+  std::shared_ptr<Promise<void>> JHybridTestObjectSwiftKotlinSpec::promiseThatResolvesVoidInstantly() {
+    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>()>("promiseThatResolvesVoidInstantly");
+    auto __result = method(_javaPart);
+    return [&]() {
+      auto __promise = Promise<void>::create();
+      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& /* unit */) {
+        __promise->resolve();
       });
       __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
         jni::JniException __jniError(__throwable);

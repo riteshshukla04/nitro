@@ -148,6 +148,10 @@ void HybridTestObjectCpp::simpleFunc() {
   // do nothing
 }
 
+std::shared_ptr<HybridObject> HybridTestObjectCpp::bounceAnyHybrid(const std::shared_ptr<HybridObject>& object) {
+  return object;
+}
+
 CustomString HybridTestObjectCpp::bounceCustomType(CustomString value) {
   return value;
 }
@@ -166,6 +170,10 @@ std::vector<double> HybridTestObjectCpp::bounceNumbers(const std::vector<double>
 
 std::vector<Person> HybridTestObjectCpp::bounceStructs(const std::vector<Person>& array) {
   return array;
+}
+
+PartialPerson HybridTestObjectCpp::bouncePartialStruct(const PartialPerson& person) {
+  return person;
 }
 
 std::string HybridTestObjectCpp::sumUpAllPassengers(const std::vector<Car>& cars) {
@@ -220,6 +228,21 @@ std::shared_ptr<AnyMap> HybridTestObjectCpp::mapRoundtrip(const std::shared_ptr<
 
 std::vector<std::string> HybridTestObjectCpp::getMapKeys(const std::shared_ptr<AnyMap>& map) {
   return map->getAllKeys();
+}
+
+std::shared_ptr<AnyMap> HybridTestObjectCpp::mergeMaps(const std::shared_ptr<AnyMap>& a, const std::shared_ptr<AnyMap>& b) {
+  a->merge(b);
+  return a;
+}
+
+std::shared_ptr<AnyMap> HybridTestObjectCpp::copyAnyValues(const std::shared_ptr<AnyMap>& map) {
+  auto keys = map->getAllKeys();
+  auto newMap = AnyMap::make();
+  for (const auto& key : keys) {
+    auto any = map->getAny(key);
+    newMap->setAny(key, any);
+  }
+  return newMap;
 }
 
 double HybridTestObjectCpp::funcThatThrows() {
@@ -439,6 +462,10 @@ std::shared_ptr<Promise<double>> HybridTestObjectCpp::promiseReturnsInstantly() 
 
 std::shared_ptr<Promise<double>> HybridTestObjectCpp::promiseReturnsInstantlyAsync() {
   return Promise<double>::async([=]() { return 55; });
+}
+
+std::shared_ptr<Promise<void>> HybridTestObjectCpp::promiseThatResolvesVoidInstantly() {
+  return Promise<void>::resolved();
 }
 
 void HybridTestObjectCpp::callAll(const std::function<void()>& first, const std::function<void()>& second,

@@ -21,6 +21,8 @@ namespace margelo::nitro::test { enum class Powertrain; }
 namespace margelo::nitro::test { enum class OldEnum; }
 // Forward declaration of `Person` to properly resolve imports.
 namespace margelo::nitro::test { struct Person; }
+// Forward declaration of `PartialPerson` to properly resolve imports.
+namespace margelo::nitro::test { struct PartialPerson; }
 // Forward declaration of `Car` to properly resolve imports.
 namespace margelo::nitro::test { struct Car; }
 // Forward declaration of `MapWrapper` to properly resolve imports.
@@ -54,6 +56,7 @@ namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpec; }
 #include <functional>
 #include <variant>
 #include "Person.hpp"
+#include "PartialPerson.hpp"
 #include "Car.hpp"
 #include <NitroModules/AnyMap.hpp>
 #include <unordered_map>
@@ -138,12 +141,15 @@ namespace margelo::nitro::test {
       virtual std::vector<std::string> bounceStrings(const std::vector<std::string>& array) = 0;
       virtual std::vector<double> bounceNumbers(const std::vector<double>& array) = 0;
       virtual std::vector<Person> bounceStructs(const std::vector<Person>& array) = 0;
+      virtual PartialPerson bouncePartialStruct(const PartialPerson& person) = 0;
       virtual std::string sumUpAllPassengers(const std::vector<Car>& cars) = 0;
       virtual std::vector<Powertrain> bounceEnums(const std::vector<Powertrain>& array) = 0;
       virtual void complexEnumCallback(const std::vector<Powertrain>& array, const std::function<void(const std::vector<Powertrain>& /* array */)>& callback) = 0;
       virtual std::shared_ptr<AnyMap> createMap() = 0;
       virtual std::shared_ptr<AnyMap> mapRoundtrip(const std::shared_ptr<AnyMap>& map) = 0;
       virtual std::vector<std::string> getMapKeys(const std::shared_ptr<AnyMap>& map) = 0;
+      virtual std::shared_ptr<AnyMap> mergeMaps(const std::shared_ptr<AnyMap>& a, const std::shared_ptr<AnyMap>& b) = 0;
+      virtual std::shared_ptr<AnyMap> copyAnyValues(const std::shared_ptr<AnyMap>& map) = 0;
       virtual std::unordered_map<std::string, std::variant<bool, double>> bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map) = 0;
       virtual std::unordered_map<std::string, std::string> extractMap(const MapWrapper& mapWrapper) = 0;
       virtual double funcThatThrows() = 0;
@@ -161,6 +167,7 @@ namespace margelo::nitro::test {
       virtual std::shared_ptr<Promise<void>> promiseThrows() = 0;
       virtual std::shared_ptr<Promise<double>> promiseReturnsInstantly() = 0;
       virtual std::shared_ptr<Promise<double>> promiseReturnsInstantlyAsync() = 0;
+      virtual std::shared_ptr<Promise<void>> promiseThatResolvesVoidInstantly() = 0;
       virtual std::shared_ptr<Promise<double>> awaitAndGetPromise(const std::shared_ptr<Promise<double>>& promise) = 0;
       virtual std::shared_ptr<Promise<Car>> awaitAndGetComplexPromise(const std::shared_ptr<Promise<Car>>& promise) = 0;
       virtual std::shared_ptr<Promise<void>> awaitPromise(const std::shared_ptr<Promise<void>>& promise) = 0;

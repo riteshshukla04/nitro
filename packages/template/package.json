@@ -34,7 +34,7 @@
     "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "lint-ci": "eslint \"**/*.{js,ts,tsx}\" -f @jamesacarr/github-actions",
     "typescript": "tsc",
-    "specs": "typescript && nitrogen --logLevel=\"debug\""
+    "specs": "tsc --noEmit false && nitrogen --logLevel=\"debug\""
   },
   "keywords": [
     "react-native",
@@ -55,7 +55,6 @@
   },
   "devDependencies": {
     "@react-native/eslint-config": "0.82.0",
-    "@types/jest": "^29.5.12",
     "@types/react": "^19.1.03",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",

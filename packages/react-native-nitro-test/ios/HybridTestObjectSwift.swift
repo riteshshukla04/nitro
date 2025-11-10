@@ -143,6 +143,10 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     return array
   }
 
+  func bouncePartialStruct(person: PartialPerson) throws -> PartialPerson {
+    return person
+  }
+
   func sumUpAllPassengers(cars: [Car]) throws -> String {
     let passengers = cars.flatMap { car in car.passengers }
     let stringified = passengers.map { passenger in
@@ -195,6 +199,16 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
 
   func getMapKeys(map: AnyMap) throws -> [String] {
     return map.getAllKeys()
+  }
+
+  func mergeMaps(a: AnyMap, b: AnyMap) throws -> AnyMap {
+    a.merge(other: b)
+    return a
+  }
+
+  func copyAnyValues(map: AnyMap) throws -> AnyMap {
+    let dictionary = map.toDictionary()
+    return try AnyMap.fromDictionary(dictionary)
   }
 
   func newTestObject() throws -> any HybridTestObjectSwiftKotlinSpec {
@@ -340,6 +354,10 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     return Promise.async {
       return 55.0
     }
+  }
+
+  func promiseThatResolvesVoidInstantly() throws -> Promise<Void> {
+    return Promise.resolved()
   }
 
   func awaitAndGetPromise(promise: Promise<Double>) throws -> Promise<Double> {

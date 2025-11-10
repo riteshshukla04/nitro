@@ -10,6 +10,7 @@ import {
   WeirdNumbersEnum,
   CustomString,
   Base,
+  HybridPlatformObject,
 } from 'react-native-nitro-test'
 import type { State } from './Testers'
 import { it } from './Testers'
@@ -422,6 +423,26 @@ export function getTests(
           { age: 5, name: 'Ben' },
         ])
     ),
+    createTest('bouncePartialStruct(...) empty equals', () =>
+      it(() =>
+        testObject.bouncePartialStruct({ name: undefined, age: undefined })
+      )
+        .didNotThrow()
+        .didReturn('object')
+        .equals({ name: undefined, age: undefined })
+    ),
+    createTest('bouncePartialStruct(...) with 1 key equals', () =>
+      it(() => testObject.bouncePartialStruct({ name: 'Marc', age: undefined }))
+        .didNotThrow()
+        .didReturn('object')
+        .equals({ name: 'Marc', age: undefined })
+    ),
+    createTest('bouncePartialStruct(...) with all keys equals', () =>
+      it(() => testObject.bouncePartialStruct({ name: 'Marc', age: 25 }))
+        .didNotThrow()
+        .didReturn('object')
+        .equals({ name: 'Marc', age: 25 })
+    ),
     createTest('sumUpAllPassengers(...) equals', () =>
       it(() => testObject.sumUpAllPassengers([TEST_CAR, TEST_CAR_2]))
         .didNotThrow()
@@ -565,6 +586,16 @@ export function getTests(
         .didNotThrow()
         .equals(targetKeys)
     }),
+    createTest('mergeMaps(...) works', () =>
+      it(() => testObject.mergeMaps(TEST_MAP, TEST_MAP_2))
+        .didNotThrow()
+        .equals({ ...TEST_MAP, ...TEST_MAP_2 })
+    ),
+    createTest('copyAnyValues(...) works', () =>
+      it(() => testObject.copyAnyValues(TEST_MAP))
+        .didNotThrow()
+        .equals(TEST_MAP)
+    ),
 
     // Test errors
     createTest('funcThatThrows() throws', () =>
@@ -998,6 +1029,31 @@ export function getTests(
           // Swift/Kotlin Test Object does not have CustomTypes!
         ]),
 
+    // AnyHybridObject test
+    ...('bounceAnyHybrid' in testObject
+      ? [
+          createTest('bounceAnyHybrid(...) works', () =>
+            it(() => testObject.bounceAnyHybrid(HybridSomeExternalObject))
+              .didNotThrow()
+              .equals(HybridSomeExternalObject)
+          ),
+          createTest(
+            'bounceAnyHybrid(...) different object does not equal',
+            () =>
+              it(() => {
+                const external = testObject.bounceAnyHybrid(
+                  HybridSomeExternalObject
+                )
+                return external.equals(testObject)
+              })
+                .didNotThrow()
+                .equals(false)
+          ),
+        ]
+      : [
+          // Swift/Kotlin Test Object does not have CustomTypes!
+        ]),
+
     createTest('bounceMap(map) === map', () =>
       it(() => testObject.bounceMap(TEST_MAP))
         .didNotThrow()
@@ -1044,6 +1100,11 @@ export function getTests(
       (await it(() => testObject.promiseReturnsInstantlyAsync()))
         .didNotThrow()
         .equals(55)
+    ),
+    createTest('promiseThatResolvesVoidInstantly() works', async () =>
+      (await it(() => testObject.promiseThatResolvesVoidInstantly()))
+        .didNotThrow()
+        .didReturn('undefined')
     ),
     createTest('twoPromises can run in parallel', async () =>
       (
@@ -1764,6 +1825,11 @@ export function getTests(
       )
         .didNotThrow()
         .equals(true)
+    ),
+    createTest('PlatformObject getOSVersion() returns a string', () =>
+      it(() => HybridPlatformObject.getOSVersion())
+        .didNotThrow()
+        .didReturn('string')
     ),
     createTest('NitroModules.updateMemorySize(obj) works (roundtrip)', () =>
       it(() => {

@@ -175,6 +175,10 @@ abstract class HybridTestObjectSwiftKotlinSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
+  abstract fun bouncePartialStruct(person: PartialPerson): PartialPerson
+  
+  @DoNotStrip
+  @Keep
   abstract fun sumUpAllPassengers(cars: Array<Car>): String
   
   @DoNotStrip
@@ -201,6 +205,14 @@ abstract class HybridTestObjectSwiftKotlinSpec: HybridObject() {
   @DoNotStrip
   @Keep
   abstract fun getMapKeys(map: AnyMap): Array<String>
+  
+  @DoNotStrip
+  @Keep
+  abstract fun mergeMaps(a: AnyMap, b: AnyMap): AnyMap
+  
+  @DoNotStrip
+  @Keep
+  abstract fun copyAnyValues(map: AnyMap): AnyMap
   
   @DoNotStrip
   @Keep
@@ -269,6 +281,10 @@ abstract class HybridTestObjectSwiftKotlinSpec: HybridObject() {
   @DoNotStrip
   @Keep
   abstract fun promiseReturnsInstantlyAsync(): Promise<Double>
+  
+  @DoNotStrip
+  @Keep
+  abstract fun promiseThatResolvesVoidInstantly(): Promise<Unit>
   
   @DoNotStrip
   @Keep

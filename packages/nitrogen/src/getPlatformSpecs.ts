@@ -54,30 +54,27 @@ function getPlatformSpec(typeName: string, platformSpecs: Type): PlatformSpec {
     // Property name (ios, android)
     const platform = property.getName()
     if (!isValidPlatform(platform)) {
-      console.warn(
-        `    ⚠️   ${typeName} does not properly extend HybridObject<T> - "${platform}" is not a valid Platform! ` +
+      throw new Error(
+        `${typeName} does not properly extend HybridObject<T> - "${platform}" is not a valid Platform! ` +
           `Valid platforms are: [${allPlatforms.join(', ')}]`
       )
-      continue
     }
 
     // Value (swift, kotlin, c++)
     const language = getLiteralValue(property)
     if (!isValidLanguage(language)) {
-      console.warn(
-        `    ⚠️   ${typeName}: Language ${language} is not a valid language for ${platform}! ` +
+      throw new Error(
+        `${typeName}: Language ${language} is not a valid language for ${platform}! ` +
           `Valid languages are: [${platformLanguages[platform].join(', ')}]`
       )
-      continue
     }
 
     // Double-check that language works on this platform (android: kotlin/c++, ios: swift/c++)
     if (!isValidLanguageForPlatform(language, platform)) {
-      console.warn(
-        `    ⚠️   ${typeName}: Language ${language} is not a valid language for ${platform}! ` +
+      throw new Error(
+        `${typeName}: Language ${language} is not a valid language for ${platform}! ` +
           `Valid languages are: [${platformLanguages[platform].join(', ')}]`
       )
-      continue
     }
 
     // @ts-expect-error because TypeScript isn't smart enough yet to correctly cast after the `isValidLanguageForPlatform` check.
@@ -113,6 +110,10 @@ function extendsType(type: Type, name: string, recursive: boolean): boolean {
 
 export function isDirectlyHybridObject(type: Type): boolean {
   return isDirectlyType(type, 'HybridObject')
+}
+
+export function isDirectlyAnyHybridObject(type: Type): boolean {
+  return isDirectlyType(type, 'AnyHybridObject')
 }
 
 export function extendsHybridObject(type: Type, recursive: boolean): boolean {
@@ -154,7 +155,7 @@ export function isAnyHybridSubclass(type: Type): boolean {
  */
 export function getHybridObjectPlatforms(
   declaration: InterfaceDeclaration | TypeAliasDeclaration
-): PlatformSpec | undefined {
+): PlatformSpec {
   const base = getBaseTypes(declaration.getType()).find((t) =>
     isDirectlyHybridObject(t)
   )
@@ -167,9 +168,15 @@ export function getHybridObjectPlatforms(
 
   const genericArguments = base.getTypeArguments()
   const platformSpecsArgument = genericArguments[0]
-  if (platformSpecsArgument == null) {
-    // it uses `HybridObject` without generic arguments. This defaults to C++
-    return { android: 'c++', ios: 'c++' }
+  if (
+    platformSpecsArgument == null ||
+    platformSpecsArgument.getProperties().length === 0
+  ) {
+    // it uses `HybridObject` without generic arguments. We throw as we don't know what to generate.
+    throw new Error(
+      `HybridObject ${declaration.getName()} does not declare any platforms in the \`HybridObject\` type argument! ` +
+        `Pass at least one platform (and language) to \`interface ${declaration.getName()} extends HybridObject<{ ... }>\``
+    )
   }
 
   return getPlatformSpec(declaration.getName(), platformSpecsArgument)
@@ -177,7 +184,7 @@ export function getHybridObjectPlatforms(
 
 export function getHybridViewPlatforms(
   view: InterfaceDeclaration | TypeAliasDeclaration
-): PlatformSpec | undefined {
+): PlatformSpec {
   if (Node.isTypeAliasDeclaration(view)) {
     const hybridViewTypeNode = view.getTypeNode()
 
@@ -186,7 +193,9 @@ export function getHybridViewPlatforms(
       hybridViewTypeNode.getTypeName().getText() === 'HybridView'
 
     if (!isHybridViewType) {
-      return
+      throw new Error(
+        `${view.getName()} looks like a HybridView, but doesn't seem to alias HybridView<...>!`
+      )
     }
 
     const genericArguments = hybridViewTypeNode.getTypeArguments()

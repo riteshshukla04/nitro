@@ -116,7 +116,7 @@ On Android, you need to register the generated view manager in your React Native
 
 ```kotlin title="CameraPackage.kt"
 // ...
-public class CameraPackage: TurboReactPackage() {
+public class CameraPackage: BaseReactPackage() {
   // ...
 
   override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
@@ -162,7 +162,8 @@ For example, a custom `<ImageView>` component can be used to render custom `Imag
 <div className="side-by-side-block">
 
 ```ts title="Image.nitro.ts"
-export interface Image extends HybridObject {
+export interface Image
+  extends HybridObject<{ ios: 'swift' }> {
   readonly width: number
   readonly height: number
   save(): Promise<string>
@@ -174,7 +175,8 @@ export interface Image extends HybridObject {
 
 ```ts title="ImageView.nitro.ts"
 import { type Image } from './Image.nitro.ts'
-export interface ImageProps extends HybridViewProps {
+export interface ImageProps
+  extends HybridViewProps {
   image: Image
 }
 export type ImageView = HybridView<ImageProps>
@@ -230,9 +232,9 @@ To batch prop changes, you can override `beforeUpdate()` and `afterUpdate()` in 
 ### Callbacks have to be wrapped
 
 Whereas Nitro allows passing JS functions to native code directly, React Native core doesn't allow that. Instead, functions are wrapped in an event listener registry, and a simple boolean is passed to the native side.
-Unfortunately React Native's renderer does not allow changing this behaviour, so functions cannot be passed directly to Nitro Views. As a workaround, Nitro requires you to wrap each function in an object, which bypasses React Native's conversion.
+Unfortunately React Native's renderer does not yet allow changing this behaviour, so functions cannot be passed directly to Nitro Views. As a workaround, Nitro requires you to wrap each function in an object, which bypasses React Native's conversion.
 
-To simplify this, React Native exposes the `callback(...)` method:
+To simplify this, Nitro exposes the `callback(...)` method:
 
 ```tsx
 export interface CameraProps extends HybridViewProps {
@@ -272,11 +274,9 @@ To call the function, you would need to get a reference to the `HybridObject` fi
 function App() {
   return (
     <Camera
-      hybridRef={{
-        f: (ref) => {
-          const image = ref.takePhoto()
-        }
-      }}
+      hybridRef={callback((ref) => {
+        const image = ref.takePhoto()
+      })}
     />
   )
 }

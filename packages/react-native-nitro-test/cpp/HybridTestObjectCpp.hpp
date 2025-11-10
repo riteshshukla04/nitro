@@ -86,11 +86,14 @@ public:
   double addNumbers(double a, double b) override;
   std::string addStrings(const std::string& a, const std::string& b) override;
   void simpleFunc() override;
+  std::shared_ptr<HybridObject> bounceAnyHybrid(const std::shared_ptr<HybridObject>& object) override;
   CustomString bounceCustomType(CustomString value) override;
   void multipleArguments(double num, const std::string& str, bool boo) override;
   std::shared_ptr<AnyMap> createMap() override;
   std::shared_ptr<AnyMap> mapRoundtrip(const std::shared_ptr<AnyMap>& map) override;
   std::vector<std::string> getMapKeys(const std::shared_ptr<AnyMap>& map) override;
+  std::shared_ptr<AnyMap> mergeMaps(const std::shared_ptr<AnyMap>& a, const std::shared_ptr<AnyMap>& b) override;
+  std::shared_ptr<AnyMap> copyAnyValues(const std::shared_ptr<AnyMap>& map) override;
   double funcThatThrows() override;
   std::shared_ptr<Promise<void>> funcThatThrowsBeforePromise() override;
   void throwError(const std::exception_ptr& error) override;
@@ -106,6 +109,7 @@ public:
   std::vector<std::string> bounceStrings(const std::vector<std::string>& array) override;
   std::vector<double> bounceNumbers(const std::vector<double>& array) override;
   std::vector<Person> bounceStructs(const std::vector<Person>& array) override;
+  PartialPerson bouncePartialStruct(const PartialPerson& person) override;
   std::string sumUpAllPassengers(const std::vector<Car>& cars) override;
   std::vector<Powertrain> bounceEnums(const std::vector<Powertrain>& array) override;
   void complexEnumCallback(const std::vector<Powertrain>& array,
@@ -150,6 +154,7 @@ public:
   std::shared_ptr<Promise<void>> promiseThrows() override;
   std::shared_ptr<Promise<double>> promiseReturnsInstantly() override;
   std::shared_ptr<Promise<double>> promiseReturnsInstantlyAsync() override;
+  std::shared_ptr<Promise<void>> promiseThatResolvesVoidInstantly() override;
   Car getCar() override;
   bool isCarElectric(const Car& car) override;
   std::optional<Person> getDriver(const Car& car) override;

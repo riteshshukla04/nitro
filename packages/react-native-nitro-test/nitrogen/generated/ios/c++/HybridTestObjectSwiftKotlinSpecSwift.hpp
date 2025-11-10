@@ -20,6 +20,8 @@ namespace margelo::nitro::test { enum class Powertrain; }
 namespace margelo::nitro::test { enum class OldEnum; }
 // Forward declaration of `Person` to properly resolve imports.
 namespace margelo::nitro::test { struct Person; }
+// Forward declaration of `PartialPerson` to properly resolve imports.
+namespace margelo::nitro::test { struct PartialPerson; }
 // Forward declaration of `Car` to properly resolve imports.
 namespace margelo::nitro::test { struct Car; }
 // Forward declaration of `MapWrapper` to properly resolve imports.
@@ -57,6 +59,7 @@ namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpec; }
 #include <functional>
 #include <variant>
 #include "Person.hpp"
+#include "PartialPerson.hpp"
 #include "Car.hpp"
 #include <NitroModules/AnyMap.hpp>
 #include <unordered_map>
@@ -280,6 +283,14 @@ namespace margelo::nitro::test {
       auto __value = std::move(__result.value());
       return __value;
     }
+    inline PartialPerson bouncePartialStruct(const PartialPerson& person) override {
+      auto __result = _swiftPart.bouncePartialStruct(std::forward<decltype(person)>(person));
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
     inline std::string sumUpAllPassengers(const std::vector<Car>& cars) override {
       auto __result = _swiftPart.sumUpAllPassengers(cars);
       if (__result.hasError()) [[unlikely]] {
@@ -320,6 +331,22 @@ namespace margelo::nitro::test {
     }
     inline std::vector<std::string> getMapKeys(const std::shared_ptr<AnyMap>& map) override {
       auto __result = _swiftPart.getMapKeys(map);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<AnyMap> mergeMaps(const std::shared_ptr<AnyMap>& a, const std::shared_ptr<AnyMap>& b) override {
+      auto __result = _swiftPart.mergeMaps(a, b);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<AnyMap> copyAnyValues(const std::shared_ptr<AnyMap>& map) override {
+      auto __result = _swiftPart.copyAnyValues(map);
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }
@@ -454,6 +481,14 @@ namespace margelo::nitro::test {
     }
     inline std::shared_ptr<Promise<double>> promiseReturnsInstantlyAsync() override {
       auto __result = _swiftPart.promiseReturnsInstantlyAsync();
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<Promise<void>> promiseThatResolvesVoidInstantly() override {
+      auto __result = _swiftPart.promiseThatResolvesVoidInstantly();
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }

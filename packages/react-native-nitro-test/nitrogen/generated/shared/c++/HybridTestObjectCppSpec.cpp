@@ -48,6 +48,7 @@ namespace margelo::nitro::test {
       prototype.registerHybridMethod("passTuple", &HybridTestObjectCppSpec::passTuple);
       prototype.registerHybridMethod("newTestObject", &HybridTestObjectCppSpec::newTestObject);
       prototype.registerHybridMethod("getVariantHybrid", &HybridTestObjectCppSpec::getVariantHybrid);
+      prototype.registerHybridMethod("bounceAnyHybrid", &HybridTestObjectCppSpec::bounceAnyHybrid);
       prototype.registerHybridMethod("bounceCustomType", &HybridTestObjectCppSpec::bounceCustomType);
       prototype.registerHybridMethod("simpleFunc", &HybridTestObjectCppSpec::simpleFunc);
       prototype.registerHybridMethod("addNumbers", &HybridTestObjectCppSpec::addNumbers);
@@ -56,12 +57,15 @@ namespace margelo::nitro::test {
       prototype.registerHybridMethod("bounceStrings", &HybridTestObjectCppSpec::bounceStrings);
       prototype.registerHybridMethod("bounceNumbers", &HybridTestObjectCppSpec::bounceNumbers);
       prototype.registerHybridMethod("bounceStructs", &HybridTestObjectCppSpec::bounceStructs);
+      prototype.registerHybridMethod("bouncePartialStruct", &HybridTestObjectCppSpec::bouncePartialStruct);
       prototype.registerHybridMethod("sumUpAllPassengers", &HybridTestObjectCppSpec::sumUpAllPassengers);
       prototype.registerHybridMethod("bounceEnums", &HybridTestObjectCppSpec::bounceEnums);
       prototype.registerHybridMethod("complexEnumCallback", &HybridTestObjectCppSpec::complexEnumCallback);
       prototype.registerHybridMethod("createMap", &HybridTestObjectCppSpec::createMap);
       prototype.registerHybridMethod("mapRoundtrip", &HybridTestObjectCppSpec::mapRoundtrip);
       prototype.registerHybridMethod("getMapKeys", &HybridTestObjectCppSpec::getMapKeys);
+      prototype.registerHybridMethod("mergeMaps", &HybridTestObjectCppSpec::mergeMaps);
+      prototype.registerHybridMethod("copyAnyValues", &HybridTestObjectCppSpec::copyAnyValues);
       prototype.registerHybridMethod("bounceMap", &HybridTestObjectCppSpec::bounceMap);
       prototype.registerHybridMethod("extractMap", &HybridTestObjectCppSpec::extractMap);
       prototype.registerHybridMethod("funcThatThrows", &HybridTestObjectCppSpec::funcThatThrows);
@@ -79,6 +83,7 @@ namespace margelo::nitro::test {
       prototype.registerHybridMethod("promiseThrows", &HybridTestObjectCppSpec::promiseThrows);
       prototype.registerHybridMethod("promiseReturnsInstantly", &HybridTestObjectCppSpec::promiseReturnsInstantly);
       prototype.registerHybridMethod("promiseReturnsInstantlyAsync", &HybridTestObjectCppSpec::promiseReturnsInstantlyAsync);
+      prototype.registerHybridMethod("promiseThatResolvesVoidInstantly", &HybridTestObjectCppSpec::promiseThatResolvesVoidInstantly);
       prototype.registerHybridMethod("awaitAndGetPromise", &HybridTestObjectCppSpec::awaitAndGetPromise);
       prototype.registerHybridMethod("awaitAndGetComplexPromise", &HybridTestObjectCppSpec::awaitAndGetComplexPromise);
       prototype.registerHybridMethod("awaitPromise", &HybridTestObjectCppSpec::awaitPromise);

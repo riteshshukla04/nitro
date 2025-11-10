@@ -89,12 +89,15 @@ namespace margelo::nitro::test {
     std::vector<std::string> bounceStrings(const std::vector<std::string>& array) override;
     std::vector<double> bounceNumbers(const std::vector<double>& array) override;
     std::vector<Person> bounceStructs(const std::vector<Person>& array) override;
+    PartialPerson bouncePartialStruct(const PartialPerson& person) override;
     std::string sumUpAllPassengers(const std::vector<Car>& cars) override;
     std::vector<Powertrain> bounceEnums(const std::vector<Powertrain>& array) override;
     void complexEnumCallback(const std::vector<Powertrain>& array, const std::function<void(const std::vector<Powertrain>& /* array */)>& callback) override;
     std::shared_ptr<AnyMap> createMap() override;
     std::shared_ptr<AnyMap> mapRoundtrip(const std::shared_ptr<AnyMap>& map) override;
     std::vector<std::string> getMapKeys(const std::shared_ptr<AnyMap>& map) override;
+    std::shared_ptr<AnyMap> mergeMaps(const std::shared_ptr<AnyMap>& a, const std::shared_ptr<AnyMap>& b) override;
+    std::shared_ptr<AnyMap> copyAnyValues(const std::shared_ptr<AnyMap>& map) override;
     std::unordered_map<std::string, std::variant<bool, double>> bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map) override;
     std::unordered_map<std::string, std::string> extractMap(const MapWrapper& mapWrapper) override;
     double funcThatThrows() override;
@@ -112,6 +115,7 @@ namespace margelo::nitro::test {
     std::shared_ptr<Promise<void>> promiseThrows() override;
     std::shared_ptr<Promise<double>> promiseReturnsInstantly() override;
     std::shared_ptr<Promise<double>> promiseReturnsInstantlyAsync() override;
+    std::shared_ptr<Promise<void>> promiseThatResolvesVoidInstantly() override;
     std::shared_ptr<Promise<double>> awaitAndGetPromise(const std::shared_ptr<Promise<double>>& promise) override;
     std::shared_ptr<Promise<Car>> awaitAndGetComplexPromise(const std::shared_ptr<Promise<Car>>& promise) override;
     std::shared_ptr<Promise<void>> awaitPromise(const std::shared_ptr<Promise<void>>& promise) override;

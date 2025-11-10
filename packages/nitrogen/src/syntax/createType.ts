@@ -22,11 +22,11 @@ import { MapType } from './types/MapType.js'
 import { TupleType } from './types/TupleType.js'
 import {
   isAnyHybridSubclass,
-  isDirectlyHybridObject,
+  isDirectlyAnyHybridObject,
   isHybridView,
   type Language,
 } from '../getPlatformSpecs.js'
-import { HybridObjectBaseType } from './types/HybridObjectBaseType.js'
+import { AnyHybridObjectType } from './types/AnyHybridObjectType.js'
 import { ErrorType } from './types/ErrorType.js'
 import { getBaseTypes, getHybridObjectNitroModuleConfig } from '../utils.js'
 import { DateType } from './types/DateType.js'
@@ -314,6 +314,9 @@ export function createType(
         const name = type.getAliasSymbol()?.getName()
         return new VariantType(variants, name)
       }
+    } else if (isDirectlyAnyHybridObject(type)) {
+      // It is a HybridObject directly/literally. Base type
+      return new AnyHybridObjectType()
     } else if (isAnyHybridSubclass(type)) {
       // It is another HybridObject being referenced!
       const typename = getHybridObjectName(type)
@@ -324,12 +327,12 @@ export function createType(
       const sourceConfig =
         getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
       return new HybridObjectType(typename, language, baseHybrids, sourceConfig)
-    } else if (isDirectlyHybridObject(type)) {
-      // It is a HybridObject directly/literally. Base type
-      return new HybridObjectBaseType()
     } else if (type.isInterface()) {
       // It is an `interface T { ... }`, which is a `struct`
-      const typename = type.getSymbolOrThrow().getName()
+      const symbol = type.getAliasSymbol() ?? type.getSymbol()
+      if (symbol == null)
+        throw new Error(`Interface "${type.getText()}" does not have a Symbol!`)
+      const typename = symbol.getName()
       const properties = getInterfaceProperties(language, type)
       return new StructType(typename, properties)
     } else if (type.isObject()) {
@@ -350,6 +353,10 @@ export function createType(
     } else if (type.isStringLiteral()) {
       throw new Error(
         `String literal ${type.getText()} cannot be represented in C++ because it is ambiguous between a string and a discriminating union enum.`
+      )
+    } else if (type.isAny()) {
+      throw new Error(
+        `The TypeScript type "${type.getText()}" resolved to any - any is not supported in Nitro.`
       )
     } else {
       if (type.getSymbol() == null) {
