@@ -15,6 +15,7 @@ import { useColors } from '../useColors'
 import { stringify } from '../utils'
 import { KeyboardDismissBackground } from '../components/KeyboardDismissBackground'
 
+
 const VIEWS_X = 15
 const VIEWS_Y = 15
 
@@ -22,9 +23,12 @@ const PRE_CODE = `
 const NitroModules = globalThis.NitroModulesProxy;
 `.trim()
 const DEFAULT_CODE = `
-const testObject = NitroModules.createHybridObject('TestObjectCpp')
+const testObject = NitroModules.createHybridObject('TestObjectRust')
 
-JSON.stringify(testObject)
+testObject.multiplyNumbers(2, 3)
+testObject.addNumbers(2, 3)
+testObject.reverseString('Margelo Team is Awesome')
+
 `.trim()
 
 export function EvalScreen() {

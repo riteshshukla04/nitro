@@ -16,6 +16,7 @@
 #include "HybridChildSpecSwift.hpp"
 #include "HybridPlatformObjectSpecSwift.hpp"
 #include "HybridTestViewSpecSwift.hpp"
+#include "HybridTestObjectRust.hpp"
 
 @interface NitroTestAutolinking : NSObject
 @end
@@ -68,6 +69,15 @@
     []() -> std::shared_ptr<HybridObject> {
       std::shared_ptr<HybridTestViewSpec> hybridObject = NitroTest::NitroTestAutolinking::createTestView();
       return hybridObject;
+    }
+  );
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "TestObjectRust",
+    []() -> std::shared_ptr<HybridObject> {
+      static_assert(std::is_default_constructible_v<HybridTestObjectRust>,
+                    "The HybridObject \"HybridTestObjectRust\" is not default-constructible! "
+                    "Create a public constructor that takes zero arguments to be able to autolink this HybridObject.");
+      return std::make_shared<HybridTestObjectRust>();
     }
   );
 }

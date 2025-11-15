@@ -13,6 +13,9 @@ function getMemberNamesOfBaseType(language: Language): string[] {
     case 'kotlin':
       // Kotlin/JVM classes always extends `Any`, which has 3 methods
       return ['toString', 'equals', 'hashCode']
+    case 'rust':
+      // Rust FFI functions don't have a base type
+      return []
   }
 }
 function getMemberNamesOfHybridObject(): string[] {

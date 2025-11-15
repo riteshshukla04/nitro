@@ -312,3 +312,10 @@ export interface TestObjectSwiftKotlin
     variant: TestObjectSwiftKotlin | Person
   ): TestObjectSwiftKotlin | Person
 }
+
+
+export interface TestObjectRust extends HybridObject<{ ios: 'rust'; android: 'rust' }> {
+   multiplyNumbers(a: number, b: number): number
+   addNumbers(a: number, b: number): number
+   reverseString(str: string): string
+}
