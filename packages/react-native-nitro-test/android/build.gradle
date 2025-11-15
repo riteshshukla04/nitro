@@ -147,16 +147,3 @@ if (isNewArchitectureEnabled()) {
     codegenJavaPackageName = "com.margelo.nitro.test"
   }
 }
-
-
-gradle.taskGraph.whenReady { taskGraph ->
-    println "🔥 Buidling Rust Module"
-    def scriptPath = new File(projectDir, 'scripts/rn-build-start.sh')
-    def process = ['sh', scriptPath.absolutePath].execute(null, projectDir)
-    process.in.eachLine { line -> println line }
-    process.err.eachLine { line -> System.err.println line }
-    process.waitFor()
-    if (process.exitValue() != 0) {
-        throw new GradleException("Rust build failed with exit code ${process.exitValue()}")
-    }
-}
