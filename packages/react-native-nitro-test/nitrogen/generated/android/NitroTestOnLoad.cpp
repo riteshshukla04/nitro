@@ -33,6 +33,7 @@
 #include "views/JHybridTestViewStateUpdater.hpp"
 #include "HybridTestObjectCpp.hpp"
 #include <NitroModules/DefaultConstructableObject.hpp>
+#include "cpp/HybridTestObjectRust.hpp"
 
 namespace margelo::nitro::test {
 
@@ -108,6 +109,15 @@ int initialize(JavaVM* vm) {
         static DefaultConstructableObject<JHybridTestViewSpec::javaobject> object("com/margelo/nitro/test/HybridTestView");
         auto instance = object.create();
         return instance->cthis()->shared();
+      }
+    );
+    HybridObjectRegistry::registerHybridObjectConstructor(
+      "TestObjectRust",
+      []() -> std::shared_ptr<HybridObject> {
+        static_assert(std::is_default_constructible_v<HybridTestObjectRust>,
+                      "The HybridObject \"HybridTestObjectRust\" is not default-constructible! "
+                      "Create a public constructor that takes zero arguments to be able to autolink this HybridObject.");
+        return std::make_shared<HybridTestObjectRust>();
       }
     );
   });

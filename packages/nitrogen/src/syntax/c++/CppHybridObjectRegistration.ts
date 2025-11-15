@@ -9,6 +9,10 @@ interface Props {
    * The name of the C++ class that will be default-constructed
    */
   cppClassName: string
+  /**
+   * Optional subdirectory path for the header file (e.g., 'cpp' for files in cpp/ subdirectory)
+   */
+  subdirectory?: string
 }
 
 interface CppHybridObjectRegistration {
@@ -19,10 +23,14 @@ interface CppHybridObjectRegistration {
 export function createCppHybridObjectRegistration({
   hybridObjectName,
   cppClassName,
+  subdirectory,
 }: Props): CppHybridObjectRegistration {
+  const importPath = subdirectory 
+    ? `${subdirectory}/${cppClassName}.hpp`
+    : `${cppClassName}.hpp`
   return {
     requiredImports: [
-      { name: `${cppClassName}.hpp`, language: 'c++', space: 'user' },
+      { name: importPath, language: 'c++', space: 'user' },
     ],
     cppCode: `
 HybridObjectRegistry::registerHybridObjectConstructor(

@@ -18,7 +18,7 @@ export function createAndroidAutolinking(
 ): AndroidAutolinking {
   const cmakeExtension = createCMakeExtension(allFiles)
   const gradleExtension = createGradleExtension()
-  const hybridObjectInitializer = createHybridObjectIntializer()
+  const hybridObjectInitializer = createHybridObjectIntializer(allFiles)
 
   return {
     platform: 'android',

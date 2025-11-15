@@ -1,0 +1,1 @@
+/Users/riteshshukla/Desktop/development/opensource/nitro/packages/react-native-nitro-test/rust/target/x86_64-linux-android/release/librust_module.so: /Users/riteshshukla/Desktop/development/opensource/nitro/packages/react-native-nitro-test/rust/src/lib.rs
