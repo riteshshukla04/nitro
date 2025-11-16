@@ -1,13 +1,16 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
 import { createFileMetadataString } from '../../syntax/helpers.js'
 import type { SourceFile } from '../../syntax/SourceFile.js'
+import { hasRustFiles, createRustGradleConfig } from './createRustBuildScript.js'
 
 export interface GradleFile extends Omit<SourceFile, 'language'> {
   language: 'gradle'
 }
 
-export function createGradleExtension(): GradleFile {
+export function createGradleExtension(allFiles: SourceFile[] = []): GradleFile {
   const name = NitroConfig.current.getAndroidCxxLibName()
+  const usesRust = hasRustFiles(allFiles)
+  const rustGradleConfig = usesRust ? createRustGradleConfig() : ''
 
   const code = `
 ${createFileMetadataString(`${name}+autolinking.gradle`)}
@@ -32,6 +35,8 @@ android {
     }
   }
 }
+
+${rustGradleConfig}
   `.trim()
   return {
     content: code,

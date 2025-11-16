@@ -6,7 +6,7 @@
  */
 export interface PlatformSpec {
   ios?: 'c++' | 'swift'
-  android?: 'c++' | 'kotlin'
+  android?: 'c++' | 'kotlin' | 'rust'
 }
 
 /**

@@ -11,7 +11,7 @@ import type { SourceFile, SourceImport } from '../../syntax/SourceFile.js'
 import { indent } from '../../utils.js'
 import { getBuildingWithGeneratedCmakeDefinition } from './createCMakeExtension.js'
 
-export function createHybridObjectIntializer(): SourceFile[] {
+export function createHybridObjectIntializer(allFiles: SourceFile[] = []): SourceFile[] {
   const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
   const cppLibName = NitroConfig.current.getAndroidCxxLibName()
   const javaNamespace = NitroConfig.current.getAndroidPackage('java/kotlin')
@@ -24,6 +24,17 @@ export function createHybridObjectIntializer(): SourceFile[] {
   const autolinkedHybridObjects =
     NitroConfig.current.getAutolinkedHybridObjects()
 
+  // Helper function to find the subdirectory of a generated header file
+  const findHeaderSubdirectory = (headerName: string): string | undefined => {
+    const file = allFiles.find(
+      (f) => f.name === headerName && f.language === 'c++' && f.platform === 'shared'
+    )
+    if (file && file.subdirectory.length > 0) {
+      return file.subdirectory.join('/')
+    }
+    return undefined
+  }
+
   const cppHybridObjectImports: SourceImport[] = []
   const cppRegistrations: string[] = []
   for (const hybridObjectName of Object.keys(autolinkedHybridObjects)) {
@@ -31,9 +42,14 @@ export function createHybridObjectIntializer(): SourceFile[] {
 
     if (config?.cpp != null) {
       // Autolink a C++ HybridObject!
+      // Check if the header file is in a subdirectory (e.g., Rust objects in cpp/)
+      const headerName = `${config.cpp}.hpp`
+      const subdirectory = findHeaderSubdirectory(headerName)
+      
       const { cppCode, requiredImports } = createCppHybridObjectRegistration({
         hybridObjectName: hybridObjectName,
         cppClassName: config.cpp,
+        subdirectory: subdirectory,
       })
       cppHybridObjectImports.push(...requiredImports)
       cppRegistrations.push(cppCode)
