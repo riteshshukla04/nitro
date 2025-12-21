@@ -104,6 +104,7 @@ public protocol HybridTestObjectSwiftKotlinSpec_protocol: HybridObject {
   func setAllValuesTo(buffer: ArrayBuffer, value: Double) throws -> Void
   func createArrayBufferAsync() throws -> Promise<ArrayBuffer>
   func bounceArrayBuffer(buffer: ArrayBuffer) throws -> ArrayBuffer
+  func msgpackRoundtrip(buffer: ArrayBuffer) throws -> ArrayBuffer
   func passVariant(either: Variant_Bool__Double___String__String_Double) throws -> Variant_String_Double
   func getVariantEnum(variant: Variant_Bool_OldEnum) throws -> Variant_Bool_OldEnum
   func getVariantWeirdNumbersEnum(variant: Variant_Bool_WeirdNumbersEnum) throws -> Variant_Bool_WeirdNumbersEnum

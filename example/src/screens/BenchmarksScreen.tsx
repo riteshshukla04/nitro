@@ -8,14 +8,13 @@ import {
   Text,
   Button,
   Platform,
-  Animated,
-  useWindowDimensions,
+  ScrollView,
 } from 'react-native'
 import { NitroModules } from 'react-native-nitro-modules'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useColors } from '../useColors'
-import { HybridTestObjectSwiftKotlin } from 'react-native-nitro-test'
-import { ExampleTurboModule } from '../turbo-module/ExampleTurboModule'
+import { encode, decode } from '@msgpack/msgpack'
+import type { TestObjectSwiftKotlin } from 'react-native-nitro-test'
 
 declare global {
   var gc: () => void
@@ -24,10 +23,14 @@ declare global {
   }
 }
 
-interface BenchmarksResult {
-  numberOfIterations: number
-  nitroExecutionTimeMs: number
-  turboExecutionTimeMs: number
+interface BenchmarkResult {
+  iterations: string[]
+  average: string
+  total: string
+  min: string
+  max: string
+  dataSize: string
+  method: 'msgpackRoundtrip' | 'copyAnyMap'
 }
 
 function delay(ms: number): Promise<void> {
@@ -35,162 +38,249 @@ function delay(ms: number): Promise<void> {
 }
 
 async function waitForGc(): Promise<void> {
-  gc()
+  if (typeof gc === 'function') {
+    gc()
+  }
   await delay(500)
 }
 
-interface BenchmarkableObject {
-  addNumbers(a: number, b: number): number
-}
-function benchmark(obj: BenchmarkableObject): number {
-  // warmup
-  obj.addNumbers(0, 3)
-
-  // run addNumbers(...) ITERATIONS amount of times
-  const start = performance.now()
-  let num = 0
-  for (let i = 0; i < ITERATIONS; i++) {
-    num = obj.addNumbers(num, 3)
+function createTestData(): Record<string, any> {
+  const jsonData: Record<string, any> = {}
+  for (let i = 0; i < 2000; i++) {
+    jsonData[`key${i}`] = {
+      id: i,
+      name: `Item ${i}`,
+      value: i * 2,
+      active: i % 2 === 0,
+      tags: [`tag${i}`, `category${i % 10}`],
+      metadata: {
+        created: Date.now() + i,
+        updated: Date.now() + i * 2,
+      },
+    }
   }
-  const end = performance.now()
-  return end - start
+  return jsonData
 }
 
-const ITERATIONS = 100_000
-async function runBenchmarks(): Promise<BenchmarksResult> {
-  console.log(`Running benchmarks ${ITERATIONS}x...`)
+const ITERATIONS = 10
+
+async function runMsgpackBenchmark(): Promise<BenchmarkResult> {
+  console.log(`Running msgpackRoundtrip benchmark ${ITERATIONS}x...`)
   await waitForGc()
 
-  const turboTime = benchmark(ExampleTurboModule)
-  const nitroTime = benchmark(HybridTestObjectSwiftKotlin)
+  const testObject = NitroModules.createHybridObject<TestObjectSwiftKotlin>(
+    'TestObjectSwiftKotlin'
+  )
+  const jsonData = createTestData()
+
+  const times: number[] = []
+  for (let i = 0; i < ITERATIONS; i++) {
+    const start = performance.now()
+    const msgpackBuffer = encode(jsonData)
+    const resultBuffer = testObject.msgpackRoundtrip(msgpackBuffer.buffer as ArrayBuffer)
+    const decoded = decode(new Uint8Array(resultBuffer))
+    const end = performance.now()
+    times.push(end - start)
+  }
+
+  const avg = times.reduce((a, b) => a + b, 0) / times.length
+  const total = times.reduce((a, b) => a + b, 0)
 
   console.log(
-    `Benchmarks finished! Nitro: ${nitroTime.toFixed(2)}ms | Turbo: ${turboTime.toFixed(2)}ms`
+    `msgpackRoundtrip finished! Average: ${avg.toFixed(2)}ms | Total: ${total.toFixed(2)}ms`
   )
+
   return {
-    nitroExecutionTimeMs: nitroTime,
-    turboExecutionTimeMs: turboTime,
-    numberOfIterations: ITERATIONS,
+    iterations: times.map((t, i) => `Run ${i + 1}: ${t.toFixed(2)}ms`),
+    average: `${avg.toFixed(2)}ms`,
+    total: `${total.toFixed(2)}ms`,
+    min: `${Math.min(...times).toFixed(2)}ms`,
+    max: `${Math.max(...times).toFixed(2)}ms`,
+    dataSize: '2000 keys with nested objects',
+    method: 'msgpackRoundtrip',
+  }
+}
+
+async function runCopyAnyMapBenchmark(): Promise<BenchmarkResult> {
+  console.log(`Running copyAnyMap benchmark ${ITERATIONS}x...`)
+  await waitForGc()
+
+  const testObject = NitroModules.createHybridObject<TestObjectSwiftKotlin>(
+    'TestObjectSwiftKotlin'
+  )
+  const jsonData = createTestData()
+
+  const anyMap = testObject.mapRoundtrip(jsonData)
+
+  const times: number[] = []
+  for (let i = 0; i < ITERATIONS; i++) {
+    const start = performance.now()
+    const copied = testObject.copyAnyMap(anyMap)
+    const end = performance.now()
+    times.push(end - start)
+  }
+
+  const avg = times.reduce((a, b) => a + b, 0) / times.length
+  const total = times.reduce((a, b) => a + b, 0)
+
+  console.log(
+    `copyAnyMap finished! Average: ${avg.toFixed(2)}ms | Total: ${total.toFixed(2)}ms`
+  )
+
+  return {
+    iterations: times.map((t, i) => `Run ${i + 1}: ${t.toFixed(2)}ms`),
+    average: `${avg.toFixed(2)}ms`,
+    total: `${total.toFixed(2)}ms`,
+    min: `${Math.min(...times).toFixed(2)}ms`,
+    max: `${Math.max(...times).toFixed(2)}ms`,
+    dataSize: '2000 keys with nested objects',
+    method: 'copyAnyMap',
   }
 }
 
 export function BenchmarksScreen() {
   const safeArea = useSafeAreaInsets()
   const colors = useColors()
-  const dimensions = useWindowDimensions()
   const [status, setStatus] = React.useState('📱 Idle')
-  const [results, setResults] = React.useState<BenchmarksResult>()
-  const nitroWidth = React.useRef(new Animated.Value(0)).current
-  const turboWidth = React.useRef(new Animated.Value(0)).current
+  const [msgpackResults, setMsgpackResults] = React.useState<BenchmarkResult>()
+  const [copyAnyMapResults, setCopyAnyMapResults] = React.useState<BenchmarkResult>()
 
-  const factor = React.useMemo(() => {
-    if (results == null) return 0
-    const f = results.turboExecutionTimeMs / results.nitroExecutionTimeMs
-    return Math.round(f * 10) / 10
-  }, [results])
+  const runMsgpack = async () => {
+    setStatus('⏳ Running msgpackRoundtrip...')
+    const r = await runMsgpackBenchmark()
+    setMsgpackResults(r)
+    setStatus('📱 Idle')
+  }
 
-  const run = async () => {
-    nitroWidth.setValue(0)
-    turboWidth.setValue(0)
-    setStatus(`⏳ Running Benchmarks`)
-    const r = await runBenchmarks()
-    setResults(r)
+  const runCopyAnyMap = async () => {
+    setStatus('⏳ Running copyAnyMap...')
+    const r = await runCopyAnyMapBenchmark()
+    setCopyAnyMapResults(r)
+    setStatus('📱 Idle')
+  }
 
-    const slowest = Math.max(r.nitroExecutionTimeMs, r.turboExecutionTimeMs)
-    const maxWidth = dimensions.width * 0.65
-    Animated.spring(turboWidth, {
-      toValue: (r.turboExecutionTimeMs / slowest) * maxWidth,
-      friction: 10,
-      tension: 40,
-      useNativeDriver: false,
-    }).start()
-    Animated.spring(nitroWidth, {
-      toValue: (r.nitroExecutionTimeMs / slowest) * maxWidth,
-      friction: 10,
-      tension: 40,
-      useNativeDriver: false,
-    }).start()
-    setStatus(`📱 Idle`)
+  const renderResults = (results: BenchmarkResult | undefined, title: string) => {
+    if (results == null) {
+      return null
+    }
+
+    return (
+      <View style={styles.benchmarkSection}>
+        <Text style={styles.benchmarkTitle}>{title}</Text>
+        <View style={styles.smallVSpacer} />
+
+        <View style={styles.resultRow}>
+          <Text style={styles.resultLabel}>Average:</Text>
+          <Text style={styles.resultValue}>{results.average}</Text>
+        </View>
+
+        <View style={styles.resultRow}>
+          <Text style={styles.resultLabel}>Total:</Text>
+          <Text style={styles.resultValue}>{results.total}</Text>
+        </View>
+
+        <View style={styles.resultRow}>
+          <Text style={styles.resultLabel}>Min:</Text>
+          <Text style={styles.resultValue}>{results.min}</Text>
+        </View>
+
+        <View style={styles.resultRow}>
+          <Text style={styles.resultLabel}>Max:</Text>
+          <Text style={styles.resultValue}>{results.max}</Text>
+        </View>
+
+        <View style={styles.mediumVSpacer} />
+
+        <Text style={styles.sectionTitle}>Individual Runs</Text>
+        <View style={styles.smallVSpacer} />
+        {results.iterations.map((iteration, index) => (
+          <Text key={index} style={styles.iterationText}>
+            {iteration}
+          </Text>
+        ))}
+      </View>
+    )
   }
 
   return (
     <View style={[styles.container, { paddingTop: safeArea.top }]}>
-      <Text style={styles.header}>Benchmarks</Text>
+      <Text style={styles.header}>Benchmark Comparison</Text>
       <View style={styles.topControls}>
         <View style={styles.flex} />
         <Text style={styles.buildTypeText}>{NitroModules.buildType}</Text>
       </View>
 
-      <View style={styles.resultContainer}>
-        {results != null ? (
-          <View style={styles.chartsContainer}>
-            <Text style={styles.text}>
-              Calling <Text style={styles.bold}>addNumbers(...)</Text>{' '}
-              <Text style={styles.bold}>{ITERATIONS}</Text>x:
-            </Text>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {msgpackResults != null || copyAnyMapResults != null ? (
+          <View style={styles.resultsContainer}>
+            {renderResults(msgpackResults, 'msgpackRoundtrip')}
+            
+            {msgpackResults != null && copyAnyMapResults != null && (
+              <>
+                <View style={styles.largeVSpacer} />
+                <View style={styles.comparisonSection}>
+                  <Text style={styles.sectionTitle}>Comparison</Text>
+                  <View style={styles.smallVSpacer} />
+                  <View style={styles.resultRow}>
+                    <Text style={styles.resultLabel}>msgpackRoundtrip Avg:</Text>
+                    <Text style={styles.resultValue}>{msgpackResults.average}</Text>
+                  </View>
+                  <View style={styles.resultRow}>
+                    <Text style={styles.resultLabel}>copyAnyMap Avg:</Text>
+                    <Text style={styles.resultValue}>{copyAnyMapResults.average}</Text>
+                  </View>
+                  <View style={styles.mediumVSpacer} />
+                  <Text style={styles.dataSizeText}>
+                    {parseFloat(msgpackResults.average) < parseFloat(copyAnyMapResults.average)
+                      ? 'msgpackRoundtrip is faster'
+                      : 'copyAnyMap is faster'}
+                  </Text>
+                </View>
+              </>
+            )}
+
+            {renderResults(copyAnyMapResults, 'copyAnyMap')}
+
             <View style={styles.largeVSpacer} />
-
-            <View style={styles.turboResults}>
-              <Text style={styles.title}>Turbo Modules</Text>
-              <View style={styles.smallVSpacer} />
-              <Animated.View
-                style={[
-                  styles.chart,
-                  {
-                    backgroundColor: colors.card,
-                    opacity: 0.4,
-                    width: turboWidth,
-                  },
-                ]}
-              />
-              <View style={styles.smallVSpacer} />
-              <Text style={styles.text}>
-                Time:{' '}
-                <Text style={styles.bold}>
-                  {results.turboExecutionTimeMs.toFixed(2)}ms
-                </Text>
-              </Text>
-            </View>
-
-            <View style={styles.largeVSpacer} />
-
-            <View style={styles.nitroResults}>
-              <Text style={styles.title}>Nitro Modules</Text>
-              <View style={styles.smallVSpacer} />
-              <Animated.View
-                style={[
-                  styles.chart,
-                  {
-                    backgroundColor: colors.card,
-                    width: nitroWidth,
-                  },
-                ]}
-              />
-              <View style={styles.smallVSpacer} />
-              <Text style={styles.text}>
-                Time:{' '}
-                <Text style={styles.bold}>
-                  {results.nitroExecutionTimeMs.toFixed(2)}ms
-                </Text>
-                {'      '}(<Text style={styles.bold}>{factor}x</Text>{' '}
-                {factor > 1 ? 'faster' : 'slower'}!)
-              </Text>
-            </View>
+            <Text style={styles.sectionTitle}>Test Data</Text>
+            <View style={styles.smallVSpacer} />
+            <Text style={styles.dataSizeText}>2000 keys with nested objects</Text>
+            <Text style={styles.dataSizeText}>Iterations: {ITERATIONS}</Text>
           </View>
         ) : (
-          <Text numberOfLines={5} style={styles.text}>
-            Press <Text style={styles.bold}>Run</Text> to call{' '}
-            <Text style={styles.bold}>addNumbers(...)</Text> {ITERATIONS} times.
-          </Text>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+              Press <Text style={styles.bold}>Run</Text> buttons to benchmark each method.
+            </Text>
+            <View style={styles.largeVSpacer} />
+            <Text style={styles.emptySubtext}>
+              <Text style={styles.bold}>msgpackRoundtrip:</Text>
+              {'\n'}1. Create JSON with 2000 keys
+              {'\n'}2. Encode to MessagePack
+              {'\n'}3. Roundtrip through native (Kotlin)
+              {'\n'}4. Decode back to JSON
+              {'\n\n'}
+              <Text style={styles.bold}>copyAnyMap:</Text>
+              {'\n'}1. Create JSON with 2000 keys
+              {'\n'}2. Convert to AnyMap
+              {'\n'}3. Copy AnyMap through native
+            </Text>
+          </View>
         )}
-      </View>
+      </ScrollView>
 
       <View style={[styles.bottomView, { backgroundColor: colors.background }]}>
         <Text style={styles.resultText} numberOfLines={2}>
           {status}
         </Text>
-        <View style={styles.flex} />
-        <Button title="Run" onPress={run} />
+        <View style={styles.buttonContainer}>
+          <Button title="Run msgpack" onPress={runMsgpack} />
+          <View style={styles.buttonSpacer} />
+          <Button title="Run copyAnyMap" onPress={runCopyAnyMap} />
+        </View>
       </View>
     </View>
   )
@@ -206,7 +296,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContent: {},
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 15,
+    paddingBottom: 20,
+  },
   topControls: {
     marginHorizontal: 15,
     marginBottom: 10,
@@ -221,70 +317,105 @@ const styles = StyleSheet.create({
     }),
     fontWeight: 'bold',
   },
-  segmentedControl: {
-    minWidth: 180,
+  resultsContainer: {
+    marginTop: 20,
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+  benchmarkSection: {
+    marginBottom: 30,
+    paddingBottom: 20,
+    borderBottomWidth: 2,
+    borderBottomColor: '#444',
   },
-  testCase: {
-    width: '100%',
-    paddingHorizontal: 15,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingVertical: 10,
+  benchmarkTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    marginBottom: 10,
+  },
+  comparisonSection: {
+    backgroundColor: '#1a1a1a',
+    padding: 15,
+    borderRadius: 8,
+    marginVertical: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  buttonContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  testBox: {
-    flexShrink: 1,
-    flexDirection: 'column',
+  buttonSpacer: {
+    width: 10,
   },
-  resultText: {
-    flexShrink: 1,
+  mediumVSpacer: {
+    height: 15,
   },
-  testName: {
+  resultRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#333',
+  },
+  resultLabel: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
-  testStatus: {
+  resultValue: {
+    fontSize: 16,
+    fontFamily: Platform.select({
+      ios: 'Menlo',
+      macos: 'Menlo',
+      android: 'monospace',
+    }),
+  },
+  iterationText: {
     fontSize: 14,
-    flex: 1,
+    fontFamily: Platform.select({
+      ios: 'Menlo',
+      macos: 'Menlo',
+      android: 'monospace',
+    }),
+    paddingVertical: 4,
   },
-  smallVSpacer: {
-    height: 5,
+  dataSizeText: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 4,
   },
-  largeVSpacer: {
-    height: 25,
-  },
-  resultContainer: {
+  emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 45,
-    marginHorizontal: 30,
+    paddingVertical: 40,
   },
-  chartsContainer: {
-    alignItems: 'stretch',
-  },
-  nitroResults: {},
-  turboResults: {},
-  title: {
-    fontWeight: 'bold',
-    fontSize: 25,
-  },
-  chart: {
-    height: 20,
-    borderRadius: 5,
-  },
-  text: {
+  emptyText: {
     fontSize: 16,
+    textAlign: 'center',
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  smallVSpacer: {
+    height: 10,
+  },
+  largeVSpacer: {
+    height: 25,
   },
   bold: {
     fontWeight: 'bold',
   },
   flex: { flex: 1 },
+  resultText: {
+    flexShrink: 1,
+  },
   bottomView: {
     borderTopRightRadius: 15,
     borderTopLeftRadius: 15,

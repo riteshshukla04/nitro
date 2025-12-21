@@ -610,6 +610,10 @@ std::shared_ptr<ArrayBuffer> HybridTestObjectCpp::bounceArrayBuffer(const std::s
   return buffer;
 }
 
+std::shared_ptr<ArrayBuffer> HybridTestObjectCpp::msgpackRoundtrip(const std::shared_ptr<ArrayBuffer>& buffer) {
+  return buffer;
+}
+
 double HybridTestObjectCpp::getBufferLastItem(const std::shared_ptr<ArrayBuffer>& buffer) {
   size_t size = buffer->size();
   if (size == 0) {

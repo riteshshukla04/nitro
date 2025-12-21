@@ -18,6 +18,8 @@
     "build:ios": "cd ios && xcodebuild -workspace NitroExample.xcworkspace -scheme NitroExample -configuration Debug -sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO"
   },
   "dependencies": {
+    "@msgpack/msgpack": "^3.0.0",
+    "react-native-fast-encoder": "0.3.1",
     "@react-native-segmented-control/segmented-control": "^2.5.7",
     "@react-navigation/bottom-tabs": "^7.4.5",
     "@react-navigation/native": "^7.1.17",

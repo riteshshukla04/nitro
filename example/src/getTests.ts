@@ -21,6 +21,7 @@ import {
   NitroModules,
 } from 'react-native-nitro-modules'
 import { HybridSomeExternalObject } from 'react-native-nitro-test-external'
+import { encode, decode } from '@msgpack/msgpack'
 
 type TestResult =
   | {
@@ -1734,6 +1735,42 @@ export function getTests(
         // 3. Compare if the value at [73] is still equal
         return bouncedArray.buffer === originalArray.buffer
       })
+        .didNotThrow()
+        .equals(true)
+    ),
+    createTest('msgpackRoundtrip(JSON to MessagePack)', async () =>
+      (await it(async () => {
+        // 1. Create JSON object with 2000 keys
+        const jsonData: Record<string, any> = {}
+        for (let i = 0; i < 2000; i++) {
+          jsonData[`key${i}`] = {
+            id: i,
+            name: `Item ${i}`,
+            value: i * 2,
+            active: i % 2 === 0,
+            tags: [`tag${i}`, `category${i % 10}`],
+            metadata: {
+              created: Date.now() + i,
+              updated: Date.now() + i * 2,
+            },
+          }
+        }
+
+        // 2. Convert JSON to MessagePack (ArrayBuffer)
+        const msgpackBuffer = encode(jsonData)
+
+        // 3. Call msgpackRoundtrip on native side
+        const resultBuffer = testObject.msgpackRoundtrip(msgpackBuffer.buffer as ArrayBuffer)
+
+
+        // 4. Convert MessagePack back to JSON
+        const resultArray = new Uint8Array(resultBuffer)
+        const decodedJson = decode(resultArray)
+        console.log('decodedJson', decodedJson)
+
+        // 5. Verify the data matches (compare stringified versions for deep equality)
+        return JSON.stringify(jsonData) === JSON.stringify(decodedJson)
+      }))
         .didNotThrow()
         .equals(true)
     ),

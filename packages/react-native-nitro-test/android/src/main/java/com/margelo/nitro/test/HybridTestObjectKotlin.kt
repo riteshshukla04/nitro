@@ -14,6 +14,9 @@ import com.margelo.nitro.test.external.HybridSomeExternalObjectSpec
 import kotlinx.coroutines.delay
 import java.math.BigDecimal
 import java.time.Instant
+import org.msgpack.core.MessagePack
+import org.msgpack.value.Value
+import java.nio.ByteBuffer
 
 @Keep
 @DoNotStrip
@@ -520,6 +523,28 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
 
   override fun bounceArrayBuffer(buffer: ArrayBuffer): ArrayBuffer {
     return buffer
+  }
+
+  override fun msgpackRoundtrip(buffer: ArrayBuffer): ArrayBuffer {
+    val byteBuffer = buffer.getBuffer(false)
+    val bytes = ByteArray(buffer.size)
+    byteBuffer.rewind()
+    byteBuffer.get(bytes)
+
+    val unpacker = MessagePack.newDefaultUnpacker(bytes)
+    val value: Value = unpacker.unpackValue()
+    unpacker.close()
+
+    val packer = MessagePack.newDefaultBufferPacker()
+    packer.packValue(value)
+    val resultBytes = packer.toByteArray()
+    packer.close()
+
+    return ArrayBuffer.allocate(resultBytes.size).apply {
+      val resultBuffer = getBuffer(false)
+      resultBuffer.put(resultBytes)
+      resultBuffer.rewind()
+    }
   }
 
   override fun createChild(): HybridChildSpec {

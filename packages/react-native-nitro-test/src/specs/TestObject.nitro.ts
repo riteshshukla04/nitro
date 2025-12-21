@@ -247,6 +247,7 @@ interface SharedTestObjectProps {
   setAllValuesTo(buffer: ArrayBuffer, value: number): void
   createArrayBufferAsync(): Promise<ArrayBuffer>
   bounceArrayBuffer(buffer: ArrayBuffer): ArrayBuffer
+  msgpackRoundtrip(buffer: ArrayBuffer): ArrayBuffer
 
   // Complex variants
   passVariant(

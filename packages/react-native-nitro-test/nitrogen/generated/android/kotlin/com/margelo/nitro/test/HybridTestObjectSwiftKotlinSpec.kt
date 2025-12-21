@@ -521,6 +521,10 @@ abstract class HybridTestObjectSwiftKotlinSpec: HybridObject() {
   
   @DoNotStrip
   @Keep
+  abstract fun msgpackRoundtrip(buffer: ArrayBuffer): ArrayBuffer
+  
+  @DoNotStrip
+  @Keep
   abstract fun passVariant(either: Variant_Boolean_DoubleArray_Array_String__String_Double): Variant_String_Double
   
   @DoNotStrip

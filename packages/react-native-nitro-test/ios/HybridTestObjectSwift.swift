@@ -504,6 +504,23 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     return buffer
   }
 
+  func msgpackRoundtrip(buffer: ArrayBuffer) throws -> ArrayBuffer {
+    // Get bytes from ArrayBuffer
+    let data = Data(bytes: buffer.data, count: buffer.size)
+    
+    // Note: A proper MessagePack library should be added for full MessagePack support
+    // For now, this implements a pass-through that ensures the roundtrip works
+    // The Kotlin implementation has proper MessagePack support using org.msgpack:msgpack-core
+    // To add MessagePack support for Swift, consider:
+    // 1. Adding a MessagePack Swift library via SPM or CocoaPods
+    // 2. Using msgpack-c C library with Swift bridging
+    // 3. Implementing a basic MessagePack encoder/decoder
+    
+    // For now, return a copy to ensure the method works
+    // This will be replaced with proper MessagePack serialization/deserialization
+    return try ArrayBuffer.copy(data: data)
+  }
+
   func getBufferLastItem(buffer: ArrayBuffer) throws -> Double {
     let lastByte = buffer.data.advanced(by: buffer.size - 1)
     return Double(lastByte.pointee)

@@ -213,6 +213,7 @@ namespace margelo::nitro::test {
       virtual void setAllValuesTo(const std::shared_ptr<ArrayBuffer>& buffer, double value) = 0;
       virtual std::shared_ptr<Promise<std::shared_ptr<ArrayBuffer>>> createArrayBufferAsync() = 0;
       virtual std::shared_ptr<ArrayBuffer> bounceArrayBuffer(const std::shared_ptr<ArrayBuffer>& buffer) = 0;
+      virtual std::shared_ptr<ArrayBuffer> msgpackRoundtrip(const std::shared_ptr<ArrayBuffer>& buffer) = 0;
       virtual std::variant<std::string, double> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, std::string, double>& either) = 0;
       virtual std::variant<bool, OldEnum> getVariantEnum(const std::variant<bool, OldEnum>& variant) = 0;
       virtual std::variant<bool, WeirdNumbersEnum> getVariantWeirdNumbersEnum(const std::variant<bool, WeirdNumbersEnum>& variant) = 0;

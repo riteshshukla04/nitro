@@ -138,6 +138,9 @@ dependencies {
   implementation project(":react-native-nitro-modules")
   // Add a dependency on NitroTestExternal (for SomeExternalObject)
   implementation project(":react-native-nitro-test-external")
+  
+  // MessagePack for Kotlin
+  implementation "org.msgpack:msgpack-core:0.9.10"
 }
 
 if (isNewArchitectureEnabled()) {
