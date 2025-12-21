@@ -20,52 +20,9 @@ const VIEWS_Y = 15
 
 const PRE_CODE = `
 const NitroModules = globalThis.NitroModulesProxy;
-const { encode, decode } = require('@msgpack/msgpack');
-const testObject = NitroModules.createHybridObject('TestObjectSwiftKotlin');
-
-const jsonData = {};
-for (let i = 0; i < 2000; i++) {
-  jsonData[\`key\${i}\`] = {
-    id: i,
-    name: \`Item \${i}\`,
-    value: i * 2,
-    active: i % 2 === 0,
-    tags: [\`tag\${i}\`, \`category\${i % 10}\`],
-    metadata: {
-      created: Date.now() + i,
-      updated: Date.now() + i * 2,
-    }
-  }
-}
 `.trim()
 const DEFAULT_CODE = `
-
-
-
-
-
-// Benchmark msgpackRoundtrip (10 iterations)
-const times = [];
-for (let i = 0; i < 10; i++) {
-  const start = performance.now();
-  const msgpackBuffer = encode(jsonData);
-  const resultBuffer = testObject.msgpackRoundtrip(msgpackBuffer.buffer);
-  const decoded = decode(new Uint8Array(resultBuffer));
-  const end = performance.now();
-  times.push(end - start);
-}
-
-const avg = times.reduce((a, b) => a + b, 0) / times.length;
-const total = times.reduce((a, b) => a + b, 0);
-
-{
-  iterations: times.map((t, i) => \`Run \${i + 1}: \${t.toFixed(2)}ms\`),
-  average: \`\${avg.toFixed(2)}ms\`,
-  total: \`\${total.toFixed(2)}ms\`,
-  min: \`\${Math.min(...times).toFixed(2)}ms\`,
-  max: \`\${Math.max(...times).toFixed(2)}ms\`,
-  dataSize: '2000 keys with nested objects'
-}
+const testObject = NitroModules.createHybridObject('TestObjectSwiftKotlin');
 `.trim()
 
 export function EvalScreen() {
