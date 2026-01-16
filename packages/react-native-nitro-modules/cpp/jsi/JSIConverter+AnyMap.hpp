@@ -76,8 +76,9 @@ struct JSIConverter<std::shared_ptr<AnyMap>> final {
     jsi::Array propNames = object.getPropertyNames(runtime);
     size_t size = propNames.size(runtime);
     for (size_t i = 0; i < size; i++) {
-      bool canConvertProp = JSIConverter<AnyValue>::canConvert(runtime, properties.getValueAtIndex(runtime, i));
-      if (!canConvertProp) {
+      jsi::String keyString = propNames.getValueAtIndex(runtime, i).asString(runtime);
+      jsi::Value propValue = object.getProperty(runtime, keyString);
+      if (!JSIConverter<AnyValue>::canConvert(runtime, propValue)) {
         return false;
       }
     }
