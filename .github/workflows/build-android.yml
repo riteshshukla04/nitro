@@ -1,10 +1,10 @@
 name: Build Android
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-    workflow_dispatch:
     paths:
       - '.github/workflows/build-android.yml'
       - 'example/android/**'
