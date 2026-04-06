@@ -1,9 +1,5 @@
 name: Harness iOS
 
-concurrency:
-  group: harness-ios-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref_name != 'main' }}
-
 on:
   workflow_dispatch:
     inputs:
@@ -66,22 +62,50 @@ on:
 env:
   # Device configuration - can be overridden by workflow_dispatch inputs
   DEVICE_MODEL: ${{ github.event.inputs.device_model || 'iPhone 17 Pro' }}
-  IOS_VERSION: ${{ github.event.inputs.ios_version || '26.2' }}
-  XCODE_VERSION: ${{ github.event.inputs.xcode_version || '26.2.0' }}
   USE_CCACHE: 1
-  DEVELOPER_DIR: /Applications/Xcode_${{ github.event.inputs.xcode_version || '26.2.0' }}.app/Contents/Developer
   HARNESS_DEBUG: 1
 
 jobs:
   harness_ios_new:
-    name: Harness iOS (new architecture)
+    name: Harness iOS (${{ matrix.name }})
     runs-on: macOS-26
+    concurrency:
+      group: harness-ios-${{ github.ref }}-${{ matrix.name }}
+      cancel-in-progress: ${{ github.ref_name != 'main' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: xcode-26.2-static
+            xcode_version: "26.2.0"
+            ios_version: "26.2"
+            use_frameworks: static
+          - name: xcode-26.2-no-frameworks
+            xcode_version: "26.2.0"
+            ios_version: "26.2"
+            use_frameworks: ""
+          - name: xcode-26.4-static
+            xcode_version: "26.4.0"
+            ios_version: "26.4"
+            use_frameworks: static
+          - name: xcode-26.4-no-frameworks
+            xcode_version: "26.4.0"
+            ios_version: "26.4"
+            use_frameworks: ""
+    env:
+      XCODE_VERSION: ${{ matrix.xcode_version }}
+      IOS_VERSION: ${{ matrix.ios_version }}
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode_version }}.app/Contents/Developer
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
       - uses: oven-sh/setup-bun@v2
+
+      - name: Set USE_FRAMEWORKS
+        if: matrix.use_frameworks != ''
+        run: echo "USE_FRAMEWORKS=${{ matrix.use_frameworks }}" >> $GITHUB_ENV
 
       - name: Install npm dependencies (bun)
         run: bun install
@@ -90,7 +114,7 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           max-size: 1.5G
-          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-ccache-example-ios
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks || 'dynamic' }}-ccache-example-ios
           create-symlink: true
       - name: Setup ccache behavior
         run: |
@@ -113,9 +137,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: example/ios/Pods
-          key: ${{ runner.os }}-${{ runner.arch }}-pods-${{ hashFiles('bun.lock', 'example/Gemfile.lock', 'example/ios/Podfile.lock') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks || 'dynamic' }}-pods-${{ hashFiles('bun.lock', 'example/Gemfile.lock', 'example/ios/Podfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-pods-
+            ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks || 'dynamic' }}-pods-
       - name: Install Pods
         working-directory: example
         run: bun pods
@@ -124,9 +148,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: example/ios/build
-          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-dd-${{ hashFiles('bun.lock', 'example/Gemfile.lock', 'example/ios/Podfile.lock') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks || 'dynamic' }}-dd-${{ hashFiles('bun.lock', 'example/Gemfile.lock', 'example/ios/Podfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-dd-
+            ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks || 'dynamic' }}-dd-
 
       - name: Build iOS app
         working-directory: example/ios
