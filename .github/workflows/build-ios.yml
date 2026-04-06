@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - newxcbuild
     paths:
       - '.github/workflows/build-ios.yml'
       - 'example/ios/**'
@@ -39,20 +40,31 @@ on:
 
 env:
   USE_CCACHE: 1
-  XCODE_VERSION: '26.2'
-  IOS_SIMULATOR_DESTINATION: 'platform=iOS Simulator,name=iPhone 17 Pro'
 
 jobs:
   build:
-    name: Build iOS Example App
+    name: Build iOS (${{ matrix.name }})
     runs-on: macOS-26
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - name: static_frameworks
+          - name: xcode-26.2-static
+            xcode_version: "26.2.0"
             use_frameworks: static
-          - name: no_frameworks
-            use_frameworks: ""   # intentionally unset
+          - name: xcode-26.2-no-frameworks
+            xcode_version: "26.2.0"
+            use_frameworks: ""
+          - name: xcode-26.4-static
+            xcode_version: "26.4.0"
+            use_frameworks: static
+          - name: xcode-26.4-no-frameworks
+            xcode_version: "26.4.0"
+            use_frameworks: ""
+    env:
+      XCODE_VERSION: ${{ matrix.xcode_version }}
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode_version }}.app/Contents/Developer
+      IOS_SIMULATOR_DESTINATION: 'platform=iOS Simulator,name=iPhone 17 Pro'
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
@@ -68,7 +80,7 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           max-size: 1.5G
-          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks }}-ccache-example-ios
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks || 'dynamic' }}-ccache-example-ios
           create-symlink: true
       - name: Setup ccache behavior
         run: |
@@ -91,9 +103,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: example/ios/Pods
-          key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.use_frameworks }}-pods-${{ hashFiles('bun.lock', 'example/Gemfile.lock', 'example/ios/Podfile.lock') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks || 'dynamic' }}-pods-${{ hashFiles('bun.lock', 'example/Gemfile.lock', 'example/ios/Podfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-${{ matrix.use_frameworks }}-pods-
+            ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks || 'dynamic' }}-pods-
       - name: Install Pods
         working-directory: example
         run: bun pods
@@ -102,9 +114,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: example/ios/build
-          key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.use_frameworks }}-xcode${{ env.XCODE_VERSION }}-dd-${{ hashFiles('bun.lock', 'example/Gemfile.lock', 'example/ios/Podfile.lock') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks || 'dynamic' }}-dd-${{ hashFiles('bun.lock', 'example/Gemfile.lock', 'example/ios/Podfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-${{ matrix.use_frameworks }}-xcode${{ env.XCODE_VERSION }}-dd-
+            ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.use_frameworks || 'dynamic' }}-dd-
 
       - name: Build App
         working-directory: example/ios

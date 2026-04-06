@@ -21,6 +21,7 @@ on:
   push:
     branches:
       - main
+      - newxcbuild
     paths:
       - ".github/workflows/harness-ios.yml"
       - "example/ios/**"
