@@ -15,12 +15,12 @@ on:
       ios_version:
         description: "iOS version"
         required: false
-        default: "26.2"
+        default: "26.4"
         type: string
       xcode_version:
         description: "Xcode version"
         required: false
-        default: "26.2.0"
+        default: "26.4.0"
         type: string
   push:
     branches:
