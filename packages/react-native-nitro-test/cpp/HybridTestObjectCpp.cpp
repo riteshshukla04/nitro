@@ -722,6 +722,17 @@ jsi::Value HybridTestObjectCpp::rawJsiFunc(jsi::Runtime& runtime, const jsi::Val
   return array;
 }
 
+#ifdef NITRO_DEBUG
+jsi::Value HybridTestObjectCpp::reproToObjectCacheAba(jsi::Runtime& runtime, const jsi::Value&, const jsi::Value*, size_t) {
+  // `this` is already cached for `runtime` (we were called on its JS object). Simulate the ABA
+  // post-condition: a since-destroyed runtime that reused this address invalidated our cached reference.
+  debug_invalidateObjectCache(runtime);
+  // Re-materialize. Before the fix `toObject` throws "...reference got destroyed!"; after the fix it
+  // re-creates the object.
+  return toObject(runtime);
+}
+#endif
+
 std::shared_ptr<HybridBaseSpec> HybridTestObjectCpp::createBase() {
   return std::make_shared<HybridBase>();
 }

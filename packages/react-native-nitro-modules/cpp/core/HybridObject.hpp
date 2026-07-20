@@ -123,6 +123,18 @@ protected:
     return 0;
   }
 
+#ifdef NITRO_DEBUG
+protected:
+  /**
+   * Test-only: drop this object's cached JS reference for `runtime`, reproducing the stale state left
+   * behind when a destroyed runtime's `JSICache` invalidates the cached `BorrowingReference` and a new
+   * runtime is created at the same address (the ABA case handled in `toObject`). Compiled out of release.
+   */
+  void debug_invalidateObjectCache(jsi::Runtime& runtime) {
+    _objectCache[&runtime] = BorrowingReference<jsi::WeakObject>();
+  }
+#endif
+
 protected:
   /**
    * Loads all native methods of this `HybridObject` to be exposed to JavaScript.
