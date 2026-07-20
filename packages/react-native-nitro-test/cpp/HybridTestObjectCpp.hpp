@@ -233,14 +233,23 @@ public:
   // Raw JSI functions
   jsi::Value rawJsiFunc(jsi::Runtime& runtime, const jsi::Value& thisValue, const jsi::Value* args, size_t count);
 
+#ifdef NITRO_DEBUG
+  // Test-only: deterministically reproduce the `toObject` runtime-address-reuse (ABA) cache bug.
+  jsi::Value reproToObjectCacheAba(jsi::Runtime& runtime, const jsi::Value& thisValue, const jsi::Value* args, size_t count);
+#endif
+
   void dispose() override;
 
   void loadHybridMethods() override {
     // call base protoype
     HybridTestObjectCppSpec::loadHybridMethods();
     // register all methods we override here
-    registerHybrids(this,
-                    [](Prototype& prototype) { prototype.registerRawHybridMethod("rawJsiFunc", 0, &HybridTestObjectCpp::rawJsiFunc); });
+    registerHybrids(this, [](Prototype& prototype) {
+      prototype.registerRawHybridMethod("rawJsiFunc", 0, &HybridTestObjectCpp::rawJsiFunc);
+#ifdef NITRO_DEBUG
+      prototype.registerRawHybridMethod("reproToObjectCacheAba", 0, &HybridTestObjectCpp::reproToObjectCacheAba);
+#endif
+    });
   }
 };
 
