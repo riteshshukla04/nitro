@@ -24,7 +24,6 @@ interface BenchmarkDefinitionBase {
   version: number
   family: BenchmarkFamily
   implementation: BenchmarkImplementation
-  advisory?: boolean
   initialIterations?: number
   maxIterations?: number
   /** Bound live allocations, not the total operations in a measured sample. */
@@ -55,25 +54,25 @@ export interface BenchmarkRunnerOptions {
   reverse: boolean
 }
 
-export interface BenchmarkMetric {
+export interface BenchmarkWork {
   id: string
-  version: number
-  family: BenchmarkFamily
-  implementation: BenchmarkImplementation
-  advisory: boolean
   iterations: number
   /** Maximum operations between untimed garbage collections. */
   chunkIterations: number
+}
+
+export interface BenchmarkMetric extends BenchmarkWork {
+  version: number
+  family: BenchmarkFamily
+  implementation: BenchmarkImplementation
   samplesNsPerOp: number[]
-  medianNsPerOp: number
-  p95NsPerOp: number
-  medianAbsoluteDeviationNsPerOp: number
-  robustCoefficientOfVariationPercent: number
-  medianConfidenceInterval95: [number, number]
   checksum: number
 }
 
 export interface BenchmarkRunConfiguration {
+  /** Calibration is discarded; measurement always uses a fresh process. */
+  calibration?: true
+  work?: BenchmarkWork
   /** Select one case in suite order for a fresh-process measurement. */
   benchmarkIndex?: number
   runId: string

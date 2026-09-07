@@ -67,7 +67,28 @@ function validateConfiguration(value: unknown): BenchmarkRunConfiguration {
   if (!SUITE_HASH_PATTERN.test(suiteHash)) {
     throw new Error('configuration.suiteHash must be a SHA-256 digest.')
   }
+  const work = value.work
+  if (work !== undefined && !isObject(work))
+    throw new Error('configuration.work must be an object.')
+  if (value.calibration !== undefined && value.calibration !== true)
+    throw new Error('Invalid calibration flag.')
   return {
+    ...(value.calibration === true ? { calibration: true as const } : {}),
+    ...(work === undefined
+      ? {}
+      : {
+          work: {
+            id: stringValue(work.id, 'configuration.work.id'),
+            iterations: positiveInteger(
+              work.iterations,
+              'configuration.work.iterations'
+            ),
+            chunkIterations: positiveInteger(
+              work.chunkIterations,
+              'configuration.work.chunkIterations'
+            ),
+          },
+        }),
     ...(value.benchmarkIndex === undefined
       ? {}
       : {
@@ -121,25 +142,17 @@ function validateEnvironment(value: unknown): BenchmarkRunEnvironment {
 function validateMetric(value: unknown, index: number): BenchmarkMetric {
   if (!isObject(value)) throw new Error(`metrics[${index}] must be an object.`)
   const samples = value.samplesNsPerOp
-  if (
-    !Array.isArray(samples) ||
-    samples.length === 0 ||
-    samples.length > MAX_SAMPLES
-  ) {
+  if (!Array.isArray(samples) || samples.length > MAX_SAMPLES) {
     throw new Error(`metrics[${index}].samplesNsPerOp has invalid length.`)
   }
   const samplesNsPerOp = samples.map((sample, sampleIndex) =>
     finiteNumber(
       sample,
       `metrics[${index}].samples[${sampleIndex}]`,
-      0,
+      Number.MIN_VALUE,
       MAX_NS_PER_OPERATION
     )
   )
-  const interval = value.medianConfidenceInterval95
-  if (!Array.isArray(interval) || interval.length !== 2) {
-    throw new Error(`metrics[${index}] has an invalid confidence interval.`)
-  }
   const implementation = value.implementation
   if (
     implementation !== 'javascript' &&
@@ -171,16 +184,12 @@ function validateMetric(value: unknown, index: number): BenchmarkMetric {
   if (!METRIC_ID_PATTERN.test(id)) {
     throw new Error(`metrics[${index}] has an invalid ID.`)
   }
-  if (typeof value.advisory !== 'boolean') {
-    throw new Error(`metrics[${index}].advisory must be a boolean.`)
-  }
   const iterations = positiveInteger(
     value.iterations,
     `metrics[${index}].iterations`
   )
-  // Older v1 runs used one uninterrupted chunk per sample.
   const chunkIterations = positiveInteger(
-    value.chunkIterations ?? iterations,
+    value.chunkIterations,
     `metrics[${index}].chunkIterations`
   )
   if (chunkIterations > iterations) {
@@ -193,48 +202,9 @@ function validateMetric(value: unknown, index: number): BenchmarkMetric {
     version: positiveInteger(value.version, `metrics[${index}].version`),
     family: family as BenchmarkMetric['family'],
     implementation,
-    advisory: value.advisory,
     iterations,
     chunkIterations,
     samplesNsPerOp,
-    medianNsPerOp: finiteNumber(
-      value.medianNsPerOp,
-      `metrics[${index}].medianNsPerOp`,
-      0,
-      MAX_NS_PER_OPERATION
-    ),
-    p95NsPerOp: finiteNumber(
-      value.p95NsPerOp,
-      `metrics[${index}].p95NsPerOp`,
-      0,
-      MAX_NS_PER_OPERATION
-    ),
-    medianAbsoluteDeviationNsPerOp: finiteNumber(
-      value.medianAbsoluteDeviationNsPerOp,
-      `metrics[${index}].medianAbsoluteDeviationNsPerOp`,
-      0,
-      MAX_NS_PER_OPERATION
-    ),
-    robustCoefficientOfVariationPercent: finiteNumber(
-      value.robustCoefficientOfVariationPercent,
-      `metrics[${index}].robustCoefficientOfVariationPercent`,
-      0,
-      1_000_000
-    ),
-    medianConfidenceInterval95: [
-      finiteNumber(
-        interval[0],
-        `metrics[${index}].interval[0]`,
-        0,
-        MAX_NS_PER_OPERATION
-      ),
-      finiteNumber(
-        interval[1],
-        `metrics[${index}].interval[1]`,
-        0,
-        MAX_NS_PER_OPERATION
-      ),
-    ],
     checksum: finiteNumber(value.checksum, `metrics[${index}].checksum`),
   }
 }
@@ -253,11 +223,15 @@ export function validateBenchmarkRun(value: unknown): BenchmarkRunResult {
   ) {
     throw new Error('metrics must be a non-empty bounded array.')
   }
+  const configuration = validateConfiguration(value.configuration)
+  if (
+    configuration.calibration &&
+    (value.runner.warmupCount !== 0 || value.runner.sampleCount !== 0)
+  ) {
+    throw new Error('Calibration must not contain warmup or measured samples.')
+  }
   const validatedMetrics = metrics.map(validateMetric)
-  const benchmarkCount = positiveInteger(
-    value.benchmarkCount ?? metrics.length,
-    'benchmarkCount'
-  )
+  const benchmarkCount = positiveInteger(value.benchmarkCount, 'benchmarkCount')
   if (benchmarkCount > MAX_METRICS || benchmarkCount < metrics.length) {
     throw new Error('benchmarkCount is outside the bounded suite size.')
   }
@@ -265,6 +239,14 @@ export function validateBenchmarkRun(value: unknown): BenchmarkRunResult {
     new Set(validatedMetrics.map((metric) => metric.id)).size !== metrics.length
   ) {
     throw new Error('Metric IDs must be unique.')
+  }
+  const sampleCount = value.runner.sampleCount
+  if (
+    validatedMetrics.some(
+      (metric) => metric.samplesNsPerOp.length !== sampleCount
+    )
+  ) {
+    throw new Error('Sample count does not match runner settings.')
   }
   const startedAt = stringValue(value.startedAt, 'startedAt')
   if (Number.isNaN(Date.parse(startedAt))) {
@@ -274,7 +256,7 @@ export function validateBenchmarkRun(value: unknown): BenchmarkRunResult {
     schemaVersion: 1,
     suiteVersion: 1,
     benchmarkCount,
-    configuration: validateConfiguration(value.configuration),
+    configuration,
     environment: validateEnvironment(value.environment),
     runner: {
       targetBatchDurationMs: finiteNumber(
@@ -283,14 +265,12 @@ export function validateBenchmarkRun(value: unknown): BenchmarkRunResult {
         1,
         10_000
       ),
-      warmupCount: positiveInteger(
-        value.runner.warmupCount,
-        'runner.warmupCount'
-      ),
-      sampleCount: positiveInteger(
-        value.runner.sampleCount,
-        'runner.sampleCount'
-      ),
+      warmupCount: configuration.calibration
+        ? finiteNumber(value.runner.warmupCount, 'runner.warmupCount', 0, 100)
+        : positiveInteger(value.runner.warmupCount, 'runner.warmupCount'),
+      sampleCount: configuration.calibration
+        ? finiteNumber(value.runner.sampleCount, 'runner.sampleCount', 0, 100)
+        : positiveInteger(value.runner.sampleCount, 'runner.sampleCount'),
     },
     startedAt,
     durationMs: finiteNumber(value.durationMs, 'durationMs'),
@@ -306,7 +286,7 @@ export function validateExpectedRun(
   for (const key of Object.keys(
     expected
   ) as (keyof BenchmarkRunConfiguration)[]) {
-    if (actual[key] !== expected[key]) {
+    if (JSON.stringify(actual[key]) !== JSON.stringify(expected[key])) {
       throw new Error(`Result configuration mismatch for ${key}.`)
     }
   }

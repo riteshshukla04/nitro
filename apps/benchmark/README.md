@@ -14,12 +14,8 @@ Debug benchmark or publish anything to Bencher.
 From the repository root:
 
 ```sh
-bun install --frozen-lockfile
-bun benchmark build:android
-
-bun benchmark bundle-install
-bun benchmark pods
-bun benchmark build:ios
+bash scripts/performance/build-android.sh "$PWD" com.margelo.nitrobenchmark.head
+bash scripts/performance/build-ios.sh "$PWD" com.margelo.nitrobenchmark.head
 ```
 
 Both platforms use the normal `Release` configuration, an embedded optimized
@@ -29,18 +25,20 @@ permits cleartext only to `127.0.0.1` and `localhost` for the host receiver.
 
 ## Run locally
 
-For an already booted Android API 36 emulator, after building the APK:
+For an already booted Android API 36 emulator, compare two fresh launches of the
+same built APK to check measurement variation:
 
 ```sh
-bun scripts/performance/run-device.ts \
+bun scripts/performance/run-sequence.ts \
   --platform android \
-  --app apps/benchmark/android/app/build/outputs/apk/release/app-release.apk \
-  --output /tmp/nitro-benchmark.json \
+  --base-app apps/benchmark/android/app/build/outputs/apk/release/app-release.apk \
+  --head-app apps/benchmark/android/app/build/outputs/apk/release/app-release.apk \
+  --base-root "$PWD" \
+  --head-root "$PWD" \
+  --output-directory /tmp/nitro-benchmark \
   --device-id "$(adb get-serialno)" \
-  --run-id android-local-1 \
-  --reverse false \
-  --commit-sha "$(git rev-parse HEAD)" \
-  --suite-hash "$(bun scripts/performance/suite-hash.ts .)" \
+  --base-sha "$(git rev-parse HEAD)" \
+  --head-sha "$(git rev-parse HEAD)" \
   --device 'Local emulator' \
   --os-version 'Android 16 / API 36' \
   --architecture x86_64 \
@@ -53,17 +51,23 @@ The host installs each binary once, then launches a fresh process for each case
 and assembles their results. This releases Nitro's runtime-scoped JSI reference
 bookkeeping between cases; GC alone cannot clear that cache. Each process posts
 one result only after its timing is complete. Per-case raw results are kept beside
-the combined output in a `*-cases/` directory. Reversing the suite reverses the
-case launch order too. Startup, transport, and process restarts are not timed.
+the combined output in `base-1-cases/`, `head-1-cases/`, and
+`calibration-base-cases/` directories. For each case, calibration exits before
+base and head run back to back. Identical SHAs reuse one installed binary. Startup, transport, and process restarts are not timed.
 For iOS, use `--platform ios`, a simulator UDID for `--device-id`, and the built
-`NitroBenchmark.app` for `--app`, with matching simulator/toolchain metadata.
+`NitroBenchmark.app` for `--base-app` and `--head-app`, with matching
+simulator/toolchain metadata.
+To compare different revisions, build base from its own checkout using the default
+app ID (omit the second build-script argument), and build head with the `.head`
+ID shown above. Pass the corresponding app paths, source roots, and commit SHAs.
 Local runs do not upload results.
 
-Each of the 40 metrics targets 150 ms of timed work per sample (roughly
+Each metric targets 150 ms of timed work per sample (roughly
 100–200 ms), using round iteration counts with two significant digits, such as
-1,500,000 or 24,000. Calibration can grow or shrink the count and is rechecked
-after five warmup batches. That count is then frozen for twenty measured samples;
-slow samples are retained, not discarded or adaptively shortened.
+1,500,000 or 24,000. Calibration chooses the count in a separate process that is discarded. The
+measurement process performs five warmup batches and twenty samples using those
+fixed counts. In paired runs, both revisions share the base-derived count and
+chunk size for each case. Slow samples are retained without shortening the work.
 
 Allocation-heavy cases split a sample into bounded chunks, collecting garbage
 after each chunk and yielding for native cleanup at most every four chunks,
@@ -83,11 +87,12 @@ the timed batch. Operation-induced allocations remain inside it.
 
 ## CI and reporting
 
-See [performance CI](../../.github/PERFORMANCE.md) for the paired comparison,
-noise calibration, artifacts, fork-safe reporting, and Bencher activation.
-The initial infrastructure PR uses the head binary for both sides for A/A
-validation because its base does not yet contain this app. Subsequent PRs build
-base and head independently. Performance verdicts remain advisory.
+See [performance CI](../../.github/PERFORMANCE.md) for observed comparisons,
+process variability, raw artifacts, trusted reporting, and Bencher publishing.
+CI retains exact app artifacts for measurement-only reruns. It builds both
+revisions when comparable, reuses one binary for identical SHAs, and builds only
+head when definitions changed. Same-revision scheduled/manual runs show baseline
+variation. Performance remains report-only.
 
 The example's former benchmark screen and TurboModule control have moved here.
 No public Nitro API changes are needed. App dependency versions initially match

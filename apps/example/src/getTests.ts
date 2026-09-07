@@ -48,6 +48,7 @@ export interface TestRunner {
 // 2) In JVM, 51_200 is the limit for `jni::global_ref`s, then the app crashes - this intentionally exhausts that
 const MEMORY_LEAK_TEST_ALLOCATION_COUNT = 55_000
 const EXTERNAL_MEMORY_TEST_SIZE = 1024 * 1024
+const PARALLEL_HYBRID_OBJECT_TEST_TIMEOUT = 120_000
 
 type HermesInternal = {
   getInstrumentedStats?: () => { js_externalBytes: number }
@@ -550,6 +551,22 @@ export function getTests(
       })
         .didNotThrow()
         .equals(true)
+    ),
+    createTest('set + get isolatedBoolean', () =>
+      it(() => {
+        testObject.isolatedBoolean = true
+        return testObject.isolatedBoolean
+      })
+        .didNotThrow()
+        .equals(true)
+    ),
+    createTest('set + get isTextValue', () =>
+      it(() => {
+        testObject.isTextValue = 'hello'
+        return testObject.isTextValue
+      })
+        .didNotThrow()
+        .equals('hello')
     ),
     createTest('set optionalCallback, then undefined', () =>
       it(() => {
@@ -1549,7 +1566,7 @@ export function getTests(
               )
             }
             return true
-          })
+          }, PARALLEL_HYBRID_OBJECT_TEST_TIMEOUT)
         )
           .didNotThrow()
           .equals(true)
