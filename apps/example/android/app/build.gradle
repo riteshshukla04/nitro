@@ -131,9 +131,10 @@ android {
         }
         sourceSets {
             debug {
-                jniLibs.srcDir(nitroSanitizerJniLibsDir)
+                // AGP 9 no longer accepts Providers in the SourceSet API
+                jniLibs.srcDir(nitroSanitizerJniLibsDir.get().asFile)
                 if (nitroSanitizerUsesWrap) {
-                    resources.srcDir(nitroSanitizerResourcesDir)
+                    resources.srcDir(nitroSanitizerResourcesDir.get().asFile)
                 }
             }
         }
