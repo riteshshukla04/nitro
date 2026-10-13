@@ -241,6 +241,8 @@ jobs:
           api-level: 36
           arch: x86_64
           profile: pixel_7
+          # Emulator 37.1.11, used by successful performance run 34414142495.
+          emulator-build: '15917651'
           disable-animations: true
           # CPU acceleration is required, independently of software GPU rendering.
           disable-linux-hw-accel: false
