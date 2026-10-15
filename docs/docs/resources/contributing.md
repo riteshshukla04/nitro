@@ -109,7 +109,7 @@ When adding a reproduction, follow the rules in [CONTRIBUTING.md](https://github
 
 ### Reproduce a runtime error
 
-Submit a PR that demonstrates this runtime error or crash in the Nitro `apps/example/` app — ideally with a new assertion in [`apps/example/src/getTests.ts`](https://github.com/margelo/nitro/blob/main/apps/example/src/getTests.ts) so the regression is caught by the Harness CI workflows (iOS and Android). A PR that only adds the failing assertion and makes Harness go red is enough on its own; you don't have to land the fix.
+Submit a PR that demonstrates this runtime error or crash in the Nitro `apps/example/` app — ideally with a new assertion in one of the Harness test files in [`apps/example/__tests__/`](https://github.com/margelo/nitro/tree/main/apps/example/__tests__) so the regression is caught by the Harness CI workflows (iOS and Android). A PR that only adds the failing assertion and makes Harness go red is enough on its own; you don't have to land the fix.
 
 ## Performance tests
 
