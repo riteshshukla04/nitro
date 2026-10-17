@@ -808,8 +808,8 @@ std::shared_ptr<HybridTestObjectCppSpec> HybridTestObjectCpp::newTestObject() {
 }
 
 std::shared_ptr<Promise<std::shared_ptr<HybridTestObjectCppSpec>>> HybridTestObjectCpp::newTestObjectAsync() {
-  // Resolves a HybridObject off the JS thread (on the Nitro ThreadPool). The near-instant closure
-  // keeps the resolve()-vs-toJSI window wide so the C++ Promise `_state` race surfaces under TSan.
+  // Resolve on the Nitro ThreadPool so completion can overlap with toJSI reading
+  // Promise state on the JS thread during the parallel-load test.
   return Promise<std::shared_ptr<HybridTestObjectCppSpec>>::async(
       []() -> std::shared_ptr<HybridTestObjectCppSpec> { return std::make_shared<HybridTestObjectCpp>(); });
 }

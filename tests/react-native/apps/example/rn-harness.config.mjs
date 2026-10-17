@@ -35,8 +35,7 @@ const config = {
   defaultRunner: 'android',
   plugins: [runningTestPlugin()],
   resetEnvironmentBetweenTestFiles: 'runtime',
-  // Harness has no per-test timeout, and the async HybridObject stress test
-  // (__tests__/stress.harness.ts) can take up to two minutes under sanitizers.
+  // Harness has no per-test timeout. Allow more time on CI for async stress tests.
   testTimeout: process.env.CI === 'true' ? 150000 : 10000,
   platformReadyTimeout: process.env.CI === 'true' ? 420000 : 300000,
   bridgeTimeout: process.env.CI === 'true' ? 180000 : 60000,

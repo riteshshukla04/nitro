@@ -2,13 +2,12 @@ import { expect, it } from 'react-native-harness'
 import { NitroModules } from 'react-native-nitro-modules'
 import { describeEachTestObject } from './utils/testObjects'
 
-// Kept in its own file: under Thread Sanitizer this can take a long time, and a
-// timed-out test skips every remaining test in the same file.
+// Keep this workload in its own file because a timed-out test skips every
+// remaining test in the same file.
 describeEachTestObject('Promises under parallel load', (testObject) => {
-  // Resolves a HybridObject off the JS thread; the race is between resolve() and
-  // JSIConverter::toJSI reading Promise state on the JS thread. Passes
-  // functionally; the verdict is Thread Sanitizer.
-  it('newTestObjectAsync() does not data-race (run under Thread Sanitizer)', async () => {
+  // Resolve HybridObjects off the JS thread while JSIConverter::toJSI reads
+  // Promise state on the JS thread.
+  it('newTestObjectAsync() resolves HybridObjects under parallel load', async () => {
     let objects: object[] = []
     for (let round = 0; round < 20; round++) {
       objects = await Promise.all(

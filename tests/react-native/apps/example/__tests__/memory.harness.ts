@@ -34,8 +34,8 @@ function getHermesExternalMemorySize(): number {
 const IS_HERMES = getHermesInternal() != null
 
 // Harness treats the app as unresponsive if its bridge heartbeat (answered on
-// the JS thread) goes unanswered for 20s, which long synchronous loops can
-// cause under sanitizers - so give the event loop a turn between batches.
+// the JS thread) goes unanswered for 20s, so give the event loop a turn between
+// batches of long synchronous loops.
 function yieldToEventLoop(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0))
 }
