@@ -41,7 +41,7 @@ resolves the PR's current base/head SHAs and head repository through GitHub befo
 checking out either revision. Forks are supported. Re-running all jobs resolves
 the current PR revisions again; measurement-only reruns reuse the saved apps.
 
-`Nitro Performance` builds the dedicated `apps/benchmark` Release/Hermes app.
+`Nitro Performance` builds the dedicated `tests/react-native/apps/benchmark` Release/Hermes app.
 Each platform installs base and head side by side on the same machine. It
 runs four pairs at each position in the apps' suite order: **AB, BA, BA, AB**
 (A = base, B = head), then moves to the next position. It finishes any remaining
@@ -58,7 +58,7 @@ work or OS scheduling from competing for the CPU. The Android crash monitor's
 one-second polling interval runs concurrently and does not delay measurements.
 
 Each case uses checked-in operation counts from
-[`iterations.ts`](../apps/benchmark/src/benchmarks/iterations.ts), separately for
+[`iterations.ts`](../tests/react-native/apps/benchmark/src/benchmarks/iterations.ts), separately for
 Android and iOS. Each revision uses its own checked-in counts and chunk sizes.
 Timings are divided by the operation count before comparison. The initial counts are rounded to two significant digits from the measured
 medians in [GitHub run 34125332141, attempt 1](https://github.com/margelo/nitro/actions/runs/34125332141/attempts/1),
@@ -201,12 +201,12 @@ Android process failures retain logcat and process-exit diagnostics. Both platfo
 bound boot time to five minutes and individual install/launch commands to two.
 
 The benchmark app shares real Nitro test packages without Harness/navigation UI.
-Correctness remains in `apps/example`. See the [benchmark app README](../apps/benchmark/README.md)
+Correctness remains in `tests/react-native/apps/example`. See the [benchmark app README](../tests/react-native/apps/benchmark/README.md)
 for local build and run commands.
 
 ## Nitro Modules Bot
 
-The paired PR comparison can post as a dedicated GitHub App named **Nitro Modules Bot**, using [`docs/static/img/nos.png`](../docs/static/img/nos.png)
+The paired PR comparison can post as a dedicated GitHub App named **Nitro Modules Bot**, using [Nitro logo](https://github.com/margelo/nitro/blob/core-split/docs/static/img/nos.png)
 as its avatar. The app needs no hosted service or webhook receiver; Actions
 creates short-lived installation tokens for the request acknowledgment and report
 publication in separate jobs that never execute PR code.

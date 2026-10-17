@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - '.github/workflows/lint-cpp.yml'
+      - 'scripts/clang-format.sh'
+      - 'config/**'
       - '**/*.h'
       - '**/*.hpp'
       - '**/*.cpp'
@@ -14,6 +16,8 @@ on:
   pull_request:
     paths:
       - '.github/workflows/lint-cpp.yml'
+      - 'scripts/clang-format.sh'
+      - 'config/**'
       - '**/*.h'
       - '**/*.hpp'
       - '**/*.cpp'
@@ -27,6 +31,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
 
       - name: Run clang-format
         run: bun run lint-cpp

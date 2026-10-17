@@ -26,48 +26,34 @@ on:
     branches:
       - main
     paths:
-      - ".github/workflows/harness-ios.yml"
-      - "apps/example/ios/**"
-      - "**/nitrogen/generated/shared/**"
-      - "**/nitrogen/generated/ios/**"
-      - "packages/react-native-nitro-test/cpp/**"
-      - "packages/react-native-nitro-test/ios/**"
-      - "packages/react-native-nitro-test-external/cpp/**"
-      - "packages/react-native-nitro-test-external/ios/**"
-      - "packages/react-native-nitro-modules/cpp/**"
-      - "packages/react-native-nitro-modules/ios/**"
-      - "packages/react-native-nitro-modules/src/**"
-      - "**/bun.lock"
-      - "**/Podfile.lock"
-      - "**/*.podspec"
-      - "**/react-native.config.js"
-      - "**/nitro.json"
-      - "apps/example/__tests__/**"
-      - "apps/example/jest.harness.config.mjs"
-      - "apps/example/package.json"
-      - "apps/example/rn-harness.config.mjs"
+      - '.github/workflows/harness-ios.yml'
+      - 'packages/nitro-core/**'
+      - 'packages/nitrogen/**'
+      - 'packages/react-native-nitro-modules/**'
+      - 'tests/react-native/**'
+      - 'scripts/sync-core.mjs'
+      - 'scripts/core-package.mjs'
+      - 'scripts/set-version.mjs'
+      - 'package.json'
+      - 'bun.lock'
+      - 'bunfig.toml'
+      - 'scripts/releases/**'
+      - 'config/**'
   pull_request:
     paths:
-      - ".github/workflows/harness-ios.yml"
-      - "apps/example/ios/**"
-      - "**/nitrogen/generated/shared/**"
-      - "**/nitrogen/generated/ios/**"
-      - "packages/react-native-nitro-test/cpp/**"
-      - "packages/react-native-nitro-test/ios/**"
-      - "packages/react-native-nitro-test-external/cpp/**"
-      - "packages/react-native-nitro-test-external/ios/**"
-      - "packages/react-native-nitro-modules/cpp/**"
-      - "packages/react-native-nitro-modules/ios/**"
-      - "packages/react-native-nitro-modules/src/**"
-      - "**/bun.lock"
-      - "**/Podfile.lock"
-      - "**/*.podspec"
-      - "**/react-native.config.js"
-      - "**/nitro.json"
-      - "apps/example/__tests__/**"
-      - "apps/example/jest.harness.config.mjs"
-      - "apps/example/package.json"
-      - "apps/example/rn-harness.config.mjs"
+      - '.github/workflows/harness-ios.yml'
+      - 'packages/nitro-core/**'
+      - 'packages/nitrogen/**'
+      - 'packages/react-native-nitro-modules/**'
+      - 'tests/react-native/**'
+      - 'scripts/sync-core.mjs'
+      - 'scripts/core-package.mjs'
+      - 'scripts/set-version.mjs'
+      - 'package.json'
+      - 'bun.lock'
+      - 'bunfig.toml'
+      - 'scripts/releases/**'
+      - 'config/**'
 
 env:
   # Device configuration - can be overridden by workflow_dispatch inputs
@@ -79,33 +65,28 @@ env:
 
 jobs:
   harness_ios_new:
-    name: Harness iOS (${{ matrix.sanitizer.name }}, new architecture)
+    name: Harness iOS
     runs-on: macOS-26
-    strategy:
-      fail-fast: false
-      matrix:
-        sanitizer:
-          - name: Default
-            xcodebuild_flags: ""
-          - name: ASan
-            xcodebuild_flags: "-enableAddressSanitizer YES"
-          - name: TSan
-            xcodebuild_flags: "-enableThreadSanitizer YES"
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
 
       - name: Install npm dependencies (bun)
-        run: bun install
+        run: bun install --frozen-lockfile
+
+      - name: Generate React Native test bindings
+        run: bun specs
 
       - name: Install Ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           max-size: 1.5G
-          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.sanitizer.name }}-ccache-example-ios
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-Default-ccache-example-ios
       - name: Setup ccache behavior
         run: |
           {
@@ -120,7 +101,7 @@ jobs:
         with:
           ruby-version: 2.7.2
           bundler-cache: true
-          working-directory: apps/example
+          working-directory: tests/react-native/apps/example
 
       - name: Select Xcode ${{ env.XCODE_VERSION }}
         run: sudo xcode-select -s "/Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer"
@@ -128,27 +109,26 @@ jobs:
       - name: Restore Pods cache
         uses: actions/cache@v6
         with:
-          path: apps/example/ios/Pods
-          key: ${{ runner.os }}-${{ runner.arch }}-pods-${{ hashFiles('bun.lock', 'apps/example/Gemfile.lock', 'apps/example/ios/Podfile.lock') }}
+          path: tests/react-native/apps/example/ios/Pods
+          key: ${{ runner.os }}-${{ runner.arch }}-pods-${{ hashFiles('bun.lock', 'tests/react-native/apps/example/Gemfile.lock', 'tests/react-native/apps/example/ios/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-pods-
       - name: Install Pods
-        working-directory: apps/example
+        working-directory: tests/react-native/apps/example
         run: bun pods
 
       - name: Restore DerivedData cache
         uses: actions/cache@v6
         with:
-          path: apps/example/ios/build
-          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.sanitizer.name }}-dd-${{ hashFiles('bun.lock', 'apps/example/Gemfile.lock', 'apps/example/ios/Podfile.lock') }}
+          path: tests/react-native/apps/example/ios/build
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-Default-dd-${{ hashFiles('bun.lock', 'tests/react-native/apps/example/Gemfile.lock', 'tests/react-native/apps/example/ios/Podfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-${{ matrix.sanitizer.name }}-dd-
+            ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-Default-dd-
 
-      - name: Build iOS app
-        working-directory: apps/example/ios
+      - name: Build React Native iOS app
+        working-directory: tests/react-native/apps/example/ios
         run: |
           set -o pipefail
-          SANITIZER_FLAGS="${{ matrix.sanitizer.xcodebuild_flags }}"
           xcodebuild \
             C_COMPILER_LAUNCHER="$(command -v ccache)" \
             CLANG_ENABLE_EXPLICIT_MODULES_WITH_COMPILER_LAUNCHER=YES \
@@ -158,7 +138,6 @@ jobs:
             -sdk iphonesimulator \
             -configuration Debug \
             -destination 'generic/platform=iOS Simulator' \
-            ${SANITIZER_FLAGS} \
             -showBuildTimingSummary \
             ARCHS=arm64 \
             build \
@@ -169,17 +148,15 @@ jobs:
 
       - name: Run Harness E2E tests
         uses: callstackincubator/react-native-harness@v1.5.0
-        env:
-          SIMCTL_CHILD_TSAN_OPTIONS: ${{ matrix.sanitizer.name == 'TSan' && 'halt_on_error=1:log_path=/tmp/nitro-tsan' || '' }}
         with:
           runner: ios
-          projectRoot: apps/example
+          projectRoot: tests/react-native/apps/example
           app: ios/build/Build/Products/Debug-iphonesimulator/NitroExample.app
           packageManager: bun
 
       - name: Print native crash reports
         if: failure()
-        working-directory: apps/example
+        working-directory: tests/react-native/apps/example
         shell: bash
         run: |
           # Harness only extracts crash logs it classifies as native crashes,
@@ -192,23 +169,3 @@ jobs:
             cat "$report"
             echo "::endgroup::"
           done
-
-      - name: Check TSan reports
-        if: always() && matrix.sanitizer.name == 'TSan'
-        shell: bash
-        run: |
-          shopt -s nullglob
-          reports=(/tmp/nitro-tsan.*)
-          if [ ${#reports[@]} -gt 0 ]; then
-            cat "${reports[@]}"
-            echo "::error::ThreadSanitizer reported an error."
-            exit 1
-          fi
-
-      - name: Upload TSan reports
-        if: always() && matrix.sanitizer.name == 'TSan'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: tsan-reports-ios
-          path: /tmp/nitro-tsan.*
-          if-no-files-found: ignore

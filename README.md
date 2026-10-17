@@ -9,10 +9,17 @@
 <br />
 
 **Nitro Modules** are fast, type-safe native modules for React Native with statically compiled bindings to JSI.
-They consist of two parts:
+This repository contains:
 
-- [**react-native-nitro-modules**](packages/react-native-nitro-modules): The core C++ library powering all nitro modules
-- [**nitrogen**](packages/nitrogen): An optional code-generator for nitro module library authors
+- [**nitro-core**](packages/nitro-core): Shared native runtime, JavaScript API, and TypeScript definitions
+- [**nitrogen**](packages/nitrogen): Code generator for C++, Swift, and Kotlin bindings
+- [**react-native-nitro-modules**](packages/react-native-nitro-modules): React Native installation, views, worklets, and native build integration
+
+All three packages are built and released together at the same version. The documentation site lives in [docs/](docs).
+
+The tests have two environments: [standalone](tests/standalone) runs Nitro directly in Hermes through Swift Testing and JUnit; [React Native](tests/react-native) runs the example app and Harness suite. Both use the local Core and Nitrogen packages.
+
+Run `bun bootstrap` to install dependencies and build the workspace. See [CONTRIBUTING.md](CONTRIBUTING.md) for development and [RELEASING.md](RELEASING.md) for stable and nightly releases. Until this work lands on `main`, target `core-split` for contributions.
 
 ## Example
 
@@ -58,8 +65,8 @@ cd ios && pod install
 - [**How to build a Nitro Module** YouTube Tutorial ▶️](https://youtu.be/528SxTGnIlc?si=IxH7n09ZVe4iwRPv)
 - [**nitrogen**/README.md](./packages/nitrogen/README.md)
 - [**react-native-nitro-modules**/README.md](./packages/react-native-nitro-modules/README.md)
-- [**react-native-nitro-test** example module](./packages/react-native-nitro-test/README.md)
-- [`TestObject.nitro.ts` example playground](./packages/react-native-nitro-test/src/specs/TestObject.nitro.ts)
+- [**react-native-nitro-test** example module](./tests/react-native/packages/react-native-nitro-test/README.md)
+- [`TestObject.nitro.ts` example playground](./tests/react-native/packages/react-native-nitro-test/src/specs/TestObject.nitro.ts)
 
 ## Supported Platforms
 

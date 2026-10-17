@@ -3,12 +3,10 @@
 set -e
 
 SWIFT_DIRS=(
-  # react-native-nitro-modules
-  "packages/react-native-nitro-modules/ios"
-  # react-native-nitro-test
-  "packages/react-native-nitro-test/ios"
-  # react-native-nitro-test-external
-  "packages/react-native-nitro-test-external/ios"
+  "packages/nitro-core/native/apple"
+  "tests/standalone/runtime/ios"
+  "tests/react-native/packages/react-native-nitro-test/ios"
+  "tests/react-native/packages/react-native-nitro-test-external/ios"
 )
 
 if which swift >/dev/null; then

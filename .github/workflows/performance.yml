@@ -171,12 +171,12 @@ jobs:
             --architecture x86_64 --toolchain "$(java -version 2>&1 | head -1) / NDK 29.0.14206865" \
             --output apps/build.json
           bash head/scripts/performance/build-android.sh "$GITHUB_WORKSPACE/head" com.margelo.nitrobenchmark.head
-          cp head/apps/benchmark/android/app/build/outputs/apk/release/app-release.apk apps/head.apk
+          cp head/tests/react-native/apps/benchmark/android/app/build/outputs/apk/release/app-release.apk apps/head.apk
           if [[ "$(jq -r .baseSha apps/build.json)" == "$(jq -r .headSha apps/build.json)" ]]; then
             cp apps/head.apk apps/base.apk
           else
             bash head/scripts/performance/build-android.sh "$GITHUB_WORKSPACE/base"
-            cp base/apps/benchmark/android/app/build/outputs/apk/release/app-release.apk apps/base.apk
+            cp base/tests/react-native/apps/benchmark/android/app/build/outputs/apk/release/app-release.apk apps/base.apk
           fi
       - name: Save immutable Android apps
         id: upload
@@ -301,7 +301,7 @@ jobs:
       - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
           ruby-version: 3.3.0
-          working-directory: head/apps/benchmark
+          working-directory: head/tests/react-native/apps/benchmark
       - name: Select Xcode 26.5
         run: sudo xcode-select -s /Applications/Xcode_26.5.app/Contents/Developer
       - name: Build and package exact simulator apps
@@ -313,12 +313,12 @@ jobs:
             --output apps/build.json
           bash head/scripts/performance/build-ios.sh "$GITHUB_WORKSPACE/head" com.margelo.nitrobenchmark.head
           # Tar preserves the executable bits and symlinks inside each .app.
-          tar -czf apps/head.app.tar.gz -C head/apps/benchmark/ios/build-benchmark/Build/Products/Release-iphonesimulator NitroBenchmark.app
+          tar -czf apps/head.app.tar.gz -C head/tests/react-native/apps/benchmark/ios/build-benchmark/Build/Products/Release-iphonesimulator NitroBenchmark.app
           if [[ "$(jq -r .baseSha apps/build.json)" == "$(jq -r .headSha apps/build.json)" ]]; then
             cp apps/head.app.tar.gz apps/base.app.tar.gz
           else
             bash head/scripts/performance/build-ios.sh "$GITHUB_WORKSPACE/base"
-            tar -czf apps/base.app.tar.gz -C base/apps/benchmark/ios/build-benchmark/Build/Products/Release-iphonesimulator NitroBenchmark.app
+            tar -czf apps/base.app.tar.gz -C base/tests/react-native/apps/benchmark/ios/build-benchmark/Build/Products/Release-iphonesimulator NitroBenchmark.app
           fi
       - name: Save immutable iOS apps
         id: upload

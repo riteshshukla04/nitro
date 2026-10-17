@@ -24,7 +24,7 @@ import { createIOSAutolinking } from './autolinking/createIOSAutolinking.js'
 import { createAndroidAutolinking } from './autolinking/createAndroidAutolinking.js'
 import type { Autolinking } from './autolinking/Autolinking.js'
 import { createGitAttributes } from './createGitAttributes.js'
-import type { PlatformSpec } from 'react-native-nitro-modules'
+import type { PlatformSpec } from 'nitro-core'
 import { NITROGEN_VERSION } from './config/nitrogenVersion.js'
 
 interface NitrogenOptions {

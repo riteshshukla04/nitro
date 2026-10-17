@@ -3,17 +3,21 @@
 set -e
 
 CPP_DIRS=(
-  # react-native-nitro-modules
-  "packages/react-native-nitro-modules/android/src/main/cpp"
-  "packages/react-native-nitro-modules/cpp"
-  "packages/react-native-nitro-modules/ios"
-  # react-native-nitro-test
-  "packages/react-native-nitro-test/android/src/main/cpp"
-  "packages/react-native-nitro-test/cpp"
-  "packages/react-native-nitro-test/ios"
-  # react-native-nitro-test-external
-  "packages/react-native-nitro-test-external/android/src/main/cpp"
-  "packages/react-native-nitro-test-external/ios"
+  "packages/nitro-core/native/android/src/main/cpp"
+  "packages/nitro-core/native/cpp"
+  "packages/nitro-core/native/apple"
+  "tests/standalone/hermes/Sources"
+  "tests/standalone/nitro-core/android/src/main/cpp"
+  "tests/standalone/runtime/cpp"
+  "tests/standalone/runtime/ios/Support"
+  "tests/standalone/runtime/ios/Tests"
+  "tests/standalone/runtime/android/src/main/cpp"
+  "tests/react-native/packages/react-native-nitro-test/cpp"
+  "tests/react-native/packages/react-native-nitro-test/ios"
+  "tests/react-native/packages/react-native-nitro-test/android/src/main/cpp"
+  "tests/react-native/packages/react-native-nitro-test-external/cpp"
+  "tests/react-native/packages/react-native-nitro-test-external/ios"
+  "tests/react-native/packages/react-native-nitro-test-external/android/src/main/cpp"
 )
 
 if which clang-format >/dev/null; then
