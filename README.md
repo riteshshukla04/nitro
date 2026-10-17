@@ -11,15 +11,9 @@
 **Nitro Modules** are fast, type-safe native modules for React Native with statically compiled bindings to JSI.
 This repository contains:
 
-- [**nitro-core**](packages/nitro-core): Shared native runtime, JavaScript API, and TypeScript definitions
+- [**nitro-core**](packages/nitro-core): Shared native runtime for C++, Swift and Kotlin, the JavaScript API, and TypeScript definitions
 - [**nitrogen**](packages/nitrogen): Code generator for C++, Swift, and Kotlin bindings
 - [**react-native-nitro-modules**](packages/react-native-nitro-modules): React Native installation, views, worklets, and native build integration
-
-All three packages are built and released together at the same version. The documentation site lives in [docs/](docs).
-
-The tests have two environments: [standalone](tests/standalone) runs Nitro directly in Hermes through Swift Testing and JUnit; [React Native](tests/react-native) runs the example app and Harness suite. Both use the local Core and Nitrogen packages.
-
-Run `bun bootstrap` to install dependencies and build the workspace. See [CONTRIBUTING.md](CONTRIBUTING.md) for development and [RELEASING.md](RELEASING.md) for stable and nightly releases. Until this work lands on `main`, target `core-split` for contributions.
 
 ## Example
 
