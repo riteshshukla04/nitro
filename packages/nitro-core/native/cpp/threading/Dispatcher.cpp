@@ -9,7 +9,7 @@
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroLogger.hpp>
-#include <NitroModules/RuntimeData.hpp>
+#include <NitroModules/detail/RuntimeData.hpp>
 
 namespace margelo::nitro {
 
@@ -22,11 +22,11 @@ void Dispatcher::installRuntimeGlobalDispatcher(jsi::Runtime& runtime, std::shar
   Logger::log(LogLevel::Info, TAG, "Installing Dispatcher into Runtime \"%s\"...", getRuntimeId(runtime).c_str());
 
   // Store it in the Runtime's data, which holds a strong reference until the Runtime is destroyed
-  RuntimeData::create(runtime, RUNTIME_DATA_UUID, std::move(dispatcher));
+  detail::RuntimeData::create(runtime, RUNTIME_DATA_UUID, std::move(dispatcher));
 }
 
 std::shared_ptr<Dispatcher> Dispatcher::getRuntimeGlobalDispatcher(jsi::Runtime& runtime) {
-  std::shared_ptr<Dispatcher>* dispatcher = RuntimeData::get<std::shared_ptr<Dispatcher>>(runtime, RUNTIME_DATA_UUID);
+  std::shared_ptr<Dispatcher>* dispatcher = detail::RuntimeData::get<std::shared_ptr<Dispatcher>>(runtime, RUNTIME_DATA_UUID);
   if (dispatcher != nullptr) [[likely]] {
     return *dispatcher;
   }

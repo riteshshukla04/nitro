@@ -10,7 +10,7 @@ namespace margelo::nitro {
 class HybridObject;
 } // namespace margelo::nitro
 
-#include <NitroModules/IsSharedPtrTo.hpp>
+#include <NitroModules/detail/IsSharedPtrTo.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroTypeInfo.hpp>
 #include <jsi/jsi.h>
@@ -22,7 +22,7 @@ using namespace facebook;
 
 // NativeState <> {}
 template <typename T>
-  requires is_shared_ptr_to_v<T, jsi::NativeState>
+  requires detail::is_shared_ptr_to_v<T, jsi::NativeState>
 struct JSIConverter<T> final {
   using TPointee = typename T::element_type;
 

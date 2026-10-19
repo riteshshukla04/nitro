@@ -10,7 +10,7 @@
 #include <atomic>
 #include <mutex>
 
-namespace margelo::nitro {
+namespace margelo::nitro::detail {
 
 /**
  * Holds state for an `BorrowingReference` (or `WeakReference`).
@@ -50,4 +50,4 @@ struct ReferenceState {
   explicit ReferenceState() : strongRefCount(1), weakRefCount(1), isDeleted(false) {}
 };
 
-} // namespace margelo::nitro
+} // namespace margelo::nitro::detail

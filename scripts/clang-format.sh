@@ -9,7 +9,6 @@ CPP_DIRS=(
   "packages/react-native-nitro-modules/android/src/main/cpp"
   "packages/react-native-nitro-modules/include"
   "packages/react-native-nitro-modules/cpp/views"
-  "packages/react-native-nitro-modules/cpp/threading"
   "packages/react-native-nitro-modules/apple/turbomodule"
   "tests/standalone/hermes/Sources"
   "tests/standalone/nitro-core/android/src/main/cpp"

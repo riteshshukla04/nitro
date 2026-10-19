@@ -6,7 +6,7 @@
 //
 
 #include <NitroModules/PropNameIDCache.hpp>
-#include <NitroModules/RuntimeData.hpp>
+#include <NitroModules/detail/RuntimeData.hpp>
 
 namespace margelo::nitro {
 
@@ -16,7 +16,7 @@ using namespace facebook;
 static constexpr jsi::UUID RUNTIME_DATA_UUID{0x7836f9bb, 0x6a55, 0x49dd, 0xb80b, 0xc640af1d17ce};
 
 const jsi::PropNameID& PropNameIDCache::get(jsi::Runtime& runtime, const std::string& value) {
-  CacheMap& cache = RuntimeData::getOrCreate(runtime, RUNTIME_DATA_UUID, [] { return CacheMap(); });
+  CacheMap& cache = detail::RuntimeData::getOrCreate(runtime, RUNTIME_DATA_UUID, [] { return CacheMap(); });
   const auto& cachedName = cache.find(value);
   if (cachedName != cache.end()) {
     // cache warm!

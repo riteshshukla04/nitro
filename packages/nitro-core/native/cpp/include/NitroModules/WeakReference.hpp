@@ -8,7 +8,7 @@
 #pragma once
 
 #include <NitroModules/NitroDefines.hpp>
-#include <NitroModules/ReferenceState.hpp>
+#include <NitroModules/detail/ReferenceState.hpp>
 #include <atomic>
 #include <cstddef>
 #include <mutex>
@@ -116,7 +116,7 @@ private:
 
 private:
   T* NULLABLE _value;
-  ReferenceState* NULLABLE _state;
+  detail::ReferenceState* NULLABLE _state;
 };
 
 } // namespace margelo::nitro

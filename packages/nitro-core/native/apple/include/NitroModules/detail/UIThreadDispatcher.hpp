@@ -3,7 +3,7 @@
 #include <NitroModules/Dispatcher.hpp>
 #include <dispatch/dispatch.h>
 
-namespace margelo::nitro {
+namespace margelo::nitro::detail {
 
 class UIThreadDispatcher : public Dispatcher {
 public:
@@ -17,4 +17,4 @@ private:
   dispatch_queue_t _queue;
 };
 
-} // namespace margelo::nitro
+} // namespace margelo::nitro::detail

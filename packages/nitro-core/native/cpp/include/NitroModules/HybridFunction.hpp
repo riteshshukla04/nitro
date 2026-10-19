@@ -12,7 +12,7 @@ template <typename T>
 struct JSIConverter;
 } // namespace margelo::nitro
 
-#include <NitroModules/CountTrailingOptionals.hpp>
+#include <NitroModules/detail/CountTrailingOptionals.hpp>
 #include <NitroModules/InstanceMethod.hpp>
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/JSIString.hpp>
@@ -108,7 +108,7 @@ public:
       std::shared_ptr<THybrid> hybridInstance = getHybridObjectNativeState<THybrid>(runtime, thisValue, kind, name);
 
       // 2. Make sure the given arguments match, either with a static size, or with potentially optional arguments size.
-      constexpr size_t optionalArgsCount = trailing_optionals_count_v<Args...>;
+      constexpr size_t optionalArgsCount = detail::trailing_optionals_count_v<Args...>;
       constexpr size_t maxArgsCount = sizeof...(Args);
       constexpr size_t minArgsCount = maxArgsCount - optionalArgsCount;
       bool isWithinArgsRange = (count >= minArgsCount && count <= maxArgsCount);
@@ -153,7 +153,7 @@ public:
     jsi::HostFunctionType hostFunction = [name, function](jsi::Runtime& runtime, const jsi::Value&,
                                                          const jsi::Value* args, size_t count) -> jsi::Value {
       constexpr size_t maximum = sizeof...(Args);
-      constexpr size_t minimum = maximum - trailing_optionals_count_v<Args...>;
+      constexpr size_t minimum = maximum - detail::trailing_optionals_count_v<Args...>;
       if (count < minimum || count > maximum) [[unlikely]] {
         throw jsi::JSError(runtime, "`" + name + "` expected " + std::to_string(minimum) + " to " +
                                        std::to_string(maximum) + " arguments, but received " + std::to_string(count) + "!");

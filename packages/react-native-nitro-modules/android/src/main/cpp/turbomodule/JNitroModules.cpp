@@ -3,7 +3,7 @@
 //
 
 #include "JNitroModules.hpp"
-#include "CallInvokerDispatcher.hpp"
+#include <NitroModulesReactNative/detail/CallInvokerDispatcher.hpp>
 #include <NitroModules/InstallNitro.hpp>
 
 #include <exception>
@@ -28,7 +28,7 @@ void JNitroModules::install(jlong runtimePointer, jni::alias_ref<react::CallInvo
     throw std::invalid_argument("CallInvoker was null!");
   }
 
-  auto dispatcher = std::make_shared<CallInvokerDispatcher>(callInvoker);
+  auto dispatcher = std::make_shared<detail::CallInvokerDispatcher>(callInvoker);
   margelo::nitro::install(*runtime, dispatcher);
 }
 

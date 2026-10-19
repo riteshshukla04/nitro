@@ -9,7 +9,7 @@
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
-#include <NitroModules/RuntimeData.hpp>
+#include <NitroModules/detail/RuntimeData.hpp>
 
 namespace margelo::nitro {
 
@@ -169,7 +169,7 @@ const jsi::PropNameID& CommonGlobals::getKnownGlobalPropertyName(jsi::Runtime& r
 const jsi::Function& CommonGlobals::getGlobalFunction(jsi::Runtime& runtime, const char* key,
                                                       std::function<jsi::Function(jsi::Runtime&)> getFunction) {
   // Let's try to find the function in cache
-  FunctionCache& functionCache = RuntimeData::getOrCreate(runtime, RUNTIME_DATA_UUID, [] { return FunctionCache(); });
+  FunctionCache& functionCache = detail::RuntimeData::getOrCreate(runtime, RUNTIME_DATA_UUID, [] { return FunctionCache(); });
   std::string stringKey = key;
   auto iterator = functionCache.find(stringKey);
   if (iterator != functionCache.end()) [[likely]] {

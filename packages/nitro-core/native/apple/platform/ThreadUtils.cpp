@@ -6,7 +6,7 @@
 //
 
 #include <NitroModules/ThreadUtils.hpp>
-#include <NitroModules/UIThreadDispatcher.hpp>
+#include <NitroModules/detail/UIThreadDispatcher.hpp>
 #include <dispatch/dispatch.h>
 #include <pthread.h>
 #include <sstream>
@@ -46,7 +46,7 @@ bool ThreadUtils::isUIThread() {
 }
 
 std::shared_ptr<Dispatcher> ThreadUtils::createUIThreadDispatcher() {
-  return std::make_shared<UIThreadDispatcher>();
+  return std::make_shared<detail::UIThreadDispatcher>();
 }
 
 } // namespace margelo::nitro

@@ -24,7 +24,6 @@ include_directories(
   # Shared Nitro Core public headers
   ../cpp/core/include
   # React Native C++ includes
-  ../cpp/threading
   ../include
   src/main/cpp/turbomodule
   src/main/cpp/views

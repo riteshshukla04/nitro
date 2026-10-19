@@ -7,7 +7,7 @@
 
 #include <NitroModules/InstallNitro.hpp>
 #include <NitroModules/CommonGlobals.hpp>
-#include <NitroModules/HybridNitroModulesProxy.hpp>
+#include <NitroModules/detail/HybridNitroModulesProxy.hpp>
 
 namespace margelo::nitro {
 
@@ -22,7 +22,7 @@ void install(jsi::Runtime& runtime, std::shared_ptr<Dispatcher> dispatcher) {
 
 void install(jsi::Runtime& runtime) {
   // Installs global.NitroModulesProxy
-  auto proxy = std::make_shared<HybridNitroModulesProxy>();
+  auto proxy = std::make_shared<detail::HybridNitroModulesProxy>();
   CommonGlobals::defineGlobal(runtime, KnownGlobalPropertyName::NITRO_MODULES_PROXY, proxy->toObject(runtime));
 }
 

@@ -4,7 +4,7 @@
 
 #include <NitroModules/HybridObject.hpp>
 #include <NitroModules/CommonGlobals.hpp>
-#include <NitroModules/HybridNitroModulesProxy.hpp>
+#include <NitroModules/detail/HybridNitroModulesProxy.hpp>
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/NitroDefines.hpp>
 
@@ -12,13 +12,13 @@ namespace margelo::nitro {
 
 HybridObject::HybridObject() {
 #ifdef NITRO_DEBUG
-  HybridNitroModulesProxy::debug_notifyHybridObjectAllocated();
+  detail::HybridNitroModulesProxy::debug_notifyHybridObjectAllocated();
 #endif
 }
 
 HybridObject::~HybridObject() {
 #ifdef NITRO_DEBUG
-  HybridNitroModulesProxy::debug_notifyHybridObjectDeallocated();
+  detail::HybridNitroModulesProxy::debug_notifyHybridObjectDeallocated();
 #endif
 }
 

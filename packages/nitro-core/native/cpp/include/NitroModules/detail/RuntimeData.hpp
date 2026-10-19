@@ -14,7 +14,7 @@
 #include <string>
 #include <type_traits>
 
-namespace margelo::nitro {
+namespace margelo::nitro::detail {
 
 using namespace facebook;
 
@@ -108,4 +108,4 @@ private:
   };
 };
 
-} // namespace margelo::nitro
+} // namespace margelo::nitro::detail

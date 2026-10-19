@@ -100,7 +100,6 @@ let package = Package(
       publicHeadersPath: "include",
       cxxSettings: cxxSettings + [
         .define("RCT_NEW_ARCH_ENABLED", to: "1"),
-        .headerSearchPath("cpp/threading"),
       ]
     ),
   ],

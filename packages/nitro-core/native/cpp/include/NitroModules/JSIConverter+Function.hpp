@@ -6,7 +6,7 @@
 
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroModules/PromiseType.hpp>
+#include <NitroModules/detail/PromiseType.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <functional>
 #include <jsi/jsi.h>
@@ -22,9 +22,9 @@ using namespace facebook;
 template <typename R, typename... Args>
 struct JSIConverter<std::function<R(Args...)>> final {
   // Decoded void and Promise-returning JS functions are dispatched asynchronously.
-  inline static constexpr bool isAsync = is_promise_v<R> || std::is_void_v<R>;
+  inline static constexpr bool isAsync = detail::is_promise_v<R> || std::is_void_v<R>;
   // Promise<T> -> T
-  using ActualR = std::conditional_t<isAsync, promise_type_v<R>, R>;
+  using ActualR = std::conditional_t<isAsync, detail::promise_type_v<R>, R>;
 
   static inline std::function<R(Args...)> fromJSI(jsi::Runtime& runtime, const jsi::Value& arg)
     requires((JSIEncodable<Args> && ...) && (std::is_void_v<ActualR> || JSIDecodable<ActualR>))

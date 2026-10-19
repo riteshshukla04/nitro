@@ -5,9 +5,9 @@
 //  Created by Marc Rousavy on 15.10.26.
 //
 
-#include <NitroModules/RuntimeData.hpp>
+#include <NitroModules/detail/RuntimeData.hpp>
 
-namespace margelo::nitro {
+namespace margelo::nitro::detail {
 
 #ifdef NITRO_DEBUG
 // Its address identifies this copy of Nitro Modules. It is writable, so the linker never merges it with another copy's.
@@ -18,4 +18,4 @@ const void* RuntimeData::getNitroModulesCopyIdentifier() {
 }
 #endif
 
-} // namespace margelo::nitro
+} // namespace margelo::nitro::detail

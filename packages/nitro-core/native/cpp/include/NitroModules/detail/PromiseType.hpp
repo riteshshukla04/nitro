@@ -10,7 +10,7 @@
 #include <NitroModules/Promise.hpp>
 #include <type_traits>
 
-namespace margelo::nitro {
+namespace margelo::nitro::detail {
 
 // Gets the `T` in `Promise<T>`.
 template <typename T>
@@ -36,4 +36,4 @@ using promise_type_v = typename promise_type<std::remove_reference_t<T>>::type;
 template <typename T>
 inline constexpr bool is_promise_v = promise_type<std::remove_reference_t<T>>::is_promise::value;
 
-} // namespace margelo::nitro
+} // namespace margelo::nitro::detail

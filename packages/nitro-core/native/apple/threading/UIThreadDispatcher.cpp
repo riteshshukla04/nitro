@@ -1,7 +1,7 @@
-#include <NitroModules/UIThreadDispatcher.hpp>
+#include <NitroModules/detail/UIThreadDispatcher.hpp>
 #include <NitroModules/ThreadUtils.hpp>
 
-namespace margelo::nitro {
+namespace margelo::nitro::detail {
 
 UIThreadDispatcher::UIThreadDispatcher() : _queue(dispatch_get_main_queue()) {}
 
@@ -21,4 +21,4 @@ bool UIThreadDispatcher::isOnDispatcher() {
   return ThreadUtils::isUIThread();
 }
 
-} // namespace margelo::nitro
+} // namespace margelo::nitro::detail

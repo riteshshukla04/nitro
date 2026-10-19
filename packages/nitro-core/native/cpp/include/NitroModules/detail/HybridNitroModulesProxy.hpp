@@ -13,7 +13,7 @@
 #include <memory>
 #include <string>
 
-namespace margelo::nitro {
+namespace margelo::nitro::detail {
 
 /**
  * Represents the entry point for all other HybridObjects.
@@ -62,4 +62,4 @@ protected:
   }
 };
 
-} // namespace margelo::nitro
+} // namespace margelo::nitro::detail

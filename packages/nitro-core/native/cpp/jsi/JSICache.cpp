@@ -7,7 +7,7 @@
 
 #include <NitroModules/JSICache.hpp>
 #include <NitroModules/NitroDefines.hpp>
-#include <NitroModules/RuntimeData.hpp>
+#include <NitroModules/detail/RuntimeData.hpp>
 
 namespace margelo::nitro {
 
@@ -41,7 +41,7 @@ JSICache::~JSICache() {
 }
 
 JSICache& JSICache::getOrCreateCache(jsi::Runtime& runtime) {
-  return RuntimeData::getOrCreate(runtime, RUNTIME_DATA_UUID, [] { return JSICache(); });
+  return detail::RuntimeData::getOrCreate(runtime, RUNTIME_DATA_UUID, [] { return JSICache(); });
 }
 
 } // namespace margelo::nitro

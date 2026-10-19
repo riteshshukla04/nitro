@@ -10,7 +10,7 @@
 #include <optional>
 #include <type_traits>
 
-namespace margelo::nitro {
+namespace margelo::nitro::detail {
 
 // Helper template to check if a type is std::optional
 template <typename T>
@@ -61,4 +61,4 @@ struct trailing_optionals_count {
 template <typename... Args>
 constexpr int trailing_optionals_count_v = trailing_optionals_count<std::remove_cvref_t<Args>...>::value;
 
-} // namespace margelo::nitro
+} // namespace margelo::nitro::detail

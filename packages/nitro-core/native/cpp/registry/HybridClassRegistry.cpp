@@ -7,7 +7,7 @@
 
 #include <NitroModules/HybridClassRegistry.hpp>
 #include <NitroModules/HybridObject.hpp>
-#include <NitroModules/HybridNitroModulesProxy.hpp>
+#include <NitroModules/detail/HybridNitroModulesProxy.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <cassert>
 #include <mutex>
@@ -19,7 +19,7 @@ static std::mutex registryMutex;
 std::unordered_map<std::string, std::shared_ptr<const HybridClass>>& HybridClassRegistry::getRegistry() {
   static std::unordered_map<std::string, std::shared_ptr<const HybridClass>> classes = {
     {HybridObject::Class::name, HybridObject::Class::get()},
-    {HybridNitroModulesProxy::Class::name, HybridNitroModulesProxy::Class::get()},
+    {detail::HybridNitroModulesProxy::Class::name, detail::HybridNitroModulesProxy::Class::get()},
   };
   return classes;
 }

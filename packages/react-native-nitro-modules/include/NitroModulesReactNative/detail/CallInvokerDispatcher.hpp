@@ -9,7 +9,7 @@
 #include <ReactCommon/CallInvoker.h>
 #include <thread>
 
-namespace margelo::nitro {
+namespace margelo::nitro::detail {
 
 using namespace facebook;
 
@@ -39,4 +39,4 @@ private:
   const std::thread::id _threadId;
 };
 
-} // namespace margelo::nitro
+} // namespace margelo::nitro::detail

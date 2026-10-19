@@ -9,7 +9,7 @@
 
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroTypeInfo.hpp>
-#include <NitroModules/ReferenceState.hpp>
+#include <NitroModules/detail/ReferenceState.hpp>
 #include <NitroModules/WeakReference.hpp>
 #include <atomic>
 #include <cstddef>
@@ -36,7 +36,7 @@ class BorrowingReference final {
 public:
   BorrowingReference() : _value(nullptr), _state(nullptr) {}
 
-  explicit BorrowingReference(T* NULLABLE value) : _value(value), _state(new ReferenceState()) {}
+  explicit BorrowingReference(T* NULLABLE value) : _value(value), _state(new detail::ReferenceState()) {}
 
   BorrowingReference(const BorrowingReference& ref) : _value(ref._value), _state(ref._state) {
     if (_state != nullptr) {
@@ -216,9 +216,42 @@ public:
 
 private:
   T* NULLABLE _value;
-  ReferenceState* NULLABLE _state;
+  detail::ReferenceState* NULLABLE _state;
 };
 
-} // namespace margelo::nitro
+template <typename T>
+WeakReference<T>::WeakReference(const BorrowingReference<T>& ref) {
+  _value = ref._value;
+  _state = ref._state;
+  if (_state != nullptr) {
+    _state->weakRefCount++;
+  }
+}
 
-#include <NitroModules/WeakReference+Borrowing.hpp>
+template <typename T>
+BorrowingReference<T> WeakReference<T>::lock() const {
+  if (_state == nullptr) {
+    return BorrowingReference<T>();
+  }
+
+  std::unique_lock lock(_state->mutex);
+
+  if (_state->isDeleted) {
+    // return nullptr
+    return BorrowingReference<T>();
+  }
+
+  // only acquire a strong reference if there still is one - once the last strong reference
+  // has been released (possibly on another Thread), the value is about to be deleted.
+  size_t strongRefCount = _state->strongRefCount.load();
+  do {
+    if (strongRefCount == 0) {
+      // return nullptr
+      return BorrowingReference<T>();
+    }
+  } while (!_state->strongRefCount.compare_exchange_weak(strongRefCount, strongRefCount + 1));
+
+  return BorrowingReference(*this);
+}
+
+} // namespace margelo::nitro

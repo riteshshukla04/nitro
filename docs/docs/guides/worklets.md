@@ -65,7 +65,7 @@ Dispatcher::installRuntimeGlobalDispatcher(myRuntime, myDispatcher);
 
 This needs to be done once, ideally immediately after creating the `jsi::Runtime`.
 
-Your `runSync` and `runAsync` implementations must run the given `function` on the same Thread that the `jsi::Runtime` was created on - see [`CallInvokerDispatcher.hpp`](https://github.com/margelo/nitro/blob/main/packages/react-native-nitro-modules/cpp/threading/CallInvokerDispatcher.hpp) for an example.
+Your `runSync` and `runAsync` implementations must run the given `function` on the same Thread that the `jsi::Runtime` was created on - see [`CallInvokerDispatcher.hpp`](https://github.com/margelo/nitro/blob/v1/packages/react-native-nitro-modules/include/NitroModulesReactNative/detail/CallInvokerDispatcher.hpp) for an example.
 
 ## Boxing
 

@@ -158,14 +158,20 @@ if (isNewArchitectureEnabled()) {
   }
 }
 
-tasks.register('prepareHeaders', Copy) {
-  from fileTree('./src/main/cpp').filter { it.isFile() }
-  from fileTree('./core/main/cpp').filter { it.isFile() }
-  from fileTree('../cpp/').filter { it.isFile() }
-  from fileTree('../include/NitroModules').filter { it.isFile() }
-  include "*.hpp"
-  into "${project.buildDir}/headers/nitromodules/NitroModules/"
+tasks.register('prepareHeaders', Sync) {
+  from(fileTree('./src/main/cpp').filter { it.isFile() }) {
+    include '*.hpp'
+    into 'NitroModules'
+  }
+  from(fileTree('./core/main/cpp').filter { it.isFile() }) {
+    include '*.hpp'
+    into 'NitroModules'
+  }
+  from('../cpp/core/include') { include '**/*.hpp' }
+  from('../include') { include '**/*.hpp' }
+  into "${project.buildDir}/headers/nitromodules/"
   includeEmptyDirs = false
+  duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 
 preBuild.dependsOn(prepareHeaders)

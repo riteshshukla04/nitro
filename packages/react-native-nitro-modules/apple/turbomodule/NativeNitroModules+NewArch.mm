@@ -9,7 +9,7 @@
 
 #ifdef RCT_NEW_ARCH_ENABLED
 
-#import "CallInvokerDispatcher.hpp"
+#import <NitroModulesReactNative/detail/CallInvokerDispatcher.hpp>
 #import <NitroModules/InstallNitro.hpp>
 #import <NitroModules/NitroLogger.hpp>
 
@@ -54,7 +54,7 @@ RCT_EXPORT_MODULE(NitroModules)
   }
 
   // 2. Wrap CallInvoker as Dispatcher
-  auto dispatcher = std::make_shared<nitro::CallInvokerDispatcher>(callInvoker);
+  auto dispatcher = std::make_shared<nitro::detail::CallInvokerDispatcher>(callInvoker);
 
   // 3. Install Nitro
   try {

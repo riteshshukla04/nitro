@@ -5,12 +5,12 @@
 //  Created by Marc Rousavy on 05.10.24
 //
 
-#include <NitroModules/HybridNitroModulesProxy.hpp>
+#include <NitroModules/detail/HybridNitroModulesProxy.hpp>
 #include <NitroModules/HybridClassRegistry.hpp>
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/NitroDefines.hpp>
 
-namespace margelo::nitro {
+namespace margelo::nitro::detail {
 
 const std::shared_ptr<const HybridClass>& HybridNitroModulesProxy::Class::get() {
   static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
@@ -113,4 +113,4 @@ void HybridNitroModulesProxy::debug_notifyHybridObjectDeallocated() {
   _hybridObjectInstancesCount.fetch_sub(1, std::memory_order_relaxed);
 }
 
-} // namespace margelo::nitro
+} // namespace margelo::nitro::detail

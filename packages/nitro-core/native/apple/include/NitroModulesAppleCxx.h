@@ -5,4 +5,3 @@
 #include <NitroModules/RuntimeError.hpp>
 #include <NitroModules/StringBufferConsumer.hpp>
 #include <NitroModules/SwiftValueCallbacks.hpp>
-#include <NitroModules/UIThreadDispatcher.hpp>

@@ -9,7 +9,7 @@
 
 #ifndef RCT_NEW_ARCH_ENABLED
 
-#import "CallInvokerDispatcher.hpp"
+#import <NitroModulesReactNative/detail/CallInvokerDispatcher.hpp>
 #import <NitroModules/InstallNitro.hpp>
 
 #import <React/RCTBridge+Private.h>
@@ -52,7 +52,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
     }
 
     // 4. Wrap react::CallInvoker in nitro::Dispatcher
-    auto dispatcher = std::make_shared<nitro::CallInvokerDispatcher>(callInvoker);
+    auto dispatcher = std::make_shared<nitro::detail::CallInvokerDispatcher>(callInvoker);
 
     // 5. Install Nitro
     nitro::install(*runtime, dispatcher);
