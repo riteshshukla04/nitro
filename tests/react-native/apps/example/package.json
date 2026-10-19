@@ -24,7 +24,8 @@
     "react-native-nitro-test": "workspace:*",
     "react-native-nitro-modules": "1.0.0-alpha.0",
     "react-native-safe-area-context": "^5.10.1",
-    "nitro-core": "1.0.0-alpha.0"
+    "nitro-core": "1.0.0-alpha.0",
+    "react-native-nitro-test-external": "workspace:*"
   },
   "devDependencies": {
     "@babel/core": "^8.0.7",

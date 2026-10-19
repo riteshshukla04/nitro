@@ -12,7 +12,7 @@ import { NamedWrappingType } from '../syntax/types/NamedWrappingType.js'
 import { OptionalType } from '../syntax/types/OptionalType.js'
 
 export function getHybridViewComponentName(spec: HybridObjectSpec): string {
-  return `${spec.config.getIosModuleName()}_${spec.name}`
+  return spec.config.getHybridClassRegistryName(spec.name)
 }
 
 /** Properties inherited from view bases are also React props. */

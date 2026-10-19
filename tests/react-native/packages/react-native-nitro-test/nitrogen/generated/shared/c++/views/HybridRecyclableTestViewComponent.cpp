@@ -16,7 +16,7 @@ namespace margelo::nitro::test::views {
   using namespace margelo;
   using namespace facebook;
 
-  extern const char HybridRecyclableTestViewComponentName[] = "NitroTest_RecyclableTestView";
+  extern const char HybridRecyclableTestViewComponentName[] = "test.RecyclableTestView";
 
   HybridRecyclableTestViewProps::HybridRecyclableTestViewProps(const react::PropsParserContext& context,
                                                                const HybridRecyclableTestViewProps& sourceProps,

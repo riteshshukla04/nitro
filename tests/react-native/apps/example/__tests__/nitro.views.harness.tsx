@@ -15,6 +15,11 @@ import {
   TestView,
   type TestViewRef,
 } from 'react-native-nitro-test'
+import { TestView as TestViewClass } from 'react-native-nitro-test/src/specs/TestView.nitro'
+import {
+  TestView as ExternalTestView,
+  TestViewComponent as ExternalTestViewComponent,
+} from 'react-native-nitro-test-external'
 import * as UPNG from 'upng-js'
 
 interface Deferred<T> {
@@ -560,6 +565,131 @@ describe('TestView', () => {
     const remountedCapture = await captureView('test-view-lifecycle')
     expectRenderedSize(remountedCapture.size, INITIAL_SIZE)
     expectRed(remountedCapture.pixelCoverage)
+  })
+})
+
+describe('namespaced TestViews', () => {
+  it('keeps same-named views from different packages independent', async () => {
+    const mainRef = deferred<TestViewRef>()
+    const externalRef = deferred<ExternalTestView>()
+    const mainCallbackFinished = deferred<void>()
+    const externalCallbackFinished = deferred<void>()
+    const mainCallback = fn(() => mainCallbackFinished.resolve(undefined))
+    const externalCallback = fn(() =>
+      externalCallbackFinished.resolve(undefined)
+    )
+
+    const renderResult = await render(
+      <View style={{ flexDirection: 'row' }}>
+        <TestView
+          testID="namespaced-test-view-main"
+          style={INITIAL_SIZE}
+          hybridRef={(view) => mainRef.resolve(view)}
+          isBlue={true}
+          hasBeenCalled={false}
+          int64Value={INITIAL_INT64_VALUE}
+          colorScheme="dark"
+          someCallback={mainCallback}
+        />
+        <ExternalTestViewComponent
+          testID="namespaced-test-view-external"
+          style={INITIAL_SIZE}
+          hybridRef={(view) => externalRef.resolve(view)}
+          isBlue={false}
+          someCallback={externalCallback}
+        />
+      </View>,
+      { timeout: RENDER_TIMEOUT }
+    )
+
+    const mainView = await mainRef.promise
+    const externalView = await externalRef.promise
+    expect(mainView instanceof TestViewClass).toBe(true)
+    expect(mainView instanceof ExternalTestView).toBe(false)
+    expect(externalView instanceof ExternalTestView).toBe(true)
+    expect(externalView instanceof TestViewClass).toBe(false)
+    expect(mainView.equals(externalView)).toBe(false)
+    expect(mainView.isBlue).toBe(true)
+    expect(externalView.isBlue).toBe(false)
+    expect(externalView.getModuleName()).toBe('NitroTestExternal')
+
+    const mainCapture = await captureView('namespaced-test-view-main')
+    const externalCapture = await captureView('namespaced-test-view-external')
+    expectRenderedSize(mainCapture.size, INITIAL_SIZE)
+    expectRenderedSize(externalCapture.size, INITIAL_SIZE)
+    expectBlue(mainCapture.pixelCoverage)
+    expectRed(externalCapture.pixelCoverage)
+
+    mainView.someMethod()
+    await mainCallbackFinished.promise
+    expect(mainCallback).toHaveBeenCalledTimes(1)
+    expect(externalCallback).not.toHaveBeenCalled()
+    expect(mainView.hasBeenCalled).toBe(true)
+
+    externalView.someMethod()
+    await externalCallbackFinished.promise
+    expect(mainCallback).toHaveBeenCalledTimes(1)
+    expect(externalCallback).toHaveBeenCalledTimes(1)
+
+    const updatedMainRef = deferred<TestViewRef>()
+    const updatedExternalRef = deferred<ExternalTestView>()
+    const updatedMainCallbackFinished = deferred<void>()
+    const updatedExternalCallbackFinished = deferred<void>()
+    const updatedMainCallback = fn(() =>
+      updatedMainCallbackFinished.resolve(undefined)
+    )
+    const updatedExternalCallback = fn(() =>
+      updatedExternalCallbackFinished.resolve(undefined)
+    )
+
+    await renderResult.rerender(
+      <View style={{ flexDirection: 'row' }}>
+        <TestView
+          testID="namespaced-test-view-main"
+          style={INITIAL_SIZE}
+          hybridRef={(view) => updatedMainRef.resolve(view)}
+          isBlue={false}
+          hasBeenCalled={false}
+          int64Value={INITIAL_INT64_VALUE}
+          colorScheme="dark"
+          someCallback={updatedMainCallback}
+        />
+        <ExternalTestViewComponent
+          testID="namespaced-test-view-external"
+          style={INITIAL_SIZE}
+          hybridRef={(view) => updatedExternalRef.resolve(view)}
+          isBlue={true}
+          someCallback={updatedExternalCallback}
+        />
+      </View>
+    )
+
+    const updatedMainView = await updatedMainRef.promise
+    const updatedExternalView = await updatedExternalRef.promise
+    expect(updatedMainView.equals(mainView)).toBe(true)
+    expect(updatedExternalView.equals(externalView)).toBe(true)
+    expect(mainView.isBlue).toBe(false)
+    expect(externalView.isBlue).toBe(true)
+    expect(externalView.getModuleName()).toBe('NitroTestExternal')
+
+    const updatedMainCapture = await captureView('namespaced-test-view-main')
+    const updatedExternalCapture = await captureView(
+      'namespaced-test-view-external'
+    )
+    expectRed(updatedMainCapture.pixelCoverage)
+    expectBlue(updatedExternalCapture.pixelCoverage)
+
+    externalView.someMethod()
+    await updatedExternalCallbackFinished.promise
+    expect(updatedExternalCallback).toHaveBeenCalledTimes(1)
+    expect(updatedMainCallback).not.toHaveBeenCalled()
+
+    mainView.someMethod()
+    await updatedMainCallbackFinished.promise
+    expect(updatedMainCallback).toHaveBeenCalledTimes(1)
+    expect(updatedExternalCallback).toHaveBeenCalledTimes(1)
+    expect(mainCallback).toHaveBeenCalledTimes(1)
+    expect(externalCallback).toHaveBeenCalledTimes(1)
   })
 })
 

@@ -21,7 +21,7 @@ module.exports = {
   get TestViewComponent() {
     if (hybridComponent === undefined) {
       const { getHostComponent, NitroViewProp } = require('react-native-nitro-modules')
-      hybridComponent = getHostComponent("NitroTest_TestView", {
+      hybridComponent = getHostComponent("test.TestView", {
         "isBlue": NitroViewProp,
         "hasBeenCalled": NitroViewProp,
         "int64Value": NitroViewProp,
