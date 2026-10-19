@@ -249,6 +249,11 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
     })
   }
   get needsAdapter(): boolean {
+    // TODO: Remove this Promise-result workaround once our minimum supported
+    // Swift toolchain includes https://github.com/swiftlang/swift/pull/93329.
+    // Swift can omit std::function copy constructors when it instantiates the
+    // Promise's JSI callbacks, so compile those calls in the C++ adapters.
+    if (this.returnType.kind === 'promise') return true
     const adapterTypes = [
       this.adapterReturnType,
       ...this.adapterParameters.map((parameter) => parameter.type),

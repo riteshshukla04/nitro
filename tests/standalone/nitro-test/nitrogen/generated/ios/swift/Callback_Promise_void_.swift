@@ -17,18 +17,18 @@ extension Callback_Promise_void_: Callback {
   public typealias AsyncResult = margelo.nitro.test.swift_bridge.Promise_Promise_void_
   private typealias bridge = margelo.nitro.test.swift_bridge
 
-  public borrowing func callSync(_ arguments: Arguments) throws -> Return {
+  public func callSync(_ arguments: Arguments) throws -> Return {
     let __result = bridge.callSync_Callback_Promise_void_(self)
     if __result.hasError() {
       throw RuntimeError.from(cppError: __result.error())
     }
     return __result.copyValue()
   }
-  public borrowing func callAsync(_ arguments: Arguments) -> AsyncResult {
-    return __callAsync()
+  public func callAsync(_ arguments: Arguments) -> AsyncResult {
+    return bridge.callAsync_Callback_Promise_void_(self)
   }
-  public borrowing func callAndForget(_ arguments: Arguments) {
-    __callAndForget()
+  public func callAndForget(_ arguments: Arguments) {
+    bridge.callAndForget_Callback_Promise_void_(self)
   }
   public init(_ closure: @escaping () throws -> Return) {
     self = bridge.create_Callback_Promise_void_(.init { () -> bridge.Result_Promise_void_ in

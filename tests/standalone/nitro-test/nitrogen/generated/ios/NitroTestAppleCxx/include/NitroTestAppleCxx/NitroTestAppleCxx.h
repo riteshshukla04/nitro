@@ -228,6 +228,8 @@ namespace margelo::nitro::test::swift_bridge {
   using Result_Promise_void_ = Result<Promise<void>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Callback_Promise_void_ = Callback<Promise<void>()>;
   Result<Promise<void>, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_Promise_void_(const Callback_Promise_void_& callback) noexcept;
+  Promise<Promise<void>> callAsync_Callback_Promise_void_(const Callback_Promise_void_& callback);
+  void callAndForget_Callback_Promise_void_(const Callback_Promise_void_& callback);
   Callback_Promise_void_ create_Callback_Promise_void_(std::function<Result<Promise<void>, margelo::nitro::test::swift_bridge::ResultTag>()> closure);
   using Callback_void_swift__Optional_double_ = Callback<void(const swift::Optional<double>&)>;
   Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void_swift__Optional_double_(const Callback_void_swift__Optional_double_& callback, const void* NON_NULL param0) noexcept;
@@ -241,12 +243,16 @@ namespace margelo::nitro::test::swift_bridge {
   using Result_Promise_double_ = Result<Promise<double>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Callback_Promise_double_ = Callback<Promise<double>()>;
   Result<Promise<double>, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_Promise_double_(const Callback_Promise_double_& callback) noexcept;
+  Promise<Promise<double>> callAsync_Callback_Promise_double_(const Callback_Promise_double_& callback);
+  void callAndForget_Callback_Promise_double_(const Callback_Promise_double_& callback);
   Callback_Promise_double_ create_Callback_Promise_double_(std::function<Result<Promise<double>, margelo::nitro::test::swift_bridge::ResultTag>()> closure);
   using Promise_ArrayBuffer = Promise<ArrayBuffer>;
   using Promise_Promise_ArrayBuffer_ = Promise<Promise<ArrayBuffer>>;
   using Result_Promise_ArrayBuffer_ = Result<Promise<ArrayBuffer>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Callback_Promise_ArrayBuffer_ = Callback<Promise<ArrayBuffer>()>;
   Result<Promise<ArrayBuffer>, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_Promise_ArrayBuffer_(const Callback_Promise_ArrayBuffer_& callback) noexcept;
+  Promise<Promise<ArrayBuffer>> callAsync_Callback_Promise_ArrayBuffer_(const Callback_Promise_ArrayBuffer_& callback);
+  void callAndForget_Callback_Promise_ArrayBuffer_(const Callback_Promise_ArrayBuffer_& callback);
   Callback_Promise_ArrayBuffer_ create_Callback_Promise_ArrayBuffer_(std::function<Result<Promise<ArrayBuffer>, margelo::nitro::test::swift_bridge::ResultTag>()> closure);
   using Callback_void_swift__String = Callback<void(const swift::String&)>;
   Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void_swift__String(const Callback_void_swift__String& callback, const void* NON_NULL param0) noexcept;

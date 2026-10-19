@@ -386,6 +386,14 @@ namespace margelo::nitro::test::swift_bridge {
     }
   }
 
+  Promise<Promise<void>> callAsync_Callback_Promise_void_(const Callback_Promise_void_& callback) {
+    return callback.callAsync();
+  }
+
+  void callAndForget_Callback_Promise_void_(const Callback_Promise_void_& callback) {
+    callback.callAndForget();
+  }
+
   Callback_Promise_void_ create_Callback_Promise_void_(std::function<Result<Promise<void>, margelo::nitro::test::swift_bridge::ResultTag>()> closure) {
     return Callback_Promise_void_::make([closure = std::move(closure)]() -> Promise<void> {
       auto __result = closure();
@@ -450,6 +458,14 @@ namespace margelo::nitro::test::swift_bridge {
     }
   }
 
+  Promise<Promise<double>> callAsync_Callback_Promise_double_(const Callback_Promise_double_& callback) {
+    return callback.callAsync();
+  }
+
+  void callAndForget_Callback_Promise_double_(const Callback_Promise_double_& callback) {
+    callback.callAndForget();
+  }
+
   Callback_Promise_double_ create_Callback_Promise_double_(std::function<Result<Promise<double>, margelo::nitro::test::swift_bridge::ResultTag>()> closure) {
     return Callback_Promise_double_::make([closure = std::move(closure)]() -> Promise<double> {
       auto __result = closure();
@@ -466,6 +482,14 @@ namespace margelo::nitro::test::swift_bridge {
     } catch (...) {
       return Result<Promise<ArrayBuffer>, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
     }
+  }
+
+  Promise<Promise<ArrayBuffer>> callAsync_Callback_Promise_ArrayBuffer_(const Callback_Promise_ArrayBuffer_& callback) {
+    return callback.callAsync();
+  }
+
+  void callAndForget_Callback_Promise_ArrayBuffer_(const Callback_Promise_ArrayBuffer_& callback) {
+    callback.callAndForget();
   }
 
   Callback_Promise_ArrayBuffer_ create_Callback_Promise_ArrayBuffer_(std::function<Result<Promise<ArrayBuffer>, margelo::nitro::test::swift_bridge::ResultTag>()> closure) {
