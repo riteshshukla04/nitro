@@ -271,14 +271,33 @@ export function packPackage(packageDir, destination) {
   return packed
 }
 
-export async function registryPackage(name, version, fetcher = fetch) {
-  const response = await fetcher(
-    `https://registry.npmjs.org/${encodeURIComponent(name)}/${encodeURIComponent(version)}`
-  )
-  if (response.status === 404) return null
-  if (!response.ok)
-    throw new Error(`npm registry ${name}@${version}: HTTP ${response.status}`)
-  return response.json()
+export async function registryPackage(name, version, execute = spawnSync) {
+  const spec = `${name}@${version}`
+  // npm handles registry configuration and retries transient read failures.
+  const result = execute('npm', ['view', spec, '--json'], {
+    encoding: 'utf8',
+  })
+  if (result.error) throw result.error
+  // npm returns empty output when an existing package has no latest tag.
+  if (result.status === 0 && version === 'latest' && !result.stdout.trim())
+    return null
+  let metadata
+  try {
+    metadata = JSON.parse(result.stdout)
+  } catch (cause) {
+    throw new Error(`npm view ${spec}: invalid JSON\n${result.stderr ?? ''}`, {
+      cause,
+    })
+  }
+  if (result.status !== 0) {
+    if (metadata?.error?.code === 'E404') return null
+    throw new Error(
+      `npm view ${spec} failed (${result.status})\n${result.stderr || result.stdout}`
+    )
+  }
+  if (typeof metadata?.version !== 'string')
+    throw new Error(`npm view ${spec}: missing package version`)
+  return metadata
 }
 
 export async function assertPublishedPackages(

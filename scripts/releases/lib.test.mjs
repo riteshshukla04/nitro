@@ -527,59 +527,104 @@ test('manifest validation binds artifacts to the expected repository, tag and pa
   }
 })
 
-test('registry lookup returns missing only for 404 and encodes package identifiers', async () => {
-  const missing = await registryPackage(
-    '@scope/core',
-    '0.38.0-beta.1',
-    async (url) => {
-      assert.equal(
-        url,
-        'https://registry.npmjs.org/%40scope%2Fcore/0.38.0-beta.1'
-      )
-      return {
-        status: 404,
-        ok: false,
-        json: () => assert.fail('404 has no package body'),
+test('registry lookup reads versions and tags through npm with tarball integrity', async () => {
+  const pkg = {
+    version: '0.38.0-beta.1',
+    dist: { integrity: 'sha512-recorded' },
+  }
+  for (const version of [pkg.version, 'beta']) {
+    const published = await registryPackage(
+      '@scope/core',
+      version,
+      (command, args, options) => {
+        assert.equal(command, 'npm')
+        assert.deepEqual(args, [
+          'view',
+          `@scope/core@${version}`,
+          '--json',
+        ])
+        assert.equal(options.encoding, 'utf8')
+        return { status: 0, stdout: JSON.stringify(pkg), stderr: '' }
       }
-    }
-  )
-  assert.equal(missing, null)
-  const pkg = { name: 'nitro-core', version: '0.37.2' }
+    )
+    assert.deepEqual(published, pkg)
+  }
+})
+
+test('registry lookup recognizes npm E404 and a missing latest tag', async () => {
   assert.equal(
-    await registryPackage(pkg.name, pkg.version, async () => ({
-      status: 200,
-      ok: true,
-      json: async () => pkg,
+    await registryPackage('nitro-core', '0.37.2', () => ({
+      status: 1,
+      stdout: JSON.stringify({ error: { code: 'E404' } }),
+      stderr: 'npm error code E404',
     })),
-    pkg
+    null
+  )
+  assert.equal(
+    await registryPackage('nitro-core', 'latest', () => ({
+      status: 0,
+      stdout: '',
+      stderr: '',
+    })),
+    null
   )
 })
 
-test('registry auth, rate limit, server, network and parse failures propagate', async () => {
-  for (const status of [401, 403, 429, 500, 503]) {
+test('registry auth, rate limit, server and exhausted network failures propagate', async () => {
+  for (const code of [
+    'E401',
+    'E403',
+    'E429',
+    'E500',
+    'E503',
+    'EPIPE',
+    'ECONNRESET',
+  ]) {
     await assert.rejects(
-      registryPackage('nitro-core', '0.37.2', async () => ({
-        status,
-        ok: false,
+      registryPackage('nitro-core', '0.37.2', () => ({
+        status: 1,
+        stdout: JSON.stringify({ error: { code } }),
+        stderr: `npm error code ${code}`,
       })),
-      new RegExp(`HTTP ${status}`)
+      new RegExp(`npm view nitro-core@0.37.2 failed \\(1\\)\\n.*${code}`)
+    )
+  }
+  const error = new Error('spawn npm ENOENT')
+  await assert.rejects(
+    registryPackage('nitro-core', '0.37.2', () => ({ error })),
+    error
+  )
+})
+
+test('registry lookup rejects malformed metadata and unexpected empty output', async () => {
+  for (const status of [0, 1]) {
+    for (const stdout of ['', 'not JSON']) {
+      await assert.rejects(
+        registryPackage('nitro-core', '0.37.2', () => ({
+          status,
+          stdout,
+          stderr: 'npm error E404 in unstructured output',
+        })),
+        /npm view nitro-core@0.37.2: invalid JSON/
+      )
+    }
+  }
+  for (const metadata of [null, {}, [], '0.37.2', { error: { code: 'E404' } }]) {
+    await assert.rejects(
+      registryPackage('nitro-core', '0.37.2', () => ({
+        status: 0,
+        stdout: JSON.stringify(metadata),
+      })),
+      /missing package version/
     )
   }
   await assert.rejects(
-    registryPackage('nitro-core', '0.37.2', async () => {
-      throw new Error('offline')
-    }),
-    /offline/
-  )
-  await assert.rejects(
-    registryPackage('nitro-core', '0.37.2', async () => ({
-      status: 200,
-      ok: true,
-      json: async () => {
-        throw new SyntaxError('bad JSON')
-      },
+    registryPackage('nitro-core', 'latest', () => ({
+      status: 1,
+      stdout: '',
+      stderr: 'npm error EPIPE',
     })),
-    /bad JSON/
+    /invalid JSON\n.*EPIPE/
   )
 })
 
