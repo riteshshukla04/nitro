@@ -13,5 +13,8 @@
   },
   "exports": {
     ".": "./specs/SomeExternalObject.nitro.ts"
+  },
+  "imports": {
+    "#nitro/*": "./nitrogen/generated/shared/javascript/*.cjs"
   }
 }

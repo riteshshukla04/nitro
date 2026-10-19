@@ -1,12 +1,10 @@
 import { expect } from "chai";
 import { casesForTestObjects, namedCases, recordCallback } from "./utils/cases";
 
-import { getNitroModules } from "nitro-core";
+import { NitroModules } from "nitro-core";
 import { HybridSomeExternalObject } from "./utils/testObjects";
 
 import { debugOnly } from "./utils/helpers";
-
-const NitroModules = getNitroModules();
 
 const INT64_MIN = -(2n ** 63n);
 
@@ -121,7 +119,10 @@ export const cases = {
 
     'name is "SomeExternalObject"': () => {
       expect(
-        Object.is(HybridSomeExternalObject.name, "SomeExternalObject"),
+        Object.is(
+          HybridSomeExternalObject.constructor.name,
+          "SomeExternalObject",
+        ),
       ).to.equal(true);
     },
 
@@ -194,7 +195,10 @@ export const cases = {
   ...casesForTestObjects("External HybridObject subclasses", {
     'createInternalObject() is named "SomeExternalObject"': (testObject) => {
       expect(
-        Object.is(testObject.createInternalObject().name, "SomeExternalObject"),
+        Object.is(
+          testObject.createInternalObject().constructor.name,
+          "SomeExternalObject",
+        ),
       ).to.equal(true);
     },
 
@@ -275,14 +279,14 @@ export const cases = {
     "bounceExternalVariant(number) throws": (testObject) => {
       // @ts-expect-error - a number is neither a string nor a SomeExternalObject
       expect(() => testObject.bounceExternalVariant(55)).to.throw(
-        `${testObject.name}.bounceExternalVariant(...): Cannot convert "55" to any type in variant<${debugOnly("std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>!")}`,
+        `${testObject.constructor.name}.bounceExternalVariant(...): Cannot convert "55" to any type in variant<${debugOnly("std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>!")}`,
       );
     },
 
     "bounceExternalVariant(another HybridObject type) throws": (testObject) => {
       // @ts-expect-error - a TestObject is not a SomeExternalObject
       expect(() => testObject.bounceExternalVariant(testObject)).to.throw(
-        `Cannot convert "[HybridObject ${testObject.name}]" to any type in variant<`,
+        `Cannot convert "[HybridObject ${testObject.constructor.name}]" to any type in variant<`,
       );
     },
 
@@ -299,7 +303,7 @@ export const cases = {
       // @ts-expect-error - a plain object is not a SomeExternalObject
       const bouncePlainObject = () => testObject.bounceExternalHybrid({});
       expect(bouncePlainObject).to.throw(
-        `${testObject.name}.bounceExternalHybrid(...)`,
+        `${testObject.constructor.name}.bounceExternalHybrid(...)`,
       );
       expect(bouncePlainObject).to.throw("It does not have a NativeState!");
     },

@@ -576,7 +576,7 @@ export const cases = {
       };
       expect(() => testObject.callbackSync(callback)).to.throw(
         new RegExp(
-          `^${escapeRegExp(`${testObject.name}.callbackSync(...): `)}.*sync callback failed`,
+          `^${escapeRegExp(`${testObject.constructor.name}.callbackSync(...): `)}.*sync callback failed`,
         ),
       );
     },

@@ -1,9 +1,14 @@
-import type { HybridObject } from 'nitro-core'
+import { iOS } from "nitro-core";
+import type { HybridObject } from "nitro-core";
 
 // This is a simple `HybridObject` with just one value.
-export interface Base extends HybridObject<{
-  ios: 'swift'
-  android: 'kotlin'
-}> {
-  readonly baseValue: number
+@iOS({
+  language: "swift",
+  implementation: { className: "HybridBase" },
+  allowMultipleImplementations: true,
+  allowInheritance: true,
+})
+export declare class Base extends HybridObject {
+  constructor();
+  readonly baseValue: number;
 }

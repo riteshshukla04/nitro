@@ -1,21 +1,18 @@
-import { NitroModules } from 'react-native-nitro-modules'
-import type {
+import { NitroModules } from "react-native-nitro-modules";
+import {
   BenchmarkObjectCpp,
   BenchmarkObjectSwiftKotlin,
-} from './specs/BenchmarkObject.nitro'
+} from "./specs/BenchmarkObject.nitro";
 
-export * from './specs/BenchmarkObject.nitro'
-export * from './specs/TestView.nitro'
+export * from "./specs/BenchmarkObject.nitro";
+export * from "./specs/TestView.nitro";
 
-export const HybridBenchmarkObjectCpp =
-  NitroModules.createHybridObject<BenchmarkObjectCpp>('BenchmarkObjectCpp')
+export const HybridBenchmarkObjectCpp = new BenchmarkObjectCpp();
 export const HybridBenchmarkObjectSwiftKotlin =
-  NitroModules.createHybridObject<BenchmarkObjectSwiftKotlin>(
-    'BenchmarkObjectSwiftKotlin'
-  )
+  new BenchmarkObjectSwiftKotlin();
 
-export { TestView, type TestViewRef } from './views/TestView'
+export { TestView, type TestViewRef } from "./views/TestView";
 export {
   RecyclableTestView,
   type RecyclableTestViewRef,
-} from './views/RecyclableTestView'
+} from "./views/RecyclableTestView";

@@ -62,7 +62,7 @@ export const cases = {
       expect(() => {
         testObject.uint64Value = -7362572367826385n;
       }).to.throw(
-        `${testObject.name}.uint64Value: Lossy truncation in BigInt64::asUint64`,
+        `${testObject.constructor.name}.uint64Value: Lossy truncation in BigInt64::asUint64`,
       );
     },
   }),
@@ -123,7 +123,7 @@ export const cases = {
     "bounceNull(undefined) throws": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.bounceNull(undefined)).to.throw(
-        `${testObject.name}.bounceNull(...)`,
+        `${testObject.constructor.name}.bounceNull(...)`,
       );
     },
   }),
@@ -184,7 +184,7 @@ export const cases = {
     "add1Hour(...) throws for a number instead of a Date": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.add1Hour(0)).to.throw(
-        `${testObject.name}.add1Hour(...): ${debugOnly('Value "0" is not a Date')}`,
+        `${testObject.constructor.name}.add1Hour(...): ${debugOnly('Value "0" is not a Date')}`,
       );
     },
   }),
@@ -376,7 +376,7 @@ export const cases = {
       expect(() => {
         testObject.int64Value = INT64_MAX + 1n;
       }).to.throw(
-        `${testObject.name}.int64Value: Lossy truncation in BigInt64::asInt64`,
+        `${testObject.constructor.name}.int64Value: Lossy truncation in BigInt64::asInt64`,
       );
     },
 
@@ -384,7 +384,7 @@ export const cases = {
       expect(() => {
         testObject.int64Value = INT64_MIN - 1n;
       }).to.throw(
-        `${testObject.name}.int64Value: Lossy truncation in BigInt64::asInt64`,
+        `${testObject.constructor.name}.int64Value: Lossy truncation in BigInt64::asInt64`,
       );
     },
 
@@ -416,7 +416,7 @@ export const cases = {
       expect(() => {
         testObject.uint64Value = UINT64_MAX + 1n;
       }).to.throw(
-        `${testObject.name}.uint64Value: Lossy truncation in BigInt64::asUint64`,
+        `${testObject.constructor.name}.uint64Value: Lossy truncation in BigInt64::asUint64`,
       );
     },
   }),
@@ -424,28 +424,28 @@ export const cases = {
     "addNumbers(...) throws for a numeric string": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.addNumbers("1", 2)).to.throw(
-        `${testObject.name}.addNumbers(...): Value is a string, expected a number`,
+        `${testObject.constructor.name}.addNumbers(...): Value is a string, expected a number`,
       );
     },
 
     "addNumbers(...) throws for a BigInt": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.addNumbers(1, 2n)).to.throw(
-        `${testObject.name}.addNumbers(...): Value is a bigint, expected a number`,
+        `${testObject.constructor.name}.addNumbers(...): Value is a bigint, expected a number`,
       );
     },
 
     "addNumbers(...) throws for an explicit undefined": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.addNumbers(1, undefined)).to.throw(
-        `${testObject.name}.addNumbers(...): Value is undefined, expected a number`,
+        `${testObject.constructor.name}.addNumbers(...): Value is undefined, expected a number`,
       );
     },
 
     "addStrings(...) throws for a number": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.addStrings("a", 1)).to.throw(
-        `${testObject.name}.addStrings(...): Value is a number, expected a String`,
+        `${testObject.constructor.name}.addStrings(...): Value is a number, expected a String`,
       );
     },
 
@@ -454,14 +454,14 @@ export const cases = {
     ) => {
       // @ts-expect-error
       expect(() => testObject.multipleArguments(13, "hello!", 1)).to.throw(
-        `${testObject.name}.multipleArguments(...): Value is a number, expected a boolean`,
+        `${testObject.constructor.name}.multipleArguments(...): Value is a number, expected a boolean`,
       );
     },
 
     "bounceNull(...) throws for a falsy non-null value": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.bounceNull(0)).to.throw(
-        `${testObject.name}.bounceNull(...): Cannot convert non-null value to NullType!`,
+        `${testObject.constructor.name}.bounceNull(...): Cannot convert non-null value to NullType!`,
       );
     },
 
@@ -470,7 +470,7 @@ export const cases = {
         // @ts-expect-error
         testObject.numberValue = "13";
       }).to.throw(
-        `${testObject.name}.numberValue: Value is a string, expected a number`,
+        `${testObject.constructor.name}.numberValue: Value is a string, expected a number`,
       );
     },
 
@@ -479,7 +479,7 @@ export const cases = {
         // @ts-expect-error
         testObject.numberValue = 13n;
       }).to.throw(
-        `${testObject.name}.numberValue: Value is a bigint, expected a number`,
+        `${testObject.constructor.name}.numberValue: Value is a bigint, expected a number`,
       );
     },
 
@@ -490,7 +490,7 @@ export const cases = {
         // @ts-expect-error
         testObject.boolValue = 1;
       }).to.throw(
-        `${testObject.name}.boolValue: Value is a number, expected a boolean`,
+        `${testObject.constructor.name}.boolValue: Value is a number, expected a boolean`,
       );
     },
 
@@ -499,7 +499,7 @@ export const cases = {
         // @ts-expect-error
         testObject.stringValue = 13;
       }).to.throw(
-        `${testObject.name}.stringValue: Value is a number, expected a String`,
+        `${testObject.constructor.name}.stringValue: Value is a number, expected a String`,
       );
     },
 
@@ -508,7 +508,7 @@ export const cases = {
         // @ts-expect-error
         testObject.int64Value = 13;
       }).to.throw(
-        `${testObject.name}.int64Value: Value is a number, expected a BigInt`,
+        `${testObject.constructor.name}.int64Value: Value is a number, expected a BigInt`,
       );
     },
 
@@ -517,7 +517,7 @@ export const cases = {
         // @ts-expect-error
         testObject.uint64Value = 13;
       }).to.throw(
-        `${testObject.name}.uint64Value: Value is a number, expected a BigInt`,
+        `${testObject.constructor.name}.uint64Value: Value is a number, expected a BigInt`,
       );
     },
   }),
@@ -525,21 +525,21 @@ export const cases = {
     "addNumbers(...) throws for one argument": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.addNumbers(1)).to.throw(
-        `\`${testObject.name}.addNumbers(...)\` expected 2 arguments, but received 1!`,
+        `\`${testObject.constructor.name}.addNumbers(...)\` expected 2 arguments, but received 1!`,
       );
     },
 
     "addNumbers(...) throws for three arguments": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.addNumbers(1, 2, 3)).to.throw(
-        `\`${testObject.name}.addNumbers(...)\` expected 2 arguments, but received 3!`,
+        `\`${testObject.constructor.name}.addNumbers(...)\` expected 2 arguments, but received 3!`,
       );
     },
 
     "addNumbers() throws for no arguments": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.addNumbers()).to.throw(
-        `\`${testObject.name}.addNumbers(...)\` expected 2 arguments, but received 0!`,
+        `\`${testObject.constructor.name}.addNumbers(...)\` expected 2 arguments, but received 0!`,
       );
     },
 
@@ -548,21 +548,21 @@ export const cases = {
     ) => {
       // @ts-expect-error
       expect(() => testObject.addNumbers("a")).to.throw(
-        `\`${testObject.name}.addNumbers(...)\` expected 2 arguments, but received 1!`,
+        `\`${testObject.constructor.name}.addNumbers(...)\` expected 2 arguments, but received 1!`,
       );
     },
 
     "simpleFunc(...) throws for an unexpected argument": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.simpleFunc(1)).to.throw(
-        `\`${testObject.name}.simpleFunc(...)\` expected 0 arguments, but received 1!`,
+        `\`${testObject.constructor.name}.simpleFunc(...)\` expected 0 arguments, but received 1!`,
       );
     },
 
     "multipleArguments(...) throws for a missing argument": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.multipleArguments(13, "hello!")).to.throw(
-        `\`${testObject.name}.multipleArguments(...)\` expected 3 arguments, but received 2!`,
+        `\`${testObject.constructor.name}.multipleArguments(...)\` expected 3 arguments, but received 2!`,
       );
     },
   }),

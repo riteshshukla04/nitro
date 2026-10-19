@@ -22,7 +22,8 @@
     "ios/**/*.swift",
     "app.plugin.js",
     "*.podspec",
-    "README.md"
+    "README.md",
+    "nitrogen/generated"
   ],
   "keywords": [
     "react-native",
@@ -71,5 +72,8 @@
       "optional": true
     }
   },
-  "private": true
+  "private": true,
+  "imports": {
+    "#nitro/*": "./nitrogen/generated/shared/javascript/*.cjs"
+  }
 }

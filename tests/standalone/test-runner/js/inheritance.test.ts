@@ -1,10 +1,8 @@
 import { expect } from "chai";
 import { casesForTestObjects } from "./utils/cases";
 
-import { getNitroModules } from "nitro-core";
+import { NitroModules } from "nitro-core";
 import { HybridChild } from "./utils/testObjects";
-
-const NitroModules = getNitroModules();
 
 const CHILD_TO_STRING = "HybridChild custom toString() :)";
 
@@ -49,11 +47,15 @@ export const cases = {
     },
 
     'createBase() has name "Base"': (testObject) => {
-      expect(Object.is(testObject.createBase().name, "Base")).to.equal(true);
+      expect(
+        Object.is(testObject.createBase().constructor.name, "Base"),
+      ).to.equal(true);
     },
 
     'createChild() has name "Child"': (testObject) => {
-      expect(Object.is(testObject.createChild().name, "Child")).to.equal(true);
+      expect(
+        Object.is(testObject.createChild().constructor.name, "Child"),
+      ).to.equal(true);
     },
 
     "createChild() has overridden toString()": (testObject) => {
@@ -73,7 +75,7 @@ export const cases = {
 
     'createBaseActualChild() has name "Child"': (testObject) => {
       expect(
-        Object.is(testObject.createBaseActualChild().name, "Child"),
+        Object.is(testObject.createBaseActualChild().constructor.name, "Child"),
       ).to.equal(true);
     },
 
@@ -111,7 +113,9 @@ export const cases = {
       const base = testObject.createBase();
       // @ts-expect-error - a Base is not a Child
       const bounceBaseAsChild = () => testObject.bounceChild(base);
-      expect(bounceBaseAsChild).to.throw(`${testObject.name}.bounceChild(...)`);
+      expect(bounceBaseAsChild).to.throw(
+        `${testObject.constructor.name}.bounceChild(...)`,
+      );
       expect(bounceBaseAsChild).to.throw(
         "Downcasting failed - It has a different NativeState<T>!",
       );
@@ -162,7 +166,7 @@ export const cases = {
       // @ts-expect-error - a Base is not a Child
       const bounceBaseAsChild = () => testObject.bounceChildBase(base);
       expect(bounceBaseAsChild).to.throw(
-        `${testObject.name}.bounceChildBase(...)`,
+        `${testObject.constructor.name}.bounceChildBase(...)`,
       );
       expect(bounceBaseAsChild).to.throw(
         "Downcasting failed - It has a different NativeState<T>!",

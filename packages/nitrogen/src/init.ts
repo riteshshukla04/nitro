@@ -1,3 +1,4 @@
+import { NITROGEN_VERSION } from './config/nitrogenVersion.js'
 import path from 'path'
 import { prettifyDirectory } from './prettifyDirectory.js'
 import fs from 'fs/promises'
@@ -10,7 +11,7 @@ import { randomUUID } from 'crypto'
 export async function initNewNitroModule(
   baseDirectory: string,
   moduleName: string,
-  ref: string = 'main'
+  ref: string = 'v1'
 ): Promise<void> {
   Logger.info(
     `⚙️  Creating new Nitro Module "${chalk.bold(moduleName)}" in ${chalk.underline(prettifyDirectory(baseDirectory))}...`
@@ -51,6 +52,7 @@ export async function initNewNitroModule(
   await replaceTemplate(modulePath, `iosModuleName`, camelCaseName)
   await replaceTemplate(modulePath, `packageName`, moduleName)
   await replaceTemplate(modulePath, `packageDescription`, moduleName)
+  await replaceTemplate(modulePath, `nitroVersion`, NITROGEN_VERSION)
 
   Logger.info(
     `🎉 Created Nitro Module "${chalk.bold(moduleName)}" in ${chalk.underline(prettifyDirectory(directory))}!`

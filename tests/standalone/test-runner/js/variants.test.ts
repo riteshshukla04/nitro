@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { casesForTestObjects, recordCallback, waitFor } from "./utils/cases";
 
-import { getNitroModules } from "nitro-core";
-import type { Base } from "nitro-test";
+import { NitroModules } from "nitro-core";
+import { Base } from "nitro-test";
 import {
   type Car,
   OldEnum,
@@ -15,9 +15,7 @@ import { TEST_CAR, TEST_CAR_2, TEST_PERSON } from "./utils/fixtures";
 import { debugOnly, deferred } from "./utils/helpers";
 import { type TestObject } from "./utils/testObjects";
 
-const NitroModules = getNitroModules();
-
-const BASE = NitroModules.createHybridObject<Base>("Base");
+const BASE = new Base();
 
 const POWERTRAINS: Powertrain[] = ["electric", "gas", "hybrid"];
 
@@ -63,7 +61,7 @@ export const cases = {
         // @ts-expect-error
         testObject.someVariant = false;
       }).to.throw(
-        `${testObject.name}.someVariant: Cannot convert "false" to any type in ${debugOnly("variant<double, std::string>!")}`,
+        `${testObject.constructor.name}.someVariant: Cannot convert "false" to any type in ${debugOnly("variant<double, std::string>!")}`,
       );
     },
 
@@ -90,7 +88,7 @@ export const cases = {
           {},
         ),
       ).to.throw(
-        `${testObject.name}.passVariant(...): Cannot convert "[object Object]" to any type in `,
+        `${testObject.constructor.name}.passVariant(...): Cannot convert "[object Object]" to any type in `,
       );
     },
 
@@ -172,7 +170,7 @@ export const cases = {
       });
     },
 
-    "bounceComplexVariant(...) bounces an AnyMap": (testObject) => {
+    "bounceComplexVariant(...) bounces an AnyJSON": (testObject) => {
       expect(
         testObject.bounceComplexVariant({ whateverValue: 55 }),
       ).to.deep.equal({
@@ -208,7 +206,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantEnum("string"),
       ).to.throw(
-        `${testObject.name}.getVariantEnum(...): Cannot convert "string" to any type in ${debugOnly("variant<margelo::nitro::test::OldEnum, bool>!")}`,
+        `${testObject.constructor.name}.getVariantEnum(...): Cannot convert "string" to any type in ${debugOnly("variant<margelo::nitro::test::OldEnum, bool>!")}`,
       );
     },
 
@@ -217,7 +215,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantEnum(9999),
       ).to.throw(
-        `${testObject.name}.getVariantEnum(...): Cannot convert "9999" to any type in ${debugOnly("variant<margelo::nitro::test::OldEnum, bool>!")}`,
+        `${testObject.constructor.name}.getVariantEnum(...): Cannot convert "9999" to any type in ${debugOnly("variant<margelo::nitro::test::OldEnum, bool>!")}`,
       );
     },
 
@@ -234,7 +232,7 @@ export const cases = {
         // @ts-expect-error
         testObject.bounceVariantUnionEnum("diesel"),
       ).to.throw(
-        `${testObject.name}.bounceVariantUnionEnum(...): Cannot convert "diesel" to any type in `,
+        `${testObject.constructor.name}.bounceVariantUnionEnum(...): Cannot convert "diesel" to any type in `,
       );
     },
 
@@ -243,7 +241,7 @@ export const cases = {
         // @ts-expect-error
         testObject.bounceVariantUnionEnum({}),
       ).to.throw(
-        `${testObject.name}.bounceVariantUnionEnum(...): Cannot convert "[object Object]" to any type in `,
+        `${testObject.constructor.name}.bounceVariantUnionEnum(...): Cannot convert "[object Object]" to any type in `,
       );
     },
 
@@ -252,7 +250,7 @@ export const cases = {
         // @ts-expect-error
         testObject.bounceVariantUnionEnum(true),
       ).to.throw(
-        `${testObject.name}.bounceVariantUnionEnum(...): Cannot convert "true" to any type in `,
+        `${testObject.constructor.name}.bounceVariantUnionEnum(...): Cannot convert "true" to any type in `,
       );
     },
 
@@ -267,7 +265,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantWeirdNumbersEnum("string"),
       ).to.throw(
-        `${testObject.name}.getVariantWeirdNumbersEnum(...): Cannot convert "string" to any type in ${debugOnly("variant<margelo::nitro::test::WeirdNumbersEnum, bool>!")}`,
+        `${testObject.constructor.name}.getVariantWeirdNumbersEnum(...): Cannot convert "string" to any type in ${debugOnly("variant<margelo::nitro::test::WeirdNumbersEnum, bool>!")}`,
       );
     },
 
@@ -278,7 +276,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantWeirdNumbersEnum(99999),
       ).to.throw(
-        `${testObject.name}.getVariantWeirdNumbersEnum(...): Cannot convert "99999" to any type in ${debugOnly("variant<margelo::nitro::test::WeirdNumbersEnum, bool>!")}`,
+        `${testObject.constructor.name}.getVariantWeirdNumbersEnum(...): Cannot convert "99999" to any type in ${debugOnly("variant<margelo::nitro::test::WeirdNumbersEnum, bool>!")}`,
       );
     },
 
@@ -302,7 +300,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantObjects("some-string"),
       ).to.throw(
-        `${testObject.name}.getVariantObjects(...): Cannot convert "some-string" to any type in ${debugOnly("variant<margelo::nitro::test::Person, margelo::nitro::test::Car>!")}`,
+        `${testObject.constructor.name}.getVariantObjects(...): Cannot convert "some-string" to any type in ${debugOnly("variant<margelo::nitro::test::Person, margelo::nitro::test::Car>!")}`,
       );
     },
 
@@ -311,7 +309,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantObjects({ someValue: 55 }),
       ).to.throw(
-        `${testObject.name}.getVariantObjects(...): Cannot convert "[object Object]" to any type in ${debugOnly("variant<margelo::nitro::test::Person, margelo::nitro::test::Car>!")}`,
+        `${testObject.constructor.name}.getVariantObjects(...): Cannot convert "[object Object]" to any type in ${debugOnly("variant<margelo::nitro::test::Person, margelo::nitro::test::Car>!")}`,
       );
     },
 
@@ -332,7 +330,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantHybrid("some-string"),
       ).to.throw(
-        `${testObject.name}.getVariantHybrid(...): Cannot convert "some-string" to any type in `,
+        `${testObject.constructor.name}.getVariantHybrid(...): Cannot convert "some-string" to any type in `,
       );
     },
 
@@ -341,7 +339,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantHybrid({ someValue: 55 }),
       ).to.throw(
-        `${testObject.name}.getVariantHybrid(...): Cannot convert "[object Object]" to any type in `,
+        `${testObject.constructor.name}.getVariantHybrid(...): Cannot convert "[object Object]" to any type in `,
       );
     },
 
@@ -373,7 +371,7 @@ export const cases = {
         // @ts-expect-error
         testObject.someVariant = null;
       }).to.throw(
-        `${testObject.name}.someVariant: Cannot convert "null" to any type in ${debugOnly("variant<double, std::string>!")}`,
+        `${testObject.constructor.name}.someVariant: Cannot convert "null" to any type in ${debugOnly("variant<double, std::string>!")}`,
       );
     },
 
@@ -382,7 +380,7 @@ export const cases = {
         // @ts-expect-error
         testObject.someVariant = undefined;
       }).to.throw(
-        `${testObject.name}.someVariant: Cannot convert "undefined" to any type in ${debugOnly("variant<double, std::string>!")}`,
+        `${testObject.constructor.name}.someVariant: Cannot convert "undefined" to any type in ${debugOnly("variant<double, std::string>!")}`,
       );
     },
 
@@ -391,7 +389,9 @@ export const cases = {
       expect(() => {
         // @ts-expect-error
         testObject.someVariant = false;
-      }).to.throw(`${testObject.name}.someVariant: Cannot convert "false"`);
+      }).to.throw(
+        `${testObject.constructor.name}.someVariant: Cannot convert "false"`,
+      );
       expect(Object.is(testObject.someVariant, "before")).to.equal(true);
     },
 
@@ -436,7 +436,7 @@ export const cases = {
         // @ts-expect-error
         testObject.passVariant(null),
       ).to.throw(
-        `${testObject.name}.passVariant(...): Cannot convert "null" to any type in ${debugOnly("variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>!")}`,
+        `${testObject.constructor.name}.passVariant(...): Cannot convert "null" to any type in ${debugOnly("variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>!")}`,
       );
     },
 
@@ -445,7 +445,7 @@ export const cases = {
         // @ts-expect-error
         testObject.passVariant(5n),
       ).to.throw(
-        `${testObject.name}.passVariant(...): Cannot convert "5" to any type in `,
+        `${testObject.constructor.name}.passVariant(...): Cannot convert "5" to any type in `,
       );
     },
 
@@ -456,7 +456,7 @@ export const cases = {
           [[1, 2], [3]],
         ),
       ).to.throw(
-        `${testObject.name}.passVariant(...): Cannot convert "1,2,3" to any type in `,
+        `${testObject.constructor.name}.passVariant(...): Cannot convert "1,2,3" to any type in `,
       );
     },
 
@@ -466,7 +466,7 @@ export const cases = {
           // @ts-expect-error
           [1, "two"],
         ),
-      ).to.throw(`${testObject.name}.passVariant(...): `);
+      ).to.throw(`${testObject.constructor.name}.passVariant(...): `);
     },
 
     "getVariantEnum(...) bounces OldEnum.FIRST (0)": (testObject) => {
@@ -484,7 +484,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantEnum(3),
       ).to.throw(
-        `${testObject.name}.getVariantEnum(...): Cannot convert "3" to any type in `,
+        `${testObject.constructor.name}.getVariantEnum(...): Cannot convert "3" to any type in `,
       );
     },
 
@@ -493,7 +493,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantEnum(-1),
       ).to.throw(
-        `${testObject.name}.getVariantEnum(...): Cannot convert "-1" to any type in `,
+        `${testObject.constructor.name}.getVariantEnum(...): Cannot convert "-1" to any type in `,
       );
     },
 
@@ -502,7 +502,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantEnum(1.5),
       ).to.throw(
-        `${testObject.name}.getVariantEnum(...): Cannot convert "1.5" to any type in `,
+        `${testObject.constructor.name}.getVariantEnum(...): Cannot convert "1.5" to any type in `,
       );
     },
 
@@ -530,7 +530,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantWeirdNumbersEnum(33),
       ).to.throw(
-        `${testObject.name}.getVariantWeirdNumbersEnum(...): Cannot convert "33" to any type in `,
+        `${testObject.constructor.name}.getVariantWeirdNumbersEnum(...): Cannot convert "33" to any type in `,
       );
     },
 
@@ -550,7 +550,7 @@ export const cases = {
         // @ts-expect-error
         testObject.bounceVariantUnionEnum("GAS"),
       ).to.throw(
-        `${testObject.name}.bounceVariantUnionEnum(...): Cannot convert "GAS" to any type in ${debugOnly("variant<margelo::nitro::test::Powertrain, margelo::nitro::test::Car>!")}`,
+        `${testObject.constructor.name}.bounceVariantUnionEnum(...): Cannot convert "GAS" to any type in ${debugOnly("variant<margelo::nitro::test::Powertrain, margelo::nitro::test::Car>!")}`,
       );
     },
 
@@ -564,7 +564,7 @@ export const cases = {
           powertrain: "diesel",
         }),
       ).to.throw(
-        `${testObject.name}.bounceVariantUnionEnum(...): Cannot convert "[object Object]" to any type in `,
+        `${testObject.constructor.name}.bounceVariantUnionEnum(...): Cannot convert "[object Object]" to any type in `,
       );
     },
 
@@ -594,7 +594,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantObjects({ name: "Marc" }),
       ).to.throw(
-        `${testObject.name}.getVariantObjects(...): Cannot convert "[object Object]" to any type in `,
+        `${testObject.constructor.name}.getVariantObjects(...): Cannot convert "[object Object]" to any type in `,
       );
     },
 
@@ -605,7 +605,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantObjects({ ...TEST_CAR, passengers: undefined }),
       ).to.throw(
-        `${testObject.name}.getVariantObjects(...): Cannot convert "[object Object]" to any type in `,
+        `${testObject.constructor.name}.getVariantObjects(...): Cannot convert "[object Object]" to any type in `,
       );
     },
 
@@ -614,7 +614,7 @@ export const cases = {
         // @ts-expect-error
         testObject.getVariantObjects([TEST_PERSON]),
       ).to.throw(
-        `${testObject.name}.getVariantObjects(...): Cannot convert "[object Object]" to any type in `,
+        `${testObject.constructor.name}.getVariantObjects(...): Cannot convert "[object Object]" to any type in `,
       );
     },
 
@@ -632,15 +632,15 @@ export const cases = {
       testObject,
     ) => {
       const otherName =
-        testObject.name === "TestObjectCpp"
+        testObject.constructor.name === "TestObjectCpp"
           ? "TestObjectSwiftKotlin"
           : "TestObjectCpp";
-      const other = NitroModules.createHybridObject<TestObject>(otherName);
+      const other = new (NitroModules.getHybridClass<typeof Base>(otherName))();
       expect(() =>
         // @ts-expect-error
         testObject.getVariantHybrid(other),
       ).to.throw(
-        `${testObject.name}.getVariantHybrid(...): Cannot convert "${String(other)}" to any type in `,
+        `${testObject.constructor.name}.getVariantHybrid(...): Cannot convert "${String(other)}" to any type in `,
       );
     },
 
@@ -653,7 +653,7 @@ export const cases = {
         // @ts-expect-error
         testObject.passNamedVariant(55),
       ).to.throw(
-        `${testObject.name}.passNamedVariant(...): Cannot convert "55" to any type in ${debugOnly("variant<std::string, margelo::nitro::test::Car>!")}`,
+        `${testObject.constructor.name}.passNamedVariant(...): Cannot convert "55" to any type in ${debugOnly("variant<std::string, margelo::nitro::test::Car>!")}`,
       );
     },
 
@@ -669,7 +669,7 @@ export const cases = {
         // @ts-expect-error
         child.bounceVariant(55),
       ).to.throw(
-        `${child.name}.bounceVariant(...): Cannot convert "55" to any type in `,
+        `${child.constructor.name}.bounceVariant(...): Cannot convert "55" to any type in `,
       );
     },
 
@@ -686,7 +686,7 @@ export const cases = {
       testObject,
     ) => {
       expect(() => testObject.passAllEmptyObjectVariant(testObject)).to.throw(
-        `${testObject.name}.passAllEmptyObjectVariant(...): Cannot convert "${String(testObject)}" to any type in `,
+        `${testObject.constructor.name}.passAllEmptyObjectVariant(...): Cannot convert "${String(testObject)}" to any type in `,
       );
     },
 
@@ -696,23 +696,20 @@ export const cases = {
           // @ts-expect-error
           testObject.passAllEmptyObjectVariant({ optionalString: 55 }),
         ).to.throw(
-          `${testObject.name}.passAllEmptyObjectVariant(...): Cannot convert "[object Object]" to any type in `,
+          `${testObject.constructor.name}.passAllEmptyObjectVariant(...): Cannot convert "[object Object]" to any type in `,
         );
       },
 
-    "bounceComplexVariant(...) falls back to an AnyMap for a mismatching struct":
+    "bounceComplexVariant(...) falls back to an AnyJSON for a mismatching struct":
       (testObject) => {
         const map = { value: 55, items: "not-an-array" };
         expect(testObject.bounceComplexVariant(map)).to.deep.equal(map);
       },
 
-    "bounceComplexVariant(...) throws for a number": (testObject) => {
-      expect(() =>
-        // @ts-expect-error
-        testObject.bounceComplexVariant(55),
-      ).to.throw(
-        `${testObject.name}.bounceComplexVariant(...): Cannot convert "55" to any type in `,
-      );
+    "bounceComplexVariant(...) accepts a number through AnyJSON": (
+      testObject,
+    ) => {
+      expect(testObject.bounceComplexVariant(55)).to.equal(55);
     },
   }),
 };

@@ -18,7 +18,7 @@ export const cases = {
       expect(() => {
         // @ts-expect-error
         testObject.stringOrUndefined = null;
-      }).to.throw(`${testObject.name}.stringOrUndefined`);
+      }).to.throw(`${testObject.constructor.name}.stringOrUndefined`);
     },
 
     "optionalString roundtrips a string and undefined": (testObject) => {
@@ -38,14 +38,14 @@ export const cases = {
       expect(() => {
         // @ts-expect-error
         testObject.nullValue = undefined;
-      }).to.throw(`${testObject.name}.nullValue`);
+      }).to.throw(`${testObject.constructor.name}.nullValue`);
     },
 
     "nullValue setter throws for a number": (testObject) => {
       expect(() => {
         // @ts-expect-error
         testObject.nullValue = 19;
-      }).to.throw(`${testObject.name}.nullValue`);
+      }).to.throw(`${testObject.constructor.name}.nullValue`);
     },
 
     "stringOrNull roundtrips a string and null": (testObject) => {
@@ -132,14 +132,14 @@ export const cases = {
           "too many args!",
         ),
       ).to.throw(
-        `\`${testObject.name}.tryOptionalParams(...)\` expected between 2 and 3 arguments, but received 4!`,
+        `\`${testObject.constructor.name}.tryOptionalParams(...)\` expected between 2 and 3 arguments, but received 4!`,
       );
     },
 
     "tryOptionalParams(...) throws for one argument too few": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.tryOptionalParams(13)).to.throw(
-        `\`${testObject.name}.tryOptionalParams(...)\` expected between 2 and 3 arguments, but received 1!`,
+        `\`${testObject.constructor.name}.tryOptionalParams(...)\` expected between 2 and 3 arguments, but received 1!`,
       );
     },
 
@@ -199,7 +199,7 @@ export const cases = {
     ) => {
       // @ts-expect-error
       expect(() => testObject.tryOptionalParams(13, true, null)).to.throw(
-        `${testObject.name}.tryOptionalParams(...): Value is null, expected a String`,
+        `${testObject.constructor.name}.tryOptionalParams(...): Value is null, expected a String`,
       );
     },
 
@@ -209,7 +209,7 @@ export const cases = {
       // A middle optional param does not make the params after it optional
       // @ts-expect-error
       expect(() => testObject.tryMiddleParam(13, undefined)).to.throw(
-        `\`${testObject.name}.tryMiddleParam(...)\` expected 3 arguments, but received 2!`,
+        `\`${testObject.constructor.name}.tryMiddleParam(...)\` expected 3 arguments, but received 2!`,
       );
     },
 
@@ -220,14 +220,14 @@ export const cases = {
     "tryOptionalEnum(...) throws for an invalid enum value": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.tryOptionalEnum("diesel")).to.throw(
-        `${testObject.name}.tryOptionalEnum(...): Cannot convert "diesel" to enum Powertrain - invalid value!`,
+        `${testObject.constructor.name}.tryOptionalEnum(...): Cannot convert "diesel" to enum Powertrain - invalid value!`,
       );
     },
 
     "tryOptionalEnum(...) throws for two arguments": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.tryOptionalEnum("gas", "gas")).to.throw(
-        `\`${testObject.name}.tryOptionalEnum(...)\` expected between 0 and 1 arguments, but received 2!`,
+        `\`${testObject.constructor.name}.tryOptionalEnum(...)\` expected between 0 and 1 arguments, but received 2!`,
       );
     },
 
@@ -242,7 +242,7 @@ export const cases = {
     "tryTrailingOptional(...) throws for one argument": (testObject) => {
       // @ts-expect-error
       expect(() => testObject.tryTrailingOptional(0)).to.throw(
-        `\`${testObject.name}.tryTrailingOptional(...)\` expected between 2 and 3 arguments, but received 1!`,
+        `\`${testObject.constructor.name}.tryTrailingOptional(...)\` expected between 2 and 3 arguments, but received 1!`,
       );
     },
   }),
@@ -288,7 +288,7 @@ export const cases = {
         // @ts-expect-error
         testObject.optionalEnumPlusOne = "petrol";
       }).to.throw(
-        `${testObject.name}.optionalEnumPlusOne: Cannot convert "petrol" to enum TruckPowertrain - invalid value!`,
+        `${testObject.constructor.name}.optionalEnumPlusOne: Cannot convert "petrol" to enum TruckPowertrain - invalid value!`,
       );
     },
 
@@ -297,7 +297,7 @@ export const cases = {
         // @ts-expect-error
         testObject.optionalEnumPlusOne = "Diesel";
       }).to.throw(
-        `${testObject.name}.optionalEnumPlusOne: Cannot convert "Diesel" to enum TruckPowertrain - invalid value!`,
+        `${testObject.constructor.name}.optionalEnumPlusOne: Cannot convert "Diesel" to enum TruckPowertrain - invalid value!`,
       );
     },
 
@@ -308,7 +308,7 @@ export const cases = {
         // @ts-expect-error
         testObject.optionalEnum = "diesel";
       }).to.throw(
-        `${testObject.name}.optionalEnum: Cannot convert "diesel" to enum Powertrain - invalid value!`,
+        `${testObject.constructor.name}.optionalEnum: Cannot convert "diesel" to enum Powertrain - invalid value!`,
       );
     },
   }),
@@ -318,7 +318,7 @@ export const cases = {
         // @ts-expect-error
         testObject.optionalString = null;
       }).to.throw(
-        `${testObject.name}.optionalString: Value is null, expected a String`,
+        `${testObject.constructor.name}.optionalString: Value is null, expected a String`,
       );
     },
 
@@ -336,7 +336,7 @@ export const cases = {
         // @ts-expect-error
         testObject.optionalArray = null;
       }).to.throw(
-        `${testObject.name}.optionalArray: Value is null, expected an Object`,
+        `${testObject.constructor.name}.optionalArray: Value is null, expected an Object`,
       );
     },
 
@@ -345,7 +345,7 @@ export const cases = {
         // @ts-expect-error
         testObject.optionalEnum = null;
       }).to.throw(
-        `${testObject.name}.optionalEnum: Value is null, expected a String`,
+        `${testObject.constructor.name}.optionalEnum: Value is null, expected a String`,
       );
     },
 
@@ -354,7 +354,7 @@ export const cases = {
         // @ts-expect-error
         testObject.optionalEnumPlusOne = null;
       }).to.throw(
-        `${testObject.name}.optionalEnumPlusOne: Value is null, expected a String`,
+        `${testObject.constructor.name}.optionalEnumPlusOne: Value is null, expected a String`,
       );
     },
 
@@ -363,7 +363,7 @@ export const cases = {
         // @ts-expect-error
         testObject.optionalOldEnum = null;
       }).to.throw(
-        `${testObject.name}.optionalOldEnum: Value is null, expected a number`,
+        `${testObject.constructor.name}.optionalOldEnum: Value is null, expected a number`,
       );
     },
 
@@ -372,7 +372,7 @@ export const cases = {
         // @ts-expect-error
         testObject.optionalCallback = null;
       }).to.throw(
-        `${testObject.name}.optionalCallback: Value is null, expected an Object`,
+        `${testObject.constructor.name}.optionalCallback: Value is null, expected an Object`,
       );
     },
 
@@ -381,7 +381,7 @@ export const cases = {
         // @ts-expect-error
         testObject.optionalHybrid = null;
       }).to.throw(
-        `${testObject.name}.optionalHybrid: ${debugOnly('Cannot convert "null" to NativeState<')}`,
+        `${testObject.constructor.name}.optionalHybrid: ${debugOnly('Cannot convert "null" to NativeState<')}`,
       );
     },
 
@@ -390,7 +390,7 @@ export const cases = {
         // @ts-expect-error
         testObject.stringOrNull = undefined;
       }).to.throw(
-        `${testObject.name}.stringOrNull: Cannot convert "undefined" to any type in variant<`,
+        `${testObject.constructor.name}.stringOrNull: Cannot convert "undefined" to any type in variant<`,
       );
     },
   }),
