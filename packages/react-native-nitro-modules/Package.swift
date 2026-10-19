@@ -48,6 +48,7 @@ let package = Package(
       name: "NitroModulesCxx",
       dependencies: reactHeaders,
       path: "cpp/core",
+      sources: ["src"],
       publicHeadersPath: "include",
       cxxSettings: cxxSettings
     ),
@@ -55,7 +56,7 @@ let package = Package(
       name: "NitroModulesAppleCxx",
       dependencies: ["NitroModulesCxx"] + reactHeaders,
       path: "apple/core",
-      sources: ["platform", "threading"],
+      sources: ["src"],
       publicHeadersPath: "include",
       cxxSettings: cxxSettings
     ),
@@ -83,6 +84,7 @@ let package = Package(
       name: "NitroModulesSwiftBridge",
       dependencies: ["NitroModules", "NitroModulesAppleCxx", "NitroModulesCxx"],
       path: "apple/core/swift-bridge",
+      sources: ["src"],
       publicHeadersPath: "include",
       cxxSettings: cxxSettings + [
         .unsafeFlags(["-I${GENERATED_MODULEMAP_DIR}", "-fno-modules"]),
@@ -96,7 +98,7 @@ let package = Package(
         .product(name: "ReactAppHeaders", package: "React-GeneratedCode"),
       ] + reactHeaders,
       path: ".",
-      sources: ["apple/turbomodule", "cpp/views"],
+      sources: ["apple/src", "cpp/src"],
       publicHeadersPath: "include",
       cxxSettings: cxxSettings + [
         .define("RCT_NEW_ARCH_ENABLED", to: "1"),

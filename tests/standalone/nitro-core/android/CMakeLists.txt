@@ -9,8 +9,8 @@ find_package(fbjni REQUIRED CONFIG)
 find_package(hermes REQUIRED CONFIG)
 
 # Build every source in Nitro Core directly from the package.
-file(GLOB_RECURSE NITRO_CPP CONFIGURE_DEPENDS "${NITRO_NATIVE}/cpp/*.cpp")
-file(GLOB_RECURSE NITRO_ANDROID CONFIGURE_DEPENDS "${NITRO_NATIVE}/android/src/main/cpp/*.cpp")
+file(GLOB NITRO_CPP CONFIGURE_DEPENDS "${NITRO_NATIVE}/cpp/src/*.cpp")
+file(GLOB NITRO_ANDROID CONFIGURE_DEPENDS "${NITRO_NATIVE}/android/src/main/cpp/src/*.cpp")
 file(GLOB_RECURSE NITRO_HEADERS CONFIGURE_DEPENDS
   "${NITRO_NATIVE}/cpp/*.hpp"
   "${NITRO_NATIVE}/android/src/main/cpp/*.hpp")

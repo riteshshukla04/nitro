@@ -78,7 +78,7 @@ test("stages workspace sources without dependencies and cleans only generated di
   );
   put("packages/react-native-nitro-modules/src/index.ts", "// RN integration");
   const adapters = [
-    "cpp/views/HybridView.hpp",
+    "cpp/src/RawPropsCompat.cpp",
     "apple/views/HybridView.swift",
     "android/src/main/java/NitroModules.kt",
   ];

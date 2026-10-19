@@ -49,6 +49,7 @@ let package = Package(
       name: "NitroModulesCxx",
       dependencies: ["Hermes"],
       path: "packages/nitro-core/native/cpp",
+      sources: ["src"],
       publicHeadersPath: "include",
       cxxSettings: cxxSettings
     ),
@@ -56,7 +57,7 @@ let package = Package(
       name: "NitroModulesAppleCxx",
       dependencies: ["NitroModulesCxx"],
       path: "packages/nitro-core/native/apple",
-      sources: ["platform", "threading"],
+      sources: ["src"],
       publicHeadersPath: "include",
       cxxSettings: cxxSettings
     ),
@@ -75,6 +76,7 @@ let package = Package(
       name: "NitroModulesSwiftBridge",
       dependencies: ["NitroModules", "NitroModulesAppleCxx"],
       path: "packages/nitro-core/native/apple/swift-bridge",
+      sources: ["src"],
       publicHeadersPath: "include",
       cxxSettings: cxxSettings + bridgeSettings
     ),

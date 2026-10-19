@@ -16,7 +16,7 @@ export const corePackageFiles = [
   'native/cpp/include/NitroModules/HybridObject.hpp',
   'native/cpp/include/NitroModules/NitroDefines.hpp',
   'native/apple/core/HybridObject.swift',
-  'native/android/src/main/cpp/NitroOnLoad.cpp',
+  'native/android/src/main/cpp/src/NitroOnLoad.cpp',
   'native/android/src/main/java/com/margelo/nitro/core/HybridObject.kt',
 ]
 
@@ -32,8 +32,8 @@ export const reactNativePackageFiles = [
   'cpp/core/include/NitroModules/InstallNitro.hpp',
   'cpp/core/include/NitroModules/NitroDefines.hpp',
   'apple/views/HybridView.swift',
-  'android/src/main/cpp/JNIOnLoad.cpp',
-  'android/core/main/cpp/NitroOnLoad.cpp',
+  'android/src/main/cpp/src/JNIOnLoad.cpp',
+  'android/core/main/cpp/src/NitroOnLoad.cpp',
   'android/build.gradle',
   'android/CMakeLists.txt',
   'src/index.ts',
@@ -156,8 +156,8 @@ export function verifyReactNativePackage(directory, coreDirectory, options) {
     ],
     ['native/apple/core/HybridObject.swift', 'apple/core/core/HybridObject.swift'],
     [
-      'native/android/src/main/cpp/NitroOnLoad.cpp',
-      'android/core/main/cpp/NitroOnLoad.cpp',
+      'native/android/src/main/cpp/src/NitroOnLoad.cpp',
+      'android/core/main/cpp/src/NitroOnLoad.cpp',
     ],
     ['LICENSE', 'LICENSE'],
   ]) {

@@ -5,12 +5,13 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 set (CMAKE_CXX_STANDARD 20)
 
 # Find all C++ files (shared and platform specifics)
-file(GLOB_RECURSE shared_files RELATIVE ${CMAKE_SOURCE_DIR}
-     "../cpp/**.cpp"
+file(GLOB shared_files RELATIVE ${CMAKE_SOURCE_DIR}
+     "../cpp/core/src/*.cpp"
+     "../cpp/src/*.cpp"
 )
-file(GLOB_RECURSE android_files RELATIVE ${CMAKE_SOURCE_DIR}
-     "src/main/cpp/**.cpp"
-     "core/main/cpp/**.cpp"
+file(GLOB android_files RELATIVE ${CMAKE_SOURCE_DIR}
+     "src/main/cpp/src/*.cpp"
+     "core/main/cpp/src/*.cpp"
 )
 
 # Create library "NitroModules" and add all C++ files to it
@@ -31,7 +32,6 @@ include_directories(
   core/main/cpp
   core/main/cpp/core
   core/main/cpp/registry
-  core/main/cpp/platform
   core/main/cpp/threading
   core/main/cpp/utils
 )
