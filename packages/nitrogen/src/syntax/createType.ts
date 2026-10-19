@@ -6,7 +6,7 @@ import { StringType } from './types/StringType.js'
 import { Int64Type } from './types/Int64Type.js'
 import { VoidType } from './types/VoidType.js'
 import { ArrayType } from './types/ArrayType.js'
-import { FunctionType } from './types/FunctionType.js'
+import { CallbackType } from './types/CallbackType.js'
 import { PromiseType } from './types/PromiseType.js'
 import { RecordType } from './types/RecordType.js'
 import { ArrayBufferType } from './types/ArrayBufferType.js'
@@ -17,27 +17,27 @@ import { OptionalType } from './types/OptionalType.js'
 import { NamedWrappingType } from './types/NamedWrappingType.js'
 import { getInterfaceProperties } from './getInterfaceProperties.js'
 import { VariantType } from './types/VariantType.js'
-import { MapType } from './types/MapType.js'
+import { AnyJSONType } from './types/AnyJSONType.js'
 import { TupleType } from './types/TupleType.js'
 import {
-  isAnyHybridSubclass,
+  isSomeHybridObject,
   isDirectlyAnyHybridObject,
-  isHybridView,
+  getHybridObjectPlatformsForType,
   type Language,
 } from '../getPlatformSpecs.js'
 import { AnyHybridObjectType } from './types/AnyHybridObjectType.js'
 import { ErrorType } from './types/ErrorType.js'
-import { getBaseTypes, getHybridObjectNitroModuleConfig } from '../utils.js'
+import { getDirectBaseTypes, getHybridObjectNitroModuleConfig } from '../utils.js'
 import { DateType } from './types/DateType.js'
 import { NitroConfig } from '../config/NitroConfig.js'
 import { CustomType } from './types/CustomType.js'
 import {
-  isSyncFunction,
   isArrayBuffer,
   isCustomType,
   isDate,
   isError,
-  isMap,
+  isInlineCallback,
+  isAnyJSON,
   isPromise,
   isRecord,
   isInt64,
@@ -49,7 +49,7 @@ import { NullType } from './types/NullType.js'
 import { UInt64Type } from './types/UInt64Type.js'
 
 function getHybridObjectName(type: TSMorphType): string {
-  const symbol = isHybridView(type) ? type.getAliasSymbol() : type.getSymbol()
+  const symbol = type.getSymbol()
   if (symbol == null) {
     throw new Error(
       `Cannot get name of \`${type.getText()}\` - symbol not found!`
@@ -58,12 +58,12 @@ function getHybridObjectName(type: TSMorphType): string {
   return symbol.getEscapedName()
 }
 
-function getFunctionCallSignature(func: TSMorphType): Signature {
-  const callSignatures = func.getCallSignatures()
+function getCallbackCallSignature(callback: TSMorphType): Signature {
+  const callSignatures = callback.getCallSignatures()
   const callSignature = callSignatures[0]
   if (callSignatures.length !== 1 || callSignature == null) {
     throw new Error(
-      `Function overloads are not supported in Nitrogen! (in ${func.getText()})`
+      `Callback overloads are not supported in Nitrogen! (in ${callback.getText()})`
     )
   }
   return callSignature
@@ -82,7 +82,9 @@ function isOptionalType(type: TSMorphType): boolean {
 function removeDuplicates(types: Type[]): Type[] {
   return types.filter((t1, index, array) => {
     const firstIndexOfType = array.findIndex(
-      (t2) => t1.getCode('c++') === t2.getCode('c++')
+      (t2) =>
+        t1.getCode('c++', { context: 'value' }) ===
+        t2.getCode('c++', { context: 'value' })
     )
     return firstIndexOfType === index
   })
@@ -161,12 +163,18 @@ function getArguments<N extends number>(
   )
 }
 
+export interface CreateTypeOptions {
+  /** Whether the type belongs to a method, static method or constructor parameter. */
+  isParameter?: boolean
+}
+
 export function createNamedType(
   language: Language,
   name: string,
   type: TSMorphType,
   isOptional: boolean,
-  typeNode?: TypeNode
+  typeNode?: TypeNode,
+  options: CreateTypeOptions = {}
 ) {
   if (name.startsWith('__')) {
     throw new Error(
@@ -175,7 +183,7 @@ export function createNamedType(
   }
   return new NamedWrappingType(
     name,
-    createType(language, type, isOptional, typeNode)
+    createType(language, type, isOptional, typeNode, options)
   )
 }
 
@@ -234,8 +242,19 @@ export function createType(
   language: Language,
   type: TSMorphType,
   isOptional: boolean,
-  typeNode?: TypeNode
+  typeNode?: TypeNode,
+  { isParameter = false }: CreateTypeOptions = {}
 ): Type {
+  if (isInlineCallback(type) && !isParameter) {
+    // Native code cannot keep a borrowed callback beyond the call.
+    const typeName = type.getText(
+      undefined,
+      ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope
+    )
+    throw new Error(
+      `Inline callbacks (${typeName}) can only be the type of a required method, static method or constructor parameter!`
+    )
+  }
   const key = getTypeId(type, isOptional)
   if (key != null && knownTypes[language].has(key)) {
     const known = knownTypes[language].get(key)!
@@ -288,25 +307,24 @@ export function createType(
     } else if (type.isTuple()) {
       const itemTypes = type
         .getTupleElements()
-        .map((t) => createType(language, t, t.isNullable()))
+        .map((t) => createType(language, t, isOptionalType(t)))
       return new TupleType(itemTypes)
     } else if (type.getCallSignatures().length > 0) {
-      // It's a function!
-      const callSignature = getFunctionCallSignature(type)
-      const funcReturnType = callSignature.getReturnType()
+      // It's a callback!
+      const callSignature = getCallbackCallSignature(type)
+      const callbackReturnType = callSignature.getReturnType()
       const returnType = createType(
         language,
-        funcReturnType,
-        isOptionalType(funcReturnType)
+        callbackReturnType,
+        isOptionalType(callbackReturnType)
       )
       const parameters = callSignature.getParameters().map((p) => {
         const declaration = p.getValueDeclarationOrThrow()
         const parameterType = p.getTypeAtLocation(declaration)
-        const isNullable = parameterType.isNullable() || p.isOptional()
-        return createNamedType(language, p.getName(), parameterType, isNullable)
+        const isOptional = isOptionalType(parameterType) || p.isOptional()
+        return createNamedType(language, p.getName(), parameterType, isOptional)
       })
-      const isSync = isSyncFunction(type)
-      return new FunctionType(returnType, parameters, isSync)
+      return new CallbackType(returnType, parameters, isInlineCallback(type))
     } else if (isPromise(type)) {
       // It's a Promise!
       const [promiseResolvingType] = getArguments(type, 'Promise', 1)
@@ -329,9 +347,9 @@ export function createType(
     } else if (isArrayBuffer(type)) {
       // ArrayBuffer
       return new ArrayBufferType()
-    } else if (isMap(type)) {
-      // Map
-      return new MapType()
+    } else if (isAnyJSON(type)) {
+      // AnyJSON
+      return new AnyJSONType()
     } else if (isDate(type)) {
       // Date
       return new DateType()
@@ -366,7 +384,7 @@ export function createType(
           // If there is no alias, it is an inline union instead of a separate type declaration!
           throw new Error(
             `Inline union types ("${type.getText()}") are not supported by Nitrogen!\n` +
-              `Extract the union to a separate type, and re-run nitrogen!`
+            `Extract the union to a separate type, and re-run nitrogen!`
           )
         }
         const typename = symbol.getEscapedName()
@@ -394,16 +412,25 @@ export function createType(
     } else if (isDirectlyAnyHybridObject(type)) {
       // It is a HybridObject directly/literally. Base type
       return new AnyHybridObjectType()
-    } else if (isAnyHybridSubclass(type)) {
+    } else if (isSomeHybridObject(type)) {
       // It is another HybridObject being referenced!
       const typename = getHybridObjectName(type)
-      const baseTypes = getBaseTypes(type)
-        .filter((t) => isAnyHybridSubclass(t))
+      const baseTypes = getDirectBaseTypes(type)
+        .filter((t) => isSomeHybridObject(t))
         .map((b) => createType(language, b, false))
       const baseHybrids = baseTypes.filter((b) => b instanceof HybridObjectType)
       const sourceConfig =
         getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
-      return new HybridObjectType(typename, language, baseHybrids, sourceConfig)
+      const iosOptions = getHybridObjectPlatformsForType(type).ios
+      const swiftProtocolConformances =
+        iosOptions?.language === 'swift' ? iosOptions.protocolConformances : []
+      return new HybridObjectType(
+        typename,
+        language,
+        baseHybrids,
+        sourceConfig,
+        swiftProtocolConformances
+      )
     } else if (type.isInterface()) {
       // It is an `interface T { ... }`, which is a `struct`
       const symbol = type.getAliasSymbol() ?? type.getSymbol()
@@ -434,9 +461,9 @@ export function createType(
     } else if (type.isUndefined()) {
       throw new Error(
         `The TypeScript type "undefined" cannot be represented in Nitro.\n` +
-          `- If you want to make a type optional, add \`?\` to its name, or make it an union with \`undefined\`.\n` +
-          `- If you want a method that returns nothing, use \`void\` instead.\n` +
-          `- If you want to represent an explicit absence of a value, use \`null\` instead.`
+        `- If you want to make a type optional, add \`?\` to its name, or make it an union with \`undefined\`.\n` +
+        `- If you want a method that returns nothing, use \`void\` instead.\n` +
+        `- If you want to represent an explicit absence of a value, use \`null\` instead.`
       )
     } else if (type.isAny()) {
       throw new Error(
@@ -456,7 +483,7 @@ export function createType(
         // Could be an invalid import, e.g. an alias
         throw new Error(
           `The TypeScript type "${type.getText()}" cannot be resolved - is it imported properly? ` +
-            `Make sure to import it properly using fully specified relative or absolute imports, no aliases.`
+          `Make sure to import it properly using fully specified relative or absolute imports, no aliases.`
         )
       } else {
         // A different error

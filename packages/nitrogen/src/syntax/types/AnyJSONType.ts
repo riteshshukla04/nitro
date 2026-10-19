@@ -1,31 +1,26 @@
 import type { Language } from '../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../SourceFile.js'
-import type { Type, TypeKind } from './Type.js'
+import type { GetCodeOptions, Type, TypeKind } from './Type.js'
 
-export class MapType implements Type {
-  get canBePassedByReference(): boolean {
-    // It's a shared_ptr<..>, no ref.
-    return true
-  }
-
+export class AnyJSONType implements Type {
   get kind(): TypeKind {
-    return 'map'
+    return 'any-json'
   }
   get isEquatable(): boolean {
     return true
   }
 
-  getCode(language: Language): string {
+  getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
-      case 'c++':
-        return 'std::shared_ptr<AnyMap>'
+      case 'c++': {
+        const type = 'AnyJSON'
+        return options.context === 'parameter' ? `const ${type}&` : type
+      }
       case 'swift':
-        return 'AnyMap'
-      case 'kotlin':
-        return 'AnyMap'
+        return 'AnyJSON'
       default:
         throw new Error(
-          `Language ${language} is not yet supported for MapType!`
+          `Language ${language} is not yet supported for AnyJSONType!`
         )
     }
   }
@@ -37,23 +32,21 @@ export class MapType implements Type {
     switch (language) {
       case 'c++':
         imports.push({
-          name: 'NitroModules/AnyMap.hpp',
-          language: 'c++',
-          space: 'system',
+          language,
+          declaration: { name: 'NitroModules/AnyJSON.hpp', space: 'system' },
         })
         break
       case 'swift':
         imports.push({
           name: 'NitroModules',
-          language: 'swift',
-          space: 'system',
+          language,
+          access: 'public',
         })
         break
       case 'kotlin':
         imports.push({
-          name: 'com.margelo.nitro.core.AnyMap',
-          language: 'kotlin',
-          space: 'system',
+          name: 'com.margelo.nitro.core.AnyJSON',
+          language,
         })
         break
     }

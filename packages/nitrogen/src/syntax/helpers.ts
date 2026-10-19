@@ -21,21 +21,17 @@ ${comment}
 `.trim()
 }
 
-export function isFunction(type: Type): boolean {
+export function isCallback(type: Type): boolean {
   switch (type.kind) {
-    case 'function':
+    case 'callback':
       return true
     case 'optional': {
       const optional = getTypeAs(type, OptionalType)
-      return isFunction(optional.wrappingType)
+      return isCallback(optional.wrappingType)
     }
     default:
       return false
   }
-}
-
-export function toReferenceType(type: string): `const ${typeof type}&` {
-  return `const ${type}&`
 }
 
 export function escapeCppName(string: string): string {
@@ -85,7 +81,7 @@ function getTypeLooselyness(type: Type): number {
     case 'optional':
       // We have `isUndefined()`
       return 0
-    case 'function':
+    case 'callback':
       // We have `.isFunction()`
       return 0
     case 'string':
@@ -123,7 +119,7 @@ function getTypeLooselyness(type: Type): number {
     case 'record':
       // Super loose, only type counts
       return 3
-    case 'map':
+    case 'any-json':
       // This is just super loose
       return 4
     case 'struct':
@@ -132,9 +128,8 @@ function getTypeLooselyness(type: Type): number {
     case 'variant':
       // Pretty loose
       return 2
-    case 'result-wrapper':
-      // Not loose at all
-      return 0
+    case 'unsafe-void-pointer':
+    case 'swift-result':
     case 'void':
       // Not a type
       return 0

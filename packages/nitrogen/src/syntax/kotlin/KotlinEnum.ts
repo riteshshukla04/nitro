@@ -2,9 +2,9 @@ import { NitroConfig } from '../../config/NitroConfig.js'
 import { capitalizeName, indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
-import { EnumType } from '../types/EnumType.js'
+import type { KotlinEnumType } from './types/KotlinEnumType.js'
 
-export function createKotlinEnum(enumType: EnumType): SourceFile[] {
+export function createKotlinEnum(enumType: KotlinEnumType): SourceFile[] {
   const members = enumType.enumMembers.map(
     (m) => `${m.name.toUpperCase()}(${m.value})`
   )
@@ -37,7 +37,7 @@ enum class ${enumType.enumName}(@DoNotStrip @Keep val value: Int) {
   const cppToJniConverterCode = getCppToJniConverterCode('value', enumType)
 
   const fbjniCode = `
-${createFileMetadataString(`J${enumType.enumName}.hpp`)}
+${createFileMetadataString(`${enumType.jniName}.hpp`)}
 
 #pragma once
 
@@ -51,7 +51,7 @@ namespace ${cxxNamespace} {
   /**
    * The C++ JNI bridge between the C++ enum "${enumType.enumName}" and the Kotlin enum "${enumType.enumName}".
    */
-  struct J${enumType.enumName} final: public jni::JavaClass<J${enumType.enumName}> {
+  struct ${enumType.jniName} final : public jni::JavaClass<${enumType.jniName}> {
   public:
     static constexpr auto kJavaDescriptor = "L${jniClassDescriptor};";
 
@@ -73,7 +73,7 @@ namespace ${cxxNamespace} {
      * Create a Java/Kotlin-based enum with the given C++ enum's value.
      */
     [[maybe_unused]]
-    static jni::alias_ref<J${enumType.enumName}> fromCpp(${enumType.enumName} value) {
+    static jni::alias_ref<${enumType.jniName}> fromCpp(${enumType.enumName} value) {
       ${indent(cppToJniConverterCode, '      ')}
     }
   };
@@ -92,7 +92,7 @@ namespace ${cxxNamespace} {
   files.push({
     content: fbjniCode,
     language: 'c++',
-    name: `J${enumType.enumName}.hpp`,
+    name: `${enumType.jniName}.hpp`,
     subdirectory: [],
     platform: 'android',
   })
@@ -101,9 +101,9 @@ namespace ${cxxNamespace} {
 
 function getCppToJniConverterCode(
   cppValueName: string,
-  enumType: EnumType
+  enumType: KotlinEnumType
 ): string {
-  const jniEnumName = `J${enumType.enumName}`
+  const jniEnumName = enumType.jniName
 
   const cases = enumType.enumMembers.map((m) => {
     const fieldName = `field${capitalizeName(m.name)}`

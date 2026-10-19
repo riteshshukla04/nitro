@@ -1,13 +1,8 @@
 import type { Language } from '../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../SourceFile.js'
-import type { Type, TypeKind } from './Type.js'
+import type { GetCodeOptions, Type, TypeKind } from './Type.js'
 
 export class DateType implements Type {
-  get canBePassedByReference(): boolean {
-    // simple chrono value type
-    return false
-  }
-
   get kind(): TypeKind {
     return 'date'
   }
@@ -15,7 +10,7 @@ export class DateType implements Type {
     return true
   }
 
-  getCode(language: Language): string {
+  getCode(language: Language, _options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
         return 'std::chrono::system_clock::time_point'
@@ -34,12 +29,13 @@ export class DateType implements Type {
   }
   getRequiredImports(language: Language): SourceImport[] {
     const imports: SourceImport[] = []
-    if (language === 'c++') {
-      imports.push({
-        name: 'chrono',
-        language: 'c++',
-        space: 'system',
-      })
+    switch (language) {
+      case 'c++':
+        imports.push({
+          language,
+          declaration: { name: 'chrono', space: 'system' },
+        })
+        break
     }
     return imports
   }
