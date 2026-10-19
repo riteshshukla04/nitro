@@ -31,6 +31,7 @@ import { Logger } from './Logger.js'
 import { NitroConfig } from './config/NitroConfig.js'
 import { createIOSAutolinking } from './autolinking/createIOSAutolinking.js'
 import { updateSwiftPackageManifest } from './autolinking/ios/updateSwiftPackageManifest.js'
+import { getModuleDependencies } from './syntax/getModuleDependencies.js'
 import type { Autolinking } from './autolinking/Autolinking.js'
 import { createGitAttributes } from './createGitAttributes.js'
 import { NITROGEN_VERSION } from './config/nitrogenVersion.js'
@@ -345,9 +346,14 @@ export async function runNitrogen({
     }
   }
   if (usedPlatforms.includes('ios')) {
+    const moduleDependencies = getModuleDependencies(
+      specsByPlatform.ios,
+      NitroConfig.current
+    )
     await updateSwiftPackageManifest({
       packageDirectory: process.cwd(),
       outputDirectory: outputDirectory,
+      moduleDependencies: moduleDependencies,
     })
   }
 

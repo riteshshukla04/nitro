@@ -5,9 +5,9 @@
 //  Created by Marc Rousavy on 29.09.26.
 //
 
-#include "CommonGlobals.hpp"
-#include "JSIConverter+SwiftAnyJSON.hpp"
-#include "NitroModules-Swift-Cxx-Umbrella.hpp"
+#include <NitroModules/CommonGlobals.hpp>
+#include <NitroModules/JSIConverter+SwiftAnyJSON.hpp>
+#include <NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp>
 
 #include <cassert>
 #include <exception>

@@ -5,6 +5,8 @@
 //  Created by Marc Rousavy on 02.10.26.
 //
 
+public import NitroModulesAppleCxx
+
 public import Foundation
 
 /// Equality compares the encoded JSON bytes, including key order and whitespace.

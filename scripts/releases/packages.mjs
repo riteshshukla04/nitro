@@ -14,7 +14,7 @@ export const versionedManifests = [
 ]
 
 export const versionedSources = [
-  'packages/nitro-core/native/cpp/utils/NitroDefines.hpp',
+  'packages/nitro-core/native/cpp/include/NitroModules/NitroDefines.hpp',
   'packages/nitro-core/js/src/version.ts',
 ]
 

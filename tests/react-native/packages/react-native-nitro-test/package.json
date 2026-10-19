@@ -23,7 +23,8 @@
     "app.plugin.js",
     "*.podspec",
     "README.md",
-    "nitrogen/generated"
+    "nitrogen/generated",
+    "Package.swift"
   ],
   "keywords": [
     "react-native",
@@ -75,5 +76,11 @@
   "private": true,
   "imports": {
     "#nitro/*": "./nitrogen/generated/shared/javascript/*.cjs"
+  },
+  "swiftpmConfig": {
+    "name": "NitroTest",
+    "dependencies": [
+      "react-native-nitro-modules"
+    ]
   }
 }

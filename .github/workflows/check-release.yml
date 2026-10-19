@@ -20,7 +20,7 @@ on:
         'packages/**/package.json',
         'tests/react-native/**/package.json',
         'packages/nitro-core/js/src/version.ts',
-        'packages/nitro-core/native/cpp/utils/NitroDefines.hpp',
+        'packages/nitro-core/native/cpp/include/NitroModules/NitroDefines.hpp',
         '.github/workflows/*.yml',
       ]
 

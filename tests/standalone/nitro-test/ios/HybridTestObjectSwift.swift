@@ -8,6 +8,7 @@
 import Dispatch
 import Foundation
 import NitroModules
+import NitroModulesCxx
 import NitroTestExternal
 
 class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
@@ -173,7 +174,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
   }
 
   func errorCallback(onError: any Callback<any Error, Void>) throws {
-    let error = RuntimeError.error(withMessage: "Some Error!")
+    let error = RuntimeError("Some Error!")
     onError(error)
   }
 
@@ -272,7 +273,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
 
   private func jsonObject(_ json: AnyJSON) throws -> [String: Any] {
     guard let object = try JSONSerialization.jsonObject(with: json.data) as? [String: Any] else {
-      throw RuntimeError.error(withMessage: "Expected a JSON object.")
+      throw RuntimeError("Expected a JSON object.")
     }
     return object
   }
@@ -300,13 +301,11 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
   }
 
   func funcThatThrows() throws -> Double {
-    throw RuntimeError.error(
-      withMessage: "This function will only work after sacrificing seven lambs!")
+    throw RuntimeError("This function will only work after sacrificing seven lambs!")
   }
 
   func funcThatThrowsBeforePromise() throws -> any Promise<Void> {
-    throw RuntimeError.error(
-      withMessage: "This function will only work after sacrificing eight lambs!")
+    throw RuntimeError("This function will only work after sacrificing eight lambs!")
   }
 
   func throwError(error: any Error) throws {
@@ -443,7 +442,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
 
   func promiseThrows() throws -> any Promise<Void> {
     return .async {
-      throw RuntimeError.error(withMessage: "Promise throws :)")
+      throw RuntimeError("Promise throws :)")
     }
   }
 
@@ -459,7 +458,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
 
   func createPendingPromise() throws -> any Promise<Double> {
     guard pendingPromise == nil else {
-      throw RuntimeError.error(withMessage: "A pending Promise is already waiting for completion.")
+      throw RuntimeError("A pending Promise is already waiting for completion.")
     }
     let promise: any Promise<Double> = .pending()
     pendingPromise = promise
@@ -468,7 +467,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
 
   func resolvePendingPromiseOnWorker() throws {
     guard let promise = pendingPromise else {
-      throw RuntimeError.error(withMessage: "No pending Promise is waiting for completion.")
+      throw RuntimeError("No pending Promise is waiting for completion.")
     }
     // Only JS calls access the slot; the worker owns the extracted Promise.
     pendingPromise = nil
@@ -612,7 +611,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
   func getBufferLastItem(buffer: ArrayBuffer) throws -> Double {
     return try buffer.withUnsafeBytes { bytes in
       guard let lastByte = bytes.last else {
-        throw RuntimeError.error(withMessage: "ArrayBuffer's size is 0!")
+        throw RuntimeError("ArrayBuffer's size is 0!")
       }
       return Double(lastByte)
     }
@@ -621,7 +620,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
   func setAllValuesTo(buffer: ArrayBuffer, value: Double) throws {
     try buffer.withUnsafeMutableBytes { bytes in
       guard let data = bytes.baseAddress, !bytes.isEmpty else {
-        throw RuntimeError.error(withMessage: "ArrayBuffer's size is 0!")
+        throw RuntimeError("ArrayBuffer's size is 0!")
       }
       memset(data, Int32(value), bytes.count)
     }
@@ -653,7 +652,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
 
   func castBase(base: (any HybridBaseSpec)) throws -> (any HybridChildSpec) {
     guard let child = base as? HybridChildSpec else {
-      throw RuntimeError.error(withMessage: "Cannot cast Base to Child!")
+      throw RuntimeError("Cannot cast Base to Child!")
     }
     return child
   }

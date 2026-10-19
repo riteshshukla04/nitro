@@ -5,11 +5,11 @@
 //  Created by Marc Rousavy on 17.10.25.
 //
 
-#include "CommonGlobals.hpp"
-#include "JSIHelpers.hpp"
-#include "NitroDefines.hpp"
-#include "PropNameIDCache.hpp"
-#include "RuntimeData.hpp"
+#include <NitroModules/CommonGlobals.hpp>
+#include <NitroModules/JSIHelpers.hpp>
+#include <NitroModules/NitroDefines.hpp>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/RuntimeData.hpp>
 
 namespace margelo::nitro {
 

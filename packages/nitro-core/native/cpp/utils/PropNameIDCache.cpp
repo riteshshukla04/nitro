@@ -5,8 +5,8 @@
 //  Created by Marc Rousavy on 17.10.25.
 //
 
-#include "PropNameIDCache.hpp"
-#include "RuntimeData.hpp"
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/RuntimeData.hpp>
 
 namespace margelo::nitro {
 

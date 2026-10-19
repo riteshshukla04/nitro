@@ -3,7 +3,9 @@ import { readFile, realpath, writeFile } from 'fs/promises'
 import path from 'path'
 import chalk from 'chalk'
 import { Logger } from '../../Logger.js'
+import type { NitroConfig } from '../../config/NitroConfig.js'
 import { prettifyDirectory } from '../../prettifyDirectory.js'
+import { checkSwiftPMConfig } from './checkSwiftPMConfig.js'
 import {
   createSwiftPackageTargets,
   SWIFT_PACKAGE_FUNCTION_NAME,
@@ -20,6 +22,10 @@ interface UpdateSwiftPackageManifestOptions {
    * The directory nitrogen writes generated files to.
    */
   outputDirectory: string
+  /**
+   * Other Nitro modules whose types the specs use.
+   */
+  moduleDependencies: NitroConfig[]
 }
 
 /**
@@ -31,6 +37,7 @@ interface UpdateSwiftPackageManifestOptions {
 export async function updateSwiftPackageManifest({
   packageDirectory,
   outputDirectory,
+  moduleDependencies,
 }: UpdateSwiftPackageManifestOptions): Promise<void> {
   const manifestPath = path.join(packageDirectory, 'Package.swift')
   if (!existsSync(manifestPath)) {
@@ -55,6 +62,7 @@ export async function updateSwiftPackageManifest({
     )
     return
   }
+  checkSwiftPMConfig(packageDirectory)
 
   const generatedDirectory = await getGeneratedDirectory(
     packageDirectory,
@@ -62,6 +70,7 @@ export async function updateSwiftPackageManifest({
   )
   const section = createSwiftPackageTargets({
     generatedDirectory: generatedDirectory,
+    moduleDependencies: moduleDependencies,
   })
 
   const [beginIndex, ...otherBeginIndexes] = beginIndexes

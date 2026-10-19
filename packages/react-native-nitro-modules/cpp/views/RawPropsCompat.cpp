@@ -2,7 +2,7 @@
 // Created by Marc Rousavy on 21.08.26.
 //
 
-#include "RawPropsCompat.hpp"
+#include <NitroModules/RawPropsCompat.hpp>
 
 #if defined(ANDROID) && !defined(FOLLY_NO_CONFIG)
 #define FOLLY_NO_CONFIG 1

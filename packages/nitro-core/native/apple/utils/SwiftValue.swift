@@ -1,3 +1,4 @@
+public import NitroModulesAppleCxx
 
 /// Copies a value from borrowed Swift storage. The source must contain an initialized T.
 @_expose(Cxx)

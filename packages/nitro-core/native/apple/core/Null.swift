@@ -6,6 +6,8 @@
 //
 
 
+public import NitroModulesAppleCxx
+
 /**
  * Represents an explicit `null` from JS.
  */

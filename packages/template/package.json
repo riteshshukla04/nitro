@@ -28,8 +28,9 @@
     "ios/**/*.swift",
     "app.plugin.js",
     "nitro.json",
-    "*.podspec",
-    "README.md"
+    "README.md",
+    "Package.swift",
+    "*.podspec"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -109,5 +110,11 @@
     "trailingComma": "es5",
     "useTabs": false,
     "semi": false
+  },
+  "swiftpmConfig": {
+    "name": "$$iosModuleName$$",
+    "dependencies": [
+      "react-native-nitro-modules"
+    ]
   }
 }

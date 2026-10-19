@@ -5,8 +5,8 @@
 //  Created by Marc Rousavy on 14.07.24.
 //
 
-#include "NitroLogger.hpp"
-#include "NitroDefines.hpp"
+#include <NitroModules/NitroLogger.hpp>
+#include <NitroModules/NitroDefines.hpp>
 #include <os/log.h>
 
 namespace margelo::nitro {

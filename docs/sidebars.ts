@@ -62,7 +62,6 @@ const sidebars: SidebarsConfig = {
         'types/callbacks',
         'types/tuples',
         'types/variants',
-        'types/dates',
         'types/typed-maps',
         'types/untyped-maps',
         'types/hybrid-objects',

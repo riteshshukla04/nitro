@@ -5,10 +5,10 @@
 //  Created by Marc Rousavy on 14.07.24.
 //
 
-#include "ArrayBuffer.hpp"
-#include "BorrowingReference.hpp"
-#include "NitroDefines.hpp"
-#include "Dispatcher.hpp"
+#include <NitroModules/ArrayBuffer.hpp>
+#include <NitroModules/BorrowingReference.hpp>
+#include <NitroModules/NitroDefines.hpp>
+#include <NitroModules/Dispatcher.hpp>
 #include <cassert>
 #include <cstring>
 #include <functional>

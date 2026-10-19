@@ -162,6 +162,7 @@ tasks.register('prepareHeaders', Copy) {
   from fileTree('./src/main/cpp').filter { it.isFile() }
   from fileTree('./core/main/cpp').filter { it.isFile() }
   from fileTree('../cpp/').filter { it.isFile() }
+  from fileTree('../include/NitroModules').filter { it.isFile() }
   include "*.hpp"
   into "${project.buildDir}/headers/nitromodules/NitroModules/"
   includeEmptyDirs = false

@@ -5,10 +5,10 @@
 //  Created by Marc Rousavy on 22.07.24.
 //
 
-#include "HybridClassRegistry.hpp"
-#include "HybridObject.hpp"
-#include "HybridNitroModulesProxy.hpp"
-#include "NitroDefines.hpp"
+#include <NitroModules/HybridClassRegistry.hpp>
+#include <NitroModules/HybridObject.hpp>
+#include <NitroModules/HybridNitroModulesProxy.hpp>
+#include <NitroModules/NitroDefines.hpp>
 #include <cassert>
 #include <mutex>
 

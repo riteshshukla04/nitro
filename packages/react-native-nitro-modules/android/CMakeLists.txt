@@ -21,20 +21,11 @@ add_library(NitroModules SHARED
 
 # Specifies a path to native header files.
 include_directories(
-  # Shared Nitro Core C++ includes
-  ../cpp/core/core
-  ../cpp/core/entrypoint
-  ../cpp/core/jsi
-  ../cpp/core/platform
-  ../cpp/core/registry
-  ../cpp/core/prototype
-  ../cpp/core/test-object
-  ../cpp/core/templates
-  ../cpp/core/threading
-  ../cpp/core/utils
+  # Shared Nitro Core public headers
+  ../cpp/core/include
   # React Native C++ includes
   ../cpp/threading
-  ../cpp/views
+  ../include
   src/main/cpp/turbomodule
   src/main/cpp/views
   # Android-specific Nitro Core C++ includes

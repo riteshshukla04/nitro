@@ -1,9 +1,21 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
+import { indent } from '../../utils.js'
 import { getAppleCxxTargetName } from './createAppleCxxTarget.js'
 
 export const SWIFT_PACKAGE_SECTION_BEGIN = '// nitrogen:begin'
 export const SWIFT_PACKAGE_SECTION_END = '// nitrogen:end'
 export const SWIFT_PACKAGE_FUNCTION_NAME = 'addNitrogenTargets'
+
+/**
+ * The SwiftPM package name of `react-native-nitro-modules`.
+ * React Native's autolinking references each library through
+ * `build/generated/autolinking/libs/<SwiftName>`, so this is also its package identity.
+ */
+export const NITRO_MODULES_PACKAGE_NAME = 'NitroModules'
+/**
+ * The SwiftPM package name of React Native's prebuilt headers and frameworks.
+ */
+export const REACT_NATIVE_PACKAGE_NAME = 'ReactNative'
 
 interface SwiftPackageTargetsOptions {
   /**
@@ -11,6 +23,10 @@ interface SwiftPackageTargetsOptions {
    * relative to the Swift package's root (e.g. `nitrogen/generated`).
    */
   generatedDirectory: string
+  /**
+   * Other Nitro modules whose types the specs use.
+   */
+  moduleDependencies: NitroConfig[]
 }
 
 /**
@@ -23,6 +39,7 @@ interface SwiftPackageTargetsOptions {
  */
 export function createSwiftPackageTargets({
   generatedDirectory,
+  moduleDependencies,
 }: SwiftPackageTargetsOptions): string {
   const moduleName = NitroConfig.current.getIosModuleName()
   const cxxTargetName = `${moduleName}Cxx`
@@ -31,6 +48,26 @@ export function createSwiftPackageTargets({
   const iosDirectory = `${generatedDirectory}/ios`
   const bridgeSourceName = `${NitroConfig.current.getSwiftBridgeHeaderName()}.cpp`
   const autolinkingSourceName = `${moduleName}Autolinking.cpp`
+  const autolinkingObjcSourceName = `${moduleName}Autolinking.mm`
+  const nitroModules = NITRO_MODULES_PACKAGE_NAME
+  const reactNative = REACT_NATIVE_PACKAGE_NAME
+  const dependencyModuleNames = moduleDependencies.map((config) =>
+    config.getIosModuleName()
+  )
+  const packageDependencies = [
+    `.package(name: "${reactNative}", path: "../../../../xcframeworks"),`,
+    `.package(name: "${nitroModules}", path: "../${nitroModules}"),`,
+    ...dependencyModuleNames.map(
+      (name) => `.package(name: "${name}", path: "../${name}"),`
+    ),
+  ]
+  const productDependencies = [nitroModules, ...dependencyModuleNames].map(
+    (name) => `.product(name: "${name}", package: "${name}"),`
+  )
+  const exposedSwiftModules = [nitroModules, ...dependencyModuleNames].map(
+    (name) =>
+      `"-Xfrontend", "-clang-header-expose-module", "-Xfrontend", "${name}=${name}-Swift.h",`
+  )
 
   return `
 ${SWIFT_PACKAGE_SECTION_BEGIN}
@@ -45,74 +82,107 @@ import Foundation
 
 /// Adds the \`${moduleName}\` library and its targets to \`package\`:
 ///
-/// - \`${cxxTargetName}\`: The generated cross-platform C++ specs.
+/// - \`${cxxTargetName}\`: The generated cross-platform C++ specs, and your C++ sources.
 /// - \`${appleCxxTargetName}\`: The generated C++ bridge declarations that Swift imports.
-/// - \`${moduleName}\`: The Swift sources in \`Sources/${moduleName}\` and the generated Swift specs.
-/// - \`${swiftBridgeTargetName}\`: The generated C++ wrappers that call into Swift.
+/// - \`${moduleName}\`: Your Swift sources and the generated Swift specs.
+/// - \`${swiftBridgeTargetName}\`: The generated C++ wrappers that call into Swift, and autolinking.
 ///
-/// \`package\` must depend on the \`nitro-core\` and \`nitro-core\` packages.
+/// It also adds the packages these targets depend on: React Native's \`${reactNative}\` package,
+/// \`${nitroModules}\`, and the Nitro modules whose types the specs use.
+/// React Native's autolinking references every library through \`build/generated/autolinking/libs/<SwiftName>\`,
+/// and SwiftPM resolves the relative package paths against that location.
+/// List every Nitro module this library depends on in \`swiftpmConfig.dependencies\` in package.json,
+/// so React Native's autolinking links it too.
 /// Packages without a C++ language standard use C++20.
 ///
 /// - Parameters:
 ///   - package: The package to add the library and its targets to.
-///   - dependencies: Additional dependencies of the \`${cxxTargetName}\`, \`${appleCxxTargetName}\` and \`${moduleName}\` targets,
-///     including the libraries of other Nitro modules that the specs use.
+///   - swiftSources: Directories or files containing your Swift sources, relative to the package root.
+///     Paths that don't exist are skipped.
+///   - cxxSources: Directories or files containing your C++ sources, relative to the package root.
+///     Paths that don't exist are skipped. Their directories are also added to the header search paths.
+///   - dependencies: Additional dependencies of all targets.
 ///   - swiftSettings: Additional Swift settings of the \`${moduleName}\` Swift target.
+///   - cxxSettings: Additional C++ settings of the \`${cxxTargetName}\` and \`${swiftBridgeTargetName}\` targets.
 func ${SWIFT_PACKAGE_FUNCTION_NAME}(
     to package: Package,
+    swiftSources: [String] = ["ios"],
+    cxxSources: [String] = ["cpp"],
     dependencies: [Target.Dependency] = [],
-    swiftSettings: [SwiftSetting] = []
+    swiftSettings: [SwiftSetting] = [],
+    cxxSettings: [CXXSetting] = []
 ) {
+    package.dependencies += [
+        ${indent(packageDependencies.join('\n'), '        ')}
+    ]
+    let nitroModuleDependencies: [Target.Dependency] = [
+        ${indent(productDependencies.join('\n'), '        ')}
+    ] + dependencies
+
+    let packageDirectory = URL(fileURLWithPath: Context.packageDirectory)
+    func exists(_ path: String) -> Bool {
+        return FileManager.default.fileExists(atPath: packageDirectory.appendingPathComponent(path).path)
+    }
+    let userSwiftSources = swiftSources.filter(exists)
+    let userCxxSources = cxxSources.filter(exists)
+
+    // React Native's prebuilt React.framework is either Debug or Release, keep the C++ ABI in sync.
     let releaseSettings: [CXXSetting] = [
+        .define("DEBUG", .when(configuration: .debug)),
         .define("NDEBUG", .when(configuration: .release)),
     ]
-    let cxxSettings: [CXXSetting] = releaseSettings + [
+    let userHeaderSearchPaths = userCxxSources.map { "-I" + packageDirectory.appendingPathComponent($0).path }
+    let commonCxxSettings: [CXXSetting] = releaseSettings + [
         .disableWarning("nullability-extension"),
+        .unsafeFlags(userHeaderSearchPaths),
+    ]
+    let reactNativeDependencies: [Target.Dependency] = [
+        .product(name: "ReactNativeHeaders", package: "${reactNative}"),
+        .product(name: "ReactNativeDependenciesHeaders", package: "${reactNative}"),
     ]
 
+    let cxxSourcesInTarget = ["${generatedDirectory}/shared/c++"] + userCxxSources
     let cxxTarget: Target = .target(
         name: "${cxxTargetName}",
-        dependencies: [
-            .product(name: "NitroModules", package: "nitro-core"),
-        ] + dependencies,
-        path: "${generatedDirectory}/shared/c++",
-        publicHeadersPath: ".",
-        cxxSettings: cxxSettings
+        dependencies: nitroModuleDependencies + reactNativeDependencies,
+        path: ".",
+        exclude: nitrogenExcludes(in: ".", keeping: cxxSourcesInTarget),
+        sources: cxxSourcesInTarget,
+        publicHeadersPath: "${generatedDirectory}/shared/c++",
+        cxxSettings: commonCxxSettings + cxxSettings
     )
 
     let appleCxxTarget: Target = .target(
         name: "${appleCxxTargetName}",
-        dependencies: ["${cxxTargetName}"] + dependencies,
+        dependencies: ["${cxxTargetName}"] + nitroModuleDependencies,
         path: "${iosDirectory}/${appleCxxTargetName}",
-        cxxSettings: cxxSettings
+        cxxSettings: commonCxxSettings
     )
 
-    let swiftSources = [
-        "Sources/${moduleName}",
+    let swiftSourcesInTarget = userSwiftSources + [
         "${iosDirectory}/swift",
     ]
-    let swiftDependencies: [Target.Dependency] = [
-        "${appleCxxTargetName}",
-        .product(name: "NitroModules", package: "nitro-core"),
-    ]
+    let swiftDependencies: [Target.Dependency] = ["${appleCxxTargetName}"] + nitroModuleDependencies
     let generatedSwiftSettings: [SwiftSetting] = [
+        // Nitro's Swift APIs don't support Swift 6 strict concurrency yet, e.g. the generated
+        // \`Promise.async\` wrappers return non-Sendable HybridObjects from \`@isolated(any)\` closures.
+        // Pass \`.swiftLanguageMode(.v6)\` in \`swiftSettings\` to opt into Swift 6.
+        .swiftLanguageMode(.v5),
         .enableUpcomingFeature("InternalImportsByDefault"),
-        .enableUpcomingFeature("MemberImportVisibility"),
         .interoperabilityMode(.Cxx),
         .unsafeFlags(["-Xfrontend", "-clang-header-expose-decls=has-expose-attr-or-stdlib"]),
         // Swift leaves declarations that use another module's Swift types, like AnyJSON,
         // out of the generated header unless that module's header is exposed to it.
         .unsafeFlags([
-            "-Xfrontend", "-clang-header-expose-module",
-            "-Xfrontend", "NitroModules=NitroModules-Swift.h",
+            ${indent(exposedSwiftModules.join('\n'), '            ')}
         ]),
     ]
     let swiftTarget: Target = .target(
         name: "${moduleName}",
-        dependencies: swiftDependencies + dependencies,
+        dependencies: swiftDependencies,
         path: ".",
-        exclude: nitrogenExcludes(in: ".", keeping: swiftSources),
-        sources: swiftSources,
+        exclude: nitrogenExcludes(in: ".", keeping: swiftSourcesInTarget),
+        sources: swiftSourcesInTarget,
         cxxSettings: releaseSettings,
         swiftSettings: generatedSwiftSettings + swiftSettings
     )
@@ -121,7 +191,8 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
         "c++",
         "${bridgeSourceName}",
         "${autolinkingSourceName}",
-    ]
+        "${autolinkingObjcSourceName}",
+    ].filter { exists("${iosDirectory}/" + $0) }
     let swiftBridgeSettings: [CXXSetting] = [
         .headerSearchPath("."),
         .headerSearchPath("c++"),
@@ -134,17 +205,16 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
         dependencies: [
             "${moduleName}",
             "${appleCxxTargetName}",
-            .product(name: "NitroModulesSwiftBridge", package: "nitro-core"),
-        ],
+        ] + nitroModuleDependencies + reactNativeDependencies,
         path: "${iosDirectory}",
         exclude: nitrogenExcludes(in: "${iosDirectory}", keeping: swiftBridgeSources),
         sources: swiftBridgeSources,
         publicHeadersPath: "c++",
-        cxxSettings: cxxSettings + swiftBridgeSettings
+        cxxSettings: commonCxxSettings + swiftBridgeSettings + cxxSettings
     )
 
     package.products.append(
-        .library(name: "${moduleName}", targets: ["${moduleName}", "${swiftBridgeTargetName}"])
+        .library(name: "${moduleName}", targets: ["${cxxTargetName}", "${moduleName}", "${swiftBridgeTargetName}"])
     )
     package.targets += [cxxTarget, appleCxxTarget, swiftTarget, swiftBridgeTarget]
     if package.cxxLanguageStandard == nil {

@@ -5,11 +5,11 @@
 //  Created by Marc Rousavy on 07.08.24.
 //
 
-#include "HybridClass.hpp"
-#include "CommonGlobals.hpp"
-#include "NitroDefines.hpp"
-#include "JSICache.hpp"
-#include "NitroLogger.hpp"
+#include <NitroModules/HybridClass.hpp>
+#include <NitroModules/CommonGlobals.hpp>
+#include <NitroModules/NitroDefines.hpp>
+#include <NitroModules/JSICache.hpp>
+#include <NitroModules/NitroLogger.hpp>
 
 namespace margelo::nitro {
 

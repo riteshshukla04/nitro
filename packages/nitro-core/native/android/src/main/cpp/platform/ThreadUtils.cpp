@@ -5,7 +5,7 @@
 //  Created by Marc Rousavy on 14.07.24.
 //
 
-#include "ThreadUtils.hpp"
+#include <NitroModules/ThreadUtils.hpp>
 #include "JThreadUtils.hpp"
 #include "UIThreadDispatcher.hpp"
 #include <pthread.h>

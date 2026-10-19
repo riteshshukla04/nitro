@@ -5,11 +5,11 @@
 //  Created by Marc Rousavy on 22.07.24.
 //
 
-#include "Dispatcher.hpp"
-#include "JSIHelpers.hpp"
-#include "NitroDefines.hpp"
-#include "NitroLogger.hpp"
-#include "RuntimeData.hpp"
+#include <NitroModules/Dispatcher.hpp>
+#include <NitroModules/JSIHelpers.hpp>
+#include <NitroModules/NitroDefines.hpp>
+#include <NitroModules/NitroLogger.hpp>
+#include <NitroModules/RuntimeData.hpp>
 
 namespace margelo::nitro {
 

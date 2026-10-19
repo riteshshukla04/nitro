@@ -3,6 +3,8 @@
 //  NitroModules
 //
 
+public import NitroModulesAppleCxx
+
 internal import Foundation
 internal import SimdUTF
 

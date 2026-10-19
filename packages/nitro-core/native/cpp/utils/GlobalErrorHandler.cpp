@@ -5,10 +5,10 @@
 //  Created by Marc Rousavy on 14.10.26.
 //
 
-#include "GlobalErrorHandler.hpp"
-#include "NitroDefines.hpp"
-#include "NitroLogger.hpp"
-#include "NitroTypeInfo.hpp"
+#include <NitroModules/GlobalErrorHandler.hpp>
+#include <NitroModules/NitroDefines.hpp>
+#include <NitroModules/NitroLogger.hpp>
+#include <NitroModules/NitroTypeInfo.hpp>
 #include <string>
 
 namespace margelo::nitro {

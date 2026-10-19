@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Dispatcher.hpp"
+#include <NitroModules/Dispatcher.hpp>
 
 #include <ReactCommon/CallInvoker.h>
 #include <thread>

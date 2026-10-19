@@ -2,11 +2,11 @@
 // Created by Marc Rousavy on 21.02.24.
 //
 
-#include "HybridObject.hpp"
-#include "CommonGlobals.hpp"
-#include "HybridNitroModulesProxy.hpp"
-#include "JSIConverter.hpp"
-#include "NitroDefines.hpp"
+#include <NitroModules/HybridObject.hpp>
+#include <NitroModules/CommonGlobals.hpp>
+#include <NitroModules/HybridNitroModulesProxy.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <NitroModules/NitroDefines.hpp>
 
 namespace margelo::nitro {
 

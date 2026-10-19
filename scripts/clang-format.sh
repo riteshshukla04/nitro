@@ -7,6 +7,7 @@ CPP_DIRS=(
   "packages/nitro-core/native/cpp"
   "packages/nitro-core/native/apple"
   "packages/react-native-nitro-modules/android/src/main/cpp"
+  "packages/react-native-nitro-modules/include"
   "packages/react-native-nitro-modules/cpp/views"
   "packages/react-native-nitro-modules/cpp/threading"
   "packages/react-native-nitro-modules/apple/turbomodule"

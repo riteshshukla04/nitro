@@ -6,7 +6,7 @@
 //
 
 #include "JHardwareBufferUtils.hpp"
-#include "NitroDefines.hpp"
+#include <NitroModules/NitroDefines.hpp>
 #include <android/hardware_buffer_jni.h>
 #include <android/ndk-version.h>
 

@@ -3,9 +3,9 @@
 //  NitroModulesSwiftBridge
 //
 
-#include "NitroModules-Swift-Cxx-Umbrella.hpp"
+#include <NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp>
 
-#include "SwiftConverter+AnyJSON.hpp"
+#include <NitroModules/SwiftConverter+AnyJSON.hpp>
 
 #include <exception>
 #include <utility>

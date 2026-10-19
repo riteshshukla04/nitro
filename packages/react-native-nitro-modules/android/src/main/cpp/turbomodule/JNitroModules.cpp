@@ -4,7 +4,7 @@
 
 #include "JNitroModules.hpp"
 #include "CallInvokerDispatcher.hpp"
-#include "InstallNitro.hpp"
+#include <NitroModules/InstallNitro.hpp>
 
 #include <exception>
 

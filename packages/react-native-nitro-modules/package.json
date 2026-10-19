@@ -22,6 +22,8 @@
     "android/core/",
     "apple/",
     "cpp/",
+    "include/",
+    "Package.swift",
     "README.md",
     "NitroModules.podspec",
     "LICENSE",
@@ -93,6 +95,11 @@
     "jsSrcsDir": "./src",
     "android": {
       "javaPackageName": "com.margelo.nitro"
+    },
+    "ios": {
+      "modulesProvider": {
+        "NitroModules": "NativeNitroModules"
+      }
     }
   },
   "jest": {
@@ -118,5 +125,8 @@
   },
   "dependencies": {
     "nitro-core": "1.0.0-alpha.0"
+  },
+  "swiftpmConfig": {
+    "name": "NitroModules"
   }
 }

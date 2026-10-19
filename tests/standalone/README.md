@@ -23,7 +23,7 @@ tests/standalone/
     js/                    # Shared TypeScript behavior tests
     scripts/               # Test discovery and bundling
     cpp/                   # Hermes runtime and dispatcher
-    ios/                   # Xcode project and Swift Testing suite
+    ios/                   # Simulator runner and Swift Testing suite
     android/               # Gradle project and instrumented JUnit suite
   hermes/                  # Engine build helpers and platform libraries
     hermes/                # Public Hermes static_h submodule, pinned by Git

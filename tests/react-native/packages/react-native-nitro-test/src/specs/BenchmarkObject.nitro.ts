@@ -84,3 +84,7 @@ export declare class BenchmarkObjectSwiftKotlin extends HybridObject {
   readonly thisObject: BenchmarkObjectSwiftKotlin;
   newBenchmarkObject(): BenchmarkObjectSwiftKotlin;
 }
+
+export * from "#nitro/BenchmarkObjectCpp";
+
+export * from "#nitro/BenchmarkObjectSwiftKotlin";

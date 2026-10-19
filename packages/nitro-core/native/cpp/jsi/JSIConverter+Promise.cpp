@@ -5,7 +5,7 @@
 //  Created by Marc Rousavy on 29.09.26.
 //
 
-#include "JSIConverter+Promise.hpp"
+#include <NitroModules/JSIConverter+Promise.hpp>
 
 namespace margelo::nitro {
   Promise<void> JSIConverter<Promise<void>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {

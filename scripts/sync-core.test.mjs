@@ -43,7 +43,7 @@ function fixture(t) {
     "export const version = '1.2.3'\n",
   );
   put(
-    "packages/nitro-core/native/cpp/utils/NitroDefines.hpp",
+    "packages/nitro-core/native/cpp/include/NitroModules/NitroDefines.hpp",
     '#define NITRO_VERSION "1.2.3"\n',
   );
   put(

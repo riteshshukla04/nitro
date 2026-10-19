@@ -5,9 +5,9 @@
 //  Created by Marc Rousavy on 21.06.24.
 //
 
-#include "ThreadPool.hpp"
-#include "NitroLogger.hpp"
-#include "ThreadUtils.hpp"
+#include <NitroModules/ThreadPool.hpp>
+#include <NitroModules/NitroLogger.hpp>
+#include <NitroModules/ThreadUtils.hpp>
 
 namespace margelo::nitro {
 

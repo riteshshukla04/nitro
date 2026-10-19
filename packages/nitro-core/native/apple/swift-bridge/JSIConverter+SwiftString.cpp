@@ -5,8 +5,8 @@
 //  Created by Marc Rousavy on 29.09.26.
 //
 
-#include "JSIConverter+SwiftString.hpp"
-#include "NitroModules-Swift-Cxx-Umbrella.hpp"
+#include <NitroModules/JSIConverter+SwiftString.hpp>
+#include <NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp>
 
 #include <CoreFoundation/CFString.h>
 #include <exception>

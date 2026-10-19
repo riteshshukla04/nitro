@@ -1,7 +1,16 @@
 import Foundation
+import NitroTestRunnerBridge
 import Testing
 
 private final class TestBundle: NSObject {}
+
+private var testResources: Bundle {
+  #if SWIFT_PACKAGE
+    return Bundle.module
+  #else
+    return Bundle(for: TestBundle.self)
+  #endif
+}
 
 private let runtimeQueue = DispatchQueue(label: "com.margelo.nitro.tests.runtime")
 
@@ -22,7 +31,7 @@ private struct JavaScriptFailure: Error, CustomStringConvertible {
 @Suite(.serialized)
 struct RuntimeTests {
   private static func testNames(skipped: Bool = false) throws -> [String] {
-    let resources = Bundle(for: TestBundle.self)
+    let resources = testResources
     guard let url = resources.url(forResource: "runtime-tests", withExtension: "json") else {
       throw JavaScriptFailure(
         description:
@@ -69,7 +78,7 @@ struct RuntimeTests {
   }
 
   private func run(_ name: String) async throws {
-    let resources = Bundle(for: TestBundle.self)
+    let resources = testResources
     let url = try #require(resources.url(forResource: "runtime-tests", withExtension: "js"))
     let source = try String(contentsOf: url, encoding: .utf8)
     if let failure = await runNitroTest(source, name, 10_000) {

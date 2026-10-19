@@ -228,7 +228,7 @@ export declare class Image extends HybridObject {
 ```
 
 ```swift
-public import NitroModulesAppleSwift
+public import NitroModules
 public import ImageCache
 
 public protocol HybridImageSpec_protocol: HybridObject, ImageSource, Cacheable {
@@ -236,9 +236,9 @@ public protocol HybridImageSpec_protocol: HybridObject, ImageSource, Cacheable {
 }
 ```
 
-Each protocol must be public, since the generated spec protocol is public. Without `module`, Nitrogen adds no import, so the protocol must be visible without one. Declare it in the spec's own Swift module, e.g. in `Sources/<iosModuleName>`, or use a standard library protocol like `Sendable`. With `module`, the generated spec has `public import <module>`. If that module comes from a package rather than an SDK framework like UIKit, pass it to `addNitrogenTargets(dependencies:)`.
+Each protocol must be public, since the generated spec protocol is public. Without `module`, Nitrogen adds no import, so the protocol must be visible without one. Declare it in the spec's own Swift module, e.g. in `ios/`, or use a standard library protocol like `Sendable`. With `module`, the generated spec has `public import <module>`. If that module comes from a package rather than an SDK framework like UIKit, pass it to `addNitrogenTargets(dependencies:)`.
 
-Implementations must satisfy each protocol's requirements. Extensions of these protocols can implement spec members, so implementations don't have to. The generated Swift target enables `MemberImportVisibility`, so Swift only uses an extension from another module if the file declaring the implementation class imports that module. A derived spec inherits the conformances through its parent's spec protocol.
+Implementations must satisfy each protocol's requirements. Extensions of these protocols can implement spec members, so implementations don't have to. When `MemberImportVisibility` is enabled, Swift only uses an extension from another module if the file declaring the implementation class imports that module. A derived spec inherits the conformances through its parent's spec protocol.
 
 The generated spec protocol redeclares every spec member, so a protocol requirement for the same member must match the generated declaration. Spec methods are `throws` and `readonly` properties are `{ get }`, so a non-throwing method requirement or a `{ get set }` property requirement fails to compile. Implement such a member in a protocol extension instead of requiring it.
 
@@ -279,7 +279,7 @@ Android generation is not implemented yet. Nitrogen writes the Kotlin spec class
 
 ## Swift packages
 
-`Package.swift` can't import code from other files, so Nitrogen keeps its part of the manifest in a section at the end of the file. Declare the package and its dependencies, then call `addNitrogenTargets(to:)`:
+Put `Package.swift` next to `nitro.json` and call `addNitrogenTargets(to:)`:
 
 ```swift
 // swift-tools-version: 6.4
@@ -288,44 +288,55 @@ import PackageDescription
 
 let package = Package(
     name: "NitroImage",
-    platforms: [.iOS(.v16)],
-    dependencies: [
-        .package(path: "../nitro-core"),
-        .package(path: "../nitro-core-swift-bridge"),
-    ]
+    platforms: [.iOS(.v16)]
 )
 
 addNitrogenTargets(to: package)
 ```
 
-Running Nitrogen appends `addNitrogenTargets` between `// nitrogen:begin` and `// nitrogen:end` and rewrites that section on every run, so don't edit it. The function adds the `NitroImage` library (named after `ios.iosModuleName`) and these targets:
+Running Nitrogen adds the helper between `// nitrogen:begin` and `// nitrogen:end` and replaces that section on every run. Keep your package declaration and helper call outside that section. Nitrogen leaves manifests without an `addNitrogenTargets` call alone.
 
-- `NitroImageCxx`: the C++ specs in `nitrogen/generated/shared/c++`.
-- `NitroImageAppleCxx`: the C++ bridge declarations that Swift imports, and the `<NitroImageAppleCxx/NitroImageAutolinking.hpp>` header that declares `registerHybridClasses()`.
-- `NitroImage`: your Swift sources in `Sources/NitroImage` and the generated Swift specs.
-- `NitroImageSwiftBridge`: the C++ wrappers that call your Swift implementations.
+Add React Native's SwiftPM configuration to `package.json`. Set `name` to your `ios.iosModuleName`, and list the npm names of every Nitro module your library depends on:
 
-Pass extra dependencies and Swift settings for the `NitroImage` target:
+```json
+"swiftpmConfig": {
+  "name": "NitroImage",
+  "dependencies": ["react-native-nitro-modules"]
+}
+```
+
+The helper adds the `ReactNative` and `NitroModules` packages, plus the Nitro modules whose types your specs use. React Native links each library at `ios/build/generated/autolinking/libs/<SwiftName>`, where these relative dependency paths resolve:
+
+| Package | Path from the linked library |
+| --- | --- |
+| `ReactNative` | `../../../../xcframeworks` |
+| `NitroModules` | `../NitroModules` |
+| Referenced Nitro module | `../<iosModuleName>` |
+
+`NitroModules` also depends on React Native's `React-GeneratedCode` package at `../../../ios`. React Native generates these framework and codegen packages when preparing the app's iOS build.
+
+For `ios.iosModuleName: "NitroImage"`, the helper adds the `NitroImage` library and four targets:
+
+- `NitroImageCxx`: your C++ sources in `cpp/` and the specs in `nitrogen/generated/shared/c++`.
+- `NitroImageAppleCxx`: the C++ bridge declarations imported by Swift, including the header declaring `registerHybridClasses()`.
+- `NitroImage`: your Swift sources in `ios/` and the specs in `nitrogen/generated/ios/swift`.
+- `NitroImageSwiftBridge`: the generated C++ wrappers and autolinking sources.
+
+Pass `swiftSources` and `cxxSources` to use other source paths. Paths are relative to the package root; paths that don't exist are skipped. C++ source paths are also added to the header search paths:
 
 ```swift
 addNitrogenTargets(
     to: package,
-    dependencies: [.product(name: "Yoga", package: "react-nitro-yoga")],
-    swiftSettings: [.swiftLanguageMode(.v5)]
+    swiftSources: ["Sources/NitroImage"],
+    cxxSources: ["native/cpp"]
 )
 ```
 
-If your specs use or extend a HybridObject from another Nitro module, add that module's package and pass its library in `dependencies:`, e.g. `.product(name: "ReactNitroCore", package: "react-nitro-core")`.
+The helper also accepts `dependencies`, `swiftSettings`, and `cxxSettings`. Extra dependencies apply to all four targets; Swift settings apply to `NitroImage`, and C++ settings apply to `NitroImageCxx` and `NitroImageSwiftBridge`. Declare packages for extra dependencies in `Package.swift`. Dependencies on Nitro modules referenced by your specs are added automatically, but their npm packages must still be listed in `swiftpmConfig.dependencies` for React Native to link them.
 
-Nitrogen leaves manifests that don't call `addNitrogenTargets` alone. `addNitrogenTargets` relies on the following layout and rules:
+Keep `--out` inside the package root. Leave the generated product and target names for the helper, and leave `cxxLanguageStandard` unset or set it to C++20 or newer. Swift targets use Swift 5 language mode by default because the generated APIs do not yet support Swift 6 strict concurrency.
 
-- Run Nitrogen from the folder that contains `Package.swift` and `nitro.json`, and keep `--out` inside that folder.
-- Put your Swift code in `Sources/<iosModuleName>`. Every iOS module needs this Swift module, even when all of its specs use C++, because the generated bridge includes its Swift header.
-- Add the `nitro-core` and `nitro-core-swift-bridge` packages as dependencies. If the path or URL ends in a different name, name the dependency yourself, e.g. `.package(name: "nitro-core", path: "../NitroModules")`.
-- Don't declare `products` or targets with the generated names, since the function adds them. Leave `cxxLanguageStandard` unset or set it to C++20 or newer.
-- `dependencies:` applies to the `NitroImageCxx`, `NitroImageAppleCxx` and Swift targets, and `swiftSettings:` only to the Swift target. To change a C++ target in other ways, look it up in `package.targets` after the call. To add Swift sources or resources at the package root, also remove their paths from the Swift target's `exclude`, which lists every other top-level entry.
-- The function computes `exclude` when SwiftPM evaluates the manifest, and SwiftPM and Xcode cache the result until `Package.swift` changes. If you add or remove top-level files later, for example by installing `node_modules` after the package was first opened, run `swift package purge-cache` or reset the package caches in Xcode.
-- The generated targets use unsafe flags, so use `swift-tools-version` 6.2 or later if other packages depend on yours through a versioned URL. Build with Swift 6.4's default Swift Build backend or with Xcode, because the Swift bridge needs their `GENERATED_MODULEMAP_DIR`.
+Build with Swift 6.4's Swift Build backend or Xcode: the generated C++ bridge uses their `GENERATED_MODULEMAP_DIR`. The helper computes source exclusions when SwiftPM evaluates the manifest. After adding or removing files outside the listed source paths, reset Xcode's package caches or run `swift package purge-cache` if cached exclusions cause build errors.
 
 ## Migration and current limits
 

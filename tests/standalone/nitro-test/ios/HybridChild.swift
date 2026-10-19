@@ -5,6 +5,8 @@
 //  Created by Marc Rousavy on 03.10.24.
 //
 
+import NitroModules
+
 class HybridChild: HybridChildSpec {
   var baseValue: Double {
     return 20

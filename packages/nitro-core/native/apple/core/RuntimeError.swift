@@ -5,6 +5,8 @@
 //  Created by Marc Rousavy on 17.07.24.
 //
 
+internal import NitroModulesAppleCxx
+
 public import CxxStdlib
 public import Foundation
 

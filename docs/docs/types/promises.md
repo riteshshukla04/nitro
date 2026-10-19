@@ -59,7 +59,7 @@ This allows your native code to perform heavy-, long-running tasks in parallel, 
     :::
   </TabItem>
   <TabItem value="cpp" label="C++">
-    In C++, a `Promise<T>` can be created via Nitro's [`Promise<T>`](https://github.com/margelo/nitro/blob/main/packages/nitro-core/native/cpp/core/Promise.hpp) type - for example, to use an asynchronous Thread pool:
+    In C++, a `Promise<T>` can be created via Nitro's [`Promise<T>`](https://github.com/margelo/nitro/blob/main/packages/nitro-core/native/cpp/include/NitroModules/Promise.hpp) type - for example, to use an asynchronous Thread pool:
 
     ```cpp
     std::shared_ptr<Promise<double>> fibonacci(double n) {

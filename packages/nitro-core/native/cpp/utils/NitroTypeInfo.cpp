@@ -5,7 +5,7 @@
 //  Created by Marc Rousavy on 23.02.25.
 //
 
-#include "NitroTypeInfo.hpp"
+#include <NitroModules/NitroTypeInfo.hpp>
 
 #if __has_include(<cxxabi.h>)
 #include <cxxabi.h>

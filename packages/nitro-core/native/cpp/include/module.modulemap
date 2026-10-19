@@ -1,0 +1,5 @@
+module NitroModulesCxx {
+  requires cplusplus
+  umbrella header "NitroModulesCxx.h"
+  export *
+}

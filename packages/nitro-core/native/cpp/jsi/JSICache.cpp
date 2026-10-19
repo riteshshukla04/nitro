@@ -5,9 +5,9 @@
 //  Created by Marc Rousavy on 20.06.24.
 //
 
-#include "JSICache.hpp"
-#include "NitroDefines.hpp"
-#include "RuntimeData.hpp"
+#include <NitroModules/JSICache.hpp>
+#include <NitroModules/NitroDefines.hpp>
+#include <NitroModules/RuntimeData.hpp>
 
 namespace margelo::nitro {
 

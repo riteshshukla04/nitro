@@ -3,9 +3,9 @@
 //  NitroModules
 //
 
-#include "NitroModules-Swift-Cxx-Umbrella.hpp"
+#include <NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp>
 
-#include "SwiftConverter+String.hpp"
+#include <NitroModules/SwiftConverter+String.hpp>
 
 namespace margelo::nitro {
 
