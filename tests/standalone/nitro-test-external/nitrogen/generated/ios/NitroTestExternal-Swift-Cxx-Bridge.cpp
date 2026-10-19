@@ -6,10 +6,8 @@
 ///
 #include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
 
-#include <NitroTestExternal/private/JSIConverter+SizeUnit.hpp>
-#include <NitroTestExternal/private/SwiftConverter+SizeUnit.hpp>
-#include <NitroTestExternal/private/JSIConverter+Size.hpp>
-#include <NitroTestExternal/private/SwiftConverter+Size.hpp>
+#include <NitroTestExternal/private/SizeUnit-Swift.hpp>
+#include <NitroTestExternal/private/Size-Swift.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/SwiftResult.hpp>

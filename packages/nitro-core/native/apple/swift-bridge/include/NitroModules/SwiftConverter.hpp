@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <NitroModules/SwiftConverter_fwd.hpp>
+
 // Use the consuming module's Swift definitions to avoid duplicate C++ type metadata.
 #ifndef SWIFT_SWIFT_H
 #error Include your generated -Swift.h header before SwiftConverter.hpp.
@@ -20,7 +22,7 @@ namespace margelo::nitro {
  * Specialize SwiftConverter<T> to provide a different Swift representation.
  * Use SwiftConverter<T, SwiftTarget> when the same C++ type has different Swift representations across modules.
  */
-template <typename T, typename SwiftTarget = void>
+template <typename T, typename SwiftTarget>
 struct SwiftConverter final {
   // Containers pass their element's Swift target explicitly. For example,
   // SwiftConverter<std::string, swift::String> reuses SwiftConverter<std::string>.

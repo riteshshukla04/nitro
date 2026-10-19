@@ -6,10 +6,8 @@
 ///
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 
-#include <NitroTest/private/JSIConverter+SizeUnit.hpp>
-#include <NitroTest/private/SwiftConverter+SizeUnit.hpp>
-#include <NitroTest/private/JSIConverter+Size.hpp>
-#include <NitroTest/private/SwiftConverter+Size.hpp>
+#include <NitroTest/private/SizeUnit-Swift.hpp>
+#include <NitroTest/private/Size-Swift.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/SwiftResult.hpp>
@@ -20,18 +18,14 @@
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroTest/HybridBaseSpec.hpp>
 #include <NitroTest/private/HybridPlatformObjectSpecSwift.hpp>
-#include <NitroTest/private/JSIConverter+Powertrain.hpp>
-#include <NitroTest/private/SwiftConverter+Powertrain.hpp>
+#include <NitroTest/private/Powertrain-Swift.hpp>
 #include <NitroModules/JSIConverter+SwiftArray.hpp>
 #include <NitroModules/JSIConverter+SwiftOptional.hpp>
 #include <NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/JSIConverter+SwiftString.hpp>
-#include <NitroTest/private/JSIConverter+Person.hpp>
-#include <NitroTest/private/SwiftConverter+Person.hpp>
-#include <NitroTest/private/JSIConverter+Variant_Double_String.hpp>
-#include <NitroTest/private/SwiftConverter+Variant_Double_String.hpp>
-#include <NitroTest/private/JSIConverter+Car.hpp>
-#include <NitroTest/private/SwiftConverter+Car.hpp>
+#include <NitroTest/private/Person-Swift.hpp>
+#include <NitroTest/private/Variant_Double_String-Swift.hpp>
+#include <NitroTest/private/Car-Swift.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <exception>
@@ -39,8 +33,7 @@
 #include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
 #include <NitroTest/private/HybridTestObjectSwiftKotlinSpecSwift.hpp>
 #include <NitroTest/HybridTestObjectSwiftKotlinSpec.hpp>
-#include <NitroTest/private/JSIConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp>
-#include <NitroTest/private/SwiftConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp>
+#include <NitroTest/private/HybridTestObjectSwiftKotlinSpec_cxx-Swift.hpp>
 
 namespace margelo::nitro::test::swift_bridge {
   Promise_NitroTest__Size create_Promise_NitroTest__Size() { return Promise_NitroTest__Size::pending(); }

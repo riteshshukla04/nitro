@@ -110,22 +110,13 @@ export class SwiftVariantType extends VariantType implements SwiftType {
           }
         )
         if (context === 'implementation') {
-          imports.push(
-            {
-              language,
-              declaration: NitroConfig.current.getCxxHeader(
-                `JSIConverter+${this.name}.hpp`,
-                'private'
-              ),
-            },
-            {
-              language,
-              declaration: NitroConfig.current.getCxxHeader(
-                `SwiftConverter+${this.name}.hpp`,
-                'private'
-              ),
-            }
-          )
+          imports.push({
+            language: language,
+            declaration: NitroConfig.current.getCxxHeader(
+              `${this.name}-Swift.hpp`,
+              'private'
+            ),
+          })
         }
         break
       case 'swift':

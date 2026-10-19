@@ -328,6 +328,8 @@ For `ios.iosModuleName: "NitroImage"`, the helper adds the `NitroImage` library 
 
 Generated C++ headers live in `include/<Module>/` below their `shared/c++` or `ios/c++` directory. Public headers declare user types, HybridObject specs, and autolinking functions. Internal bridge and converter headers live in `include/<Module>/private/`. These directories contain the declarations themselves, without forwarding headers. Include generated types with their module prefix, for example `#include <NitroImage/Size.hpp>`.
 
+Each generated Swift type has a private converter pair, such as `Size-Swift.hpp` and `Size-Swift.cpp`. The header forward-declares the Swift type and declares its `JSIConverter` and `SwiftConverter` specializations. The implementation includes the private Swift umbrella to access the complete Swift type.
+
 Pass `swiftSources` and `cxxSources` to use other source paths. Paths are relative to the package root; paths that don't exist are skipped. C++ source paths are also added to the header search paths:
 
 ```swift

@@ -2,7 +2,6 @@ import { createSwiftConverter } from './SwiftConverter.js'
 import { NitroConfig } from '../../config/NitroConfig.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { SwiftHybridObjectType } from './types/SwiftHybridObjectType.js'
-import { createSwiftJSIConverter } from './SwiftJSIConverter.js'
 import { escapeCppName } from '../helpers.js'
 import { HybridObjectType } from '../types/HybridObjectType.js'
 import { SwiftRetainedPointerType } from './types/SwiftRetainedPointerType.js'
@@ -44,22 +43,15 @@ return ${cppHybridObjectConverter}::toJSI(runtime, hybridSpec);
   const swiftToCppConverterCode = 'return SwiftType::getCxxPart(value);'
   const cppToSwiftConverterCode = `return ${cppToSwiftValue};`
   const jsCanConvertCode = `return ${cppHybridObjectConverter}::canConvert(runtime, value);`
-  return [
-    ...createSwiftConverter({
-      name: type.name,
-      cppType: hybridObjectType,
-      swiftType: type,
-      fromSwift: swiftToCppConverterCode,
-      toSwift: cppToSwiftConverterCode,
-    }),
-    ...createSwiftJSIConverter({
-      name: type.name,
-      cppType: cppWrapperType,
-      forwardDeclaration: type.forwardDeclaration,
-      imports: [],
-      fromJSI: jsToSwiftConverterCode,
-      toJSI: swiftToJSConverterCode,
-      canConvert: jsCanConvertCode,
-    }),
-  ]
+  return createSwiftConverter({
+    name: type.name,
+    cppType: hybridObjectType,
+    swiftType: type,
+    forwardDeclaration: type.forwardDeclaration,
+    fromSwift: swiftToCppConverterCode,
+    toSwift: cppToSwiftConverterCode,
+    fromJSI: jsToSwiftConverterCode,
+    toJSI: swiftToJSConverterCode,
+    canConvert: jsCanConvertCode,
+  })
 }

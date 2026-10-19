@@ -1,11 +1,9 @@
 import { createSwiftConverter, getSwiftConverter } from './SwiftConverter.js'
-import { NitroConfig } from '../../config/NitroConfig.js'
 import { wrapSwiftType } from './wrapSwiftType.js'
 import { capitalizeName, indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { SwiftVariantType } from './types/SwiftVariantType.js'
-import { createSwiftJSIConverter } from './SwiftJSIConverter.js'
 import { getImportsCode } from '../getImportCode.js'
 import {
   getProtocolConformanceImports,
@@ -172,23 +170,9 @@ switch (value.index()) {
       name: type.name,
       cppType: variantType,
       swiftType: type,
+      forwardDeclaration: type.forwardDeclaration,
       fromSwift: swiftToCppConverterCode,
       toSwift: cppToSwiftConverterCode,
-    }),
-    ...createSwiftJSIConverter({
-      name: type.name,
-      cppType: type.getCode('c++', { context: 'value' }),
-      forwardDeclaration: type.forwardDeclaration,
-      imports: [
-        ...variantType.getRequiredImports('c++'),
-        {
-          language: 'c++',
-          declaration: NitroConfig.current.getCxxHeader(
-            `SwiftConverter+${type.name}.hpp`,
-            'private'
-          ),
-        },
-      ],
       fromJSI: jsToSwiftConverterCode,
       toJSI: swiftToJSConverterCode,
       canConvert: jsCanConvertCode,

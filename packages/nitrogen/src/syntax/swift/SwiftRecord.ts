@@ -3,7 +3,6 @@ import { indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { SwiftRecordType } from './types/SwiftRecordType.js'
-import { createSwiftJSIConverter } from './SwiftJSIConverter.js'
 import { getImportsCode } from '../getImportCode.js'
 import {
   getProtocolConformanceImports,
@@ -94,6 +93,7 @@ public struct ${swiftStructName}${conformancePrefix}${protocolNames.join(', ')} 
       name: type.name,
       cppType: type.type,
       swiftType: type,
+      forwardDeclaration: type.forwardDeclaration,
       fromSwift: swiftToCppConverterCode,
       toSwift: cppToSwiftConverterCode,
       imports: [
@@ -104,13 +104,6 @@ public struct ${swiftStructName}${conformancePrefix}${protocolNames.join(', ')} 
             space: 'system',
           },
         },
-      ],
-    }),
-    ...createSwiftJSIConverter({
-      name: swiftStructName,
-      cppType: type.getCode('c++', { context: 'value' }),
-      forwardDeclaration: type.forwardDeclaration,
-      imports: [
         {
           language: 'c++',
           declaration: {

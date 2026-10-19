@@ -3,7 +3,6 @@ import { indent, toLowerCamelCase } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { SwiftEnumType } from './types/SwiftEnumType.js'
-import { createSwiftJSIConverter } from './SwiftJSIConverter.js'
 import { getImportsCode } from '../getImportCode.js'
 import { getProtocolConformanceImports } from './getSwiftImports.js'
 
@@ -188,6 +187,7 @@ return SwiftType::fromRawValue(rawValue);
       name: type.name,
       cppType: enumType,
       swiftType: type,
+      forwardDeclaration: type.forwardDeclaration,
       fromSwift: swiftToCppConverterCode,
       toSwift: cppToSwiftConverterCode,
       imports: [
@@ -195,13 +195,6 @@ return SwiftType::fromRawValue(rawValue);
           language: 'c++',
           declaration: { name: 'NitroModules/NitroDefines.hpp', space: 'system' },
         },
-      ],
-    }),
-    ...createSwiftJSIConverter({
-      name: type.name,
-      cppType: cppEnumType,
-      forwardDeclaration: type.forwardDeclaration,
-      imports: [
         {
           language: 'c++',
           declaration: {

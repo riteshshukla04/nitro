@@ -3,7 +3,6 @@ import { capitalizeName, indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { SwiftStructType } from './types/SwiftStructType.js'
-import { createSwiftJSIConverter } from './SwiftJSIConverter.js'
 import { getImportsCode } from '../getImportCode.js'
 import {
   getProtocolConformanceImports,
@@ -125,14 +124,10 @@ return ${cppPropertyChecks.join(' && ')};
     ...createSwiftConverter({
       name: swiftType.name,
       cppType: structType,
-      swiftType,
+      swiftType: swiftType,
+      forwardDeclaration: swiftType.forwardDeclaration,
       fromSwift: swiftToCppConverterCode,
       toSwift: cppToSwiftConverterCode,
-    }),
-    ...createSwiftJSIConverter({
-      name: swiftType.name,
-      cppType: cppStructType,
-      forwardDeclaration: swiftType.forwardDeclaration,
       imports: [
         {
           language: 'c++',

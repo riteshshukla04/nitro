@@ -168,22 +168,13 @@ export class SwiftHybridObjectType
         if (context === 'implementation') {
           imports.push(...this.type.getRequiredImports(language))
           if (!this.sourceConfig.isExternalConfig) {
-            imports.push(
-              {
-                language,
-                declaration: this.sourceConfig.getCxxHeader(
-                  `JSIConverter+${this.name}.hpp`,
-                  'private'
-                ),
-              },
-              {
-                language,
-                declaration: this.sourceConfig.getCxxHeader(
-                  `SwiftConverter+${this.name}.hpp`,
-                  'private'
-                ),
-              }
-            )
+            imports.push({
+              language: language,
+              declaration: this.sourceConfig.getCxxHeader(
+                `${this.name}-Swift.hpp`,
+                'private'
+              ),
+            })
           }
         }
         break

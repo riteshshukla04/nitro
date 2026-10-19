@@ -27,22 +27,17 @@
 #endif
 
 
-#include <NitroTestExternal/private/JSIConverter+SizeUnit.hpp>
-#include <NitroTestExternal/private/SwiftConverter+SizeUnit.hpp>
-#include <NitroTestExternal/private/JSIConverter+Size.hpp>
-#include <NitroTestExternal/private/SwiftConverter+Size.hpp>
+#include <NitroTestExternal/private/SizeUnit-Swift.hpp>
+#include <NitroTestExternal/private/Size-Swift.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <memory>
 #include <NitroTestExternal/HybridBaseSpec.hpp>
-#include <NitroTestExternal/private/JSIConverter+HybridBaseSpec_cxx.hpp>
-#include <NitroTestExternal/private/SwiftConverter+HybridBaseSpec_cxx.hpp>
+#include <NitroTestExternal/private/HybridBaseSpec_cxx-Swift.hpp>
 #include <NitroModules/Result.hpp>
 #include <NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/JSIConverter+SwiftString.hpp>
 #include <NitroModules/JSIConverter+SwiftOptional.hpp>
-#include <NitroTestExternal/private/JSIConverter+OptionalPrimitivesHolder.hpp>
-#include <NitroTestExternal/private/SwiftConverter+OptionalPrimitivesHolder.hpp>
+#include <NitroTestExternal/private/OptionalPrimitivesHolder-Swift.hpp>
 #include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
-#include <NitroTestExternal/private/JSIConverter+HybridSomeExternalObjectSpec_cxx.hpp>
-#include <NitroTestExternal/private/SwiftConverter+HybridSomeExternalObjectSpec_cxx.hpp>
+#include <NitroTestExternal/private/HybridSomeExternalObjectSpec_cxx-Swift.hpp>
