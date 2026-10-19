@@ -32,6 +32,7 @@
 #include "SwiftConverter+Variant_Double_String.hpp"
 #include "JSIConverter+Car.hpp"
 #include "SwiftConverter+Car.hpp"
+#include <NitroModules/InlineCallback.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <exception>
 #include <NitroTestExternal-Swift-Cxx-Bridge.hpp>
@@ -221,6 +222,41 @@ namespace margelo::nitro::test::swift_bridge {
         listener(pointer);
       });
     });
+  }
+
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> call_InlineCallback_void(const InlineCallback_void& callback) noexcept {
+    try {
+      callback.call();
+      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withValue();
+    } catch (...) {
+      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
+    }
+  }
+
+  Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double_double(const Callback_double_double& callback, double param0) noexcept {
+    try {
+      return Result<double, margelo::nitro::test::swift_bridge::ResultTag>::withValue(callback.callSync(param0));
+    } catch (...) {
+      return Result<double, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
+    }
+  }
+
+  Callback_double_double create_Callback_double_double(std::function<Result<double, margelo::nitro::test::swift_bridge::ResultTag>(double param0)> closure) {
+    return Callback_double_double::make([closure = std::move(closure)](double param0) -> double {
+      auto __result = closure(param0);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      return std::move(__result.value());
+    });
+  }
+
+  Result<double, margelo::nitro::test::swift_bridge::ResultTag> call_InlineCallback_double_double(const InlineCallback_double_double& callback, double param0) noexcept {
+    try {
+      return Result<double, margelo::nitro::test::swift_bridge::ResultTag>::withValue(callback.call(param0));
+    } catch (...) {
+      return Result<double, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
+    }
   }
 
   Result<Promise<void>, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_Promise_void_(const Callback_Promise_void_& callback) noexcept {

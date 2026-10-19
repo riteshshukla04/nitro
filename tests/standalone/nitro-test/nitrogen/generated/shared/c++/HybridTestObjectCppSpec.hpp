@@ -34,6 +34,7 @@ namespace margelo::nitro::test { class HybridChildSpec; }
 #include <unordered_map>
 #include "MapWrapper.hpp"
 #include <exception>
+#include <NitroModules/InlineCallback.hpp>
 #include "JsStyleStruct.hpp"
 #include "WrappedJsStruct.hpp"
 #include "OptionalWrapper.hpp"
@@ -190,6 +191,8 @@ namespace margelo::nitro::test {
       virtual Promise<Car> awaitAndGetComplexPromise(const Promise<Car>& promise) = 0;
       virtual Promise<void> awaitPromise(const Promise<void>& promise) = 0;
       virtual void callCallback(const Callback<void()>& callback) = 0;
+      virtual void callInlineCallback(const InlineCallback<void()>& callback) = 0;
+      virtual double callInlineCallbackWithValue(double value, const InlineCallback<double(double /* value */)>& callback) = 0;
       virtual Promise<void> callCallbackThatReturnsPromiseVoid(const Callback<Promise<void>()>& callback) = 0;
       virtual void callAll(const Callback<void()>& first, const Callback<void()>& second, const Callback<void()>& third) = 0;
       virtual void callWithOptional(const std::optional<double>& value, const Callback<void(const std::optional<double>& /* maybe */)>& callback) = 0;

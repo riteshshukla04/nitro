@@ -540,6 +540,14 @@ void HybridTestObjectCpp::callCallback(const Callback<void()>& callback) {
   callback();
 }
 
+void HybridTestObjectCpp::callInlineCallback(const InlineCallback<void()>& callback) {
+  callback.call();
+}
+
+double HybridTestObjectCpp::callInlineCallbackWithValue(double value, const InlineCallback<double(double)>& callback) {
+  return callback.call(value);
+}
+
 Callback<void(double /* num */)> HybridTestObjectCpp::createNativeCallback(const Callback<void(double /* num */)>& wrappingJsCallback) {
   return Callback<void(double)>::make([=](double num) { wrappingJsCallback(num); });
 }

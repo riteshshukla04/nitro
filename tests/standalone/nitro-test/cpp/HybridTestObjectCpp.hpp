@@ -175,6 +175,8 @@ public:
   Promise<int64_t> calculateFibonacciAsync(double value) override;
   Promise<void> wait(double seconds) override;
   void callCallback(const Callback<void()>& callback) override;
+  void callInlineCallback(const InlineCallback<void()>& callback) override;
+  double callInlineCallbackWithValue(double value, const InlineCallback<double(double)>& callback) override;
   Promise<void> callCallbackThatReturnsPromiseVoid(const Callback<Promise<void>()>& callback) override;
   Callback<void(double /* num */)> createNativeCallback(const Callback<void(double /* num */)>& wrappingJsCallback) override;
   void callWithOptional(const std::optional<double>& value, const Callback<void(const std::optional<double>& /* maybe */)>& callback) override;

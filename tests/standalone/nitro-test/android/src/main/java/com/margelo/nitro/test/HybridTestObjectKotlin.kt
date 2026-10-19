@@ -373,6 +373,14 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     callback()
   }
 
+  override fun callInlineCallback(callback: () -> Unit) {
+    callback()
+  }
+
+  override fun callInlineCallbackWithValue(value: Double, callback: (Double) -> Double): Double {
+    return callback(value)
+  }
+
   override fun callCallbackThatReturnsPromiseVoid(callback: () -> Promise<Promise<Unit>>): Promise<Unit> {
     return Promise.async {
       val callPromise = callback()

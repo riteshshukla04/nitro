@@ -66,6 +66,7 @@ namespace NitroTest { class SecondMapWrapper; }
 // Forward declaration of `MapWrapper` to properly resolve imports.
 namespace NitroTest { class MapWrapper; }
 #include <exception>
+#include <NitroModules/InlineCallback.hpp>
 // Forward declaration of `JsStyleStruct` to properly resolve imports.
 namespace NitroTest { class JsStyleStruct; }
 // Forward declaration of `WrappedJsStruct` to properly resolve imports.
@@ -178,6 +179,14 @@ namespace margelo::nitro::test::swift_bridge {
   void listenRejected_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::function<void(const std::exception_ptr&)> listener);
   void resolve_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, const void* NON_NULL value);
   void listen_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::function<void(const void* NON_NULL)> listener);
+  using InlineCallback_void = InlineCallback<void()>;
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> call_InlineCallback_void(const InlineCallback_void& callback) noexcept;
+  using Result_double = Result<double, margelo::nitro::test::swift_bridge::ResultTag>;
+  using Callback_double_double = Callback<double(double)>;
+  Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double_double(const Callback_double_double& callback, double param0) noexcept;
+  Callback_double_double create_Callback_double_double(std::function<Result<double, margelo::nitro::test::swift_bridge::ResultTag>(double param0)> closure);
+  using InlineCallback_double_double = InlineCallback<double(double)>;
+  Result<double, margelo::nitro::test::swift_bridge::ResultTag> call_InlineCallback_double_double(const InlineCallback_double_double& callback, double param0) noexcept;
   using Promise_Promise_void_ = Promise<Promise<void>>;
   using Result_Promise_void_ = Result<Promise<void>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Callback_Promise_void_ = Callback<Promise<void>()>;
@@ -188,7 +197,6 @@ namespace margelo::nitro::test::swift_bridge {
   Promise<void> callAsync_Callback_void_swift__Optional_double_(const Callback_void_swift__Optional_double_& callback, const void* NON_NULL param0);
   void callAndForget_Callback_void_swift__Optional_double_(const Callback_void_swift__Optional_double_& callback, const void* NON_NULL param0);
   Callback_void_swift__Optional_double_ create_Callback_void_swift__Optional_double_(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0)> closure);
-  using Result_double = Result<double, margelo::nitro::test::swift_bridge::ResultTag>;
   using Callback_double = Callback<double()>;
   Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double(const Callback_double& callback) noexcept;
   Callback_double create_Callback_double(std::function<Result<double, margelo::nitro::test::swift_bridge::ResultTag>()> closure);

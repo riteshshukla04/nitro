@@ -85,6 +85,19 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     callback()
   }
 
+  func callInlineCallback(
+    callback: borrowing some InlineCallback<(), Void> & ~Copyable & ~Escapable
+  ) throws {
+    try callback()
+  }
+
+  func callInlineCallbackWithValue(
+    value: Double,
+    callback: borrowing some InlineCallback<Double, Double> & ~Copyable & ~Escapable
+  ) throws -> Double {
+    return try callback(value)
+  }
+
   func callCallbackThatReturnsPromiseVoid(callback: any Callback<(), any Promise<Void>>) throws
     -> any Promise<Void>
   {

@@ -99,6 +99,7 @@
 #include "JSIConverter+MapWrapper.hpp"
 #include "SwiftConverter+MapWrapper.hpp"
 #include <exception>
+#include <NitroModules/InlineCallback.hpp>
 #include "JSIConverter+JsStyleStruct.hpp"
 #include "SwiftConverter+JsStyleStruct.hpp"
 #include "JSIConverter+WrappedJsStruct.hpp"

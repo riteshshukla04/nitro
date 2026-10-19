@@ -6,6 +6,7 @@ import {
   type AnyHybridObject,
   type UInt64,
   type Int64,
+  type Inline,
 } from "nitro-core";
 import type { SomeExternalObject } from "nitro-test-external";
 import type { Child } from "./Child.nitro";
@@ -274,6 +275,11 @@ export declare class TestObjectCpp extends HybridObject {
 
   // Callbacks
   callCallback(callback: () => void): void;
+  callInlineCallback(callback: Inline<() => void>): void;
+  callInlineCallbackWithValue(
+    value: number,
+    callback: Inline<(value: number) => number>,
+  ): number;
   callCallbackThatReturnsPromiseVoid(
     callback: () => Promise<void>,
   ): Promise<void>;
@@ -534,6 +540,11 @@ export declare class TestObjectSwiftKotlin extends HybridObject {
 
   // Callbacks
   callCallback(callback: () => void): void;
+  callInlineCallback(callback: Inline<() => void>): void;
+  callInlineCallbackWithValue(
+    value: number,
+    callback: Inline<(value: number) => number>,
+  ): number;
   callCallbackThatReturnsPromiseVoid(
     callback: () => Promise<void>,
   ): Promise<void>;

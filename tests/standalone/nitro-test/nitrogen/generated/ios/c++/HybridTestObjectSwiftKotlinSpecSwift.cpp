@@ -1137,6 +1137,30 @@ namespace margelo::nitro::test {
     }
   }
 
+  void HybridTestObjectSwiftKotlinSpecSwift::callInlineCallback(const InlineCallback<void()>& callback) {
+    callInlineCallback_Swift(SwiftConverter<InlineCallback<void()>, InlineCallback<void()>>::toSwift(callback));
+  }
+
+  void HybridTestObjectSwiftKotlinSpecSwift::callInlineCallback_Swift(const InlineCallback<void()>& callback) {
+    auto __result = _swiftPart.callInlineCallback(callback);
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+  }
+
+  double HybridTestObjectSwiftKotlinSpecSwift::callInlineCallbackWithValue(double value, const InlineCallback<double(double /* value */)>& callback) {
+    auto __result = callInlineCallbackWithValue_Swift(SwiftConverter<double, double>::toSwift(value), SwiftConverter<InlineCallback<double(double /* value */)>, InlineCallback<double(double)>>::toSwift(callback));
+    return SwiftConverter<double, double>::fromSwift(__result);
+  }
+
+  double HybridTestObjectSwiftKotlinSpecSwift::callInlineCallbackWithValue_Swift(double value, const InlineCallback<double(double)>& callback) {
+    auto __result = _swiftPart.callInlineCallbackWithValue(value, callback);
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return std::move(__result.value());
+  }
+
   Promise<void> HybridTestObjectSwiftKotlinSpecSwift::callCallbackThatReturnsPromiseVoid(const Callback<Promise<void>()>& callback) {
     auto __result = callCallbackThatReturnsPromiseVoid_Swift(SwiftConverter<Callback<Promise<void>()>, Callback<Promise<void>()>>::toSwift(callback));
     return SwiftConverter<Promise<void>, Promise<void>>::fromSwift(__result);
@@ -2003,6 +2027,8 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("awaitAndGetComplexPromise", &HybridTestObjectSwiftKotlinSpecSwift::awaitAndGetComplexPromise_Swift);
       clazz.registerHybridMethod("awaitPromise", &HybridTestObjectSwiftKotlinSpecSwift::awaitPromise_Swift);
       clazz.registerHybridMethod("callCallback", &HybridTestObjectSwiftKotlinSpecSwift::callCallback_Swift);
+      clazz.registerHybridMethod("callInlineCallback", &HybridTestObjectSwiftKotlinSpecSwift::callInlineCallback_Swift);
+      clazz.registerHybridMethod("callInlineCallbackWithValue", &HybridTestObjectSwiftKotlinSpecSwift::callInlineCallbackWithValue_Swift);
       clazz.registerHybridMethod("callCallbackThatReturnsPromiseVoid", &HybridTestObjectSwiftKotlinSpecSwift::callCallbackThatReturnsPromiseVoid_Swift);
       clazz.registerHybridMethod("callAll", &HybridTestObjectSwiftKotlinSpecSwift::callAll_Swift);
       clazz.registerHybridMethod("callWithOptional", &HybridTestObjectSwiftKotlinSpecSwift::callWithOptional_Swift);

@@ -840,6 +840,24 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
+  public final func callInlineCallback(callback: borrowing margelo.nitro.test.swift_bridge.InlineCallback_void) -> bridge.Result_void {
+    do {
+      try __implementation.callInlineCallback(callback: callback)
+      return bridge.Result_void.withValue()
+    } catch {
+      return bridge.Result_void.withError(error.toCpp())
+    }
+  }
+
+  public final func callInlineCallbackWithValue(value: Double, callback: borrowing margelo.nitro.test.swift_bridge.InlineCallback_double_double) -> bridge.Result_double {
+    do {
+      let value = try __implementation.callInlineCallbackWithValue(value: value, callback: callback)
+      return bridge.Result_double.withValue(value)
+    } catch {
+      return bridge.Result_double.withError(error.toCpp())
+    }
+  }
+
   public final func callCallbackThatReturnsPromiseVoid(callback: margelo.nitro.test.swift_bridge.Callback_Promise_void_) -> bridge.Result_Promise_void_ {
     do {
       let value = try __implementation.callCallbackThatReturnsPromiseVoid(callback: callback)

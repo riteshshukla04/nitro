@@ -253,6 +253,10 @@ namespace margelo::nitro::test {
     Promise<void> awaitPromise_Swift(const Promise<void>& promise);
     void callCallback(const Callback<void()>& callback) override;
     void callCallback_Swift(const Callback<void()>& callback);
+    void callInlineCallback(const InlineCallback<void()>& callback) override;
+    void callInlineCallback_Swift(const InlineCallback<void()>& callback);
+    double callInlineCallbackWithValue(double value, const InlineCallback<double(double /* value */)>& callback) override;
+    double callInlineCallbackWithValue_Swift(double value, const InlineCallback<double(double)>& callback);
     Promise<void> callCallbackThatReturnsPromiseVoid(const Callback<Promise<void>()>& callback) override;
     Promise<void> callCallbackThatReturnsPromiseVoid_Swift(const Callback<Promise<void>()>& callback);
     void callAll(const Callback<void()>& first, const Callback<void()>& second, const Callback<void()>& third) override;

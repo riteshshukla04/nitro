@@ -90,6 +90,8 @@ public protocol HybridTestObjectSwiftKotlinSpec_protocol: HybridObject {
   func awaitAndGetComplexPromise(promise: any Promise<Car>) throws -> any Promise<Car>
   func awaitPromise(promise: any Promise<Void>) throws -> any Promise<Void>
   func callCallback(callback: any Callback<(), Void>) throws -> Void
+  func callInlineCallback(callback: borrowing some InlineCallback<(), Void> & ~Copyable & ~Escapable) throws -> Void
+  func callInlineCallbackWithValue(value: Double, callback: borrowing some InlineCallback<(/* value */ Double), Double> & ~Copyable & ~Escapable) throws -> Double
   func callCallbackThatReturnsPromiseVoid(callback: any Callback<(), any Promise<Void>>) throws -> any Promise<Void>
   func callAll(first: any Callback<(), Void>, second: any Callback<(), Void>, third: any Callback<(), Void>) throws -> Void
   func callWithOptional(value: Double?, callback: any Callback<(/* maybe */ Double?), Void>) throws -> Void

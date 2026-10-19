@@ -28,6 +28,7 @@
 #include <unordered_map>
 #include "MapWrapper.hpp"
 #include <exception>
+#include <NitroModules/InlineCallback.hpp>
 #include "JsStyleStruct.hpp"
 #include "WrappedJsStruct.hpp"
 #include "OptionalWrapper.hpp"
@@ -163,6 +164,8 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("awaitAndGetComplexPromise", &HybridTestObjectCppSpec::awaitAndGetComplexPromise);
       clazz.registerHybridMethod("awaitPromise", &HybridTestObjectCppSpec::awaitPromise);
       clazz.registerHybridMethod("callCallback", &HybridTestObjectCppSpec::callCallback);
+      clazz.registerHybridMethod("callInlineCallback", &HybridTestObjectCppSpec::callInlineCallback);
+      clazz.registerHybridMethod("callInlineCallbackWithValue", &HybridTestObjectCppSpec::callInlineCallbackWithValue);
       clazz.registerHybridMethod("callCallbackThatReturnsPromiseVoid", &HybridTestObjectCppSpec::callCallbackThatReturnsPromiseVoid);
       clazz.registerHybridMethod("callAll", &HybridTestObjectCppSpec::callAll);
       clazz.registerHybridMethod("callWithOptional", &HybridTestObjectCppSpec::callWithOptional);

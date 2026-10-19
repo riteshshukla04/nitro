@@ -8,9 +8,8 @@ import {
   withTimeout,
 } from "./utils/cases";
 
-// Nitro calls void and Promise-returning JS callbacks asynchronously (through
-// the JS dispatcher), so a spy passed to native is only called some time
-// after the native method returned.
+// Owning callbacks invoked through their default call operator run asynchronously
+// through the JS dispatcher. Inline callbacks run before the native method returns.
 const CALLBACK_TIMEOUT = { timeout: 2000 };
 
 // `createArrayBuffer()` allocates 10 MB on every platform.
@@ -26,6 +25,46 @@ function exactly(text: string): RegExp {
 }
 export const cases = {
   ...casesForTestObjects("Callbacks", {
+    "callInlineCallback(...) runs synchronously exactly once": (testObject) => {
+      const order: string[] = ["before"];
+      testObject.callInlineCallback(() => {
+        order.push("callback");
+      });
+      order.push("after");
+      expect(order).to.deep.equal(["before", "callback", "after"]);
+    },
+
+    "callInlineCallbackWithValue(...) forwards the argument and returns the result":
+      (testObject) => {
+        const values: number[] = [];
+        const result = testObject.callInlineCallbackWithValue(21, (value) => {
+          values.push(value);
+          return value * 2;
+        });
+        expect(values).to.deep.equal([21]);
+        expect(result).to.equal(42);
+      },
+
+    "callInlineCallback(...) propagates a thrown callback error": (
+      testObject,
+    ) => {
+      expect(() =>
+        testObject.callInlineCallback(() => {
+          throw new Error("Inline void callback failed");
+        }),
+      ).to.throw("Inline void callback failed");
+    },
+
+    "callInlineCallbackWithValue(...) propagates a thrown callback error": (
+      testObject,
+    ) => {
+      expect(() =>
+        testObject.callInlineCallbackWithValue(21, () => {
+          throw new Error("Inline value callback failed");
+        }),
+      ).to.throw("Inline value callback failed");
+    },
+
     "callCallback(...) calls the callback once without arguments": async (
       testObject,
     ) => {
