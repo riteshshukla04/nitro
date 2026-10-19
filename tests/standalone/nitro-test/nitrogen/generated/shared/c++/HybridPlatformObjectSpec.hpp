@@ -7,14 +7,8 @@
 
 #pragma once
 
-#if __has_include(<NitroModules/HybridObject.hpp>)
 #include <NitroModules/HybridObject.hpp>
-#else
-#error NitroModules cannot be found! Are you sure you installed NitroModules properly?
-#endif
-
-
-
+#include <NitroModules/HybridClass.hpp>
 #include <string>
 
 namespace margelo::nitro::test {
@@ -24,27 +18,33 @@ namespace margelo::nitro::test {
   /**
    * An abstract base class for `PlatformObject`
    * Inherit this class to create instances of `HybridPlatformObjectSpec` in C++.
-   * You must explicitly call `HybridObject`'s constructor yourself, because it is virtual.
    * @example
    * ```cpp
-   * class HybridPlatformObject: public HybridPlatformObjectSpec {
+   * class HybridPlatformObject : public HybridPlatformObjectSpec {
    * public:
-   *   HybridPlatformObject(...): HybridObject(TAG) { ... }
+   *   HybridPlatformObject(...) { ... }
    *   // ...
    * };
    * ```
    */
-  class HybridPlatformObjectSpec: public virtual HybridObject {
+  class HybridPlatformObjectSpec : public virtual HybridObject {
+    public:
+      struct Class {
+        using Base = HybridObject::Class;
+        static constexpr const char* name = "PlatformObject";
+        static const std::shared_ptr<const HybridClass>& get();
+      };
+
     public:
       // Constructor
-      explicit HybridPlatformObjectSpec(): HybridObject(TAG) { }
+      HybridPlatformObjectSpec() = default;
 
       // Destructor
-      ~HybridPlatformObjectSpec() override = default;
+      ~HybridPlatformObjectSpec() override;
 
     public:
       // Properties
-      
+
 
     public:
       // Methods
@@ -52,11 +52,9 @@ namespace margelo::nitro::test {
 
     protected:
       // Hybrid Setup
-      void loadHybridMethods() override;
-
-    protected:
-      // Tag for logging
-      static constexpr auto TAG = "PlatformObject";
+      const std::shared_ptr<const HybridClass>& getHybridClass() override {
+        return Class::get();
+      }
   };
 
 } // namespace margelo::nitro::test

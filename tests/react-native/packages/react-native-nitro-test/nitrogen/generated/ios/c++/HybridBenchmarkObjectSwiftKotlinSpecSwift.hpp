@@ -7,37 +7,11 @@
 
 #pragma once
 
+#include <NitroModules/HybridClass.hpp>
 #include "HybridBenchmarkObjectSwiftKotlinSpec.hpp"
 
-// Forward declaration of `HybridBenchmarkObjectSwiftKotlinSpec_cxx` to properly resolve imports.
-namespace NitroTest { class HybridBenchmarkObjectSwiftKotlinSpec_cxx; }
 
-// Forward declaration of `HybridBenchmarkObjectSwiftKotlinSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridBenchmarkObjectSwiftKotlinSpec; }
-// Forward declaration of `Car` to properly resolve imports.
-namespace margelo::nitro::test { struct Car; }
-// Forward declaration of `Powertrain` to properly resolve imports.
-namespace margelo::nitro::test { enum class Powertrain; }
-// Forward declaration of `Person` to properly resolve imports.
-namespace margelo::nitro::test { struct Person; }
-// Forward declaration of `ArrayBufferHolder` to properly resolve imports.
-namespace NitroModules { class ArrayBufferHolder; }
-
-#include <memory>
-#include "HybridBenchmarkObjectSwiftKotlinSpec.hpp"
-#include <string>
-#include <vector>
-#include "Car.hpp"
-#include "Powertrain.hpp"
-#include "Person.hpp"
-#include <optional>
-#include <variant>
-#include <unordered_map>
-#include <NitroModules/ArrayBuffer.hpp>
-#include <NitroModules/ArrayBufferHolder.hpp>
-#include <functional>
-#include <NitroModules/Promise.hpp>
-
+// This implementation header is consumed only by C++ translation units.
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 
 namespace margelo::nitro::test {
@@ -45,173 +19,89 @@ namespace margelo::nitro::test {
   /**
    * The C++ part of HybridBenchmarkObjectSwiftKotlinSpec_cxx.swift.
    *
-   * HybridBenchmarkObjectSwiftKotlinSpecSwift (C++) accesses HybridBenchmarkObjectSwiftKotlinSpec_cxx (Swift), and might
-   * contain some additional bridging code for C++ <> Swift interop.
+   * HybridBenchmarkObjectSwiftKotlinSpecSwift accesses the concrete Swift wrapper and registers
+   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
    *
-   * Since this obviously introduces an overhead, I hope at some point in
-   * the future, HybridBenchmarkObjectSwiftKotlinSpec_cxx can directly inherit from the C++ class HybridBenchmarkObjectSwiftKotlinSpec
-   * to simplify the whole structure and memory management.
+   * Once Swift can inherit from C++ classes, the Swift implementation could
+   * inherit HybridBenchmarkObjectSwiftKotlinSpec directly to simplify this structure.
    */
-  class HybridBenchmarkObjectSwiftKotlinSpecSwift: public virtual HybridBenchmarkObjectSwiftKotlinSpec {
+  class HybridBenchmarkObjectSwiftKotlinSpecSwift final : public virtual HybridBenchmarkObjectSwiftKotlinSpec {
+  public:
+    struct Class {
+      using Base = HybridObject::Class;
+      static constexpr const char* name = "BenchmarkObjectSwiftKotlin";
+      static const std::shared_ptr<const HybridClass>& get();
+    };
+
   public:
     // Constructor from a Swift instance
     explicit HybridBenchmarkObjectSwiftKotlinSpecSwift(const NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx& swiftPart):
-      HybridObject(HybridBenchmarkObjectSwiftKotlinSpec::TAG),
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    inline NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx& getSwiftPart() noexcept {
+    NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
-  public:
-    inline size_t getExternalMemorySize() noexcept override {
+    // HybridObject overrides
+    size_t getExternalMemorySize() noexcept override {
       return _swiftPart.getMemorySize();
     }
     bool equals(const std::shared_ptr<HybridObject>& other) override {
-      if (auto otherCast = std::dynamic_pointer_cast<HybridBenchmarkObjectSwiftKotlinSpecSwift>(other)) {
-        return _swiftPart.equals(otherCast->_swiftPart);
-      }
-      return false;
+      auto value = std::dynamic_pointer_cast<HybridBenchmarkObjectSwiftKotlinSpecSwift>(other);
+      return value && _swiftPart.equals(value->_swiftPart);
     }
-    void dispose() noexcept override {
+    void dispose() override {
       _swiftPart.dispose();
     }
-    std::string toString() override {
-      return _swiftPart.toString();
-    }
+    std::string toString() override;
 
-  public:
     // Properties
-    inline std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> getThisObject() noexcept override {
-      auto __result = _swiftPart.getThisObject();
-      return __result;
-    }
-    inline double getNumberValue() noexcept override {
-      return _swiftPart.getNumberValue();
-    }
-    inline void setNumberValue(double numberValue) noexcept override {
-      _swiftPart.setNumberValue(std::forward<decltype(numberValue)>(numberValue));
-    }
-
-  public:
+    double getNumberValue() override;
+    double getNumberValue_Swift();
+    void setNumberValue(double numberValue) override;
+    void setNumberValue_Swift(double numberValue);
+    std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> getThisObject() override;
+    NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx getThisObject_Swift();
     // Methods
-    inline std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> newBenchmarkObject() override {
-      auto __result = _swiftPart.newBenchmarkObject();
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline void simpleFunc() override {
-      auto __result = _swiftPart.simpleFunc();
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-    }
-    inline double addNumbers(double a, double b) override {
-      auto __result = _swiftPart.addNumbers(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::string addStrings(const std::string& a, const std::string& b) override {
-      auto __result = _swiftPart.addStrings(a, b);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::vector<double> bounceNumbers(const std::vector<double>& array) override {
-      auto __result = _swiftPart.bounceNumbers(array);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline Car bounceCar(const Car& car) override {
-      auto __result = _swiftPart.bounceCar(std::forward<decltype(car)>(car));
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map) override {
-      auto __result = _swiftPart.bounceSimpleMap(map);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::string tryOptionalParams(double num, bool boo, const std::optional<std::string>& str) override {
-      auto __result = _swiftPart.tryOptionalParams(std::forward<decltype(num)>(num), std::forward<decltype(boo)>(boo), str);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) override {
-      auto __result = _swiftPart.passVariant(either);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::shared_ptr<ArrayBuffer> bounceArrayBuffer(const std::shared_ptr<ArrayBuffer>& buffer) override {
-      auto __result = _swiftPart.bounceArrayBuffer(ArrayBufferHolder(buffer));
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::shared_ptr<ArrayBuffer> copyBuffer(const std::shared_ptr<ArrayBuffer>& buffer) override {
-      auto __result = _swiftPart.copyBuffer(ArrayBufferHolder(buffer));
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline double callbackSync(const std::function<double()>& callback) override {
-      auto __result = _swiftPart.callbackSync(callback);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::shared_ptr<Promise<double>> promiseReturnsInstantly() override {
-      auto __result = _swiftPart.promiseReturnsInstantly();
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline std::shared_ptr<Promise<double>> createPendingPromise() override {
-      auto __result = _swiftPart.createPendingPromise();
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline void resolvePendingPromiseOnWorker() override {
-      auto __result = _swiftPart.resolvePendingPromiseOnWorker();
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
+    void simpleFunc() override;
+    void simpleFunc_Swift();
+    double addNumbers(double a, double b) override;
+    double addNumbers_Swift(double a, double b);
+    std::string addStrings(const std::string& a, const std::string& b) override;
+    swift::String addStrings_Swift(const swift::String& a, const swift::String& b);
+    std::vector<double> bounceNumbers(const std::vector<double>& array) override;
+    swift::Array<double> bounceNumbers_Swift(const swift::Array<double>& array);
+    Car bounceCar(const Car& car) override;
+    NitroTest::Car bounceCar_Swift(const NitroTest::Car& car);
+    std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map) override;
+    NitroTest::Record_swift__String_double bounceSimpleMap_Swift(const NitroTest::Record_swift__String_double& map);
+    std::string tryOptionalParams(double num, bool boo, const std::optional<std::string>& str) override;
+    swift::String tryOptionalParams_Swift(double num, bool boo, const swift::Optional<swift::String>& str);
+    std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) override;
+    NitroTest::Variant_Double_String_cxx passVariant_Swift(const NitroTest::Variant_Bool__Double___String__Double_String_cxx& either);
+    ArrayBuffer bounceArrayBuffer(const ArrayBuffer& buffer) override;
+    ArrayBuffer bounceArrayBuffer_Swift(const ArrayBuffer& buffer);
+    ArrayBuffer copyBuffer(const ArrayBuffer& buffer) override;
+    ArrayBuffer copyBuffer_Swift(const ArrayBuffer& buffer);
+    double callbackSync(const Callback<double()>& callback) override;
+    double callbackSync_Swift(const Callback<double()>& callback);
+    Promise<double> promiseReturnsInstantly() override;
+    Promise<double> promiseReturnsInstantly_Swift();
+    Promise<double> createPendingPromise() override;
+    Promise<double> createPendingPromise_Swift();
+    void resolvePendingPromiseOnWorker() override;
+    void resolvePendingPromiseOnWorker_Swift();
+    std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> newBenchmarkObject() override;
+    NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx newBenchmarkObject_Swift();
+    // Constructor
+    static std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> constructor();
+    static NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx constructor_Swift();
+
+  protected:
+    const std::shared_ptr<const HybridClass>& getHybridClass() override {
+      return Class::get();
     }
 
   private:

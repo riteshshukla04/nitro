@@ -7,15 +7,8 @@
 
 #pragma once
 
-#if __has_include(<NitroModules/HybridObject.hpp>)
 #include <NitroModules/HybridObject.hpp>
-#else
-#error NitroModules cannot be found! Are you sure you installed NitroModules properly?
-#endif
-
-// Forward declaration of `OptionalPrimitivesHolder` to properly resolve imports.
-namespace margelo::nitro::test::external { struct OptionalPrimitivesHolder; }
-
+#include <NitroModules/HybridClass.hpp>
 #include <string>
 #include "OptionalPrimitivesHolder.hpp"
 #include <optional>
@@ -27,40 +20,44 @@ namespace margelo::nitro::test::external {
   /**
    * An abstract base class for `SomeExternalObject`
    * Inherit this class to create instances of `HybridSomeExternalObjectSpec` in C++.
-   * You must explicitly call `HybridObject`'s constructor yourself, because it is virtual.
    * @example
    * ```cpp
-   * class HybridSomeExternalObject: public HybridSomeExternalObjectSpec {
+   * class HybridSomeExternalObject : public HybridSomeExternalObjectSpec {
    * public:
-   *   HybridSomeExternalObject(...): HybridObject(TAG) { ... }
+   *   HybridSomeExternalObject(...) { ... }
    *   // ...
    * };
    * ```
    */
-  class HybridSomeExternalObjectSpec: public virtual HybridObject {
+  class HybridSomeExternalObjectSpec : public virtual HybridObject {
+    public:
+      struct Class {
+        using Base = HybridObject::Class;
+        static constexpr const char* name = "SomeExternalObject";
+        static const std::shared_ptr<const HybridClass>& get();
+      };
+
     public:
       // Constructor
-      explicit HybridSomeExternalObjectSpec(): HybridObject(TAG) { }
+      HybridSomeExternalObjectSpec() = default;
 
       // Destructor
-      ~HybridSomeExternalObjectSpec() override = default;
+      ~HybridSomeExternalObjectSpec() override;
 
     public:
       // Properties
-      
+
 
     public:
       // Methods
       virtual std::string getValue() = 0;
-      virtual OptionalPrimitivesHolder createOptionalPrimitivesHolder(std::optional<double> optionalNumber, std::optional<bool> optionalBoolean, std::optional<uint64_t> optionalUInt64, std::optional<int64_t> optionalInt64) = 0;
+      virtual OptionalPrimitivesHolder createOptionalPrimitivesHolder(const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64) = 0;
 
     protected:
       // Hybrid Setup
-      void loadHybridMethods() override;
-
-    protected:
-      // Tag for logging
-      static constexpr auto TAG = "SomeExternalObject";
+      const std::shared_ptr<const HybridClass>& getHybridClass() override {
+        return Class::get();
+      }
   };
 
 } // namespace margelo::nitro::test::external

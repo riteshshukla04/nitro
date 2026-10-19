@@ -7,30 +7,10 @@
 
 #pragma once
 
-#if __has_include(<NitroModules/JSIConverter.hpp>)
 #include <NitroModules/JSIConverter.hpp>
-#else
-#error NitroModules cannot be found! Are you sure you installed NitroModules properly?
-#endif
-#if __has_include(<NitroModules/NitroDefines.hpp>)
 #include <NitroModules/NitroDefines.hpp>
-#else
-#error NitroModules cannot be found! Are you sure you installed NitroModules properly?
-#endif
-#if __has_include(<NitroModules/JSIHelpers.hpp>)
-#include <NitroModules/JSIHelpers.hpp>
-#else
-#error NitroModules cannot be found! Are you sure you installed NitroModules properly?
-#endif
-#if __has_include(<NitroModules/PropNameIDCache.hpp>)
-#include <NitroModules/PropNameIDCache.hpp>
-#else
-#error NitroModules cannot be found! Are you sure you installed NitroModules properly?
-#endif
-
-
-
 #include <optional>
+#include <utility>
 
 namespace margelo::nitro::test::external {
 
@@ -46,7 +26,7 @@ namespace margelo::nitro::test::external {
 
   public:
     OptionalPrimitivesHolder() = default;
-    explicit OptionalPrimitivesHolder(std::optional<double> optionalNumber, std::optional<bool> optionalBoolean, std::optional<uint64_t> optionalUInt64, std::optional<int64_t> optionalInt64): optionalNumber(optionalNumber), optionalBoolean(optionalBoolean), optionalUInt64(optionalUInt64), optionalInt64(optionalInt64) {}
+    explicit OptionalPrimitivesHolder(std::optional<double> optionalNumber, std::optional<bool> optionalBoolean, std::optional<uint64_t> optionalUInt64, std::optional<int64_t> optionalInt64): optionalNumber(std::move(optionalNumber)), optionalBoolean(std::move(optionalBoolean)), optionalUInt64(std::move(optionalUInt64)), optionalInt64(std::move(optionalInt64)) {}
 
   public:
     friend bool operator==(const OptionalPrimitivesHolder& lhs, const OptionalPrimitivesHolder& rhs) = default;
@@ -59,37 +39,9 @@ namespace margelo::nitro {
   // C++ OptionalPrimitivesHolder <> JS OptionalPrimitivesHolder (object)
   template <>
   struct JSIConverter<margelo::nitro::test::external::OptionalPrimitivesHolder> final {
-    static inline margelo::nitro::test::external::OptionalPrimitivesHolder fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
-      jsi::Object obj = arg.asObject(runtime);
-      return margelo::nitro::test::external::OptionalPrimitivesHolder(
-        JSIConverter<std::optional<double>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "optionalNumber"))),
-        JSIConverter<std::optional<bool>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "optionalBoolean"))),
-        JSIConverter<std::optional<uint64_t>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "optionalUInt64"))),
-        JSIConverter<std::optional<int64_t>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "optionalInt64")))
-      );
-    }
-    static inline jsi::Value toJSI(jsi::Runtime& runtime, const margelo::nitro::test::external::OptionalPrimitivesHolder& arg) {
-      jsi::Object obj(runtime);
-      obj.setProperty(runtime, PropNameIDCache::get(runtime, "optionalNumber"), JSIConverter<std::optional<double>>::toJSI(runtime, arg.optionalNumber));
-      obj.setProperty(runtime, PropNameIDCache::get(runtime, "optionalBoolean"), JSIConverter<std::optional<bool>>::toJSI(runtime, arg.optionalBoolean));
-      obj.setProperty(runtime, PropNameIDCache::get(runtime, "optionalUInt64"), JSIConverter<std::optional<uint64_t>>::toJSI(runtime, arg.optionalUInt64));
-      obj.setProperty(runtime, PropNameIDCache::get(runtime, "optionalInt64"), JSIConverter<std::optional<int64_t>>::toJSI(runtime, arg.optionalInt64));
-      return obj;
-    }
-    static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-      if (!value.isObject()) {
-        return false;
-      }
-      jsi::Object obj = value.getObject(runtime);
-      if (!nitro::isPlainObject(runtime, obj)) {
-        return false;
-      }
-      if (!JSIConverter<std::optional<double>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "optionalNumber")))) return false;
-      if (!JSIConverter<std::optional<bool>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "optionalBoolean")))) return false;
-      if (!JSIConverter<std::optional<uint64_t>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "optionalUInt64")))) return false;
-      if (!JSIConverter<std::optional<int64_t>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "optionalInt64")))) return false;
-      return true;
-    }
+    static margelo::nitro::test::external::OptionalPrimitivesHolder fromJSI(jsi::Runtime& runtime, const jsi::Value& arg);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const margelo::nitro::test::external::OptionalPrimitivesHolder& arg);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 
 } // namespace margelo::nitro

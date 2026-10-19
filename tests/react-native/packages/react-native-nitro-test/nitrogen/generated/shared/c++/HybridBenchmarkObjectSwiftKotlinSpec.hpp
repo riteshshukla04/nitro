@@ -7,19 +7,11 @@
 
 #pragma once
 
-#if __has_include(<NitroModules/HybridObject.hpp>)
 #include <NitroModules/HybridObject.hpp>
-#else
-#error NitroModules cannot be found! Are you sure you installed NitroModules properly?
-#endif
-
+#include <NitroModules/HybridClass.hpp>
+#include <memory>
 // Forward declaration of `HybridBenchmarkObjectSwiftKotlinSpec` to properly resolve imports.
 namespace margelo::nitro::test { class HybridBenchmarkObjectSwiftKotlinSpec; }
-// Forward declaration of `Car` to properly resolve imports.
-namespace margelo::nitro::test { struct Car; }
-
-#include <memory>
-#include "HybridBenchmarkObjectSwiftKotlinSpec.hpp"
 #include <string>
 #include <vector>
 #include "Car.hpp"
@@ -27,6 +19,7 @@ namespace margelo::nitro::test { struct Car; }
 #include <optional>
 #include <variant>
 #include <NitroModules/ArrayBuffer.hpp>
+#include <NitroModules/Callback.hpp>
 #include <functional>
 #include <NitroModules/Promise.hpp>
 
@@ -37,33 +30,38 @@ namespace margelo::nitro::test {
   /**
    * An abstract base class for `BenchmarkObjectSwiftKotlin`
    * Inherit this class to create instances of `HybridBenchmarkObjectSwiftKotlinSpec` in C++.
-   * You must explicitly call `HybridObject`'s constructor yourself, because it is virtual.
    * @example
    * ```cpp
-   * class HybridBenchmarkObjectSwiftKotlin: public HybridBenchmarkObjectSwiftKotlinSpec {
+   * class HybridBenchmarkObjectSwiftKotlin : public HybridBenchmarkObjectSwiftKotlinSpec {
    * public:
-   *   HybridBenchmarkObjectSwiftKotlin(...): HybridObject(TAG) { ... }
+   *   HybridBenchmarkObjectSwiftKotlin(...) { ... }
    *   // ...
    * };
    * ```
    */
-  class HybridBenchmarkObjectSwiftKotlinSpec: public virtual HybridObject {
+  class HybridBenchmarkObjectSwiftKotlinSpec : public virtual HybridObject {
+    public:
+      struct Class {
+        using Base = HybridObject::Class;
+        static constexpr const char* name = "BenchmarkObjectSwiftKotlin";
+        static const std::shared_ptr<const HybridClass>& get();
+      };
+
     public:
       // Constructor
-      explicit HybridBenchmarkObjectSwiftKotlinSpec(): HybridObject(TAG) { }
+      HybridBenchmarkObjectSwiftKotlinSpec() = default;
 
       // Destructor
-      ~HybridBenchmarkObjectSwiftKotlinSpec() override = default;
+      ~HybridBenchmarkObjectSwiftKotlinSpec() override;
 
     public:
       // Properties
-      virtual std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> getThisObject() = 0;
       virtual double getNumberValue() = 0;
       virtual void setNumberValue(double numberValue) = 0;
+      virtual std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> getThisObject() = 0;
 
     public:
       // Methods
-      virtual std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> newBenchmarkObject() = 0;
       virtual void simpleFunc() = 0;
       virtual double addNumbers(double a, double b) = 0;
       virtual std::string addStrings(const std::string& a, const std::string& b) = 0;
@@ -72,20 +70,19 @@ namespace margelo::nitro::test {
       virtual std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map) = 0;
       virtual std::string tryOptionalParams(double num, bool boo, const std::optional<std::string>& str) = 0;
       virtual std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) = 0;
-      virtual std::shared_ptr<ArrayBuffer> bounceArrayBuffer(const std::shared_ptr<ArrayBuffer>& buffer) = 0;
-      virtual std::shared_ptr<ArrayBuffer> copyBuffer(const std::shared_ptr<ArrayBuffer>& buffer) = 0;
-      virtual double callbackSync(const std::function<double()>& callback) = 0;
-      virtual std::shared_ptr<Promise<double>> promiseReturnsInstantly() = 0;
-      virtual std::shared_ptr<Promise<double>> createPendingPromise() = 0;
+      virtual ArrayBuffer bounceArrayBuffer(const ArrayBuffer& buffer) = 0;
+      virtual ArrayBuffer copyBuffer(const ArrayBuffer& buffer) = 0;
+      virtual double callbackSync(const Callback<double()>& callback) = 0;
+      virtual Promise<double> promiseReturnsInstantly() = 0;
+      virtual Promise<double> createPendingPromise() = 0;
       virtual void resolvePendingPromiseOnWorker() = 0;
+      virtual std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> newBenchmarkObject() = 0;
 
     protected:
       // Hybrid Setup
-      void loadHybridMethods() override;
-
-    protected:
-      // Tag for logging
-      static constexpr auto TAG = "BenchmarkObjectSwiftKotlin";
+      const std::shared_ptr<const HybridClass>& getHybridClass() override {
+        return Class::get();
+      }
   };
 
 } // namespace margelo::nitro::test

@@ -6,6 +6,50 @@
 ///
 
 #include "HybridBaseSpecSwift.hpp"
+#include <NitroModules/SwiftConverter.hpp>
+#include <NitroModules/SwiftResult.hpp>
+#include <optional>
 
 namespace margelo::nitro::test {
+
+  std::string HybridBaseSpecSwift::toString() {
+    return SwiftConverter<std::string, swift::String>::fromSwift(_swiftPart.toString());
+  }
+
+  // Properties
+
+  double HybridBaseSpecSwift::getBaseValue() {
+    auto __result = getBaseValue_Swift();
+    return SwiftConverter<double, double>::fromSwift(__result);
+  }
+
+  double HybridBaseSpecSwift::getBaseValue_Swift() {
+    return _swiftPart.getBaseValue();
+  }
+
+  // Methods
+
+  // Constructor
+
+  std::shared_ptr<HybridBaseSpec> HybridBaseSpecSwift::constructor() {
+    auto __result = constructor_Swift();
+    return SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, NitroTest::HybridBaseSpec_cxx>::fromSwift(__result);
+  }
+
+  NitroTest::HybridBaseSpec_cxx HybridBaseSpecSwift::constructor_Swift() {
+    auto __result = NitroTest::HybridBaseSpec_cxx::constructor();
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return NitroTest::HybridBaseSpec_cxx::fromUnsafe(__result.value());
+  }
+
+  const std::shared_ptr<const HybridClass>& HybridBaseSpecSwift::Class::get() {
+    static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
+      clazz.registerHybridGetter("baseValue", &HybridBaseSpecSwift::getBaseValue_Swift);
+      clazz.registerHybridConstructor(&HybridBaseSpecSwift::constructor_Swift);
+    });
+    return hybridClass;
+  }
+
 } // namespace margelo::nitro::test

@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-import NitroModules
+public import NitroModules
 
 /// See ``HybridBaseSpec``
 public protocol HybridBaseSpec_protocol: HybridObject {
@@ -13,7 +13,7 @@ public protocol HybridBaseSpec_protocol: HybridObject {
   var baseValue: Double { get }
 
   // Methods
-  
+
 }
 
 public extension HybridBaseSpec_protocol {
@@ -27,7 +27,7 @@ public extension HybridBaseSpec_protocol {
 open class HybridBaseSpec_base {
   private weak var cxxWrapper: HybridBaseSpec_cxx? = nil
   public init() { }
-  public func getCxxWrapper() -> HybridBaseSpec_cxx {
+  open func getCxxWrapper() -> HybridBaseSpec_cxx {
   #if DEBUG
     guard self is any HybridBaseSpec else {
       fatalError("`self` is not a `HybridBaseSpec`! Did you accidentally inherit from `HybridBaseSpec_base` instead of `HybridBaseSpec`?")

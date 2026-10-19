@@ -9,13 +9,6 @@
 
 namespace margelo::nitro::test {
 
-  void HybridPlatformObjectSpec::loadHybridMethods() {
-    // load base methods/properties
-    HybridObject::loadHybridMethods();
-    // load custom methods/properties
-    registerHybrids(this, [](Prototype& prototype) {
-      prototype.registerHybridMethod("getOSVersion", &HybridPlatformObjectSpec::getOSVersion);
-    });
-  }
+  HybridPlatformObjectSpec::~HybridPlatformObjectSpec() = default;
 
 } // namespace margelo::nitro::test

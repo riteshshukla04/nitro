@@ -7,21 +7,11 @@
 
 #pragma once
 
-#if __has_include(<NitroModules/HybridObject.hpp>)
 #include <NitroModules/HybridObject.hpp>
-#else
-#error NitroModules cannot be found! Are you sure you installed NitroModules properly?
-#endif
-
-// Forward declaration of `Car` to properly resolve imports.
-namespace margelo::nitro::test { struct Car; }
-// Forward declaration of `HybridBaseSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridBaseSpec; }
-
+#include <NitroModules/HybridClass.hpp>
 #include <string>
 #include "Car.hpp"
 #include <variant>
-#include <memory>
 #include "HybridBaseSpec.hpp"
 
 namespace margelo::nitro::test {
@@ -31,23 +21,29 @@ namespace margelo::nitro::test {
   /**
    * An abstract base class for `Child`
    * Inherit this class to create instances of `HybridChildSpec` in C++.
-   * You must explicitly call `HybridObject`'s constructor yourself, because it is virtual.
    * @example
    * ```cpp
-   * class HybridChild: public HybridChildSpec {
+   * class HybridChild : public HybridChildSpec {
    * public:
-   *   HybridChild(...): HybridObject(TAG) { ... }
+   *   HybridChild(...) { ... }
    *   // ...
    * };
    * ```
    */
-  class HybridChildSpec: public virtual HybridObject, public virtual HybridBaseSpec {
+  class HybridChildSpec : public virtual HybridObject, public virtual HybridBaseSpec {
+    public:
+      struct Class {
+        using Base = HybridBaseSpec::Class;
+        static constexpr const char* name = "Child";
+        static const std::shared_ptr<const HybridClass>& get();
+      };
+
     public:
       // Constructor
-      explicit HybridChildSpec(): HybridObject(TAG) { }
+      HybridChildSpec() = default;
 
       // Destructor
-      ~HybridChildSpec() override = default;
+      ~HybridChildSpec() override;
 
     public:
       // Properties
@@ -59,11 +55,9 @@ namespace margelo::nitro::test {
 
     protected:
       // Hybrid Setup
-      void loadHybridMethods() override;
-
-    protected:
-      // Tag for logging
-      static constexpr auto TAG = "Child";
+      const std::shared_ptr<const HybridClass>& getHybridClass() override {
+        return Class::get();
+      }
   };
 
 } // namespace margelo::nitro::test

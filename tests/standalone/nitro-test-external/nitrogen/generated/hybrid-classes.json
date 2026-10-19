@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "classes": {
+    "SomeExternalObject": {
+      "ios": {
+        "implementation": {
+          "className": "HybridSomeExternalObject"
+        },
+        "language": "swift"
+      }
+    }
+  }
+}

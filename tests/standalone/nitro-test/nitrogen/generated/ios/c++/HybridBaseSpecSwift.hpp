@@ -7,15 +7,11 @@
 
 #pragma once
 
+#include <NitroModules/HybridClass.hpp>
 #include "HybridBaseSpec.hpp"
 
-// Forward declaration of `HybridBaseSpec_cxx` to properly resolve imports.
-namespace NitroTest { class HybridBaseSpec_cxx; }
 
-
-
-
-
+// This implementation header is consumed only by C++ translation units.
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 
 namespace margelo::nitro::test {
@@ -23,52 +19,56 @@ namespace margelo::nitro::test {
   /**
    * The C++ part of HybridBaseSpec_cxx.swift.
    *
-   * HybridBaseSpecSwift (C++) accesses HybridBaseSpec_cxx (Swift), and might
-   * contain some additional bridging code for C++ <> Swift interop.
+   * HybridBaseSpecSwift accesses the concrete Swift wrapper and registers
+   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
    *
-   * Since this obviously introduces an overhead, I hope at some point in
-   * the future, HybridBaseSpec_cxx can directly inherit from the C++ class HybridBaseSpec
-   * to simplify the whole structure and memory management.
+   * Once Swift can inherit from C++ classes, the Swift implementation could
+   * inherit HybridBaseSpec directly to simplify this structure.
    */
-  class HybridBaseSpecSwift: public virtual HybridBaseSpec {
+  class HybridBaseSpecSwift : public virtual HybridBaseSpec {
+  public:
+    struct Class {
+      using Base = HybridObject::Class;
+      static constexpr const char* name = "Base";
+      static const std::shared_ptr<const HybridClass>& get();
+    };
+
   public:
     // Constructor from a Swift instance
     explicit HybridBaseSpecSwift(const NitroTest::HybridBaseSpec_cxx& swiftPart):
-      HybridObject(HybridBaseSpec::TAG),
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    inline NitroTest::HybridBaseSpec_cxx& getSwiftPart() noexcept {
+    NitroTest::HybridBaseSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
-  public:
-    inline size_t getExternalMemorySize() noexcept override {
+    // HybridObject overrides
+    size_t getExternalMemorySize() noexcept override {
       return _swiftPart.getMemorySize();
     }
     bool equals(const std::shared_ptr<HybridObject>& other) override {
-      if (auto otherCast = std::dynamic_pointer_cast<HybridBaseSpecSwift>(other)) {
-        return _swiftPart.equals(otherCast->_swiftPart);
-      }
-      return false;
+      auto value = std::dynamic_pointer_cast<HybridBaseSpecSwift>(other);
+      return value && _swiftPart.equals(value->_swiftPart);
     }
-    void dispose() noexcept override {
+    void dispose() override {
       _swiftPart.dispose();
     }
-    std::string toString() override {
-      return _swiftPart.toString();
-    }
+    std::string toString() override;
 
-  public:
     // Properties
-    inline double getBaseValue() noexcept override {
-      return _swiftPart.getBaseValue();
-    }
-
-  public:
+    double getBaseValue() override;
+    double getBaseValue_Swift();
     // Methods
-    
+    // Constructor
+    static std::shared_ptr<HybridBaseSpec> constructor();
+    static NitroTest::HybridBaseSpec_cxx constructor_Swift();
+
+  protected:
+    const std::shared_ptr<const HybridClass>& getHybridClass() override {
+      return Class::get();
+    }
 
   private:
     NitroTest::HybridBaseSpec_cxx _swiftPart;

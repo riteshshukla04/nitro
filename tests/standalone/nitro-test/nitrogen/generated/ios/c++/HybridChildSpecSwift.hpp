@@ -7,29 +7,11 @@
 
 #pragma once
 
+#include <NitroModules/HybridClass.hpp>
 #include "HybridChildSpec.hpp"
-
-// Forward declaration of `HybridChildSpec_cxx` to properly resolve imports.
-namespace NitroTest { class HybridChildSpec_cxx; }
-
-// Forward declaration of `Car` to properly resolve imports.
-namespace margelo::nitro::test { struct Car; }
-// Forward declaration of `Powertrain` to properly resolve imports.
-namespace margelo::nitro::test { enum class Powertrain; }
-// Forward declaration of `Person` to properly resolve imports.
-namespace margelo::nitro::test { struct Person; }
-// Forward declaration of `HybridBaseSpecSwift` to properly resolve imports.
-namespace margelo::nitro::test { class HybridBaseSpecSwift; }
-
-#include <string>
-#include "Car.hpp"
-#include <variant>
-#include "Powertrain.hpp"
-#include "Person.hpp"
-#include <optional>
-#include <vector>
 #include "HybridBaseSpecSwift.hpp"
 
+// This implementation header is consumed only by C++ translation units.
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 
 namespace margelo::nitro::test {
@@ -37,59 +19,58 @@ namespace margelo::nitro::test {
   /**
    * The C++ part of HybridChildSpec_cxx.swift.
    *
-   * HybridChildSpecSwift (C++) accesses HybridChildSpec_cxx (Swift), and might
-   * contain some additional bridging code for C++ <> Swift interop.
+   * HybridChildSpecSwift accesses the concrete Swift wrapper and registers
+   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
    *
-   * Since this obviously introduces an overhead, I hope at some point in
-   * the future, HybridChildSpec_cxx can directly inherit from the C++ class HybridChildSpec
-   * to simplify the whole structure and memory management.
+   * Once Swift can inherit from C++ classes, the Swift implementation could
+   * inherit HybridChildSpec directly to simplify this structure.
    */
-  class HybridChildSpecSwift: public virtual HybridChildSpec, public virtual HybridBaseSpecSwift {
+  class HybridChildSpecSwift final : public virtual HybridChildSpec, public virtual HybridBaseSpecSwift {
+  public:
+    struct Class {
+      using Base = HybridBaseSpecSwift::Class;
+      static constexpr const char* name = "Child";
+      static const std::shared_ptr<const HybridClass>& get();
+    };
+
   public:
     // Constructor from a Swift instance
     explicit HybridChildSpecSwift(const NitroTest::HybridChildSpec_cxx& swiftPart):
-      HybridObject(HybridChildSpec::TAG),
       HybridBaseSpecSwift(swiftPart),
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    inline NitroTest::HybridChildSpec_cxx& getSwiftPart() noexcept {
+    NitroTest::HybridChildSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
-  public:
-    inline size_t getExternalMemorySize() noexcept override {
+    // HybridObject overrides
+    size_t getExternalMemorySize() noexcept override {
       return _swiftPart.getMemorySize();
     }
     bool equals(const std::shared_ptr<HybridObject>& other) override {
-      if (auto otherCast = std::dynamic_pointer_cast<HybridChildSpecSwift>(other)) {
-        return _swiftPart.equals(otherCast->_swiftPart);
-      }
-      return false;
+      auto value = std::dynamic_pointer_cast<HybridChildSpecSwift>(other);
+      return value && _swiftPart.equals(value->_swiftPart);
     }
-    void dispose() noexcept override {
+    void dispose() override {
       _swiftPart.dispose();
     }
-    std::string toString() override {
-      return _swiftPart.toString();
-    }
+    std::string toString() override;
 
-  public:
     // Properties
-    inline double getChildValue() noexcept override {
-      return _swiftPart.getChildValue();
-    }
-
-  public:
+    double getChildValue() override;
+    double getChildValue_Swift();
     // Methods
-    inline std::variant<std::string, Car> bounceVariant(const std::variant<std::string, Car>& variant) override {
-      auto __result = _swiftPart.bounceVariant(variant);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
+    std::variant<std::string, Car> bounceVariant(const std::variant<std::string, Car>& variant) override;
+    NitroTest::NamedVariant_cxx bounceVariant_Swift(const NitroTest::NamedVariant_cxx& variant);
+    // Constructor
+    static std::shared_ptr<HybridChildSpec> constructor();
+    static NitroTest::HybridChildSpec_cxx constructor_Swift();
+
+  protected:
+    const std::shared_ptr<const HybridClass>& getHybridClass() override {
+      return Class::get();
     }
 
   private:

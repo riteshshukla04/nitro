@@ -7,18 +7,11 @@
 
 #pragma once
 
+#include <NitroModules/HybridClass.hpp>
 #include "HybridSomeExternalObjectSpec.hpp"
 
-// Forward declaration of `HybridSomeExternalObjectSpec_cxx` to properly resolve imports.
-namespace NitroTestExternal { class HybridSomeExternalObjectSpec_cxx; }
 
-// Forward declaration of `OptionalPrimitivesHolder` to properly resolve imports.
-namespace margelo::nitro::test::external { struct OptionalPrimitivesHolder; }
-
-#include <string>
-#include "OptionalPrimitivesHolder.hpp"
-#include <optional>
-
+// This implementation header is consumed only by C++ translation units.
 #include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
 
 namespace margelo::nitro::test::external {
@@ -26,64 +19,57 @@ namespace margelo::nitro::test::external {
   /**
    * The C++ part of HybridSomeExternalObjectSpec_cxx.swift.
    *
-   * HybridSomeExternalObjectSpecSwift (C++) accesses HybridSomeExternalObjectSpec_cxx (Swift), and might
-   * contain some additional bridging code for C++ <> Swift interop.
+   * HybridSomeExternalObjectSpecSwift accesses the concrete Swift wrapper and registers
+   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
    *
-   * Since this obviously introduces an overhead, I hope at some point in
-   * the future, HybridSomeExternalObjectSpec_cxx can directly inherit from the C++ class HybridSomeExternalObjectSpec
-   * to simplify the whole structure and memory management.
+   * Once Swift can inherit from C++ classes, the Swift implementation could
+   * inherit HybridSomeExternalObjectSpec directly to simplify this structure.
    */
-  class HybridSomeExternalObjectSpecSwift: public virtual HybridSomeExternalObjectSpec {
+  class HybridSomeExternalObjectSpecSwift final : public virtual HybridSomeExternalObjectSpec {
+  public:
+    struct Class {
+      using Base = HybridObject::Class;
+      static constexpr const char* name = "SomeExternalObject";
+      static const std::shared_ptr<const HybridClass>& get();
+    };
+
   public:
     // Constructor from a Swift instance
     explicit HybridSomeExternalObjectSpecSwift(const NitroTestExternal::HybridSomeExternalObjectSpec_cxx& swiftPart):
-      HybridObject(HybridSomeExternalObjectSpec::TAG),
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    inline NitroTestExternal::HybridSomeExternalObjectSpec_cxx& getSwiftPart() noexcept {
+    NitroTestExternal::HybridSomeExternalObjectSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
-  public:
-    inline size_t getExternalMemorySize() noexcept override {
+    // HybridObject overrides
+    size_t getExternalMemorySize() noexcept override {
       return _swiftPart.getMemorySize();
     }
     bool equals(const std::shared_ptr<HybridObject>& other) override {
-      if (auto otherCast = std::dynamic_pointer_cast<HybridSomeExternalObjectSpecSwift>(other)) {
-        return _swiftPart.equals(otherCast->_swiftPart);
-      }
-      return false;
+      auto value = std::dynamic_pointer_cast<HybridSomeExternalObjectSpecSwift>(other);
+      return value && _swiftPart.equals(value->_swiftPart);
     }
-    void dispose() noexcept override {
+    void dispose() override {
       _swiftPart.dispose();
     }
-    std::string toString() override {
-      return _swiftPart.toString();
-    }
+    std::string toString() override;
 
-  public:
     // Properties
-    
-
-  public:
     // Methods
-    inline std::string getValue() override {
-      auto __result = _swiftPart.getValue();
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
-    }
-    inline OptionalPrimitivesHolder createOptionalPrimitivesHolder(std::optional<double> optionalNumber, std::optional<bool> optionalBoolean, std::optional<uint64_t> optionalUInt64, std::optional<int64_t> optionalInt64) override {
-      auto __result = _swiftPart.createOptionalPrimitivesHolder(optionalNumber, optionalBoolean, optionalUInt64, optionalInt64);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      auto __value = std::move(__result.value());
-      return __value;
+    std::string getValue() override;
+    swift::String getValue_Swift();
+    OptionalPrimitivesHolder createOptionalPrimitivesHolder(const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64) override;
+    NitroTestExternal::OptionalPrimitivesHolder createOptionalPrimitivesHolder_Swift(const swift::Optional<double>& optionalNumber, const swift::Optional<bool>& optionalBoolean, const swift::Optional<uint64_t>& optionalUInt64, const swift::Optional<int64_t>& optionalInt64);
+    // Constructor
+    static std::shared_ptr<HybridSomeExternalObjectSpec> constructor();
+    static NitroTestExternal::HybridSomeExternalObjectSpec_cxx constructor_Swift();
+
+  protected:
+    const std::shared_ptr<const HybridClass>& getHybridClass() override {
+      return Class::get();
     }
 
   private:
