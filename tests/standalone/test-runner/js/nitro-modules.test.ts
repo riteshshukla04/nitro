@@ -18,12 +18,13 @@ const UNKNOWN_NAME = "SomeUnregisteredHybridObject";
 // Every autolinked non-view HybridObject. Views are left out because they
 // create platform views, which must happen on the UI Thread.
 const REGISTERED_NAMES = [
-  "TestObjectCpp",
-  "TestObjectSwiftKotlin",
-  "Base",
-  "Child",
-  "PlatformObject",
-  "SomeExternalObject",
+  "test.TestObjectCpp",
+  "test.TestObjectSwiftKotlin",
+  "test.Base",
+  "test.Child",
+  "test.PlatformObject",
+  "test.external.SomeExternalObject",
+  "test.external.Base",
 ];
 
 const PRIMITIVES: { label: string; value: unknown }[] = [
@@ -63,14 +64,7 @@ export const cases = {
     "getAllHybridClassNames() returns every autolinked HybridObject": () => {
       const names = NitroModules.getAllHybridClassNames();
       expect(names).to.be.instanceOf(Array);
-      expect(names).to.include.members([
-        "TestObjectCpp",
-        "TestObjectSwiftKotlin",
-        "Base",
-        "Child",
-        "PlatformObject",
-        "SomeExternalObject",
-      ]);
+      expect(names).to.include.members(REGISTERED_NAMES);
     },
 
     "version matches the nitro-core JS package": () => {
@@ -147,7 +141,7 @@ export const cases = {
 
     "hasHybridClass(...) is case-sensitive": () => {
       expect(
-        Object.is(NitroModules.hasHybridClass("testobjectcpp"), false),
+        Object.is(NitroModules.hasHybridClass("test.testobjectcpp"), false),
       ).to.equal(true);
     },
 
@@ -179,68 +173,76 @@ export const cases = {
       ).to.throw("Regenerate Nitrogen bindings and rebuild the native app.");
     },
 
-    "getHybridClass('TestObjectCpp') returns an object named \"TestObjectCpp\"":
+    "getHybridClass('test.TestObjectCpp') returns an object named \"TestObjectCpp\"":
       () => {
-        const name = REGISTERED_NAMES[0]!;
+        const name = "test.TestObjectCpp";
 
         const object = new (NitroModules.getHybridClass<typeof Base>(name))();
         expect(Object.is(NitroModules.isHybridObject(object), true)).to.equal(
           true,
         );
-        expect(Object.is(object.constructor.name, name)).to.equal(true);
+        expect(
+          Object.is(object.constructor.name, "TestObjectCpp"),
+        ).to.equal(true);
       },
 
-    "getHybridClass('TestObjectSwiftKotlin') returns an object named \"TestObjectSwiftKotlin\"":
+    "getHybridClass('test.TestObjectSwiftKotlin') returns an object named \"TestObjectSwiftKotlin\"":
       () => {
-        const name = REGISTERED_NAMES[1]!;
+        const name = "test.TestObjectSwiftKotlin";
 
         const object = new (NitroModules.getHybridClass<typeof Base>(name))();
         expect(Object.is(NitroModules.isHybridObject(object), true)).to.equal(
           true,
         );
-        expect(Object.is(object.constructor.name, name)).to.equal(true);
+        expect(
+          Object.is(object.constructor.name, "TestObjectSwiftKotlin"),
+        ).to.equal(true);
       },
 
-    "getHybridClass('Base') returns an object named \"Base\"": () => {
-      const name = REGISTERED_NAMES[2]!;
+    "getHybridClass('test.Base') returns an object named \"Base\"": () => {
+      const name = "test.Base";
 
       const object = new (NitroModules.getHybridClass<typeof Base>(name))();
       expect(Object.is(NitroModules.isHybridObject(object), true)).to.equal(
         true,
       );
-      expect(Object.is(object.constructor.name, name)).to.equal(true);
+      expect(Object.is(object.constructor.name, "Base")).to.equal(true);
     },
 
-    "getHybridClass('Child') returns an object named \"Child\"": () => {
-      const name = REGISTERED_NAMES[3]!;
+    "getHybridClass('test.Child') returns an object named \"Child\"": () => {
+      const name = "test.Child";
 
       const object = new (NitroModules.getHybridClass<typeof Base>(name))();
       expect(Object.is(NitroModules.isHybridObject(object), true)).to.equal(
         true,
       );
-      expect(Object.is(object.constructor.name, name)).to.equal(true);
+      expect(Object.is(object.constructor.name, "Child")).to.equal(true);
     },
 
-    "getHybridClass('PlatformObject') returns an object named \"PlatformObject\"":
+    "getHybridClass('test.PlatformObject') returns an object named \"PlatformObject\"":
       () => {
-        const name = REGISTERED_NAMES[4]!;
+        const name = "test.PlatformObject";
 
         const object = new (NitroModules.getHybridClass<typeof Base>(name))();
         expect(Object.is(NitroModules.isHybridObject(object), true)).to.equal(
           true,
         );
-        expect(Object.is(object.constructor.name, name)).to.equal(true);
+        expect(
+          Object.is(object.constructor.name, "PlatformObject"),
+        ).to.equal(true);
       },
 
-    "getHybridClass('SomeExternalObject') returns an object named \"SomeExternalObject\"":
+    "getHybridClass('test.external.SomeExternalObject') returns an object named \"SomeExternalObject\"":
       () => {
-        const name = REGISTERED_NAMES[5]!;
+        const name = "test.external.SomeExternalObject";
 
         const object = new (NitroModules.getHybridClass<typeof Base>(name))();
         expect(Object.is(NitroModules.isHybridObject(object), true)).to.equal(
           true,
         );
-        expect(Object.is(object.constructor.name, name)).to.equal(true);
+        expect(
+          Object.is(object.constructor.name, "SomeExternalObject"),
+        ).to.equal(true);
       },
 
     "getHybridClass(...) returns a new instance every call": () => {
@@ -337,10 +339,10 @@ export const cases = {
       expect(Object.is(boxed.unbox(), testObject)).to.equal(true);
     },
 
-    "hasHybridClass(testObject.constructor.name) is true": (testObject) => {
+    "hasHybridClass(namespace + constructor.name) is true": (testObject) => {
       expect(
         Object.is(
-          NitroModules.hasHybridClass(testObject.constructor.name),
+          NitroModules.hasHybridClass(`test.${testObject.constructor.name}`),
           true,
         ),
       ).to.equal(true);

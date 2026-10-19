@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridBenchmarkObjectSwiftKotlinSpec.hpp"
+#include "NitroTest/HybridBenchmarkObjectSwiftKotlinSpec.hpp"
 #include <memory>
 #include <string>
 #include <vector>

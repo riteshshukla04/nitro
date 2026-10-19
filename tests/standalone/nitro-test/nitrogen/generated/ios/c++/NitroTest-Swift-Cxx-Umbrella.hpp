@@ -39,7 +39,7 @@
 
 
 #include <memory>
-#include "HybridBaseSpec.hpp"
+#include "NitroTest/HybridBaseSpec.hpp"
 #include "JSIConverter+HybridBaseSpec_cxx.hpp"
 #include "SwiftConverter+HybridBaseSpec_cxx.hpp"
 #include <NitroModules/Result.hpp>
@@ -57,10 +57,10 @@
 #include "SwiftConverter+Car.hpp"
 #include "JSIConverter+NamedVariant.hpp"
 #include "SwiftConverter+NamedVariant.hpp"
-#include "HybridChildSpec.hpp"
+#include "NitroTest/HybridChildSpec.hpp"
 #include "JSIConverter+HybridChildSpec_cxx.hpp"
 #include "SwiftConverter+HybridChildSpec_cxx.hpp"
-#include "HybridPlatformObjectSpec.hpp"
+#include "NitroTest/HybridPlatformObjectSpec.hpp"
 #include "JSIConverter+HybridPlatformObjectSpec_cxx.hpp"
 #include "SwiftConverter+HybridPlatformObjectSpec_cxx.hpp"
 #include <NitroModules/Null.hpp>
@@ -125,12 +125,12 @@
 #include "SwiftConverter+Variant__any_HybridBaseSpec__OptionalWrapper.hpp"
 #include "JSIConverter+CoreTypesVariant.hpp"
 #include "SwiftConverter+CoreTypesVariant.hpp"
-#include <HybridSomeExternalObjectSpec.hpp>
+#include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
 #include "JSIConverter+ExternalObjectStruct.hpp"
 #include "SwiftConverter+ExternalObjectStruct.hpp"
 #include "JSIConverter+StringOrExternal.hpp"
 #include "SwiftConverter+StringOrExternal.hpp"
-#include "HybridTestObjectSwiftKotlinSpec.hpp"
+#include "NitroTest/HybridTestObjectSwiftKotlinSpec.hpp"
 #include "JSIConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp"
 #include "SwiftConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp"
 #include "JSIConverter+Variant__any_HybridTestObjectSwiftKotlinSpec__Person.hpp"

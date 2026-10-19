@@ -7,8 +7,8 @@
 
 #pragma once
 
+#include "NitroTest/HybridBenchmarkObjectSwiftKotlinSpec.hpp"
 #include <NitroModules/HybridClass.hpp>
-#include "HybridBenchmarkObjectSwiftKotlinSpec.hpp"
 
 
 // This implementation header is consumed only by C++ translation units.

@@ -8,15 +8,15 @@
 #include "NitroTestAutolinking.hpp"
 #include <NitroModules/HybridClassRegistry.hpp>
 
-#include "HybridBenchmarkObjectCppSpec.hpp"
-#include "HybridBenchmarkObjectSwiftKotlinSpecSwift.hpp"
+#include "NitroTest/HybridBenchmarkObjectCppSpec.hpp"
+#include "NitroTest/HybridBenchmarkObjectSwiftKotlinSpecSwift.hpp"
 
 namespace margelo::nitro::test {
   void registerHybridClasses() {
     using namespace margelo::nitro;
     using namespace margelo::nitro::test;
 
-    HybridClassRegistry::registerHybridClass(HybridBenchmarkObjectCppSpec::Class::get());
-    HybridClassRegistry::registerHybridClass(HybridBenchmarkObjectSwiftKotlinSpecSwift::Class::get());
+    HybridClassRegistry::registerHybridClass("test.BenchmarkObjectCpp", HybridBenchmarkObjectCppSpec::Class::get());
+    HybridClassRegistry::registerHybridClass("test.BenchmarkObjectSwiftKotlin", HybridBenchmarkObjectSwiftKotlinSpecSwift::Class::get());
   }
 } // namespace margelo::nitro::test

@@ -7,8 +7,8 @@
 
 #pragma once
 
+#include "NitroTestExternal/HybridSomeExternalObjectSpec.hpp"
 #include <NitroModules/HybridClass.hpp>
-#include "HybridSomeExternalObjectSpec.hpp"
 
 
 // This implementation header is consumed only by C++ translation units.

@@ -5,13 +5,13 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "HybridBaseSpecSwift.hpp"
-#include "HybridChildSpecSwift.hpp"
+#include "NitroTest/HybridBaseSpecSwift.hpp"
+#include "NitroTest/HybridChildSpecSwift.hpp"
 #include <memory>
-#include "HybridChildSpec.hpp"
+#include "NitroTest/HybridChildSpec.hpp"
 #include <NitroModules/NitroDefines.hpp>
-#include "HybridBaseSpec.hpp"
-#include "HybridPlatformObjectSpecSwift.hpp"
+#include "NitroTest/HybridBaseSpec.hpp"
+#include "NitroTest/HybridPlatformObjectSpecSwift.hpp"
 #include <NitroModules/Callback.hpp>
 
 #include "JSIConverter+Powertrain.hpp"
@@ -31,9 +31,9 @@
 #include <NitroModules/ArrayBuffer.hpp>
 #include <exception>
 #include <NitroTestExternal-Swift-Cxx-Bridge.hpp>
-#include <HybridSomeExternalObjectSpec.hpp>
-#include "HybridTestObjectSwiftKotlinSpecSwift.hpp"
-#include "HybridTestObjectSwiftKotlinSpec.hpp"
+#include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
+#include "NitroTest/HybridTestObjectSwiftKotlinSpecSwift.hpp"
+#include "NitroTest/HybridTestObjectSwiftKotlinSpec.hpp"
 #include "JSIConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp"
 #include "SwiftConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp"
 

@@ -8,13 +8,15 @@
 #include "NitroTestExternalAutolinking.hpp"
 #include <NitroModules/HybridClassRegistry.hpp>
 
-#include "HybridSomeExternalObjectSpecSwift.hpp"
+#include "NitroTestExternal/HybridBaseSpecSwift.hpp"
+#include "NitroTestExternal/HybridSomeExternalObjectSpecSwift.hpp"
 
 namespace margelo::nitro::test::external {
   void registerHybridClasses() {
     using namespace margelo::nitro;
     using namespace margelo::nitro::test::external;
 
-    HybridClassRegistry::registerHybridClass(HybridSomeExternalObjectSpecSwift::Class::get());
+    HybridClassRegistry::registerHybridClass("test.external.Base", HybridBaseSpecSwift::Class::get());
+    HybridClassRegistry::registerHybridClass("test.external.SomeExternalObject", HybridSomeExternalObjectSpecSwift::Class::get());
   }
 } // namespace margelo::nitro::test::external

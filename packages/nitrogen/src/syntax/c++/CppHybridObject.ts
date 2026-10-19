@@ -12,6 +12,7 @@ import {
   type HybridClassBindings,
 } from './CppHybridClassBindings.js'
 import { createKotlinHybridClassBindings } from '../kotlin/KotlinHybridClassBindings.js'
+import { createModuleHeader } from './createModuleHeader.js'
 
 export function createCppHybridObject(
   spec: HybridObjectSpec,
@@ -88,8 +89,12 @@ export function createCppHybridObject(
   const classRegistrations = bindings?.registrations ?? []
   const classImports = bindings?.imports ?? []
   const cppClassIncludes = getImportsCode(classImports, 'implementation')
+  const specImport: SourceImport = {
+    language: 'c++',
+    declaration: new HybridObjectType(spec).getCppHeader(),
+  }
   const cppImplementationIncludes = [
-    `#include "${name.HybridTSpec}.hpp"`,
+    getImportCode(specImport),
     ...memberImports.map((i) => getImportCode(i, 'implementation')),
   ].filter(isNotDuplicate)
 
@@ -237,6 +242,13 @@ namespace ${cxxNamespace} {
     language: 'c++',
     platform: 'shared',
   })
+  files.push(
+    createModuleHeader({
+      name: `${name.HybridTSpec}.hpp`,
+      moduleName: spec.config.getIosModuleName(),
+      platform: 'shared',
+    })
+  )
   files.push({
     content: cppBodyCode,
     name: `${name.HybridTSpec}.cpp`,

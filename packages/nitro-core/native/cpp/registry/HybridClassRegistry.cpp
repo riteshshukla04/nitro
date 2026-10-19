@@ -24,13 +24,13 @@ std::unordered_map<std::string, std::shared_ptr<const HybridClass>>& HybridClass
   return classes;
 }
 
-void HybridClassRegistry::registerHybridClass(const std::shared_ptr<const HybridClass>& hybridClass) {
+void HybridClassRegistry::registerHybridClass(const std::string& name, const std::shared_ptr<const HybridClass>& hybridClass) {
 #ifdef NITRO_DEBUG
   assert(hybridClass != nullptr && "Cannot register a null HybridClass.");
 #endif
   std::lock_guard<std::mutex> lock(registryMutex);
   auto& registry = getRegistry();
-  registry.try_emplace(hybridClass->getName(), hybridClass);
+  registry.try_emplace(name, hybridClass);
 }
 
 jsi::Function HybridClassRegistry::getHybridClass(jsi::Runtime& runtime, const std::string& name) {

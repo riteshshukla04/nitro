@@ -8,7 +8,7 @@
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 #include "SwiftConverter+StringOrExternal.hpp"
 #include <memory>
-#include <HybridSomeExternalObjectSpec.hpp>
+#include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
 #include <string>
 #include <variant>
 

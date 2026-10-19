@@ -6,7 +6,7 @@
 ///
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 #include <NitroModules/Callback.hpp>
-#include "HybridBenchmarkObjectSwiftKotlinSpecSwift.hpp"
+#include "NitroTest/HybridBenchmarkObjectSwiftKotlinSpecSwift.hpp"
 
 namespace margelo::nitro::test::swift_bridge {
   Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double(const Callback_double& callback) noexcept {

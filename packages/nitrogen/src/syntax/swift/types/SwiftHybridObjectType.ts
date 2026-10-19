@@ -126,7 +126,10 @@ export class SwiftHybridObjectType
   /** The header declaring the C++ class that wraps this Swift implementation. */
   getCxxPartHeader(): { name: string; space: 'user' | 'system' } {
     const { HybridTSpecSwift } = getHybridObjectName(this.hybridObjectName)
-    return this.sourceConfig.getCxxHeader(`${HybridTSpecSwift}.hpp`)
+    const moduleName = this.sourceConfig.getIosModuleName()
+    return this.sourceConfig.getCxxHeader(
+      `${moduleName}/${HybridTSpecSwift}.hpp`
+    )
   }
 
   override getCode(language: Language, options: GetCodeOptions): string {

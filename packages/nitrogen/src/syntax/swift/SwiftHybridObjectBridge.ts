@@ -17,6 +17,7 @@ import {
   getSwiftImports,
 } from './getSwiftImports.js'
 import type { SwiftMethodBridge } from './SwiftMethodHelpers.js'
+import { createModuleHeader } from '../c++/createModuleHeader.js'
 
 function getCxxPartName(type: HybridObjectType): string {
   const name = getHybridObjectName(type.hybridObjectName).HybridTSpecSwift
@@ -400,6 +401,10 @@ private:
 `.trim()
   const cppImports = getImportsCode(
     [
+      {
+        language: 'c++',
+        declaration: type.getCppHeader(),
+      },
       ...spec.staticMethods.flatMap((method) =>
         method.getRequiredImports('c++')
       ),
@@ -420,7 +425,6 @@ ${createFileMetadataString(`${hybridObjectNames.HybridTSpecSwift}.hpp`)}
 #pragma once
 
 ${cppImports}
-#include "${hybridObjectNames.HybridTSpec}.hpp"
 ${cppBaseImports}
 
 // This implementation header is consumed only by C++ translation units.
@@ -476,6 +480,11 @@ namespace ${cppNamespace} {
       platform: 'ios',
       subdirectory: [],
     },
+    createModuleHeader({
+      name: `${hybridObjectNames.HybridTSpecSwift}.hpp`,
+      moduleName: swiftModuleName,
+      platform: 'ios',
+    }),
     {
       name: `${hybridObjectNames.HybridTSpecSwift}.cpp`,
       content: cppImplementationCode,

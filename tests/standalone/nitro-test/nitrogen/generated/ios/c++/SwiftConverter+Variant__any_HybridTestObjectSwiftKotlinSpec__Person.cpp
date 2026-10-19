@@ -8,7 +8,7 @@
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 #include "SwiftConverter+Variant__any_HybridTestObjectSwiftKotlinSpec__Person.hpp"
 #include <memory>
-#include "HybridTestObjectSwiftKotlinSpec.hpp"
+#include "NitroTest/HybridTestObjectSwiftKotlinSpec.hpp"
 #include "Person.hpp"
 #include <variant>
 

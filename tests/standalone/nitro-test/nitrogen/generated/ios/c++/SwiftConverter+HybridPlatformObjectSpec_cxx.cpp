@@ -8,7 +8,7 @@
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 #include "SwiftConverter+HybridPlatformObjectSpec_cxx.hpp"
 #include <memory>
-#include "HybridPlatformObjectSpec.hpp"
+#include "NitroTest/HybridPlatformObjectSpec.hpp"
 
 namespace margelo::nitro {
 

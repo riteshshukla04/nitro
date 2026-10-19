@@ -13,6 +13,7 @@ export function createHybridClassRegistration(
   spec: HybridObjectSpec
 ): HybridClassRegistration {
   const names = getHybridObjectName(spec.name)
+  const registryName = spec.config.getHybridClassRegistryName(spec.name)
   let className: string
   let header: SourceImport<'c++'>['declaration']
   switch (spec.language) {
@@ -30,7 +31,7 @@ export function createHybridClassRegistration(
       throw new Error('Kotlin class registration is not implemented yet.')
   }
   const registration = `
-HybridClassRegistry::registerHybridClass(${className}::Class::get());
+HybridClassRegistry::registerHybridClass("${registryName}", ${className}::Class::get());
 `.trim()
   return {
     imports: [{ language: 'c++', declaration: header }],

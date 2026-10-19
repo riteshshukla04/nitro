@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridSomeExternalObjectSpec.hpp"
+#include "NitroTestExternal/HybridSomeExternalObjectSpec.hpp"
 #include <string>
 #include "OptionalPrimitivesHolder.hpp"
 #include <optional>

@@ -1,5 +1,6 @@
 import { mkdir, readdir, rm, writeFile } from 'fs/promises'
 import path from 'path'
+import { NitroConfig } from './config/NitroConfig.js'
 import { createFileMetadataString } from './syntax/helpers.js'
 
 interface HybridClassRuntimeFile {
@@ -33,6 +34,7 @@ function createHybridClassRuntime(
   classNames: readonly string[]
 ): HybridClassRuntimeFile[] {
   return classNames.flatMap((name) => {
+    const registryName = NitroConfig.current.getHybridClassRegistryName(name)
     const jsFileName = `${name}.cjs`
     const declarationFileName = `${name}.d.cts`
     // The getter replaces itself with a read-only data property. It stays
@@ -48,7 +50,7 @@ let hybridClass
 module.exports = {
   get ${name}() {
     if (hybridClass === undefined) {
-      hybridClass = NitroModules.getHybridClass('${name}')
+      hybridClass = NitroModules.getHybridClass('${registryName}')
     }
     Object.defineProperty(module.exports, '${name}', {
       value: hybridClass,

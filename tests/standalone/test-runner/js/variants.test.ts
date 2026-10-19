@@ -626,8 +626,8 @@ export const cases = {
     ) => {
       const otherName =
         testObject.constructor.name === "TestObjectCpp"
-          ? "TestObjectSwiftKotlin"
-          : "TestObjectCpp";
+          ? "test.TestObjectSwiftKotlin"
+          : "test.TestObjectCpp";
       const other = new (NitroModules.getHybridClass<typeof Base>(otherName))();
       expect(() =>
         // @ts-expect-error

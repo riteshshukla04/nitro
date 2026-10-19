@@ -8,7 +8,7 @@
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 #include "SwiftConverter+Variant__any_HybridBaseSpec__OptionalWrapper.hpp"
 #include <memory>
-#include "HybridBaseSpec.hpp"
+#include "NitroTest/HybridBaseSpec.hpp"
 #include "OptionalWrapper.hpp"
 #include <variant>
 

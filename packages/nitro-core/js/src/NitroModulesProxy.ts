@@ -10,6 +10,8 @@ declare class NitroModulesProxy extends HybridObject {
 
   /**
    * Returns the registered class and its shared prototype in this runtime.
+   * Generated classes use their `nitro.json` namespace as a dot-separated prefix,
+   * for example `image.Image`. The constructor's `name` remains `Image`.
    * Nitrogen's generated exports provide the class type automatically.
    * Classes without a public constructor can still be used with `instanceof`.
    */
@@ -108,7 +110,7 @@ declare class NitroModulesProxy extends HybridObject {
  * import { NitroModules, NitroModulesProxy } from 'nitro-core'
  *
  * NitroModules instanceof NitroModulesProxy // true
- * NitroModules.getHybridClass('Performance')
+ * NitroModules.getHybridClass('core.Performance')
  * ```
  */
 const NativeNitroModulesProxy: typeof NitroModulesProxy =

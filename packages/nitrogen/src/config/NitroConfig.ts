@@ -43,6 +43,11 @@ export class NitroConfig {
     return this.config.ios.iosModuleName
   }
 
+  /** Returns the registry key for a HybridObject in this module. */
+  getHybridClassRegistryName(name: string): string {
+    return [...this.config.cxxNamespace, name].join('.')
+  }
+
   /**
    * Represents the C++ namespace of the module that will be generated.
    * This can have multiple sub-namespaces, and is always relative to `margelo::nitro`.

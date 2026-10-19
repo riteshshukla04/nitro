@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridTestObjectCppSpec.hpp"
+#include "NitroTest/HybridTestObjectCppSpec.hpp"
 #include <string>
 #include <NitroModules/Null.hpp>
 #include <optional>
@@ -21,7 +21,7 @@
 #include "Person.hpp"
 #include "PartialPerson.hpp"
 #include "Car.hpp"
-#include "HybridChildSpec.hpp"
+#include "NitroTest/HybridChildSpec.hpp"
 #include <NitroModules/AnyJSON.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
@@ -35,8 +35,8 @@
 #include "OptionalEnumWrapper.hpp"
 #include "HardwareBufferFormat.hpp"
 #include "WeirdNumbersEnum.hpp"
-#include "HybridBaseSpec.hpp"
-#include <HybridSomeExternalObjectSpec.hpp>
+#include "NitroTest/HybridBaseSpec.hpp"
+#include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
 #include "ExternalObjectStruct.hpp"
 #include <NitroModules/HybridObject.hpp>
 #include "CustomString.hpp"

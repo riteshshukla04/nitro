@@ -8,7 +8,7 @@
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 #include "SwiftConverter+HybridChildSpec_cxx.hpp"
 #include <memory>
-#include "HybridChildSpec.hpp"
+#include "NitroTest/HybridChildSpec.hpp"
 
 namespace margelo::nitro {
 

@@ -142,6 +142,10 @@ nitrogen/generated/shared/javascript/
 
 `Image.cjs` fetches the native class in a getter on first access and caches it. Bundlers that re-export CommonJS through getters, such as Rolldown, keep classes lazy until they are used. Node's ESM loader reads CommonJS exports while importing, which fetches classes eagerly.
 
+The registry key uses the `cxxNamespace` from `nitro.json` as a prefix, with dots between components. For `"cxxNamespace": ["image", "filters"]`, Nitrogen registers `Image` as `image.filters.Image`, and its lazy export looks up that key. Other modules can declare their own `Image` class. The JavaScript constructor's `name` remains `Image`.
+
+HybridObject headers also have module-qualified include paths. In handwritten C++, use `#include <NitroImage/HybridImageSpec.hpp>`, where `NitroImage` is the `iosModuleName`, to select the owning module when another library declares `Image`.
+
 Nitrogen only generates code for HybridObject classes. Other exports from a spec, such as types or helper functions, are ordinary TypeScript.
 
 Commit `nitrogen/generated` and include it when publishing, along with the `imports` entry, `nitro.json`, and the `.nitro.ts` specs with their referenced types. If you pass `--out`, the directory must be inside the package, and `#nitro/*` must map to `<out>/shared/javascript/*.cjs`. Nitrogen deletes files in its output directory that it did not generate, so do not put handwritten files there.

@@ -2,6 +2,8 @@ import { expect } from "chai";
 import { casesForTestObjects, namedCases, recordCallback } from "./utils/cases";
 
 import { NitroModules } from "nitro-core";
+import { Base } from "nitro-test";
+import { Base as ExternalBase } from "nitro-test-external";
 import { HybridSomeExternalObject } from "./utils/testObjects";
 
 import { debugOnly } from "./utils/helpers";
@@ -13,6 +15,41 @@ const INT64_MAX = 2n ** 63n - 1n;
 const UINT64_MAX = 2n ** 64n - 1n;
 
 export const cases = {
+  ...namedCases("Namespaced HybridObjects", {
+    "same-named exports construct their own native implementations": () => {
+      expect(Base).not.to.equal(ExternalBase);
+      expect(new Base().baseValue).to.equal(10);
+      expect(new ExternalBase().baseValue).to.equal(20);
+    },
+
+    "registry lookups return each package's exported constructor": () => {
+      expect(NitroModules.getHybridClass<typeof Base>("test.Base")).to.equal(
+        Base,
+      );
+      expect(
+        NitroModules.getHybridClass<typeof ExternalBase>("test.external.Base"),
+      ).to.equal(ExternalBase);
+      expect(NitroModules.hasHybridClass("Base")).to.equal(false);
+    },
+
+    "same-named classes have independent prototypes": () => {
+      const local = new Base();
+      const external = new ExternalBase();
+      expect(local).to.be.instanceOf(Base);
+      expect(local).not.to.be.instanceOf(ExternalBase);
+      expect(external).to.be.instanceOf(ExternalBase);
+      expect(external).not.to.be.instanceOf(Base);
+    },
+
+    "constructor names and object descriptions stay unqualified": () => {
+      expect(Base.name).to.equal("Base");
+      expect(ExternalBase.name).to.equal("Base");
+      for (const object of [new Base(), new ExternalBase()]) {
+        expect(object.constructor.name).to.equal("Base");
+        expect(object.toString()).to.equal("[HybridObject Base]");
+      }
+    },
+  }),
   ...namedCases("SomeExternalObject optional primitives", {
     "createOptionalPrimitivesHolder(5) only sets optionalNumber": () => {
       expect(

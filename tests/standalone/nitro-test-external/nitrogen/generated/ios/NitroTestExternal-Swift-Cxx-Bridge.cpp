@@ -5,9 +5,20 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 #include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
-#include "HybridSomeExternalObjectSpecSwift.hpp"
+#include "NitroTestExternal/HybridBaseSpecSwift.hpp"
+#include "NitroTestExternal/HybridSomeExternalObjectSpecSwift.hpp"
 
 namespace margelo::nitro::test::external::swift_bridge {
+  std__shared_ptr_HybridBaseSpec_ create_std__shared_ptr_HybridBaseSpec_(void* NON_NULL pointer) {
+    return std::make_shared<margelo::nitro::test::external::HybridBaseSpecSwift>(NitroTestExternal::HybridBaseSpec_cxx::fromUnsafe(pointer));
+  }
+
+  void* NON_NULL get_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value) {
+    auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::external::HybridBaseSpecSwift>(value);
+    if (!wrapper) throw std::runtime_error("HybridBaseSpec is not implemented in Swift");
+    return wrapper->getSwiftPart().toUnsafe();
+  }
+
   std__shared_ptr_HybridSomeExternalObjectSpec_ create_std__shared_ptr_HybridSomeExternalObjectSpec_(void* NON_NULL pointer) {
     return std::make_shared<margelo::nitro::test::external::HybridSomeExternalObjectSpecSwift>(NitroTestExternal::HybridSomeExternalObjectSpec_cxx::fromUnsafe(pointer));
   }

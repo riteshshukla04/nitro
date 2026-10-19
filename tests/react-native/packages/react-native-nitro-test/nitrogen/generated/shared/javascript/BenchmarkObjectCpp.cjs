@@ -13,7 +13,7 @@ let hybridClass
 module.exports = {
   get BenchmarkObjectCpp() {
     if (hybridClass === undefined) {
-      hybridClass = NitroModules.getHybridClass('BenchmarkObjectCpp')
+      hybridClass = NitroModules.getHybridClass('test.BenchmarkObjectCpp')
     }
     Object.defineProperty(module.exports, 'BenchmarkObjectCpp', {
       value: hybridClass,

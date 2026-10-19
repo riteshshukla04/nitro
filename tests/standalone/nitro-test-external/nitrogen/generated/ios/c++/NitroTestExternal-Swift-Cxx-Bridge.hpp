@@ -6,6 +6,9 @@
 ///
 #pragma once
 
+// Forward declaration of `HybridBaseSpec_cxx` to properly resolve imports.
+namespace NitroTestExternal { class HybridBaseSpec_cxx; }
+#include <NitroModules/Result.hpp>
 namespace swift { class String; }
 #ifndef SWIFT_SWIFT_H
 namespace swift { template <class T> class Optional; }
@@ -14,20 +17,26 @@ namespace swift { template <class T> class Optional; }
 namespace NitroTestExternal { class OptionalPrimitivesHolder; }
 // Forward declaration of `HybridSomeExternalObjectSpec_cxx` to properly resolve imports.
 namespace NitroTestExternal { class HybridSomeExternalObjectSpec_cxx; }
-#include <NitroModules/Result.hpp>
 #include <memory>
+// Forward declaration of `HybridBaseSpec` to properly resolve imports.
+namespace margelo::nitro::test::external { class HybridBaseSpec; }
+#include <NitroModules/NitroDefines.hpp>
 // Forward declaration of `HybridSomeExternalObjectSpec` to properly resolve imports.
 namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpec; }
-#include <NitroModules/NitroDefines.hpp>
 
 namespace margelo::nitro::test::external::swift_bridge {
+  using std__shared_ptr_HybridBaseSpec_ = std::shared_ptr<HybridBaseSpec>;
+  using std__weak_ptr_HybridBaseSpec_ = std::weak_ptr<HybridBaseSpec>;
+  inline std__weak_ptr_HybridBaseSpec_ weakify_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value) { return value; }
+  std__shared_ptr_HybridBaseSpec_ create_std__shared_ptr_HybridBaseSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value);
+  // Distinct specializations prevent duplicate Swift metadata across module headers.
+  struct ResultTag {};
+  using Result_void_ = Result<void*, margelo::nitro::test::external::swift_bridge::ResultTag>;
   using std__shared_ptr_HybridSomeExternalObjectSpec_ = std::shared_ptr<HybridSomeExternalObjectSpec>;
   using std__weak_ptr_HybridSomeExternalObjectSpec_ = std::weak_ptr<HybridSomeExternalObjectSpec>;
   inline std__weak_ptr_HybridSomeExternalObjectSpec_ weakify_std__shared_ptr_HybridSomeExternalObjectSpec_(const std__shared_ptr_HybridSomeExternalObjectSpec_& value) { return value; }
   std__shared_ptr_HybridSomeExternalObjectSpec_ create_std__shared_ptr_HybridSomeExternalObjectSpec_(void* NON_NULL pointer);
   void* NON_NULL get_std__shared_ptr_HybridSomeExternalObjectSpec_(const std__shared_ptr_HybridSomeExternalObjectSpec_& value);
-  // Distinct specializations prevent duplicate Swift metadata across module headers.
-  struct ResultTag {};
   using Result_void = Result<void, margelo::nitro::test::external::swift_bridge::ResultTag>;
-  using Result_void_ = Result<void*, margelo::nitro::test::external::swift_bridge::ResultTag>;
 } // namespace margelo::nitro::test::external::swift_bridge

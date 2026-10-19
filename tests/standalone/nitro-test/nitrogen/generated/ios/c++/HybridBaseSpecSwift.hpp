@@ -7,8 +7,8 @@
 
 #pragma once
 
+#include "NitroTest/HybridBaseSpec.hpp"
 #include <NitroModules/HybridClass.hpp>
-#include "HybridBaseSpec.hpp"
 
 
 // This implementation header is consumed only by C++ translation units.

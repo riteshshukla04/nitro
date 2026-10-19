@@ -8,21 +8,21 @@
 #include "NitroTestAutolinking.hpp"
 #include <NitroModules/HybridClassRegistry.hpp>
 
-#include "HybridBaseSpecSwift.hpp"
-#include "HybridChildSpecSwift.hpp"
-#include "HybridPlatformObjectSpecSwift.hpp"
-#include "HybridTestObjectCppSpec.hpp"
-#include "HybridTestObjectSwiftKotlinSpecSwift.hpp"
+#include "NitroTest/HybridBaseSpecSwift.hpp"
+#include "NitroTest/HybridChildSpecSwift.hpp"
+#include "NitroTest/HybridPlatformObjectSpecSwift.hpp"
+#include "NitroTest/HybridTestObjectCppSpec.hpp"
+#include "NitroTest/HybridTestObjectSwiftKotlinSpecSwift.hpp"
 
 namespace margelo::nitro::test {
   void registerHybridClasses() {
     using namespace margelo::nitro;
     using namespace margelo::nitro::test;
 
-    HybridClassRegistry::registerHybridClass(HybridBaseSpecSwift::Class::get());
-    HybridClassRegistry::registerHybridClass(HybridChildSpecSwift::Class::get());
-    HybridClassRegistry::registerHybridClass(HybridPlatformObjectSpecSwift::Class::get());
-    HybridClassRegistry::registerHybridClass(HybridTestObjectCppSpec::Class::get());
-    HybridClassRegistry::registerHybridClass(HybridTestObjectSwiftKotlinSpecSwift::Class::get());
+    HybridClassRegistry::registerHybridClass("test.Base", HybridBaseSpecSwift::Class::get());
+    HybridClassRegistry::registerHybridClass("test.Child", HybridChildSpecSwift::Class::get());
+    HybridClassRegistry::registerHybridClass("test.PlatformObject", HybridPlatformObjectSpecSwift::Class::get());
+    HybridClassRegistry::registerHybridClass("test.TestObjectCpp", HybridTestObjectCppSpec::Class::get());
+    HybridClassRegistry::registerHybridClass("test.TestObjectSwiftKotlin", HybridTestObjectSwiftKotlinSpecSwift::Class::get());
   }
 } // namespace margelo::nitro::test

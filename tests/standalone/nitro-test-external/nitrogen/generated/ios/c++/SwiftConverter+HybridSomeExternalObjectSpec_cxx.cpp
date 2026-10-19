@@ -8,7 +8,7 @@
 #include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
 #include "SwiftConverter+HybridSomeExternalObjectSpec_cxx.hpp"
 #include <memory>
-#include "HybridSomeExternalObjectSpec.hpp"
+#include "NitroTestExternal/HybridSomeExternalObjectSpec.hpp"
 
 namespace margelo::nitro {
 

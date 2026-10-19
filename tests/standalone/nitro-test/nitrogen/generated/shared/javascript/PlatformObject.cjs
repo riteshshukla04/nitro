@@ -13,7 +13,7 @@ let hybridClass
 module.exports = {
   get PlatformObject() {
     if (hybridClass === undefined) {
-      hybridClass = NitroModules.getHybridClass('PlatformObject')
+      hybridClass = NitroModules.getHybridClass('test.PlatformObject')
     }
     Object.defineProperty(module.exports, 'PlatformObject', {
       value: hybridClass,

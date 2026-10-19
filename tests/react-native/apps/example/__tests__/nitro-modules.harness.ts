@@ -14,7 +14,7 @@ describe('nitro-core integration', () => {
     expect(CoreHybridObject).toBe(HybridObject)
     expect(
       CoreNitroModules.getHybridClass<typeof BenchmarkObjectCpp>(
-        'BenchmarkObjectCpp'
+        'test.BenchmarkObjectCpp'
       )
     ).toBe(BenchmarkObjectCpp)
   })
@@ -28,10 +28,10 @@ describe('NitroModules', () => {
   it('getAllHybridClassNames() includes every autolinked HybridObject class', () => {
     expect(NitroModules.getAllHybridClassNames()).toEqual(
       expect.arrayContaining([
-        'BenchmarkObjectCpp',
-        'BenchmarkObjectSwiftKotlin',
-        'TestView',
-        'RecyclableTestView',
+        'test.BenchmarkObjectCpp',
+        'test.BenchmarkObjectSwiftKotlin',
+        'test.TestView',
+        'test.RecyclableTestView',
       ])
     )
   })

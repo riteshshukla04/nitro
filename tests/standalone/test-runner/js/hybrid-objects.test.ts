@@ -196,9 +196,9 @@ export const cases = {
       ).to.equal(true);
     },
 
-    "name is a registered HybridObject name": (testObject) => {
+    "namespace and name identify a registered HybridObject": (testObject) => {
       expect(NitroModules.getAllHybridClassNames()).to.include(
-        testObject.constructor.name,
+        `test.${testObject.constructor.name}`,
       );
     },
 

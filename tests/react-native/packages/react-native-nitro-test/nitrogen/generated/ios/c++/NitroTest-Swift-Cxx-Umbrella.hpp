@@ -47,7 +47,7 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/Promise.hpp>
 #include <memory>
-#include "HybridBenchmarkObjectSwiftKotlinSpec.hpp"
+#include "NitroTest/HybridBenchmarkObjectSwiftKotlinSpec.hpp"
 #include "JSIConverter+HybridBenchmarkObjectSwiftKotlinSpec_cxx.hpp"
 #include "SwiftConverter+HybridBenchmarkObjectSwiftKotlinSpec_cxx.hpp"
 #include <NitroModules/Result.hpp>

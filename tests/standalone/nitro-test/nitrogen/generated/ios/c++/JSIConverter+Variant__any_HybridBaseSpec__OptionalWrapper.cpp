@@ -8,7 +8,7 @@
 #include "JSIConverter+Variant__any_HybridBaseSpec__OptionalWrapper.hpp"
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 #include <memory>
-#include "HybridBaseSpec.hpp"
+#include "NitroTest/HybridBaseSpec.hpp"
 #include "OptionalWrapper.hpp"
 #include <variant>
 #include "SwiftConverter+Variant__any_HybridBaseSpec__OptionalWrapper.hpp"

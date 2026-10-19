@@ -13,7 +13,7 @@ let hybridClass
 module.exports = {
   get TestObjectSwiftKotlin() {
     if (hybridClass === undefined) {
-      hybridClass = NitroModules.getHybridClass('TestObjectSwiftKotlin')
+      hybridClass = NitroModules.getHybridClass('test.TestObjectSwiftKotlin')
     }
     Object.defineProperty(module.exports, 'TestObjectSwiftKotlin', {
       value: hybridClass,

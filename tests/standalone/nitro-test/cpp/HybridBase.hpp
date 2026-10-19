@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "HybridBaseSpec.hpp"
+#include <NitroTest/HybridBaseSpec.hpp>
 
 namespace margelo::nitro::test {
 

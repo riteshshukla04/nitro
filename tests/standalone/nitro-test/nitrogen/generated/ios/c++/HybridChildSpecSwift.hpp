@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include "NitroTest/HybridChildSpec.hpp"
 #include <NitroModules/HybridClass.hpp>
-#include "HybridChildSpec.hpp"
-#include "HybridBaseSpecSwift.hpp"
+#include "NitroTest/HybridBaseSpecSwift.hpp"
 
 // This implementation header is consumed only by C++ translation units.
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"

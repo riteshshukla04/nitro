@@ -12,7 +12,7 @@
 #include <string>
 #include "Car.hpp"
 #include <variant>
-#include "HybridBaseSpec.hpp"
+#include "NitroTest/HybridBaseSpec.hpp"
 
 namespace margelo::nitro::test {
 

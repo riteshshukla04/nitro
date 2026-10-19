@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridBenchmarkObjectCppSpec.hpp"
+#include "NitroTest/HybridBenchmarkObjectCppSpec.hpp"
 #include <memory>
 #include <string>
 #include <vector>

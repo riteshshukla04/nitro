@@ -19,8 +19,8 @@ class HybridClassRegistry {
 public:
   HybridClassRegistry() = delete;
 
-  /** Register the same descriptor returned by instances of this type. */
-  static void registerHybridClass(const std::shared_ptr<const HybridClass>& hybridClass);
+  /** Register the descriptor under a namespaced lookup key, preserving its JavaScript class name. */
+  static void registerHybridClass(const std::string& name, const std::shared_ptr<const HybridClass>& hybridClass);
 
   /** The built-in HybridObject and NitroModulesProxy types have no public constructors. */
   static jsi::Function getHybridClass(jsi::Runtime& runtime, const std::string& name);

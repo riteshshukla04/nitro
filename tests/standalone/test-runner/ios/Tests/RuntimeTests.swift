@@ -119,7 +119,8 @@ struct RuntimeTests {
   @Test func swiftTasksCanCompleteDuringNativeRun() async throws {
     let source = """
       globalThis.runNitroTest = async () => {
-        const object = NitroModulesProxy.createHybridObject('TestObjectSwiftKotlin');
+        const TestObject = NitroModulesProxy.getHybridClass('test.TestObjectSwiftKotlin');
+        const object = new TestObject();
         const value = await object.calculateFibonacciAsync(10);
         if (value !== 55n) throw new Error('Unexpected Fibonacci result');
       };
