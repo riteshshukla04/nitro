@@ -32,44 +32,15 @@ template <typename Signature>
 class Callback;
 
 /**
- * Drains the Runtime's microtask queue when it goes out of scope.
- *
- * This also runs while unwinding from a throwing JS call, so errors thrown by
- * microtasks are reported to the `GlobalErrorHandler` instead of propagated.
- */
-struct MicrotaskScope {
-  MicrotaskScope(jsi::Runtime& runtime): _runtime(runtime) { }
-  MicrotaskScope(const MicrotaskScope&) = delete;
-  MicrotaskScope(MicrotaskScope&&) = delete;
-  ~MicrotaskScope() noexcept {
-    // Hermes stops draining at the first throwing microtask, so drain again for the remaining ones.
-    // The bound guards against microtasks that keep enqueueing throwing microtasks, like React Native does.
-    constexpr int maxDrainAttempts = 255;
-    for (int attempt = 0; attempt < maxDrainAttempts; attempt++) {
-      try {
-        if (_runtime.drainMicrotasks()) {
-          return;
-        }
-      } catch (...) {
-        GlobalErrorHandler::reportError(ErrorSource::Microtask, std::current_exception());
-      }
-    }
-    // The remaining microtasks stay queued until the next drain.
-    std::string message = "Stopped draining microtasks after " + std::to_string(maxDrainAttempts) + " attempts!";
-    GlobalErrorHandler::reportError(ErrorSource::Microtask, std::make_exception_ptr(std::runtime_error(message)));
-  }
-private:
-  jsi::Runtime& _runtime;
-};
-
-/**
  * A Callback to either JS (`jsi::Function`) or native (`std::function`).
  *
  * Unlike `InlineCallback`, `Callback` is escapable, meaning it can be called
  * "later", e.g. stored as a class member and invoked at a later point in time.
  *
  * `Callback` can be invoked sync (which has to be called on the JS Runtime
- * context/Thread) or async (which returns a `Promise<T>` and uses the `Dispatcher`)
+ * context/Thread) or async (which returns a `Promise<T>` and uses the `Dispatcher`).
+ * Synchronous JS calls invoke the Dispatcher's JS entry hooks. The runtime host
+ * controls microtask checkpoints through those hooks and its dispatched tasks.
  */
 template <typename R, typename... Args>
 class Callback<R(Args...)> final {
@@ -175,13 +146,14 @@ private:
       assert(dispatcher->isOnDispatcher() && "callSync(...) must be called on the JS Runtime's context/Thread!");
       assertFunctionNotNull(_function);
 
-      MicrotaskScope scope(_runtime);
-      if constexpr (std::is_void_v<R>) {
-        _function->call(_runtime, JSIConverter<std::decay_t<Args>>::toJSI(_runtime, std::forward<Args>(args))...);
-      } else {
-        jsi::Value result = _function->call(_runtime, JSIConverter<std::decay_t<Args>>::toJSI(_runtime, std::forward<Args>(args))...);
-        return JSIConverter<R>::fromJSI(_runtime, result);
-      }
+      return dispatcher->withJSEntry(_runtime, [&]() -> R {
+        if constexpr (std::is_void_v<R>) {
+          _function->call(_runtime, JSIConverter<std::decay_t<Args>>::toJSI(_runtime, std::forward<Args>(args))...);
+        } else {
+          jsi::Value result = _function->call(_runtime, JSIConverter<std::decay_t<Args>>::toJSI(_runtime, std::forward<Args>(args))...);
+          return JSIConverter<R>::fromJSI(_runtime, result);
+        }
+      });
     }
     Promise<R> callAsync(Args&&... args) const {
       std::shared_ptr<Dispatcher> dispatcher = _dispatcher.lock();
@@ -193,7 +165,6 @@ private:
       return dispatcher->runAsyncAwaitable([&runtime, function = _function, ...args = std::move(args)]() mutable -> R {
         assertFunctionNotNull(function);
 
-        MicrotaskScope scope(runtime);
         if constexpr (std::is_void_v<R>) {
           function->call(runtime, JSIConverter<std::decay_t<Args>>::toJSI(runtime, std::forward<Args>(args))...);
         } else {
@@ -216,7 +187,6 @@ private:
         try {
           assertFunctionNotNull(function);
 
-          MicrotaskScope scope(runtime);
           function->call(runtime, JSIConverter<std::decay_t<Args>>::toJSI(runtime, std::forward<Args>(args))...);
         } catch (...) {
           GlobalErrorHandler::reportError(ErrorSource::JSCallback, std::current_exception());

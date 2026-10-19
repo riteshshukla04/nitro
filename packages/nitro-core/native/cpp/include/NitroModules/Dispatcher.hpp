@@ -51,6 +51,31 @@ public:
   virtual bool isOnDispatcher() = 0;
 
   /**
+   * Host hooks for synchronous entries into JS on this Dispatcher's context.
+   * Hosts that already manage JS execution, such as React Native, can leave
+   * these as no-ops. Standalone hosts can track nesting and checkpoint on exit.
+   * A successful enterJS must be paired with leaveJS, including on exceptions.
+   */
+  virtual void enterJS(jsi::Runtime&) {}
+  virtual void leaveJS(jsi::Runtime&) noexcept {}
+
+  /**
+   * Invoke inline within a host JS entry, including argument/result conversion.
+   * This does not dispatch or change threads. Hosts should also use this scope
+   * around evaluation and complete dispatched tasks, including Promise settlement.
+   */
+  template <typename Func>
+  decltype(auto) withJSEntry(jsi::Runtime& runtime, Func&& function) {
+    enterJS(runtime);
+    struct Entry {
+      Dispatcher& dispatcher;
+      jsi::Runtime& runtime;
+      ~Entry() { dispatcher.leaveJS(runtime); }
+    } entry{*this, runtime};
+    return std::invoke(std::forward<Func>(function));
+  }
+
+  /**
    * Run the given function asynchronously on the Thread this Dispatcher is managing,
    * and return a `Promise<T>`, with `T` inferred from the callable's return type.
    * The callable is copied or moved into the queued task and must be copy-constructible.
