@@ -15,12 +15,6 @@ module.exports = {
     if (hybridClass === undefined) {
       hybridClass = NitroModules.getHybridClass('test.Child')
     }
-    Object.defineProperty(module.exports, 'Child', {
-      value: hybridClass,
-      enumerable: true,
-      writable: false,
-      configurable: true,
-    })
     return hybridClass
   },
 }

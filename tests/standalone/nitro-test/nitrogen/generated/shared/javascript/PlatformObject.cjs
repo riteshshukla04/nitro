@@ -15,12 +15,6 @@ module.exports = {
     if (hybridClass === undefined) {
       hybridClass = NitroModules.getHybridClass('test.PlatformObject')
     }
-    Object.defineProperty(module.exports, 'PlatformObject', {
-      value: hybridClass,
-      enumerable: true,
-      writable: false,
-      configurable: true,
-    })
     return hybridClass
   },
 }

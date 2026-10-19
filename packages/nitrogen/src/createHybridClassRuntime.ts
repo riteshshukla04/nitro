@@ -48,12 +48,6 @@ get ${name}() {
   if (${cacheName} === undefined) {
     ${indent(initializationCode.join('\n'), '    ')}
   }
-  Object.defineProperty(module.exports, '${name}', {
-    value: ${cacheName},
-    enumerable: true,
-    writable: false,
-    configurable: true,
-  })
   return ${cacheName}
 },
 `.trim()
@@ -178,8 +172,6 @@ function createHybridClassRuntime({
 export {}
 `.trim()
     }
-    // The getters replace themselves with read-only data properties. They stay
-    // configurable so test tools can replace the class or component.
     const jsCode = `
 ${createFileMetadataString(jsFileName)}
 

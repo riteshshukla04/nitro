@@ -15,12 +15,6 @@ module.exports = {
     if (hybridClass === undefined) {
       hybridClass = NitroModules.getHybridClass('test.TestObjectSwiftKotlin')
     }
-    Object.defineProperty(module.exports, 'TestObjectSwiftKotlin', {
-      value: hybridClass,
-      enumerable: true,
-      writable: false,
-      configurable: true,
-    })
     return hybridClass
   },
 }

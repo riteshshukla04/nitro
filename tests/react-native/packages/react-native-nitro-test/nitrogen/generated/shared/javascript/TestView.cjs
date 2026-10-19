@@ -16,12 +16,6 @@ module.exports = {
     if (hybridClass === undefined) {
       hybridClass = NitroModules.getHybridClass('test.TestView')
     }
-    Object.defineProperty(module.exports, 'TestView', {
-      value: hybridClass,
-      enumerable: true,
-      writable: false,
-      configurable: true,
-    })
     return hybridClass
   },
   get TestViewComponent() {
@@ -37,12 +31,6 @@ module.exports = {
         "hybridRef": NitroViewProp,
       })
     }
-    Object.defineProperty(module.exports, 'TestViewComponent', {
-      value: hybridComponent,
-      enumerable: true,
-      writable: false,
-      configurable: true,
-    })
     return hybridComponent
   },
 }

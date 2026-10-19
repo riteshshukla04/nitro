@@ -16,12 +16,6 @@ module.exports = {
     if (hybridClass === undefined) {
       hybridClass = NitroModules.getHybridClass('test.RecyclableTestView')
     }
-    Object.defineProperty(module.exports, 'RecyclableTestView', {
-      value: hybridClass,
-      enumerable: true,
-      writable: false,
-      configurable: true,
-    })
     return hybridClass
   },
   get RecyclableTestViewComponent() {
@@ -33,12 +27,6 @@ module.exports = {
         "hybridRef": NitroViewProp,
       })
     }
-    Object.defineProperty(module.exports, 'RecyclableTestViewComponent', {
-      value: hybridComponent,
-      enumerable: true,
-      writable: false,
-      configurable: true,
-    })
     return hybridComponent
   },
 }
