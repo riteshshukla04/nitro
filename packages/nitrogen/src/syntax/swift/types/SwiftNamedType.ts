@@ -26,6 +26,9 @@ export class SwiftNamedType
   get isReferenceType(): boolean {
     return this.type.isReferenceType
   }
+  get requiresSwiftGenericContext(): boolean {
+    return this.type.requiresSwiftGenericContext
+  }
   get containsSwiftGenerics(): boolean {
     return this.type.containsSwiftGenerics
   }

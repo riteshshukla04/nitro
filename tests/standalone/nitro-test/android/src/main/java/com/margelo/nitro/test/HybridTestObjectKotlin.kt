@@ -126,6 +126,37 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     callback(array)
   }
 
+  override fun callEnumArrayCallback(
+    array: Array<Powertrain>, callback: (Array<Powertrain>) -> Array<Powertrain>,
+  ): Array<Powertrain> {
+    return callback(array)
+  }
+
+  override fun getEnumArrayCallback(): (Array<Powertrain>) -> Array<Powertrain> {
+    return { array -> array }
+  }
+
+  override fun callEnumArrayPromiseCallback(
+    callback: () -> Promise<Promise<Array<Powertrain>>>,
+  ): Promise<Array<Powertrain>> {
+    return Promise.async {
+      val promise = callback().await()
+      return@async promise.await()
+    }
+  }
+
+  override fun awaitEnumArrayPromise(promise: Promise<Array<Powertrain>>): Promise<Array<Powertrain>> {
+    return Promise.async {
+      return@async promise.await()
+    }
+  }
+
+  override fun callNestedStructCallback(
+    value: Array<Array<Person?>>, callback: (Array<Array<Person?>>) -> Array<Array<Person?>>,
+  ): Array<Array<Person?>> {
+    return callback(value)
+  }
+
   override fun bounceHybridObjects(array: Array<HybridChildSpec>): Array<HybridChildSpec> {
     return array
   }

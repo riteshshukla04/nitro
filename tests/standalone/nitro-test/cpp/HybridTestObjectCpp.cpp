@@ -287,6 +287,31 @@ void HybridTestObjectCpp::complexEnumCallback(const std::vector<Powertrain>& arr
   callback(array);
 }
 
+std::vector<Powertrain> HybridTestObjectCpp::callEnumArrayCallback(const std::vector<Powertrain>& array, const Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)>& callback) {
+  return callback.callSync(array);
+}
+
+Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)> HybridTestObjectCpp::getEnumArrayCallback() {
+  return Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)>::make([](const std::vector<Powertrain>& array) { return array; });
+}
+
+Promise<std::vector<Powertrain>> HybridTestObjectCpp::callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) {
+  return Promise<std::vector<Powertrain>>::async([=]() {
+    Promise<std::vector<Powertrain>> promise = callback().await().get();
+    return promise.await().get();
+  });
+}
+
+Promise<std::vector<Powertrain>> HybridTestObjectCpp::awaitEnumArrayPromise(const Promise<std::vector<Powertrain>>& promise) {
+  return Promise<std::vector<Powertrain>>::async([=]() {
+    return promise.await().get();
+  });
+}
+
+std::vector<std::vector<std::optional<Person>>> HybridTestObjectCpp::callNestedStructCallback(const std::vector<std::vector<std::optional<Person>>>& value, const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>&)>& callback) {
+  return callback.callSync(value);
+}
+
 std::vector<std::shared_ptr<HybridChildSpec>> HybridTestObjectCpp::bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) {
   return array;
 }

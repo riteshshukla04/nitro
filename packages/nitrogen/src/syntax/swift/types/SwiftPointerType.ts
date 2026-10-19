@@ -17,6 +17,7 @@ export abstract class SwiftPointerType implements SwiftType {
   readonly isSendable = false
   readonly canImportFromCpp = true
   readonly isReferenceType = false
+  readonly requiresSwiftGenericContext = false
   readonly containsSwiftGenerics = false
   readonly needsSwiftConversion = true
   readonly requiresExplicitSwiftTarget = false

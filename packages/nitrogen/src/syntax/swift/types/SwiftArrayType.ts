@@ -7,12 +7,13 @@ import { getSwiftGenericImport } from '../getSwiftGenericImport.js'
 import { wrapSwiftType } from '../wrapSwiftType.js'
 import { getClangImporterReferenceName } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
+import { SwiftContainerType } from './SwiftContainerType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
 
 export class SwiftArrayType extends ArrayType implements SwiftType {
   override readonly itemType: SwiftType
 
-  constructor(type: ArrayType) {
+  constructor(readonly type: ArrayType) {
     const itemType = wrapSwiftType(type.itemType)
     super(itemType)
     this.itemType = itemType
@@ -33,6 +34,16 @@ export class SwiftArrayType extends ArrayType implements SwiftType {
   get isReferenceType(): boolean {
     return false
   }
+  get requiresSwiftGenericContext(): boolean {
+    return this.itemType.requiresSwiftGenericContext
+  }
+
+  /** Keep the entire native container together, including nested containers. */
+  getBridgeType(): SwiftType {
+    if (!this.requiresSwiftGenericContext) return this
+    return new SwiftContainerType(this)
+  }
+
   get containsSwiftGenerics(): boolean {
     return true
   }

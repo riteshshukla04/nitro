@@ -70,3 +70,15 @@ export function wrapSwiftType(type: Type): SwiftType {
       throw new Error(`Swift interop for ${type.kind} is not yet implemented`)
   }
 }
+
+/** Types named by callback/promise aliases before the local generated Swift header. */
+export function wrapSwiftTypeForBridge(type: Type): SwiftType {
+  const swiftType = wrapSwiftType(type)
+  if (
+    swiftType instanceof SwiftArrayType ||
+    swiftType instanceof SwiftOptionalType
+  ) {
+    return swiftType.getBridgeType()
+  }
+  return swiftType
+}

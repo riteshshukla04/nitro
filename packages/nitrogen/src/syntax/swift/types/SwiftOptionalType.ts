@@ -7,12 +7,13 @@ import { getSwiftGenericImport } from '../getSwiftGenericImport.js'
 import { wrapSwiftType } from '../wrapSwiftType.js'
 import { getClangImporterReferenceName } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
+import { SwiftContainerType } from './SwiftContainerType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
 
 export class SwiftOptionalType extends OptionalType implements SwiftType {
   override readonly wrappingType: SwiftType
 
-  constructor(type: OptionalType) {
+  constructor(readonly type: OptionalType) {
     const wrappingType = wrapSwiftType(type.wrappingType)
     super(wrappingType)
     this.wrappingType = wrappingType
@@ -33,6 +34,16 @@ export class SwiftOptionalType extends OptionalType implements SwiftType {
   get isReferenceType(): boolean {
     return false
   }
+  get requiresSwiftGenericContext(): boolean {
+    return this.wrappingType.requiresSwiftGenericContext
+  }
+
+  /** Keep the entire native container together, including nested containers. */
+  getBridgeType(): SwiftType {
+    if (!this.requiresSwiftGenericContext) return this
+    return new SwiftContainerType(this)
+  }
+
   get containsSwiftGenerics(): boolean {
     return true
   }

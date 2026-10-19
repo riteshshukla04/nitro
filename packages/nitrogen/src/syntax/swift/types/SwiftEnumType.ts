@@ -36,6 +36,7 @@ export class SwiftEnumType extends EnumType implements SwiftType {
   get isReferenceType(): boolean {
     return false
   }
+  readonly requiresSwiftGenericContext = true
   get containsSwiftGenerics(): boolean {
     return false
   }

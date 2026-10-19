@@ -20,9 +20,9 @@
 #include <NitroTest/Person.hpp>
 #include <NitroTest/PartialPerson.hpp>
 #include <NitroTest/Car.hpp>
+#include <NitroModules/Promise.hpp>
 #include <NitroTest/HybridChildSpec.hpp>
 #include <NitroModules/AnyJSON.hpp>
-#include <NitroModules/Promise.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <unordered_map>
 #include <NitroTest/MapWrapper.hpp>
@@ -102,6 +102,11 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("sumUpAllPassengers", &HybridTestObjectSwiftKotlinSpec::sumUpAllPassengers);
       clazz.registerHybridMethod("bounceEnums", &HybridTestObjectSwiftKotlinSpec::bounceEnums);
       clazz.registerHybridMethod("complexEnumCallback", &HybridTestObjectSwiftKotlinSpec::complexEnumCallback);
+      clazz.registerHybridMethod("callEnumArrayCallback", &HybridTestObjectSwiftKotlinSpec::callEnumArrayCallback);
+      clazz.registerHybridMethod("getEnumArrayCallback", &HybridTestObjectSwiftKotlinSpec::getEnumArrayCallback);
+      clazz.registerHybridMethod("callEnumArrayPromiseCallback", &HybridTestObjectSwiftKotlinSpec::callEnumArrayPromiseCallback);
+      clazz.registerHybridMethod("awaitEnumArrayPromise", &HybridTestObjectSwiftKotlinSpec::awaitEnumArrayPromise);
+      clazz.registerHybridMethod("callNestedStructCallback", &HybridTestObjectSwiftKotlinSpec::callNestedStructCallback);
       clazz.registerHybridMethod("bounceHybridObjects", &HybridTestObjectSwiftKotlinSpec::bounceHybridObjects);
       clazz.registerHybridMethod("bounceFunctions", &HybridTestObjectSwiftKotlinSpec::bounceFunctions);
       clazz.registerHybridMethod("bounceMaps", &HybridTestObjectSwiftKotlinSpec::bounceMaps);

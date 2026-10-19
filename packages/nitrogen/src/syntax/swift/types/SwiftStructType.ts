@@ -53,6 +53,7 @@ export class SwiftStructType extends StructType implements SwiftType {
   get isReferenceType(): boolean {
     return false
   }
+  readonly requiresSwiftGenericContext = true
   get containsSwiftGenerics(): boolean {
     return false
   }

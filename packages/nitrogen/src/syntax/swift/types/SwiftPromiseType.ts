@@ -11,7 +11,7 @@ import {
   getQualifiedSwiftName,
   type ImportedCxxRecord,
 } from '../ImportedCxxRecord.js'
-import { wrapSwiftType } from '../wrapSwiftType.js'
+import { wrapSwiftTypeForBridge } from '../wrapSwiftType.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
 import { SwiftBorrowedPointerType } from './SwiftBorrowedPointerType.js'
@@ -21,7 +21,7 @@ export class SwiftPromiseType extends PromiseType implements SwiftType {
   override readonly resultingType: SwiftType
 
   constructor(readonly type: PromiseType) {
-    const resultingType = wrapSwiftType(type.resultingType)
+    const resultingType = wrapSwiftTypeForBridge(type.resultingType)
     super(resultingType)
     this.resultingType = resultingType
   }
@@ -39,6 +39,7 @@ export class SwiftPromiseType extends PromiseType implements SwiftType {
   get isReferenceType(): boolean {
     return false
   }
+  readonly requiresSwiftGenericContext = true
   get containsSwiftGenerics(): boolean {
     return this.resultingType.containsSwiftGenerics
   }

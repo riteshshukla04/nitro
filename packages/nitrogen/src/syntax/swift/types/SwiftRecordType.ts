@@ -66,6 +66,7 @@ export class SwiftRecordType extends RecordType implements SwiftType {
   get isReferenceType(): boolean {
     return false
   }
+  readonly requiresSwiftGenericContext = true
   get containsSwiftGenerics(): boolean {
     return false
   }

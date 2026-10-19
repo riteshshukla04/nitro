@@ -196,6 +196,21 @@ export declare class TestObjectCpp extends HybridObject {
     callback: (array: Powertrain[]) => void,
   ): void;
 
+  // Container callbacks and promises
+  callEnumArrayCallback(
+    array: Powertrain[],
+    callback: (array: Powertrain[]) => Powertrain[],
+  ): Powertrain[];
+  getEnumArrayCallback(): (array: Powertrain[]) => Powertrain[];
+  callEnumArrayPromiseCallback(
+    callback: () => Promise<Powertrain[]>,
+  ): Promise<Powertrain[]>;
+  awaitEnumArrayPromise(promise: Promise<Powertrain[]>): Promise<Powertrain[]>;
+  callNestedStructCallback(
+    value: (Person | undefined)[][],
+    callback: (value: (Person | undefined)[][]) => (Person | undefined)[][],
+  ): (Person | undefined)[][];
+
   // Arrays (complex)
   bounceHybridObjects(array: Child[]): Child[];
   bounceFunctions(functions: (() => void)[]): (() => void)[];
@@ -465,6 +480,21 @@ export declare class TestObjectSwiftKotlin extends HybridObject {
     array: Powertrain[],
     callback: (array: Powertrain[]) => void,
   ): void;
+
+  // Container callbacks and promises
+  callEnumArrayCallback(
+    array: Powertrain[],
+    callback: (array: Powertrain[]) => Powertrain[],
+  ): Powertrain[];
+  getEnumArrayCallback(): (array: Powertrain[]) => Powertrain[];
+  callEnumArrayPromiseCallback(
+    callback: () => Promise<Powertrain[]>,
+  ): Promise<Powertrain[]>;
+  awaitEnumArrayPromise(promise: Promise<Powertrain[]>): Promise<Powertrain[]>;
+  callNestedStructCallback(
+    value: (Person | undefined)[][],
+    callback: (value: (Person | undefined)[][]) => (Person | undefined)[][],
+  ): (Person | undefined)[][];
 
   // Arrays (complex)
   bounceHybridObjects(array: Child[]): Child[];

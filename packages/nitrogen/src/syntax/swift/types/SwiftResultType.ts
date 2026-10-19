@@ -28,6 +28,7 @@ export class SwiftResultType implements SwiftType {
   readonly isSendable = false
   readonly canImportFromCpp = true
   readonly isReferenceType = false
+  readonly requiresSwiftGenericContext = true
   get containsSwiftGenerics(): boolean {
     return this.payload.containsSwiftGenerics
   }

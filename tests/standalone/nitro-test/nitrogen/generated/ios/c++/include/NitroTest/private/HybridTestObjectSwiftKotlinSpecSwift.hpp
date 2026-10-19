@@ -170,7 +170,17 @@ namespace margelo::nitro::test {
     std::vector<Powertrain> bounceEnums(const std::vector<Powertrain>& array) override;
     swift::Array<NitroTest::Powertrain> bounceEnums_Swift(const swift::Array<NitroTest::Powertrain>& array);
     void complexEnumCallback(const std::vector<Powertrain>& array, const Callback<void(const std::vector<Powertrain>& /* array */)>& callback) override;
-    void complexEnumCallback_Swift(const swift::Array<NitroTest::Powertrain>& array, const Callback<void(const swift::Array<NitroTest::Powertrain>&)>& callback);
+    void complexEnumCallback_Swift(const swift::Array<NitroTest::Powertrain>& array, const Callback<void(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)>& callback);
+    std::vector<Powertrain> callEnumArrayCallback(const std::vector<Powertrain>& array, const Callback<std::vector<Powertrain>(const std::vector<Powertrain>& /* array */)>& callback) override;
+    swift::Array<NitroTest::Powertrain> callEnumArrayCallback_Swift(const swift::Array<NitroTest::Powertrain>& array, const Callback<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)>& callback);
+    Callback<std::vector<Powertrain>(const std::vector<Powertrain>& /* array */)> getEnumArrayCallback() override;
+    Callback<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)> getEnumArrayCallback_Swift();
+    Promise<std::vector<Powertrain>> callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) override;
+    Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_> callEnumArrayPromiseCallback_Swift(const Callback<Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>()>& callback);
+    Promise<std::vector<Powertrain>> awaitEnumArrayPromise(const Promise<std::vector<Powertrain>>& promise) override;
+    Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_> awaitEnumArrayPromise_Swift(const Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>& promise);
+    std::vector<std::vector<std::optional<Person>>> callNestedStructCallback(const std::vector<std::vector<std::optional<Person>>>& value, const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>& /* value */)>& callback) override;
+    swift::Array<swift::Array<swift::Optional<NitroTest::Person>>> callNestedStructCallback_Swift(const swift::Array<swift::Array<swift::Optional<NitroTest::Person>>>& value, const Callback<NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___&)>& callback);
     std::vector<std::shared_ptr<HybridChildSpec>> bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) override;
     swift::Array<NitroTest::HybridChildSpec_cxx> bounceHybridObjects_Swift(const swift::Array<NitroTest::HybridChildSpec_cxx>& array);
     std::vector<Callback<void()>> bounceFunctions(const std::vector<Callback<void()>>& functions) override;

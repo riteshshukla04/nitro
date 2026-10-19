@@ -556,14 +556,83 @@ namespace margelo::nitro::test {
   }
 
   void HybridTestObjectSwiftKotlinSpecSwift::complexEnumCallback(const std::vector<Powertrain>& array, const Callback<void(const std::vector<Powertrain>& /* array */)>& callback) {
-    complexEnumCallback_Swift(SwiftConverter<std::vector<margelo::nitro::test::Powertrain>, swift::Array<NitroTest::Powertrain>>::toSwift(array), SwiftConverter<Callback<void(const std::vector<margelo::nitro::test::Powertrain>& /* array */)>, Callback<void(const swift::Array<NitroTest::Powertrain>&)>>::toSwift(callback));
+    complexEnumCallback_Swift(SwiftConverter<std::vector<margelo::nitro::test::Powertrain>, swift::Array<NitroTest::Powertrain>>::toSwift(array), SwiftConverter<Callback<void(const std::vector<margelo::nitro::test::Powertrain>& /* array */)>, Callback<void(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)>>::toSwift(callback));
   }
 
-  void HybridTestObjectSwiftKotlinSpecSwift::complexEnumCallback_Swift(const swift::Array<NitroTest::Powertrain>& array, const Callback<void(const swift::Array<NitroTest::Powertrain>&)>& callback) {
+  void HybridTestObjectSwiftKotlinSpecSwift::complexEnumCallback_Swift(const swift::Array<NitroTest::Powertrain>& array, const Callback<void(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)>& callback) {
     auto __result = _swiftPart.complexEnumCallback(array, callback);
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
     }
+  }
+
+  std::vector<Powertrain> HybridTestObjectSwiftKotlinSpecSwift::callEnumArrayCallback(const std::vector<Powertrain>& array, const Callback<std::vector<Powertrain>(const std::vector<Powertrain>& /* array */)>& callback) {
+    auto __result = callEnumArrayCallback_Swift(SwiftConverter<std::vector<margelo::nitro::test::Powertrain>, swift::Array<NitroTest::Powertrain>>::toSwift(array), SwiftConverter<Callback<std::vector<margelo::nitro::test::Powertrain>(const std::vector<margelo::nitro::test::Powertrain>& /* array */)>, Callback<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)>>::toSwift(callback));
+    return SwiftConverter<std::vector<margelo::nitro::test::Powertrain>, swift::Array<NitroTest::Powertrain>>::fromSwift(__result);
+  }
+
+  swift::Array<NitroTest::Powertrain> HybridTestObjectSwiftKotlinSpecSwift::callEnumArrayCallback_Swift(const swift::Array<NitroTest::Powertrain>& array, const Callback<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)>& callback) {
+    auto __result = withSwiftResult<swift::Array<NitroTest::Powertrain>>([&](void* __outResult) {
+      return _swiftPart.callEnumArrayCallback(array, callback, __outResult);
+    });
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return std::move(__result.value());
+  }
+
+  Callback<std::vector<Powertrain>(const std::vector<Powertrain>& /* array */)> HybridTestObjectSwiftKotlinSpecSwift::getEnumArrayCallback() {
+    auto __result = getEnumArrayCallback_Swift();
+    return SwiftConverter<Callback<std::vector<margelo::nitro::test::Powertrain>(const std::vector<margelo::nitro::test::Powertrain>& /* array */)>, Callback<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)>>::fromSwift(__result);
+  }
+
+  Callback<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)> HybridTestObjectSwiftKotlinSpecSwift::getEnumArrayCallback_Swift() {
+    auto __result = _swiftPart.getEnumArrayCallback();
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return std::move(__result.value());
+  }
+
+  Promise<std::vector<Powertrain>> HybridTestObjectSwiftKotlinSpecSwift::callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) {
+    auto __result = callEnumArrayPromiseCallback_Swift(SwiftConverter<Callback<Promise<std::vector<margelo::nitro::test::Powertrain>>()>, Callback<Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>()>>::toSwift(callback));
+    return SwiftConverter<Promise<std::vector<margelo::nitro::test::Powertrain>>, Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>>::fromSwift(__result);
+  }
+
+  Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_> HybridTestObjectSwiftKotlinSpecSwift::callEnumArrayPromiseCallback_Swift(const Callback<Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>()>& callback) {
+    auto __result = _swiftPart.callEnumArrayPromiseCallback(callback);
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return std::move(__result.value());
+  }
+
+  Promise<std::vector<Powertrain>> HybridTestObjectSwiftKotlinSpecSwift::awaitEnumArrayPromise(const Promise<std::vector<Powertrain>>& promise) {
+    auto __result = awaitEnumArrayPromise_Swift(SwiftConverter<Promise<std::vector<margelo::nitro::test::Powertrain>>, Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>>::toSwift(promise));
+    return SwiftConverter<Promise<std::vector<margelo::nitro::test::Powertrain>>, Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>>::fromSwift(__result);
+  }
+
+  Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_> HybridTestObjectSwiftKotlinSpecSwift::awaitEnumArrayPromise_Swift(const Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>& promise) {
+    auto __result = _swiftPart.awaitEnumArrayPromise(promise);
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return std::move(__result.value());
+  }
+
+  std::vector<std::vector<std::optional<Person>>> HybridTestObjectSwiftKotlinSpecSwift::callNestedStructCallback(const std::vector<std::vector<std::optional<Person>>>& value, const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>& /* value */)>& callback) {
+    auto __result = callNestedStructCallback_Swift(SwiftConverter<std::vector<std::vector<std::optional<margelo::nitro::test::Person>>>, swift::Array<swift::Array<swift::Optional<NitroTest::Person>>>>::toSwift(value), SwiftConverter<Callback<std::vector<std::vector<std::optional<margelo::nitro::test::Person>>>(const std::vector<std::vector<std::optional<margelo::nitro::test::Person>>>& /* value */)>, Callback<NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___&)>>::toSwift(callback));
+    return SwiftConverter<std::vector<std::vector<std::optional<margelo::nitro::test::Person>>>, swift::Array<swift::Array<swift::Optional<NitroTest::Person>>>>::fromSwift(__result);
+  }
+
+  swift::Array<swift::Array<swift::Optional<NitroTest::Person>>> HybridTestObjectSwiftKotlinSpecSwift::callNestedStructCallback_Swift(const swift::Array<swift::Array<swift::Optional<NitroTest::Person>>>& value, const Callback<NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___&)>& callback) {
+    auto __result = withSwiftResult<swift::Array<swift::Array<swift::Optional<NitroTest::Person>>>>([&](void* __outResult) {
+      return _swiftPart.callNestedStructCallback(value, callback, __outResult);
+    });
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return std::move(__result.value());
   }
 
   std::vector<std::shared_ptr<HybridChildSpec>> HybridTestObjectSwiftKotlinSpecSwift::bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) {
@@ -1986,6 +2055,11 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("sumUpAllPassengers", &HybridTestObjectSwiftKotlinSpecSwift::sumUpAllPassengers_Swift);
       clazz.registerHybridMethod("bounceEnums", &HybridTestObjectSwiftKotlinSpecSwift::bounceEnums_Swift);
       clazz.registerHybridMethod("complexEnumCallback", &HybridTestObjectSwiftKotlinSpecSwift::complexEnumCallback_Swift);
+      clazz.registerHybridMethod("callEnumArrayCallback", &HybridTestObjectSwiftKotlinSpecSwift::callEnumArrayCallback_Swift);
+      clazz.registerHybridMethod("getEnumArrayCallback", &HybridTestObjectSwiftKotlinSpecSwift::getEnumArrayCallback_Swift);
+      clazz.registerHybridMethod("callEnumArrayPromiseCallback", &HybridTestObjectSwiftKotlinSpecSwift::callEnumArrayPromiseCallback_Swift);
+      clazz.registerHybridMethod("awaitEnumArrayPromise", &HybridTestObjectSwiftKotlinSpecSwift::awaitEnumArrayPromise_Swift);
+      clazz.registerHybridMethod("callNestedStructCallback", &HybridTestObjectSwiftKotlinSpecSwift::callNestedStructCallback_Swift);
       clazz.registerHybridMethod("bounceHybridObjects", &HybridTestObjectSwiftKotlinSpecSwift::bounceHybridObjects_Swift);
       clazz.registerHybridMethod("bounceFunctions", &HybridTestObjectSwiftKotlinSpecSwift::bounceFunctions_Swift);
       clazz.registerHybridMethod("bounceMaps", &HybridTestObjectSwiftKotlinSpecSwift::bounceMaps_Swift);

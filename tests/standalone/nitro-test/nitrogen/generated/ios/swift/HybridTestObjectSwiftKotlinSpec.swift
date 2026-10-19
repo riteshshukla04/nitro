@@ -49,6 +49,11 @@ public protocol HybridTestObjectSwiftKotlinSpec_protocol: HybridObject {
   func sumUpAllPassengers(cars: [Car]) throws -> String
   func bounceEnums(array: [Powertrain]) throws -> [Powertrain]
   func complexEnumCallback(array: [Powertrain], callback: any Callback<(/* array */ [Powertrain]), Void>) throws -> Void
+  func callEnumArrayCallback(array: [Powertrain], callback: any Callback<(/* array */ [Powertrain]), [Powertrain]>) throws -> [Powertrain]
+  func getEnumArrayCallback() throws -> any Callback<(/* array */ [Powertrain]), [Powertrain]>
+  func callEnumArrayPromiseCallback(callback: any Callback<(), any Promise<[Powertrain]>>) throws -> any Promise<[Powertrain]>
+  func awaitEnumArrayPromise(promise: any Promise<[Powertrain]>) throws -> any Promise<[Powertrain]>
+  func callNestedStructCallback(value: [[Person?]], callback: any Callback<(/* value */ [[Person?]]), [[Person?]]>) throws -> [[Person?]]
   func bounceHybridObjects(array: [(any HybridChildSpec)]) throws -> [(any HybridChildSpec)]
   func bounceFunctions(functions: [any Callback<(), Void>]) throws -> [any Callback<(), Void>]
   func bounceMaps(maps: [AnyJSON]) throws -> [AnyJSON]

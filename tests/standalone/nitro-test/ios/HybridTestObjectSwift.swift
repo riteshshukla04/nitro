@@ -230,6 +230,37 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     callback(array)
   }
 
+  func callEnumArrayCallback(
+    array: [Powertrain], callback: any Callback<[Powertrain], [Powertrain]>
+  ) throws -> [Powertrain] {
+    return try callback.callSync(array)
+  }
+
+  func getEnumArrayCallback() throws -> any Callback<[Powertrain], [Powertrain]> {
+    return .native { array in array }
+  }
+
+  func callEnumArrayPromiseCallback(
+    callback: any Callback<(), any Promise<[Powertrain]>>
+  ) throws -> any Promise<[Powertrain]> {
+    return .async {
+      let promise = try await callback().await()
+      return try await promise.await()
+    }
+  }
+
+  func awaitEnumArrayPromise(promise: any Promise<[Powertrain]>) throws -> any Promise<[Powertrain]> {
+    return .async {
+      return try await promise.await()
+    }
+  }
+
+  func callNestedStructCallback(
+    value: [[Person?]], callback: any Callback<[[Person?]], [[Person?]]>
+  ) throws -> [[Person?]] {
+    return try callback.callSync(value)
+  }
+
   func bounceHybridObjects(array: [(any HybridChildSpec)]) throws -> [(any HybridChildSpec)] {
     return array
   }

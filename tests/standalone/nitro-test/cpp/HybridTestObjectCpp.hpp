@@ -148,6 +148,12 @@ public:
   std::string sumUpAllPassengers(const std::vector<Car>& cars) override;
   std::vector<Powertrain> bounceEnums(const std::vector<Powertrain>& array) override;
   void complexEnumCallback(const std::vector<Powertrain>& array, const Callback<void(const std::vector<Powertrain>& /* array */)>& callback) override;
+  std::vector<Powertrain> callEnumArrayCallback(const std::vector<Powertrain>& array, const Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)>& callback) override;
+  Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)> getEnumArrayCallback() override;
+  Promise<std::vector<Powertrain>> callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) override;
+  Promise<std::vector<Powertrain>> awaitEnumArrayPromise(const Promise<std::vector<Powertrain>>& promise) override;
+  std::vector<std::vector<std::optional<Person>>> callNestedStructCallback(const std::vector<std::vector<std::optional<Person>>>& value, const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>&)>& callback) override;
+
   std::vector<std::shared_ptr<HybridChildSpec>> bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) override;
   std::vector<Callback<void()>> bounceFunctions(const std::vector<Callback<void()>>& functions) override;
   std::vector<AnyJSON> bounceMaps(const std::vector<AnyJSON>& maps) override;

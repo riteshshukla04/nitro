@@ -64,6 +64,8 @@
 #include <NitroTest/private/OldEnum-Swift.hpp>
 #include <NitroTest/private/TruckPowertrain-Swift.hpp>
 #include <NitroTest/private/PartialPerson-Swift.hpp>
+#include <NitroTest/private/SwiftContainer_swift__Array_NitroTest__Powertrain_-Swift.hpp>
+#include <NitroTest/private/SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___-Swift.hpp>
 #include <NitroModules/JSIConverter+SwiftAnyJSON.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <NitroTest/private/Variant_Bool_Double-Swift.hpp>

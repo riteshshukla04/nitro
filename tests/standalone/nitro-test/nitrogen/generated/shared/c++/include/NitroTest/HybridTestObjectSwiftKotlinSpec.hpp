@@ -25,10 +25,10 @@ namespace margelo::nitro::test { class HybridTestObjectSwiftKotlinSpec; }
 #include <NitroTest/Person.hpp>
 #include <NitroTest/PartialPerson.hpp>
 #include <NitroTest/Car.hpp>
+#include <NitroModules/Promise.hpp>
 // Forward declaration of `HybridChildSpec` to properly resolve imports.
 namespace margelo::nitro::test { class HybridChildSpec; }
 #include <NitroModules/AnyJSON.hpp>
-#include <NitroModules/Promise.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <unordered_map>
 #include <NitroTest/MapWrapper.hpp>
@@ -139,6 +139,11 @@ namespace margelo::nitro::test {
       virtual std::string sumUpAllPassengers(const std::vector<Car>& cars) = 0;
       virtual std::vector<Powertrain> bounceEnums(const std::vector<Powertrain>& array) = 0;
       virtual void complexEnumCallback(const std::vector<Powertrain>& array, const Callback<void(const std::vector<Powertrain>& /* array */)>& callback) = 0;
+      virtual std::vector<Powertrain> callEnumArrayCallback(const std::vector<Powertrain>& array, const Callback<std::vector<Powertrain>(const std::vector<Powertrain>& /* array */)>& callback) = 0;
+      virtual Callback<std::vector<Powertrain>(const std::vector<Powertrain>& /* array */)> getEnumArrayCallback() = 0;
+      virtual Promise<std::vector<Powertrain>> callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) = 0;
+      virtual Promise<std::vector<Powertrain>> awaitEnumArrayPromise(const Promise<std::vector<Powertrain>>& promise) = 0;
+      virtual std::vector<std::vector<std::optional<Person>>> callNestedStructCallback(const std::vector<std::vector<std::optional<Person>>>& value, const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>& /* value */)>& callback) = 0;
       virtual std::vector<std::shared_ptr<HybridChildSpec>> bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) = 0;
       virtual std::vector<Callback<void()>> bounceFunctions(const std::vector<Callback<void()>>& functions) = 0;
       virtual std::vector<AnyJSON> bounceMaps(const std::vector<AnyJSON>& maps) = 0;

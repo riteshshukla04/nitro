@@ -30,10 +30,12 @@ export interface SwiftType extends Type {
   /** Whether this Swift value uses the retained class-reference bridge. */
   readonly isReferenceType: boolean
   /**
-   * Whether this representation's C++ type names `swift::Optional` or `swift::Array`, including in nested signatures.
+   * Whether this representation contains `swift::Optional` or `swift::Array`, including in wrappers and nested signatures.
    * Bridge headers only forward-declare them, so C++ that converts such values must be compiled after the generated -Swift.h.
    */
   readonly containsSwiftGenerics: boolean
+  /** Whether generic eligibility requires declarations from this module's -Swift.h. */
+  readonly requiresSwiftGenericContext: boolean
   /** Whether the public Swift API needs conversion to this representation. */
   readonly needsSwiftConversion: boolean
   /**

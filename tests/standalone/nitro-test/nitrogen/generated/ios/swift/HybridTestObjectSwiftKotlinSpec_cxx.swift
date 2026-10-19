@@ -440,9 +440,56 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
-  public final func complexEnumCallback(array: [Powertrain], callback: margelo.nitro.test.swift_bridge.Callback_void_swift__Array_NitroTest__Powertrain_) -> bridge.Result_void {
+  public final func complexEnumCallback(array: [Powertrain], callback: margelo.nitro.test.swift_bridge.Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_) -> bridge.Result_void {
     do {
       try __implementation.complexEnumCallback(array: array, callback: callback)
+      return bridge.Result_void.withValue()
+    } catch {
+      return bridge.Result_void.withError(error.toCpp())
+    }
+  }
+
+  public final func callEnumArrayCallback(array: [Powertrain], callback: margelo.nitro.test.swift_bridge.Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+    do {
+      let value = try __implementation.callEnumArrayCallback(array: array, callback: callback)
+      __outResult.assumingMemoryBound(to: [Powertrain].self).initialize(to: value)
+      return bridge.Result_void.withValue()
+    } catch {
+      return bridge.Result_void.withError(error.toCpp())
+    }
+  }
+
+  public final func getEnumArrayCallback() -> bridge.Result_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__const_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain____ {
+    do {
+      let value = try __implementation.getEnumArrayCallback()
+      return bridge.Result_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__const_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain____.withValue(value.toCpp())
+    } catch {
+      return bridge.Result_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__const_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain____.withError(error.toCpp())
+    }
+  }
+
+  public final func callEnumArrayPromiseCallback(callback: margelo.nitro.test.swift_bridge.Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__) -> bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__ {
+    do {
+      let value = try __implementation.callEnumArrayPromiseCallback(callback: callback)
+      return bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__.withValue(value.toCpp())
+    } catch {
+      return bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__.withError(error.toCpp())
+    }
+  }
+
+  public final func awaitEnumArrayPromise(promise: margelo.nitro.test.swift_bridge.Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_) -> bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__ {
+    do {
+      let value = try __implementation.awaitEnumArrayPromise(promise: promise)
+      return bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__.withValue(value.toCpp())
+    } catch {
+      return bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__.withError(error.toCpp())
+    }
+  }
+
+  public final func callNestedStructCallback(value: [[Person?]], callback: margelo.nitro.test.swift_bridge.Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+    do {
+      let value = try __implementation.callNestedStructCallback(value: value, callback: callback)
+      __outResult.assumingMemoryBound(to: [[Person?]].self).initialize(to: value)
       return bridge.Result_void.withValue()
     } catch {
       return bridge.Result_void.withError(error.toCpp())

@@ -18,6 +18,7 @@ export class SwiftStringType extends StringType implements SwiftType {
   get isReferenceType(): boolean {
     return false
   }
+  readonly requiresSwiftGenericContext = false
   get containsSwiftGenerics(): boolean {
     return false
   }

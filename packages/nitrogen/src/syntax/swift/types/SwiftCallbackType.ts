@@ -19,7 +19,7 @@ import {
   getQualifiedSwiftName,
   type ImportedCxxRecord,
 } from '../ImportedCxxRecord.js'
-import { wrapSwiftType } from '../wrapSwiftType.js'
+import { wrapSwiftTypeForBridge } from '../wrapSwiftType.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
 import { SwiftNamedType } from './SwiftNamedType.js'
@@ -59,7 +59,8 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
     const asyncResult = new SwiftPromiseType(new PromiseType(type.returnType))
     const returnType = asyncResult.resultingType
     const parameters = type.parameters.map(
-      (p, index) => new SwiftNamedType(`param${index}`, wrapSwiftType(p))
+      (p, index) =>
+        new SwiftNamedType(`param${index}`, wrapSwiftTypeForBridge(p))
     )
     super(returnType, parameters, type.isInline)
     this.returnType = returnType
@@ -91,6 +92,7 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
   get isReferenceType(): boolean {
     return false
   }
+  readonly requiresSwiftGenericContext = true
   get containsSwiftGenerics(): boolean {
     return [this.returnType, ...this.parameters].some(
       (type) => type.containsSwiftGenerics

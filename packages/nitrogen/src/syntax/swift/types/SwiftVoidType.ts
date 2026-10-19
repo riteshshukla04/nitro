@@ -12,6 +12,7 @@ export class SwiftVoidType extends VoidType implements SwiftType {
   readonly isSendable = true
   readonly canImportFromCpp = true
   readonly isReferenceType = false
+  readonly requiresSwiftGenericContext = false
   readonly containsSwiftGenerics = false
   readonly needsSwiftConversion = false
   readonly requiresExplicitSwiftTarget = false

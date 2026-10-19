@@ -114,6 +114,7 @@ export class SwiftHybridObjectType
   get isReferenceType(): boolean {
     return true
   }
+  readonly requiresSwiftGenericContext = true
   get containsSwiftGenerics(): boolean {
     return false
   }

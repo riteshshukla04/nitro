@@ -68,6 +68,9 @@ export class SwiftDirectType implements SwiftType {
   get isReferenceType(): boolean {
     return false
   }
+  get requiresSwiftGenericContext(): boolean {
+    return this.importedCxxRecord != null
+  }
   get containsSwiftGenerics(): boolean {
     return false
   }
