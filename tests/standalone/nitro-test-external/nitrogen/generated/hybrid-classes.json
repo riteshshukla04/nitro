@@ -3,6 +3,7 @@
   "classes": {
     "SomeExternalObject": {
       "ios": {
+        "allowMultipleImplementations": true,
         "implementation": {
           "className": "HybridSomeExternalObject"
         },

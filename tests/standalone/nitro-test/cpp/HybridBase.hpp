@@ -15,7 +15,7 @@ using namespace facebook;
 
 class HybridBase : public virtual HybridBaseSpec {
 public:
-  HybridBase() : HybridObject(TAG) {}
+  HybridBase() = default;
 
 public:
   double getBaseValue() override {

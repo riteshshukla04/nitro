@@ -1,4 +1,4 @@
-import { NitroModules } from "react-native-nitro-modules";
+import "react-native-nitro-modules";
 import {
   BenchmarkObjectCpp,
   BenchmarkObjectSwiftKotlin,

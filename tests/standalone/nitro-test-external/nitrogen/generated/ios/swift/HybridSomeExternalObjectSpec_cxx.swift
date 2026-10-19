@@ -24,7 +24,7 @@ public final class HybridSomeExternalObjectSpec_cxx {
   /**
    * Holds the Swift implementation of `HybridSomeExternalObjectSpec`.
    */
-  private let __implementation: HybridSomeExternalObject
+  private let __implementation: any HybridSomeExternalObjectSpec
 
   /**
    * Holds a weak pointer to the C++ class that wraps the Swift class.
@@ -35,9 +35,6 @@ public final class HybridSomeExternalObjectSpec_cxx {
    * Create a new `HybridSomeExternalObjectSpec_cxx` that wraps the given `HybridSomeExternalObjectSpec`.
    */
   public init(_ implementation: any HybridSomeExternalObjectSpec) {
-    guard let implementation = implementation as? HybridSomeExternalObject else {
-      preconditionFailure("SomeExternalObject selects HybridSomeExternalObject as its Swift implementation. Every instance must inherit HybridSomeExternalObject.")
-    }
     self.__implementation = implementation
 
   }

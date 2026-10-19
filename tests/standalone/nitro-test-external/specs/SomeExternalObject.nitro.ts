@@ -17,6 +17,7 @@ export interface OptionalPrimitivesHolder {
  */
 @iOS({
   language: "swift",
+  allowMultipleImplementations: true,
   implementation: { className: "HybridSomeExternalObject" },
 })
 export declare class SomeExternalObject extends HybridObject {

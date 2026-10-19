@@ -72,7 +72,7 @@ export const cases = {
         number: 14,
         bool: true,
         string: "hello!",
-        int64: -7362572367826385n,
+        int64: Number(-7362572367826385n),
         null: null,
         array: result.array,
         object: result.object,
@@ -85,7 +85,7 @@ export const cases = {
         testObject.numberValue,
         testObject.boolValue,
         testObject.stringValue,
-        testObject.int64Value,
+        Number(testObject.int64Value),
       ]);
     },
 
@@ -95,11 +95,11 @@ export const cases = {
         testObject.numberValue,
         testObject.boolValue,
         testObject.stringValue,
-        testObject.int64Value,
+        Number(testObject.int64Value),
       ];
       expect(getObject(testObject.createMap()).object).to.deep.equal({
         array: [...values, values],
-        int64: testObject.int64Value,
+        int64: Number(testObject.int64Value),
         bool: testObject.boolValue,
         string: testObject.stringValue,
         number: testObject.numberValue,
