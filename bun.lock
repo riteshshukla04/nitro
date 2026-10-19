@@ -55,11 +55,11 @@
     },
     "packages/nitro-core": {
       "name": "nitro-core",
-      "version": "0.37.1",
+      "version": "1.0.0-alpha.0",
     },
     "packages/nitrogen": {
       "name": "nitrogen",
-      "version": "0.37.1",
+      "version": "1.0.0-alpha.0",
       "bin": "./lib/index.js",
       "dependencies": {
         "chalk": "^5.3.0",
@@ -75,7 +75,7 @@
     },
     "packages/react-native-nitro-modules": {
       "name": "react-native-nitro-modules",
-      "version": "0.37.1",
+      "version": "1.0.0-alpha.0",
       "dependencies": {
         "nitro-core": "0.37.1",
       },
@@ -94,9 +94,12 @@
         "react-native": "*",
       },
     },
+    "scripts": {
+      "name": "@nitro/scripts",
+    },
     "tests/react-native/apps/benchmark": {
       "name": "react-native-nitro-benchmark",
-      "version": "0.37.1",
+      "version": "1.0.0-alpha.0",
       "dependencies": {
         "react": "19.3.0",
         "react-native": "0.88.0",
@@ -118,7 +121,7 @@
     },
     "tests/react-native/apps/example": {
       "name": "react-native-nitro-example",
-      "version": "0.37.1",
+      "version": "1.0.0-alpha.0",
       "dependencies": {
         "nitro-core": "0.37.1",
         "react": "19.3.0",
@@ -150,7 +153,7 @@
     },
     "tests/react-native/packages/react-native-nitro-test": {
       "name": "react-native-nitro-test",
-      "version": "0.37.1",
+      "version": "1.0.0-alpha.0",
       "devDependencies": {
         "@types/react": "^19.3.0",
         "nitrogen": "0.37.1",
@@ -958,6 +961,8 @@
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.0.7", "", { "dependencies": { "@emnapi/core": "^1.5.0", "@emnapi/runtime": "^1.5.0", "@tybys/wasm-util": "^0.10.1" } }, "sha512-SeDnOO0Tk7Okiq6DbXmmBODgOAb9dp9gjlphokTUxmt8U3liIP1ZsozBahH69j/RJv+Rfs6IwUKHTgQYJ/HBAw=="],
 
     "@nicolo-ribaudo/eslint-scope-5-internals": ["@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1", "", { "dependencies": { "eslint-scope": "5.1.1" } }, "sha512-54/JRvkLIzzDWshCWfuhadfrfZVPiElY8Fcgmg1HroEly/EDSszzhBAsarCux+D/kOslTRquNzuyGSmUSTTHGg=="],
+
+    "@nitro/scripts": ["@nitro/scripts@workspace:scripts"],
 
     "@noble/hashes": ["@noble/hashes@1.8.0", "", {}, "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A=="],
 

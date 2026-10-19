@@ -1,6 +1,6 @@
 {
   "name": "react-native-nitro-modules",
-  "version": "0.37.1",
+  "version": "1.0.0-alpha.0",
   "description": "Fast, type-safe native modules for React Native with statically compiled JSI bindings.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -69,9 +69,9 @@
     "lint-ci": "eslint \"**/*.{js,ts,tsx}\" -f @jamesacarr/github-actions --max-warnings 0",
     "test": "jest",
     "clean": "rm -rf android/build node_modules/**/android/build lib",
-    "release": "../../scripts/release.sh",
-    "sync-core": "node ../../scripts/sync-core.mjs",
-    "prepack": "bun run --cwd ../.. check-versions 1>&2 && bun run --cwd ../nitro-core build 1>&2 && bun run build 1>&2 && node ../../scripts/sync-core.mjs --check 1>&2"
+    "release": "bun --filter @nitro/scripts release",
+    "sync-core": "bun --filter @nitro/scripts sync-core",
+    "prepack": "bun --filter @nitro/scripts check-versions 1>&2 && bun --filter nitro-core build 1>&2 && bun run build 1>&2 && bun sync-core --check 1>&2"
   },
   "devDependencies": {
     "@types/jest": "*",
@@ -111,13 +111,12 @@
       [
         "typescript",
         {
-          "project": "tsconfig.build.json",
-          "tsc": "../../node_modules/typescript/bin/tsc"
+          "project": "tsconfig.build.json"
         }
       ]
     ]
   },
   "dependencies": {
-    "nitro-core": "0.37.1"
+    "nitro-core": "1.0.0-alpha.0"
   }
 }

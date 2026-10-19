@@ -16,6 +16,8 @@ bun run build
 bun typecheck
 ```
 
+Shared repository commands live in the private `@nitro/scripts` workspace. Call them with `bun --filter @nitro/scripts <command>` from other packages, and use workspace filters for cross-package builds instead of relative paths. The root keeps shortcuts such as `bun sync-core` and `bun build:core`.
+
 `packages/nitro-core/` owns the shared native sources and JS/TS API. `packages/react-native-nitro-modules/` owns the RN entry point and build configuration. `bun sync-core` stages local Core native sources into the RN package before builds and packing. Those staged directories are ignored; edit the authoritative sources in Core.
 
 For Core-only iteration, install with `bun install --frozen-lockfile --ignore-scripts` and run `bun run build:core`. This avoids building the RN JavaScript packages.
