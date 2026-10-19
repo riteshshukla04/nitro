@@ -1,5 +1,6 @@
 {
   "$schema": "https://nitro.margelo.com/nitro.schema.json",
+  "environment": "bare",
   "cxxNamespace": [
     "test",
     "external"

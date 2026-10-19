@@ -65,8 +65,8 @@ function parseConfig(json: string): NitroUserConfig {
         const prop = propPathToString(i.path)
         switch (i.code) {
           case 'invalid_type':
-            return `\`${prop}\`: ${i.message}`
           case 'invalid_value':
+            return `\`${prop}\`: ${i.message}`
           case 'invalid_union':
           case 'invalid_element':
             return `\`${prop}\` is not a valid & safe string. It must only contain alphanumeric characters and must not start with a number.`

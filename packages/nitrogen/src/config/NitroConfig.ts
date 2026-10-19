@@ -27,6 +27,13 @@ export class NitroConfig {
     return this.singleton
   }
 
+  /** Returns the package to import Nitro's JavaScript runtime from. */
+  getRuntimePackageName(): string {
+    return this.config.environment === 'react-native'
+      ? 'react-native-nitro-modules'
+      : 'nitro-core'
+  }
+
   /**
    * Returns the name of the Android C++ library (aka name in CMakeLists.txt `add_library(..)`).
    * This will be loaded via `System.loadLibrary(...)`.

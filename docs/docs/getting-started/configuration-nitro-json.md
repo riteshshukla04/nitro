@@ -10,6 +10,7 @@ description: Configure nitro.json for a React Native Nitro Module, including C++
 ```json
 {
   "$schema": "https://nitro.margelo.com/nitro.schema.json",
+  "environment": "react-native",
   "cxxNamespace": ["$$cxxNamespace$$"],
   "ios": {
     "iosModuleName": "$$iosModuleName$$"
@@ -23,6 +24,15 @@ description: Configure nitro.json for a React Native Nitro Module, including C++
 ```
 
 Nitrogen parses this file with Zod, see [`NitroUserConfig.ts`](https://github.com/margelo/nitro/blob/v1/packages/nitrogen/src/config/NitroUserConfig.ts) for more information.
+
+## `environment`
+
+Selects the package that generated JavaScript code imports Nitro APIs from:
+
+- `"react-native"` (default): imports from `react-native-nitro-modules`, which installs Nitro in the React Native runtime.
+- `"bare"`: imports from `nitro-core` for standalone runtimes.
+
+This setting only changes the JavaScript imports. Native code generation is the same for both environments.
 
 ## `cxxNamespace`
 

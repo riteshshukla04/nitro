@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-const { NitroModules } = require('nitro-core')
+const { NitroModules } = require('react-native-nitro-modules')
 
 // Copies of these getters, e.g. from Babel's interop helpers, share the caches.
 let hybridClass

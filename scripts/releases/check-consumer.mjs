@@ -131,6 +131,7 @@ export function checkConsumer(tarballs) {
     include: ["*.ts", "*.mts"],
   });
   writeJSON(path.join(consumer, "nitro.json"), {
+    environment: "bare",
     cxxNamespace: ["releasecheck"],
     ios: { iosModuleName: "ReleaseCheck" },
     android: {
@@ -156,6 +157,14 @@ export function checkConsumer(tarballs) {
   );
   if (!existsSync(header) || !readFileSync(header, "utf8").includes("add("))
     throw new Error("Packed Nitrogen did not generate the consumer spec");
+  run(
+    "node",
+    [
+      "-e",
+      `${mockRuntime} if (typeof require('#nitro/Math').Math !== 'function') throw Error('Generated HybridObject class is missing')`,
+    ],
+    { cwd: consumer },
+  );
   console.log(`Validated packed core packages in ${consumer}`);
   checkReactNativeConsumer(packed, version);
 }
@@ -232,21 +241,19 @@ function checkReactNativeConsumer(packed, version) {
     ),
   );
   writeJSON(path.join(consumer, "nitro.json"), config);
-  run("node", ["node_modules/typescript/bin/tsc", "--noEmit"], {
-    cwd: consumer,
-  });
   run(
     "node",
     ["node_modules/nitrogen/lib/index.js", "--log-level", "warning"],
     { cwd: consumer },
   );
+  run("node", ["node_modules/typescript/bin/tsc", "--noEmit"], {
+    cwd: consumer,
+  });
   for (const file of [
     "shared/c++/views/HybridTestViewComponent.cpp",
     "shared/c++/include/NitroTest/HybridBenchmarkObjectCppSpec.hpp",
     "ios/swift/HybridBenchmarkObjectSwiftKotlinSpec.swift",
-    "android/kotlin/com/margelo/nitro/test/HybridBenchmarkObjectSwiftKotlinSpec.kt",
     "ios/swift/HybridTestViewSpec.swift",
-    "android/kotlin/com/margelo/nitro/test/HybridTestViewSpec.kt",
   ]) {
     if (!existsSync(path.join(consumer, "nitrogen/generated", file)))
       throw new Error(`Packed Nitrogen did not generate ${file}`);

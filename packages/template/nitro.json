@@ -1,5 +1,6 @@
 {
   "$schema": "https://nitro.margelo.com/nitro.schema.json",
+  "environment": "react-native",
   "cxxNamespace": ["$$cxxNamespace$$"],
   "ios": {
     "iosModuleName": "$$iosModuleName$$"

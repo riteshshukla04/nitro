@@ -175,7 +175,7 @@ export {}
     const jsCode = `
 ${createFileMetadataString(jsFileName)}
 
-const { NitroModules } = require('nitro-core')
+const { NitroModules } = require('${NitroConfig.current.getRuntimePackageName()}')
 
 ${cacheComment}
 ${cacheDeclarationsCode.join('\n')}

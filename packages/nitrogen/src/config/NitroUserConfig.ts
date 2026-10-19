@@ -11,6 +11,11 @@ const isReservedKeywordError = {
 
 export const NitroUserConfigSchema = z.object({
   /**
+   * Selects the package imported by generated JavaScript runtime modules.
+   * React Native uses `react-native-nitro-modules`; bare uses `nitro-core`.
+   */
+  environment: z.enum(['react-native', 'bare']).default('react-native'),
+  /**
    * Represents the C++ namespace of the module that will be generated.
    *
    * This can have multiple sub-namespaces, and is always relative to `margelo::nitro`.
@@ -76,9 +81,12 @@ export const NitroUserConfigSchema = z.object({
    */
   ignorePaths: z.array(z.string()).optional(),
   /** Removed in favor of implementation and constructor declarations in .nitro.ts. */
-  autolinking: z.never({
-    error: 'autolinking has moved to .nitro.ts: declare implementation in each platform and a public constructor to enable new.',
-  }).optional(),
+  autolinking: z
+    .never({
+      error:
+        'autolinking has moved to .nitro.ts: declare implementation in each platform and a public constructor to enable new.',
+    })
+    .optional(),
 })
 
 /**
