@@ -49,7 +49,7 @@
     "example": "bun --filter react-native-nitro-example",
     "benchmark": "bun --filter react-native-nitro-benchmark",
     "sync-core": "bun --filter @nitro/scripts sync-core",
-    "bootstrap:ios": "bun bootstrap && bun example bundle-install && bun example pods",
+    "bootstrap:ios": "bun bootstrap && bun example spm",
     "specs": "bun nitro-rn-test specs && bun nitro-test specs",
     "test:staging": "bun --filter @nitro/scripts test:staging",
     "test:performance-tools": "bun test scripts/performance",
@@ -81,5 +81,8 @@
   },
   "engines": {
     "node": "^22.13.0 || ^24.3.0 || >=26.0.0"
+  },
+  "patchedDependencies": {
+    "@react-native-harness/ui@1.5.0": "patches/@react-native-harness%2Fui@1.5.0.patch"
   }
 }

@@ -22,6 +22,8 @@ Shared repository commands live in the private `@nitro/scripts` workspace. Call 
 
 For Core-only iteration, install with `bun install --frozen-lockfile --ignore-scripts` and run `bun run build:core`. This avoids building the RN JavaScript packages.
 
+The V1 Apple targets require Swift 6.4. React Native apps use Swift Package Manager; `bun example spm` and `bun benchmark spm` resolve their native dependencies.
+
 ## Tests and generated bindings
 
 The standalone packages `tests/standalone/nitro-test` and `tests/standalone/nitro-test-external` contain TestObjects, specs, and generated bindings. `tests/standalone/test-runner` runs their JavaScript behavior tests in Hermes through Swift Testing on an iOS simulator and instrumented JUnit on Android. The external package supplies cross-library types and objects. Add runtime regressions that do not need React Native to the runner. Initialize the pinned engine before native tests:
@@ -75,3 +77,5 @@ Run `bun docs start`, `bun docs typecheck`, or `bun docs build` for the Docusaur
 - Build, typecheck, and run the relevant linters and native tests.
 - Commit generated bindings and report checks that could not run.
 - Use Conventional Commit messages such as `fix:`, `feat:`, `docs:`, `chore:`, or `perf:`.
+
+The React Native CLI still uses the two comment-only Podfiles and library podspec metadata for iOS discovery. Native dependencies build with SwiftPM; no CocoaPods install is required.

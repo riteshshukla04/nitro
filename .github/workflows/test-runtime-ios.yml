@@ -10,6 +10,8 @@ on:
   pull_request:
     paths:
       - ".github/workflows/test-runtime-ios.yml"
+      - "Package.swift"
+      - "Package.resolved"
       - "packages/nitro-core/**"
       - "packages/nitrogen/**"
       - "tests/standalone/**"
@@ -45,7 +47,7 @@ jobs:
           - name: TSan
             value: thread
     env:
-      DEVELOPER_DIR: /Applications/Xcode_26.5.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
     steps:
       - uses: actions/checkout@v7
         with:

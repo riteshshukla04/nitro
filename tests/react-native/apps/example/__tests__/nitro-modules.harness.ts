@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'react-native-harness'
 import { HybridObject, NitroModules } from 'react-native-nitro-modules'
+import { BenchmarkObjectCpp } from 'react-native-nitro-test'
 import nitroModulesPackage from 'react-native-nitro-modules/package.json'
 import {
   HybridObject as CoreHybridObject,
@@ -7,10 +8,15 @@ import {
 } from 'nitro-core'
 
 describe('nitro-core integration', () => {
-  it('shares the installed native proxy and native classes with React Native', () => {
+  it('shares the installed native proxy and declared constructors with React Native', () => {
     expect(NitroModules).toBe(globalThis.NitroModulesProxy)
     expect(CoreNitroModules).toBe(NitroModules)
     expect(CoreHybridObject).toBe(HybridObject)
+    expect(
+      CoreNitroModules.getHybridClass<typeof BenchmarkObjectCpp>(
+        'BenchmarkObjectCpp'
+      )
+    ).toBe(BenchmarkObjectCpp)
   })
 })
 
@@ -19,8 +25,8 @@ describe('NitroModules', () => {
     expect(NitroModules.version).toBe(nitroModulesPackage.version)
   })
 
-  it('getAllHybridObjectNames() includes every autolinked HybridObject', () => {
-    expect(NitroModules.getAllHybridObjectNames()).toEqual(
+  it('getAllHybridClassNames() includes every autolinked HybridObject class', () => {
+    expect(NitroModules.getAllHybridClassNames()).toEqual(
       expect.arrayContaining([
         'BenchmarkObjectCpp',
         'BenchmarkObjectSwiftKotlin',
