@@ -5,7 +5,7 @@
 //  Created by Marc Rousavy on 04.06.25.
 //
 
-import Foundation
+public import Foundation
 
 extension Date {
   /**

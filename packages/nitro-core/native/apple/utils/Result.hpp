@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <exception>
 #include <new>
 #include <type_traits>
@@ -12,8 +13,11 @@ namespace margelo::nitro {
 
 /**
  * Represents a Result from a function. It's either a value (`T`), or an error (`std::exception_ptr`).
+ * OwnerTag gives each generated Swift module its own exported C++ type identity,
+ * preventing duplicate Swift metadata specializations for the same payload.
+ * It does not add any storage to the Result.
  */
-template <typename T>
+template <typename T, typename OwnerTag = void>
 struct Result final {
 public:
   // Constructors
@@ -95,6 +99,12 @@ public:
     return *reinterpret_cast<T*>(&_storage);
   }
 
+  // Swift cannot import value() for all T because it returns an interior reference.
+  // Return an owning copy when crossing the Swift boundary.
+  T copyValue() const noexcept(std::is_nothrow_copy_constructible<T>::value) {
+    return value();
+  }
+
   std::exception_ptr error() const noexcept {
     assert(_hasError && "Result<T> does not hold an error!");
     return _error;
@@ -131,37 +141,12 @@ private:
 };
 
 // Specialization for void
-template <>
-struct Result<void> final {
+template <typename OwnerTag>
+struct Result<void, OwnerTag> final {
 public:
-  // Constructors
-  Result(const Result& other) noexcept : _hasError(other._hasError), _error(other._error) {}
-
-  Result(Result&& other) noexcept : _hasError(other._hasError), _error(std::move(other._error)) {}
-
-  Result& operator=(const Result& other) noexcept {
-    if (this == &other)
-      return *this;
-    _hasError = other._hasError;
-    if (_hasError) {
-      _error = other._error;
-    }
-    return *this;
-  }
-
-  Result& operator=(Result&& other) noexcept {
-    if (this == &other)
-      return *this;
-    _hasError = other._hasError;
-    if (_hasError) {
-      _error = std::move(other._error);
-    }
-    return *this;
-  }
-
   // Static factories
   static Result withValue() noexcept {
-    return Result();
+    return Result(nullptr);
   }
 
   static Result withError(std::exception_ptr eptr) noexcept {
@@ -169,24 +154,22 @@ public:
   }
 
   bool hasValue() const noexcept {
-    return !_hasError;
+    return _error == nullptr;
   }
 
   bool hasError() const noexcept {
-    return _hasError;
+    return _error != nullptr;
   }
 
   std::exception_ptr error() const noexcept {
-    assert(_hasError && "Result<void> does not hold an error!");
+    assert(hasError() && "Result<void> does not hold an error!");
     return _error;
   }
 
 private:
-  explicit Result() noexcept : _hasError(false), _error(nullptr) {}
-  explicit Result(std::exception_ptr error) noexcept : _hasError(true), _error(error) {}
+  explicit Result(std::exception_ptr error) noexcept : _error(std::move(error)) {}
 
 private:
-  bool _hasError;
   std::exception_ptr _error;
 };
 

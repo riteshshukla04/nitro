@@ -33,21 +33,22 @@ Pod::Spec.new do |s|
   ]
   s.public_header_files = [
     # Public C++ headers will be exposed in modulemap (for Swift)
-    "cpp/core/core/AnyMap.hpp",
+    "cpp/core/core/AnyJSON.hpp",
+    "cpp/core/core/Callback.hpp",
+    "cpp/core/core/InlineCallback.hpp",
     "cpp/core/core/ArrayBuffer.hpp",
     "cpp/core/core/HybridObject.hpp",
     "cpp/core/core/Null.hpp",
     "cpp/core/core/Promise.hpp",
     "cpp/core/entrypoint/HybridNitroModulesProxy.hpp",
     "cpp/core/entrypoint/InstallNitro.hpp",
-    "cpp/core/registry/HybridObjectRegistry.hpp",
+    "cpp/core/registry/HybridClassRegistry.hpp",
+    "cpp/core/prototype/HybridClass.hpp",
     "cpp/core/jsi/JSIConverter.hpp",
     "cpp/core/jsi/JSIHelpers.hpp",
     "cpp/core/platform/NitroLogger.hpp",
     "cpp/core/threading/Dispatcher.hpp",
     "cpp/core/threading/ThreadPool.hpp",
-    "cpp/core/utils/JSCallback.hpp",
-    "cpp/core/utils/FastVectorCopy.hpp",
     "cpp/core/utils/NitroHash.hpp",
     "cpp/core/utils/NitroDefines.hpp",
     "cpp/core/utils/PropNameIDCache.hpp",
@@ -57,14 +58,15 @@ Pod::Spec.new do |s|
     "cpp/views/ViewComponentDescriptor.hpp",
     "cpp/views/ViewPropsHolderState.hpp",
     # Public Apple-specific headers that will be exposed in modulemap (for Swift)
-    "apple/core/core/ArrayBufferHolder.hpp",
-    "apple/core/core/PromiseHolder.hpp",
-    "apple/core/utils/AnyMapUtils.hpp",
     "apple/core/utils/Result.hpp",
     "apple/core/utils/DateToChronoDate.hpp",
     "apple/core/utils/RuntimeError.hpp",
-    "apple/core/utils/SwiftClosure.hpp",
+    "apple/core/utils/StringBufferConsumer.hpp",
+    "apple/core/utils/SwiftValueCallbacks.hpp",
   ]
+
+  # These headers consume NitroModules-Swift.h and must stay outside the Swift-facing module map.
+  s.private_header_files = "apple/core/swift-bridge/**/*.hpp"
 
   xcconfig = {
     # Use C++ 20
@@ -73,6 +75,12 @@ Pod::Spec.new do |s|
     "SWIFT_OBJC_INTEROP_MODE" => "objcxx",
     # Enables stricter modular headers
     "DEFINES_MODULE" => "YES",
+    "SWIFT_VERSION" => "5.0",
+    "SWIFT_STRICT_CONCURRENCY" => "minimal",
+    "OTHER_SWIFT_FLAGS" => "$(inherited) -enable-upcoming-feature InternalImportsByDefault -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature ApproachableConcurrency -Xfrontend -clang-header-expose-decls=has-expose-attr-or-stdlib",
+    # Import the generated Swift definitions after their C++ prerequisites.
+    "OTHER_CPLUSPLUSFLAGS" => "$(inherited) -fno-modules -DNITRO_JSI_HAS_FAST_UTF16=false",
+    "HEADER_SEARCH_PATHS" => "$(inherited) $(DERIVED_SOURCES_DIR)",
   }
 
   if has_react_native()
@@ -82,11 +90,14 @@ Pod::Spec.new do |s|
       current_header_search_paths = Array(xcconfig["HEADER_SEARCH_PATHS"])
       xcconfig["HEADER_SEARCH_PATHS"] = current_header_search_paths + ["${PODS_ROOT}/RCT-Folly"]
       xcconfig["GCC_PREPROCESSOR_DEFINITIONS"] = "$(inherited) FOLLY_NO_CONFIG FOLLY_CFG_NO_COROUTINES"
-      xcconfig["OTHER_CPLUSPLUSFLAGS"] = "$(inherited) -DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1"
+      xcconfig["OTHER_CPLUSPLUSFLAGS"] += " -DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1"
     end
   end
 
   s.pod_target_xcconfig = xcconfig
+
+  # V1 also imports SimdUTF from https://github.com/margelo/simdutf-swift (>= 1.0.1).
+  # Its Swift package still needs wiring into the React Native CocoaPods build.
 
   # Nitro depends on JSI.
   s.dependency 'React-jsi'

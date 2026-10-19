@@ -81,9 +81,10 @@
 			"name" = "Debug";
 			"buildSettings" = {
 				"PRODUCT_MODULE_NAME" = "NitroTestExternal";
+				"OTHER_SWIFT_FLAGS" = "$(inherited) -Xfrontend -clang-header-expose-module -Xfrontend NitroModules=NitroModules-Swift.h";
 				"PRODUCT_BUNDLE_IDENTIFIER" = "com.margelo.nitro.tests.NitroTestExternal";
 				"SKIP_INSTALL" = "YES";
-				"SWIFT_INSTALL_OBJC_HEADER" = "NO";
+				"SWIFT_INSTALL_OBJC_HEADER" = "YES";
 				"DEFINES_MODULE" = "YES";
 				"PRODUCT_NAME" = "NitroTestExternal";
 				"MACH_O_TYPE" = "staticlib";
@@ -94,9 +95,10 @@
 			"name" = "Release";
 			"buildSettings" = {
 				"PRODUCT_MODULE_NAME" = "NitroTestExternal";
+				"OTHER_SWIFT_FLAGS" = "$(inherited) -Xfrontend -clang-header-expose-module -Xfrontend NitroModules=NitroModules-Swift.h";
 				"PRODUCT_BUNDLE_IDENTIFIER" = "com.margelo.nitro.tests.NitroTestExternal";
 				"SKIP_INSTALL" = "YES";
-				"SWIFT_INSTALL_OBJC_HEADER" = "NO";
+				"SWIFT_INSTALL_OBJC_HEADER" = "YES";
 				"DEFINES_MODULE" = "YES";
 				"PRODUCT_NAME" = "NitroTestExternal";
 				"MACH_O_TYPE" = "staticlib";
@@ -263,9 +265,10 @@
 			"name" = "Release";
 			"buildSettings" = {
 				"PRODUCT_MODULE_NAME" = "NitroTest";
+				"OTHER_SWIFT_FLAGS" = "$(inherited) -Xfrontend -clang-header-expose-module -Xfrontend NitroModules=NitroModules-Swift.h";
 				"PRODUCT_BUNDLE_IDENTIFIER" = "com.margelo.nitro.tests.NitroTest";
 				"SKIP_INSTALL" = "YES";
-				"SWIFT_INSTALL_OBJC_HEADER" = "NO";
+				"SWIFT_INSTALL_OBJC_HEADER" = "YES";
 				"DEFINES_MODULE" = "YES";
 				"PRODUCT_NAME" = "NitroTest";
 				"MACH_O_TYPE" = "staticlib";
@@ -362,6 +365,9 @@
 			"productReference" = "F1EF64D6FA16E706AC9BAF17";
 			"buildConfigurationList" = "6406EB86626EBEAC0F5BC2D2";
 			"productName" = "NitroModules";
+			"packageProductDependencies" = (
+				"A41000000000000000000002",
+			);
 			"isa" = "PBXNativeTarget";
 			"fileSystemSynchronizedGroups" = (
 				"F6EDF968062C881AA1E47828",
@@ -431,6 +437,7 @@
 			"buildConfigurationList" = "3F4E3252342126A3569A588E";
 			"packageReferences" = (
 				"01960F0288B41626470E79EC",
+				"A41000000000000000000001",
 			);
 			"targets" = (
 				"6CBE257FF20F1296AB407DBC",
@@ -515,6 +522,7 @@
 			"isa" = "PBXFrameworksBuildPhase";
 			"buildActionMask" = "2147483647";
 			"files" = (
+				"A41000000000000000000003",
 			);
 			"runOnlyForDeploymentPostprocessing" = "0";
 		};
@@ -539,9 +547,10 @@
 			"name" = "Debug";
 			"buildSettings" = {
 				"PRODUCT_MODULE_NAME" = "NitroTest";
+				"OTHER_SWIFT_FLAGS" = "$(inherited) -Xfrontend -clang-header-expose-module -Xfrontend NitroModules=NitroModules-Swift.h";
 				"PRODUCT_BUNDLE_IDENTIFIER" = "com.margelo.nitro.tests.NitroTest";
 				"SKIP_INSTALL" = "YES";
-				"SWIFT_INSTALL_OBJC_HEADER" = "NO";
+				"SWIFT_INSTALL_OBJC_HEADER" = "YES";
 				"DEFINES_MODULE" = "YES";
 				"PRODUCT_NAME" = "NitroTest";
 				"MACH_O_TYPE" = "staticlib";
@@ -607,7 +616,7 @@
 				"PRODUCT_MODULE_NAME" = "NitroModules";
 				"PRODUCT_BUNDLE_IDENTIFIER" = "com.margelo.nitro.tests.NitroModules";
 				"SKIP_INSTALL" = "YES";
-				"SWIFT_INSTALL_OBJC_HEADER" = "NO";
+				"SWIFT_INSTALL_OBJC_HEADER" = "YES";
 				"DEFINES_MODULE" = "YES";
 				"PRODUCT_NAME" = "NitroModules";
 				"MACH_O_TYPE" = "staticlib";
@@ -660,7 +669,7 @@
 				"PRODUCT_MODULE_NAME" = "NitroModules";
 				"PRODUCT_BUNDLE_IDENTIFIER" = "com.margelo.nitro.tests.NitroModules";
 				"SKIP_INSTALL" = "YES";
-				"SWIFT_INSTALL_OBJC_HEADER" = "NO";
+				"SWIFT_INSTALL_OBJC_HEADER" = "YES";
 				"DEFINES_MODULE" = "YES";
 				"PRODUCT_NAME" = "NitroModules";
 				"MACH_O_TYPE" = "staticlib";
@@ -784,6 +793,28 @@
 		"6AFB3AA230D6F3989B6D63F0" = {
 			"isa" = "PBXTargetDependency";
 			"productRef" = "E9FAC86F09E7E697F4EC48A4";
+		};
+		"A41000000000000000000001" = {
+			"isa" = "XCRemoteSwiftPackageReference";
+			"repositoryURL" = "https://github.com/margelo/simdutf-swift.git";
+			"traits" = (
+				"UTF8",
+				"UTF16",
+				"ASCII",
+			);
+			"requirement" = {
+				"kind" = "upToNextMajorVersion";
+				"minimumVersion" = "1.0.1";
+			};
+		};
+		"A41000000000000000000002" = {
+			"isa" = "XCSwiftPackageProductDependency";
+			"package" = "A41000000000000000000001";
+			"productName" = "SimdUTF";
+		};
+		"A41000000000000000000003" = {
+			"isa" = "PBXBuildFile";
+			"productRef" = "A41000000000000000000002";
 		};
 	};
 	"rootObject" = "244210E48437B6556980A702";

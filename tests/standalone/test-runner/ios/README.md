@@ -6,6 +6,8 @@ The project has three static framework targets, `NitroModules`, `NitroTest` and 
 
 `NitroRuntimeTests.xcodeproj` uses synchronized folders to discover sources and generated bindings. The Core target compiles the sources directly from `packages/nitro-core/native/cpp` and `packages/nitro-core/native/apple`, without React Native source exclusions. The mixed Swift/C++ frameworks preserve the module names and headers emitted by Nitrogen. Hermes is a local Swift package wrapping an XCFramework built from its upstream CMake targets.
 
+The V1 runtime requires Swift 6.4. The `NitroModules` target links [SimdUTF](https://github.com/margelo/simdutf-swift) 1.0.1 or newer with its `UTF8`, `UTF16`, and `ASCII` traits. Direct Swift converters compile as C++ sources in that target. Their headers stay outside its Swift-facing umbrella because they include the generated `NitroModules-Swift.h`.
+
 `prepare-headers.sh` discovers core and external fixture headers and creates build-directory symlinks for Nitrogen's existing `<NitroModules/Header.hpp>` and `<NitroTestExternal/Header.hpp>` imports. It removes stale links only in those generated directories and rejects duplicate header names within each module. The small umbrella headers expose the Swift/C++ bridge interfaces; they do not list the implementation sources.
 
 The mixed targets remain Xcode targets because [SwiftPM's mixed-language support requires Swift 6.5](https://docs.swift.org/main/documentation/packagemanagerdocs/creatingmixedlanguagetargets/). The current Swift 6.4 toolchain rejects mixed Swift/C++ package targets. Keeping them together lets C++ include the generated Swift header without depending on SwiftPM build internals.

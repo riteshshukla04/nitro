@@ -1,10 +1,11 @@
 #include "UIThreadDispatcher.hpp"
+#include "ThreadUtils.hpp"
 
 namespace margelo::nitro {
 
 UIThreadDispatcher::UIThreadDispatcher() : _queue(dispatch_get_main_queue()) {}
 
-void UIThreadDispatcher::runSync(std::function<void()>&& function) {
+void UIThreadDispatcher::runSync(std::function<void()>&&) {
   throw std::runtime_error("UIThreadDispatcher::runSync() is not implemented!");
 }
 
@@ -14,6 +15,10 @@ void UIThreadDispatcher::runAsync(std::function<void()>&& function) {
     (*funcHeap)();
     delete funcHeap;
   });
+}
+
+bool UIThreadDispatcher::isOnDispatcher() {
+  return ThreadUtils::isUIThread();
 }
 
 } // namespace margelo::nitro

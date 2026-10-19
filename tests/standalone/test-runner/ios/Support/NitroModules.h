@@ -3,10 +3,15 @@
 #import <UIKit/UIKit.h>
 #endif
 
-// Expose the Apple bridge types used by the unmodified Nitro Swift sources.
-#include "AnyMapUtils.hpp"
-#include "ArrayBufferHolder.hpp"
+// C++ declarations imported by the Swift runtime. Swift-consuming bridge headers remain private.
+#include "AnyJSON.hpp"
+#include "ArrayBuffer.hpp"
+#include "Callback.hpp"
 #include "DateToChronoDate.hpp"
-#include "PromiseHolder.hpp"
+#include "InlineCallback.hpp"
+#include "Null.hpp"
+#include "Promise.hpp"
 #include "Result.hpp"
 #include "RuntimeError.hpp"
+#include "StringBufferConsumer.hpp"
+#include "SwiftValueCallbacks.hpp"
