@@ -102,9 +102,15 @@ interface UnionConstituent {
 }
 
 function getAliasTypeNode(type: TSMorphType): TypeNode | undefined {
-  const symbol = type.getNonNullableType().getAliasSymbol()
+  // Removing null can discard the alias of a union containing AnyJSON.
+  const symbol =
+    type.getAliasSymbol() ?? type.getNonNullableType().getAliasSymbol()
   const declaration = symbol?.getDeclarations()[0]
-  if (declaration != null && Node.isTypeAliasDeclaration(declaration)) {
+  if (
+    declaration != null &&
+    Node.isTypeAliasDeclaration(declaration) &&
+    declaration.getTypeParameters().length === 0
+  ) {
     return declaration.getTypeNode()
   }
   return undefined

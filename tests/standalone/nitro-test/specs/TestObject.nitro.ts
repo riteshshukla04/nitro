@@ -11,6 +11,9 @@ import type { SomeExternalObject } from "nitro-test-external";
 import type { Child } from "./Child.nitro";
 import type { Base } from "./Base.nitro";
 
+export * from "#nitro/TestObjectCpp";
+export * from "#nitro/TestObjectSwiftKotlin";
+
 // Tuples become `std::tuple<...>` in C++.
 // In contrast to arrays, they are length-checked, and can have different types inside them.
 export type Float2 = [number, number];
