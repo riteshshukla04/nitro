@@ -9,6 +9,8 @@
 
 // Forward declaration of `ColorScheme` to properly resolve imports.
 namespace margelo::nitro::test { enum class ColorScheme; }
+// Forward declaration of `HybridTestViewSpec` to properly resolve imports.
+namespace margelo::nitro::test { class HybridTestViewSpec; }
 
 #include "ColorScheme.hpp"
 #include "JColorScheme.hpp"
@@ -16,6 +18,9 @@ namespace margelo::nitro::test { enum class ColorScheme; }
 #include "JFunc_void.hpp"
 #include <NitroModules/JNICallable.hpp>
 #include <optional>
+#include <memory>
+#include "HybridTestViewSpec.hpp"
+#include "JHybridTestViewSpec.hpp"
 
 namespace margelo::nitro::test {
 
@@ -111,6 +116,11 @@ namespace margelo::nitro::test {
   }
 
   // Methods
+  bool JHybridTestViewSpec::getIsViewBlue(const std::shared_ptr<HybridTestViewSpec>& view) {
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jboolean(jni::alias_ref<JHybridTestViewSpec::JavaPart> /* view */)>("getIsViewBlue");
+    auto __result = method(_javaPart, std::dynamic_pointer_cast<JHybridTestViewSpec>(view)->getJavaPart());
+    return static_cast<bool>(__result);
+  }
   double JHybridTestViewSpec::getOnDropViewCount() {
     static const auto method = _javaPart->javaClassStatic()->getMethod<double()>("getOnDropViewCount");
     auto __result = method(_javaPart);

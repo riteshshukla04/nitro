@@ -26,6 +26,7 @@ namespace margelo::nitro::test {
       prototype.registerHybridSetter("someCallback", &HybridTestViewSpec::setSomeCallback);
       prototype.registerHybridGetter("nativeDefaultValue", &HybridTestViewSpec::getNativeDefaultValue);
       prototype.registerHybridSetter("nativeDefaultValue", &HybridTestViewSpec::setNativeDefaultValue);
+      prototype.registerHybridMethod("getIsViewBlue", &HybridTestViewSpec::getIsViewBlue);
       prototype.registerHybridMethod("getOnDropViewCount", &HybridTestViewSpec::getOnDropViewCount);
       prototype.registerHybridMethod("getIsBlueSetterCallCount", &HybridTestViewSpec::getIsBlueSetterCallCount);
       prototype.registerHybridMethod("getNativeDefaultValueSetterCallCount", &HybridTestViewSpec::getNativeDefaultValueSetterCallCount);

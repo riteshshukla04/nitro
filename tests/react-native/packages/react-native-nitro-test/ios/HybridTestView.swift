@@ -34,6 +34,10 @@ class HybridTestView: HybridTestViewSpec {
   }
 
   // Methods
+  func getIsViewBlue(view: any HybridTestViewSpec) throws -> Bool {
+    return view.isBlue
+  }
+
   func getOnDropViewCount() throws -> Double {
     return lifecycleLock.withLock { onDropViewCount }
   }

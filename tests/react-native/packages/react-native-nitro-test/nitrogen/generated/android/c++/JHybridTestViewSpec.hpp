@@ -65,6 +65,7 @@ namespace margelo::nitro::test {
 
   public:
     // Methods
+    bool getIsViewBlue(const std::shared_ptr<HybridTestViewSpec>& view) override;
     double getOnDropViewCount() override;
     double getIsBlueSetterCallCount() override;
     double getNativeDefaultValueSetterCallCount() override;

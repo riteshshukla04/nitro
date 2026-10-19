@@ -16,6 +16,7 @@ export interface TestViewProps extends HybridViewProps {
   nativeDefaultValue?: number
 }
 export interface TestViewMethods extends HybridViewMethods {
+  getIsViewBlue(view: TestView): boolean
   getOnDropViewCount(): number
   getIsBlueSetterCallCount(): number
   getNativeDefaultValueSetterCallCount(): number

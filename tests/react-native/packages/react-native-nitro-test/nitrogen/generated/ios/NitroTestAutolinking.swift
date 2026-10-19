@@ -12,33 +12,9 @@ import NitroModules
 public final class NitroTestAutolinking {
   public typealias bridge = margelo.nitro.test.bridge.swift
 
-  public static func createTestObjectSwiftKotlin() -> bridge.std__shared_ptr_HybridTestObjectSwiftKotlinSpec_ {
-    let hybridObject = HybridTestObjectSwift()
-    return { () -> bridge.std__shared_ptr_HybridTestObjectSwiftKotlinSpec_ in
-      let __cxxWrapped = hybridObject.getCxxWrapper()
-      return __cxxWrapped.getCxxPart()
-    }()
-  }
-  
-  public static func createBase() -> bridge.std__shared_ptr_HybridBaseSpec_ {
-    let hybridObject = HybridBase()
-    return { () -> bridge.std__shared_ptr_HybridBaseSpec_ in
-      let __cxxWrapped = hybridObject.getCxxWrapper()
-      return __cxxWrapped.getCxxPart()
-    }()
-  }
-  
-  public static func createChild() -> bridge.std__shared_ptr_HybridChildSpec_ {
-    let hybridObject = HybridChild()
-    return { () -> bridge.std__shared_ptr_HybridChildSpec_ in
-      let __cxxWrapped = hybridObject.getCxxWrapper()
-      return __cxxWrapped.getCxxPart()
-    }()
-  }
-  
-  public static func createPlatformObject() -> bridge.std__shared_ptr_HybridPlatformObjectSpec_ {
-    let hybridObject = HybridPlatformObject()
-    return { () -> bridge.std__shared_ptr_HybridPlatformObjectSpec_ in
+  public static func createBenchmarkObjectSwiftKotlin() -> bridge.std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_ {
+    let hybridObject = HybridBenchmarkObjectSwift()
+    return { () -> bridge.std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_ in
       let __cxxWrapped = hybridObject.getCxxWrapper()
       return __cxxWrapped.getCxxPart()
     }()

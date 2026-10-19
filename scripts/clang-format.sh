@@ -12,21 +12,17 @@ CPP_DIRS=(
   "packages/react-native-nitro-modules/apple/turbomodule"
   "tests/standalone/hermes/Sources"
   "tests/standalone/nitro-core/android/src/main/cpp"
-  "tests/standalone/test-runner/cpp"
   "tests/standalone/nitro-test/cpp"
+  "tests/standalone/test-runner/cpp"
   "tests/standalone/nitro-test/ios/Support"
+  "tests/standalone/test-runner/ios"
   "tests/standalone/nitro-test/android/src/main/cpp"
-  "tests/standalone/test-runner/ios/Support"
-  "tests/standalone/test-runner/ios/Tests"
   "tests/standalone/test-runner/android/src/main/cpp"
   "tests/standalone/nitro-test-external/android/src/main/cpp"
   "tests/standalone/nitro-test-external/ios/Support"
   "tests/react-native/packages/react-native-nitro-test/cpp"
   "tests/react-native/packages/react-native-nitro-test/ios"
   "tests/react-native/packages/react-native-nitro-test/android/src/main/cpp"
-  "tests/react-native/packages/react-native-nitro-test-external/cpp"
-  "tests/react-native/packages/react-native-nitro-test-external/ios"
-  "tests/react-native/packages/react-native-nitro-test-external/android/src/main/cpp"
 )
 
 if which clang-format >/dev/null; then

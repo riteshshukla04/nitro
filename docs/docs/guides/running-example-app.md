@@ -126,22 +126,24 @@ Then, simply clone (potentially also fork?) the Nitro repository and install its
 
 ### Reproducing bugs
 
-The Nitro repository uses the [nitrogen](../concepts/nitrogen) CLI and contains the RN integration package in `packages/react-native-nitro-modules`, plus two testing libraries:
+The Nitro repository uses the [nitrogen](../concepts/nitrogen) CLI and contains these test packages:
 
-- `tests/react-native/packages/react-native-nitro-test`: Contains a lot of tests for C++/Swift/Kotlin Hybrid Objects, functions and types.
-- `tests/react-native/packages/react-native-nitro-test-external`: Contains a Hybrid Object that is used in `react-native-nitro-test` to test cross-library-imports.
+- `tests/standalone/nitro-test`: TestObject specs, generated bindings, and C++/Swift/Kotlin implementations.
+- `tests/standalone/nitro-test-external`: Types and HybridObjects used to test cross-library imports.
+- `tests/standalone/test-runner`: JavaScript behavior tests, Hermes host, Swift Testing, and JUnit suites.
+- `tests/react-native/packages/react-native-nitro-test`: Benchmark objects and View fixtures for the React Native apps.
 
-**You can use those testing libraries to reproduce any bugs you might encounter with Nitro** - if you manage to reproduce your bug, simply open a **draft** PR against Nitro with the necessary changes so I can see what makes it break. Based on that, I have clear runnable reproduction, and can fix bugs faster.
+Use these packages to reproduce bugs in Nitro. Add HybridObject regressions to the standalone suite and View or React Native integration regressions to the example app's Harness tests. A draft PR with a minimal failing test gives maintainers a runnable reproduction.
 
 #### Changing specs
 
-Every time you change a Nitro spec in one of those two test libraries, you can simply re-generate specs in the root folder;
+After changing a Nitro spec, regenerate bindings from the repository root:
 
 ```sh
 bun specs
 ```
 
-This runs [nitrogen](../concepts/nitrogen) for both React Native test libraries and the standalone tests. You might need to reinstall pods if any iOS files changed;
+This runs [nitrogen](../concepts/nitrogen) for the React Native fixture package and both standalone packages. Reinstall pods if the React Native iOS files changed:
 
 ```sh
 bun example pods

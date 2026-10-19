@@ -20,10 +20,10 @@
   ],
   "scripts": {
     "postinstall": "bun run build && bun install --ignore-scripts --frozen-lockfile",
-    "build": "bun run build:core && bun nitro-rn build && bun nitro-test-external build && bun nitro-test build",
+    "build": "bun run build:core && bun nitro-rn build && bun nitro-rn-test build",
     "bootstrap": "bun install --frozen-lockfile",
-    "typecheck": "bun nitro typecheck && bun nitrogen typecheck && bun nitro-rn typecheck && bun nitro-test-external typecheck && bun nitro-test typecheck && bun example typecheck && bun benchmark typecheck && bun docs typecheck",
-    "lint": "bun nitro lint && bun nitrogen lint && bun nitro-rn lint && bun nitro-test-external lint && bun nitro-test lint && bun example lint && bun benchmark lint",
+    "typecheck": "bun nitro typecheck && bun nitrogen typecheck && bun nitro-rn typecheck && bun nitro-test-external typecheck && bun nitro-test typecheck && bun nitro-test-runner typecheck && bun nitro-rn-test typecheck && bun example typecheck && bun benchmark typecheck && bun docs typecheck",
+    "lint": "bun nitro lint && bun nitrogen lint && bun nitro-rn lint && bun nitro-rn-test lint && bun example lint && bun benchmark lint",
     "lint-cpp": "./scripts/clang-format.sh",
     "lint-swift": "./scripts/swift-format.sh",
     "lint-kotlin": "./scripts/kotlin-format.sh",
@@ -36,18 +36,20 @@
     "check-versions": "node scripts/set-version.mjs --check",
     "test:release": "node --test scripts/releases/*.test.mjs",
     "docs": "bun --cwd docs",
-    "test:prepare": "bun run build:core && bun install --ignore-scripts --frozen-lockfile && bun --cwd tests/standalone/test-runner prepare-tests",
-    "test:ios": "bun test:prepare && bun --cwd tests/standalone/test-runner test:ios",
-    "test:android": "bun test:prepare && bun --cwd tests/standalone/test-runner test:android",
+    "test:prepare": "bun run build:core && bun install --ignore-scripts --frozen-lockfile && bun nitro-test-runner prepare-tests",
+    "test:ios": "bun test:prepare && bun nitro-test-runner test:ios",
+    "test:android": "bun test:prepare && bun nitro-test-runner test:android",
     "build:core": "bun run check-versions && bun nitro build && bun nitrogen build",
     "nitro-rn": "bun --cwd packages/react-native-nitro-modules",
-    "nitro-test": "bun --cwd tests/react-native/packages/react-native-nitro-test",
-    "nitro-test-external": "bun --cwd tests/react-native/packages/react-native-nitro-test-external",
+    "nitro-rn-test": "bun --cwd tests/react-native/packages/react-native-nitro-test",
+    "nitro-test": "bun --cwd tests/standalone/nitro-test",
+    "nitro-test-external": "bun --cwd tests/standalone/nitro-test-external",
+    "nitro-test-runner": "bun --cwd tests/standalone/test-runner",
     "example": "bun --cwd tests/react-native/apps/example",
     "benchmark": "bun --cwd tests/react-native/apps/benchmark",
     "sync-core": "node scripts/sync-core.mjs",
     "bootstrap:ios": "bun bootstrap && bun example bundle-install && bun example pods",
-    "specs": "bun nitro-test specs && bun --cwd tests/standalone/nitro-test specs",
+    "specs": "bun nitro-rn-test specs && bun nitro-test specs",
     "test:staging": "node --test scripts/sync-core.test.mjs",
     "test:performance-tools": "bun test scripts/performance",
     "typecheck:performance-tools": "tsc -p scripts/performance/tsconfig.json",
@@ -76,8 +78,5 @@
   },
   "engines": {
     "node": "^22.13.0 || ^24.3.0 || >=26.0.0"
-  },
-  "patchedDependencies": {
-    "@react-native-segmented-control/segmented-control@2.5.7": "patches/@react-native-segmented-control%2Fsegmented-control@2.5.7.patch"
   }
 }

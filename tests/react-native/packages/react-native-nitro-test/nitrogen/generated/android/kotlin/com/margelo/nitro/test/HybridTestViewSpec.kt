@@ -74,6 +74,10 @@ abstract class HybridTestViewSpec: HybridView() {
   // Methods
   @DoNotStrip
   @Keep
+  abstract fun getIsViewBlue(view: HybridTestViewSpec): Boolean
+  
+  @DoNotStrip
+  @Keep
   abstract fun getOnDropViewCount(): Double
   
   @DoNotStrip

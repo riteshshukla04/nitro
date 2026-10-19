@@ -22,7 +22,7 @@ For Core-only iteration, install with `bun install --frozen-lockfile --ignore-sc
 
 ## Tests and generated bindings
 
-The standalone environment in `tests/standalone/` runs portable Nitro behavior tests in Hermes through Swift Testing on an iOS simulator and instrumented JUnit on Android. Add runtime regressions that do not need React Native here. Initialize its pinned engine before native tests:
+The standalone packages `tests/standalone/nitro-test` and `tests/standalone/nitro-test-external` contain TestObjects, specs, and generated bindings. `tests/standalone/test-runner` runs their JavaScript behavior tests in Hermes through Swift Testing on an iOS simulator and instrumented JUnit on Android. The external package supplies cross-library types and objects. Add runtime regressions that do not need React Native to the runner. Initialize the pinned engine before native tests:
 
 ```sh
 git submodule update --init --recursive -- tests/standalone/hermes/hermes
@@ -32,7 +32,7 @@ bun test:android
 
 See [the standalone guide](tests/standalone/README.md) for native toolchain requirements.
 
-The RN environment in `tests/react-native/` contains the example and benchmark apps plus two fixture libraries. Keep the external fixture separate because it tests cross-library behavior. The example app hosts eight Harness View tests and four React Native integration checks.
+The RN environment in `tests/react-native/` contains the example and benchmark apps. Its `react-native-nitro-test` package supplies benchmark objects and View fixtures. The example app hosts nine Harness View tests and three React Native integration checks.
 
 ```sh
 bun bootstrap:ios
@@ -50,7 +50,7 @@ After editing specs or Nitrogen, generate and commit all bindings:
 bun specs
 ```
 
-`bun specs` runs Nitrogen for the standalone runtime, its external fixture, and both RN fixture libraries. The **Check Nitrogen output** job verifies that all four generated directories match their committed files, including detecting newly generated files.
+`bun specs` runs Nitrogen for both standalone packages and the RN fixture package. The **Check Nitrogen output** job verifies that all three generated directories match their committed files, including detecting newly generated files.
 
 The standalone iOS and Android jobs run `bun test:prepare` to typecheck the tests, generate their bindings, and bundle the JavaScript and test manifests before native execution. A preparation failure stops the job before the native tests run.
 

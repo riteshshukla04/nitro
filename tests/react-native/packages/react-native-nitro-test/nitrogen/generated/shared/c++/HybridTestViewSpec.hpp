@@ -15,10 +15,14 @@
 
 // Forward declaration of `ColorScheme` to properly resolve imports.
 namespace margelo::nitro::test { enum class ColorScheme; }
+// Forward declaration of `HybridTestViewSpec` to properly resolve imports.
+namespace margelo::nitro::test { class HybridTestViewSpec; }
 
 #include "ColorScheme.hpp"
 #include <functional>
 #include <optional>
+#include <memory>
+#include "HybridTestViewSpec.hpp"
 
 namespace margelo::nitro::test {
 
@@ -62,6 +66,7 @@ namespace margelo::nitro::test {
 
     public:
       // Methods
+      virtual bool getIsViewBlue(const std::shared_ptr<HybridTestViewSpec>& view) = 0;
       virtual double getOnDropViewCount() = 0;
       virtual double getIsBlueSetterCallCount() = 0;
       virtual double getNativeDefaultValueSetterCallCount() = 0;

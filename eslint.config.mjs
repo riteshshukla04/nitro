@@ -74,7 +74,6 @@ export default [
   packageConfig('packages/nitrogen', true, false),
   packageConfig('packages/react-native-nitro-modules'),
   packageConfig('tests/react-native/packages/react-native-nitro-test'),
-  packageConfig('tests/react-native/packages/react-native-nitro-test-external'),
   packageConfig('tests/react-native/apps/example'),
   packageConfig('tests/react-native/apps/benchmark'),
 ]

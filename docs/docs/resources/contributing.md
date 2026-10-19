@@ -101,7 +101,7 @@ For example, if you have a different setting in your `Podfile`, try changing it 
 
 ### Reproduce a nitrogen bug
 
-The Nitro `tests/react-native/apps/example/` app uses a Nitro Module (`tests/react-native/packages/react-native-nitro-test/`) which acts as an example and contains a lot of test code, like `src/specs/TestObject.nitro.ts` ([link](https://github.com/margelo/nitro/blob/main/tests/react-native/packages/react-native-nitro-test/src/specs/TestObject.nitro.ts)). If you change something in `TestObject.nitro.ts`, make sure to run nitrogen from the repo root:
+Add HybridObject specs to [`tests/standalone/nitro-test/specs/TestObject.nitro.ts`](https://github.com/margelo/nitro/blob/main/tests/standalone/nitro-test/specs/TestObject.nitro.ts). Use the separate `nitro-test-external` package for cross-library types. View specs belong in `tests/react-native/packages/react-native-nitro-test/src/specs/`. After changing a spec, run Nitrogen from the repo root:
 
 ```sh
 bun specs
@@ -115,7 +115,7 @@ When adding a reproduction, follow the rules in [CONTRIBUTING.md](https://github
 
 Add portable runtime assertions to [`tests/standalone/test-runner/js/`](https://github.com/margelo/nitro/tree/main/tests/standalone/test-runner/js/). Run `bun test:ios` or `bun test:android` from the repository root. These suites run through Swift Testing and JUnit, including sanitizer configurations in CI.
 
-For React Native integration or View regressions, add an assertion to the Harness files in [`tests/react-native/apps/example/__tests__/`](https://github.com/margelo/nitro/tree/main/tests/react-native/apps/example/__tests__). Run `bun test:react-native:ios` or `bun test:react-native:android`. Harness keeps eight View tests and four integration checks; portable cases have moved to the standalone runner.
+For React Native integration or View regressions, add an assertion to the Harness files in [`tests/react-native/apps/example/__tests__/`](https://github.com/margelo/nitro/tree/main/tests/react-native/apps/example/__tests__). Run `bun test:react-native:ios` or `bun test:react-native:android`. Harness keeps nine View tests and three integration checks; portable cases run standalone.
 
 A PR that reproduces the failure is enough; you don't have to include a fix.
 

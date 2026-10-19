@@ -8,7 +8,7 @@ set (CMAKE_CXX_STANDARD 20)
 # Define C++ library and add all sources
 add_library(${PACKAGE_NAME} SHARED
         src/main/cpp/cpp-adapter.cpp
-        ../cpp/HybridTestObjectCpp.cpp
+        ../cpp/HybridBenchmarkObjectCpp.cpp
 )
 
 # Add Nitrogen specs :)
@@ -21,12 +21,10 @@ include_directories(
 )
 
 find_library(LOG_LIB log)
-find_package(react-native-nitro-test-external REQUIRED)   # <-- for the SomeExternalObject type
 
 # Link all libraries together
 target_link_libraries(
         ${PACKAGE_NAME}
         ${LOG_LIB}
         android                                   # <-- Android core
-        react-native-nitro-test-external::NitroTestExternal
 )

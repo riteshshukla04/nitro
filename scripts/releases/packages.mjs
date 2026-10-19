@@ -9,7 +9,6 @@ export const versionedManifests = [
   'package.json',
   ...releasePackages.map((name) => `packages/${name}/package.json`),
   'tests/react-native/packages/react-native-nitro-test/package.json',
-  'tests/react-native/packages/react-native-nitro-test-external/package.json',
   'tests/react-native/apps/example/package.json',
   'tests/react-native/apps/benchmark/package.json',
 ]

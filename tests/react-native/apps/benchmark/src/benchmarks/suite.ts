@@ -1,15 +1,15 @@
 import {
-  HybridTestObjectCpp,
-  HybridTestObjectSwiftKotlin,
+  HybridBenchmarkObjectCpp,
+  HybridBenchmarkObjectSwiftKotlin,
   type Car,
-  type TestObjectCpp,
-  type TestObjectSwiftKotlin,
+  type BenchmarkObjectCpp,
+  type BenchmarkObjectSwiftKotlin,
 } from 'react-native-nitro-test'
 import { Platform } from 'react-native'
 import { ExampleTurboModule } from '../turbo-module/ExampleTurboModule'
 import type { BenchmarkDefinition, BenchmarkImplementation } from './types'
 
-type TestObject = TestObjectCpp | TestObjectSwiftKotlin
+type BenchmarkObject = BenchmarkObjectCpp | BenchmarkObjectSwiftKotlin
 
 const smallNumbers = Array.from({ length: 16 }, (_, index) => index + 1)
 const largeNumbers = Array.from({ length: 1024 }, (_, index) => index + 1)
@@ -81,7 +81,7 @@ function collectJavaGarbage(): void {
 }
 
 function createObjectBenchmarks(
-  object: TestObject,
+  object: BenchmarkObject,
   implementation: BenchmarkImplementation
 ): BenchmarkDefinition[] {
   const prefix = implementation
@@ -245,7 +245,7 @@ function createObjectBenchmarks(
     },
     {
       id: `${prefix}/hybrid-object/create`,
-      version: 2,
+      version: 3,
       family: 'hybrid-object',
       implementation,
       kind: 'sync',
@@ -256,9 +256,9 @@ function createObjectBenchmarks(
       run(iterations) {
         let checksum = 0
         for (let index = 0; index < iterations; index++) {
-          checksum += object.newTestObject().addNumbers(index, 1)
+          checksum += object.newBenchmarkObject().addNumbers(index, 1)
         }
-        return assertNumber(checksum, 'newTestObject')
+        return assertNumber(checksum, 'newBenchmarkObject')
       },
     },
     {
@@ -384,7 +384,7 @@ function createObjectBenchmarks(
 }
 
 function createArrayBenchmark(
-  object: TestObject,
+  object: BenchmarkObject,
   implementation: BenchmarkImplementation,
   name: string,
   input: number[]
@@ -410,7 +410,7 @@ function createArrayBenchmark(
 }
 
 function createBufferBenchmark(
-  object: TestObject,
+  object: BenchmarkObject,
   implementation: BenchmarkImplementation,
   name: string,
   input: ArrayBuffer,
@@ -498,7 +498,10 @@ export function createBenchmarkSuite(): BenchmarkDefinition[] {
 
   return [
     ...controls,
-    ...createObjectBenchmarks(HybridTestObjectCpp, 'nitro-cpp'),
-    ...createObjectBenchmarks(HybridTestObjectSwiftKotlin, 'nitro-platform'),
+    ...createObjectBenchmarks(HybridBenchmarkObjectCpp, 'nitro-cpp'),
+    ...createObjectBenchmarks(
+      HybridBenchmarkObjectSwiftKotlin,
+      'nitro-platform'
+    ),
   ]
 }

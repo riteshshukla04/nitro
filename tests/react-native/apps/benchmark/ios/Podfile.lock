@@ -41,32 +41,6 @@ PODS:
   - NitroTest (0.37.1):
     - hermes-engine
     - NitroModules
-    - NitroTestExternal
-    - RCTRequired
-    - RCTTypeSafety
-    - React-bridging
-    - React-callinvoker
-    - React-Core
-    - React-Core-prebuilt
-    - React-cxxstableapi
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
-  - NitroTestExternal (0.37.1):
-    - hermes-engine
-    - NitroModules
     - RCTRequired
     - RCTTypeSafety
     - React-bridging
@@ -1831,7 +1805,6 @@ DEPENDENCIES:
   - hermes-engine (from `../../../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - NitroModules (from `../../../../../node_modules/react-native-nitro-modules`)
   - NitroTest (from `../../../../../node_modules/react-native-nitro-test`)
-  - NitroTestExternal (from `../../../../../node_modules/react-native-nitro-test-external`)
   - RCT-Folly (from `build/rndeps-facades/RCT-Folly`)
   - RCTDeprecation (from `build/rncore-facades/RCTDeprecation`)
   - RCTRequired (from `build/rncore-facades/RCTRequired`)
@@ -1933,8 +1906,6 @@ EXTERNAL SOURCES:
     :path: "../../../../../node_modules/react-native-nitro-modules"
   NitroTest:
     :path: "../../../../../node_modules/react-native-nitro-test"
-  NitroTestExternal:
-    :path: "../../../../../node_modules/react-native-nitro-test-external"
   RCT-Folly:
     :path: build/rndeps-facades/RCT-Folly
   RCTDeprecation:
@@ -2102,9 +2073,8 @@ SPEC CHECKSUMS:
   fmt: ba0886e864ebb21d14c98b2e12e164b8002f5b93
   glog: 3cf7cb46f743c4bc758ae3e6d9c15bd1b4cfd6d4
   hermes-engine: fb71bb47c9955e9cf777b685888f8e337d304a00
-  NitroModules: 978e09c957907d077825d12b34199202242cde06
-  NitroTest: b8093b0ce6bb1d535e1fb3098b3f2cf14f6a767b
-  NitroTestExternal: 2a33daaf3fa36629c3a55aea34771680e305dd0a
+  NitroModules: 3757e048d8c6e19bfd40561ed59c260d03a3a9ab
+  NitroTest: 3c1b7d42d08a33bde52c6b6e7d7f8bcde937bd47
   RCT-Folly: 82921e585c0400eda46fac1068297aa9dfb035e4
   RCTDeprecation: e134f2a2c096a6450f5fcbbe949531f913a2ff04
   RCTRequired: f1a68295837ee8f91e112ed1b5694d12e7ff1784
@@ -2187,4 +2157,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: fdb0427c5b39553664395712c604b36d821422d2
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.17.0

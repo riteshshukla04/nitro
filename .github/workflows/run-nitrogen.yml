@@ -61,7 +61,6 @@ jobs:
             tests/standalone/nitro-test/nitrogen/generated
             tests/standalone/nitro-test-external/nitrogen/generated
             tests/react-native/packages/react-native-nitro-test/nitrogen/generated
-            tests/react-native/packages/react-native-nitro-test-external/nitrogen/generated
           )
           git diff --exit-code -- "${paths[@]}"
           test -z "$(git ls-files --others --exclude-standard -- "${paths[@]}")"

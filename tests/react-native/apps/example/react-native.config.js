@@ -1,5 +1,4 @@
 const path = require('path')
-// const pak = require('../package.json');
 
 module.exports = {
   dependencies: {
@@ -11,8 +10,5 @@ module.exports = {
         android: null,
       },
     },
-    // [pak.name]: {
-    //   root: path.join(__dirname, '..'),
-    // },
   },
 }

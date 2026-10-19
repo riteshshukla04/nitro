@@ -4,17 +4,12 @@ import { StyleSheet, View, Text, Button, Platform } from 'react-native'
 import { callback, NitroModules } from 'react-native-nitro-modules'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useColors } from '../useColors'
-import {
-  HybridTestObjectSwiftKotlin,
-  RecyclableTestView,
-  TestView,
-} from 'react-native-nitro-test'
-import { useIsFocused } from '@react-navigation/native'
+import { RecyclableTestView, TestView } from 'react-native-nitro-test'
 
 const VIEWS_X = 15
 const VIEWS_Y = 15
 
-export function ViewScreenImpl() {
+export function ViewScreen() {
   const safeArea = useSafeAreaInsets()
   const colors = useColors()
   const [counter, setCounter] = React.useState(0)
@@ -30,7 +25,7 @@ export function ViewScreenImpl() {
               hybridRef={callback((ref) => {
                 console.log(`Ref initialized!`)
                 ref.someMethod()
-                const isBlue = HybridTestObjectSwiftKotlin.getIsViewBlue(ref)
+                const isBlue = ref.getIsViewBlue(ref)
                 console.log(`Is View blue: ${isBlue}`)
               })}
               style={styles.view}
@@ -70,11 +65,22 @@ export function ViewScreenImpl() {
   }, [isUpdating])
 
   return (
-    <View style={[styles.container, { paddingTop: safeArea.top }]}>
-      <Text style={styles.header}>View</Text>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: safeArea.top,
+          paddingBottom: safeArea.bottom,
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
+      <Text style={[styles.header, { color: colors.text }]}>Nitro Views</Text>
       <View style={styles.topControls}>
         <View style={styles.flex} />
-        <Text style={styles.buildTypeText}>{NitroModules.buildType}</Text>
+        <Text style={[styles.buildTypeText, { color: colors.text }]}>
+          {NitroModules.buildType}
+        </Text>
       </View>
 
       <View style={styles.resultContainer}>
@@ -86,8 +92,11 @@ export function ViewScreenImpl() {
       </View>
 
       <View style={[styles.bottomView, { backgroundColor: colors.background }]}>
-        <Text style={styles.resultText} numberOfLines={2}>
-          {isUpdating ? '🔄 Updating...' : '📱 Idle'}
+        <Text
+          style={[styles.resultText, { color: colors.text }]}
+          numberOfLines={2}
+        >
+          {counter} views {isUpdating ? '(updating)' : '(paused)'}
         </Text>
         <View style={styles.flex} />
         <Button
@@ -97,11 +106,6 @@ export function ViewScreenImpl() {
       </View>
     </View>
   )
-}
-
-export function ViewScreen() {
-  const isFocused = useIsFocused()
-  return isFocused ? <ViewScreenImpl /> : null
 }
 
 const styles = StyleSheet.create({
@@ -114,7 +118,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContent: {},
   topControls: {
     marginHorizontal: 15,
     marginBottom: 10,
@@ -128,14 +131,6 @@ const styles = StyleSheet.create({
       android: 'monospace',
     }),
     fontWeight: 'bold',
-  },
-  segmentedControl: {
-    minWidth: 180,
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
   },
   viewShadow: {
     width: '80%',
@@ -161,60 +156,14 @@ const styles = StyleSheet.create({
     height: `${100 / VIEWS_Y}%`,
     marginLeft: -0.0001,
   },
-  testCase: {
-    width: '100%',
-    paddingHorizontal: 15,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  testBox: {
-    flexShrink: 1,
-    flexDirection: 'column',
-  },
   resultText: {
     flexShrink: 1,
-  },
-  testName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  testStatus: {
-    fontSize: 14,
-    flex: 1,
-  },
-  smallVSpacer: {
-    height: 5,
-  },
-  largeVSpacer: {
-    height: 25,
   },
   resultContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 45,
-  },
-  chartsContainer: {
-    alignItems: 'stretch',
-    width: '70%',
-  },
-  nitroResults: {},
-  turboResults: {},
-  title: {
-    fontWeight: 'bold',
-    fontSize: 25,
-  },
-  chart: {
-    height: 20,
-    borderRadius: 5,
-  },
-  text: {
-    fontSize: 16,
-  },
-  bold: {
-    fontWeight: 'bold',
   },
   flex: { flex: 1 },
   bottomView: {

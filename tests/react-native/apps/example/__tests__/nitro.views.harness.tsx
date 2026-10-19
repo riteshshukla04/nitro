@@ -11,8 +11,6 @@ import {
 import { screen } from '@react-native-harness/ui'
 import { callback } from 'react-native-nitro-modules'
 import {
-  HybridTestObjectCpp,
-  HybridTestObjectSwiftKotlin,
   RecyclableTestView,
   type RecyclableTestViewRef,
   TestView,
@@ -214,8 +212,7 @@ describe('TestView', () => {
     expect(mountedView.int64Value).toBe(INITIAL_INT64_VALUE)
     expect(mountedView.colorScheme).toBe('dark')
     expect(mountedView.getOnDropViewCount()).toBe(0)
-    expect(HybridTestObjectCpp.getIsViewBlue(mountedView)).toBe(true)
-    expect(HybridTestObjectSwiftKotlin.getIsViewBlue(mountedView)).toBe(true)
+    expect(mountedView.getIsViewBlue(mountedView)).toBe(true)
 
     const capture = await captureView('test-view-initial')
     expectRenderedSize(capture.size, INITIAL_SIZE)
@@ -279,8 +276,7 @@ describe('TestView', () => {
     expect(updatedView.int64Value).toBe(UPDATED_INT64_VALUE)
     expect(updatedView.colorScheme).toBe('light')
     expect(updatedView.getOnDropViewCount()).toBe(0)
-    expect(HybridTestObjectCpp.getIsViewBlue(updatedView)).toBe(false)
-    expect(HybridTestObjectSwiftKotlin.getIsViewBlue(updatedView)).toBe(false)
+    expect(updatedView.getIsViewBlue(updatedView)).toBe(false)
 
     updatedView.someMethod()
     await updatedCallbackFinished.promise

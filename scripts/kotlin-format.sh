@@ -10,7 +10,6 @@ KOTLIN_DIRS=(
   "tests/standalone/test-runner/android/src"
   "tests/standalone/nitro-test-external/android/src"
   "tests/react-native/packages/react-native-nitro-test/android/src/main/java"
-  "tests/react-native/packages/react-native-nitro-test-external/android/src/main/java"
 )
 
 if which ktlint >/dev/null; then

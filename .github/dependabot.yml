@@ -55,7 +55,6 @@ updates:
       - "/packages/react-native-nitro-modules/android/"
       - "/packages/template/android/"
       - "/tests/react-native/packages/react-native-nitro-test/android/"
-      - "/tests/react-native/packages/react-native-nitro-test-external/android/"
       - "/tests/react-native/apps/example/android/"
       - "/tests/react-native/apps/benchmark/android/"
       - "/tests/standalone/test-runner/android/"

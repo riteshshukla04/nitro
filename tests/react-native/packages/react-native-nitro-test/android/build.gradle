@@ -136,8 +136,6 @@ dependencies {
 
   // Add a dependency on NitroModules
   implementation project(":react-native-nitro-modules")
-  // Add a dependency on NitroTestExternal (for SomeExternalObject)
-  implementation project(":react-native-nitro-test-external")
 }
 
 if (isNewArchitectureEnabled()) {

@@ -33,36 +33,18 @@ target_sources(
   # Autolinking Setup
   ../nitrogen/generated/android/NitroTestOnLoad.cpp
   # Shared Nitrogen C++ sources
-  ../nitrogen/generated/shared/c++/HybridBaseSpec.cpp
-  ../nitrogen/generated/shared/c++/HybridChildSpec.cpp
-  ../nitrogen/generated/shared/c++/HybridPlatformObjectSpec.cpp
+  ../nitrogen/generated/shared/c++/HybridBenchmarkObjectCppSpec.cpp
+  ../nitrogen/generated/shared/c++/HybridBenchmarkObjectSwiftKotlinSpec.cpp
   ../nitrogen/generated/shared/c++/HybridRecyclableTestViewSpec.cpp
   ../nitrogen/generated/shared/c++/views/HybridRecyclableTestViewComponent.cpp
-  ../nitrogen/generated/shared/c++/HybridTestObjectCppSpec.cpp
-  ../nitrogen/generated/shared/c++/HybridTestObjectSwiftKotlinSpec.cpp
   ../nitrogen/generated/shared/c++/HybridTestViewSpec.cpp
   ../nitrogen/generated/shared/c++/views/HybridTestViewComponent.cpp
   # Android-specific Nitrogen C++ sources
-  ../nitrogen/generated/android/c++/JHybridBaseSpec.cpp
-  ../nitrogen/generated/android/c++/JHybridChildSpec.cpp
-  ../nitrogen/generated/android/c++/JNamedVariant.cpp
+  ../nitrogen/generated/android/c++/JHybridBenchmarkObjectSwiftKotlinSpec.cpp
   ../nitrogen/generated/android/c++/JVariant_Double_String.cpp
-  ../nitrogen/generated/android/c++/JHybridPlatformObjectSpec.cpp
+  ../nitrogen/generated/android/c++/JVariant_Boolean_DoubleArray_Array_String__Double_String.cpp
   ../nitrogen/generated/android/c++/JHybridRecyclableTestViewSpec.cpp
   ../nitrogen/generated/android/c++/views/JHybridRecyclableTestViewStateUpdater.cpp
-  ../nitrogen/generated/android/c++/JHybridTestObjectSwiftKotlinSpec.cpp
-  ../nitrogen/generated/android/c++/JVariant_NullType_String.cpp
-  ../nitrogen/generated/android/c++/JVariant_HybridTestObjectSwiftKotlinSpec_Person.cpp
-  ../nitrogen/generated/android/c++/JVariant_Boolean_Double.cpp
-  ../nitrogen/generated/android/c++/JVariant_______Unit_Double.cpp
-  ../nitrogen/generated/android/c++/JVariant_OldEnum_Boolean.cpp
-  ../nitrogen/generated/android/c++/JVariant_Powertrain_Car.cpp
-  ../nitrogen/generated/android/c++/JVariant_WeirdNumbersEnum_Boolean.cpp
-  ../nitrogen/generated/android/c++/JVariant_Person_Car.cpp
-  ../nitrogen/generated/android/c++/JVariant_HybridBaseSpec_OptionalWrapper.cpp
-  ../nitrogen/generated/android/c++/JCoreTypesVariant.cpp
-  ../nitrogen/generated/android/c++/JStringOrExternal.cpp
-  ../nitrogen/generated/android/c++/JVariant_Boolean_DoubleArray_Array_String__Double_String.cpp
   ../nitrogen/generated/android/c++/JHybridTestViewSpec.cpp
   ../nitrogen/generated/android/c++/views/JHybridTestViewStateUpdater.cpp
 )

@@ -50,11 +50,11 @@ defined in `nitro-test/specs/TestObject.nitro.ts`.
   rendering, view refs, Fabric, and recycling. Their specs and native
   implementations stay in the React Native fixtures, including `getIsViewBlue`.
 - The standalone `PlatformObject` case checks that the OS version is a nonempty
-  string. Harness keeps the comparison with React Native's `Platform` constants.
+  string. The React Native fixture no longer includes `PlatformObject`.
 - Standalone registry expectations omit the two view registrations, and version
   checks use `nitro-core`. Harness retains the React Native registry and package
   version checks, plus the installed Core proxy and constructor identity check.
-  These four integration checks and the nine View cases are its remaining tests.
+  These three integration checks and the nine View cases are its remaining tests.
 - HardwareBuffer tests remain: Android platform APIs do not require React Native.
 - The external fixture remains a separate native module, preserving tests of
   cross-module HybridObjects and optional primitives.
@@ -64,8 +64,8 @@ defined in `nitro-test/specs/TestObject.nitro.ts`.
   with omitted optional fields preserve `toEqual`'s undefined-key semantics.
 - The host supplies platform metadata and `gc()` directly through JSI.
 
-The two package `src/__tests__/index.test.tsx` files contain only
-`it.todo('write a test')`, so they contribute no executable cases. The 18
+The original two package `src/__tests__/index.test.tsx` files contained only
+`it.todo('write a test')` and have been removed. The 18
 `scripts/performance/*.test.ts` suites test the React Native benchmark/reporting
 toolchain (Bun, subprocesses, filesystem, GitHub reports). They remain in
 `scripts/performance/` and run through Bun.

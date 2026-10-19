@@ -198,15 +198,11 @@ function checkReactNativeConsumer(packed, version) {
     { installed: true }
   )
   mkdirSync(path.join(consumer, 'src'))
-  for (const [pkg, filename] of [
-    ['react-native-nitro-test', 'TestView.nitro.ts'],
-    ['react-native-nitro-test-external', 'SomeExternalObject.nitro.ts'],
-  ]) {
+  for (const filename of ['TestView.nitro.ts', 'BenchmarkObject.nitro.ts']) {
     copyFileSync(
       path.join(
         root,
-        'tests/react-native/packages',
-        pkg,
+        'tests/react-native/packages/react-native-nitro-test',
         'src/specs',
         filename
       ),
@@ -233,12 +229,8 @@ function checkReactNativeConsumer(packed, version) {
   )
   config.autolinking = {
     TestView: config.autolinking.TestView,
-    SomeExternalObject: readJSON(
-      path.join(
-        root,
-        'tests/react-native/packages/react-native-nitro-test-external/nitro.json'
-      )
-    ).autolinking.SomeExternalObject,
+    BenchmarkObjectCpp: config.autolinking.BenchmarkObjectCpp,
+    BenchmarkObjectSwiftKotlin: config.autolinking.BenchmarkObjectSwiftKotlin,
   }
   writeJSON(path.join(consumer, 'nitro.json'), config)
   run('node', ['node_modules/typescript/bin/tsc', '--noEmit'], {
@@ -251,7 +243,9 @@ function checkReactNativeConsumer(packed, version) {
   )
   for (const file of [
     'shared/c++/views/HybridTestViewComponent.cpp',
-    'shared/c++/HybridSomeExternalObjectSpec.hpp',
+    'shared/c++/HybridBenchmarkObjectCppSpec.hpp',
+    'ios/swift/HybridBenchmarkObjectSwiftKotlinSpec.swift',
+    'android/kotlin/com/margelo/nitro/test/HybridBenchmarkObjectSwiftKotlinSpec.kt',
     'ios/swift/HybridTestViewSpec.swift',
     'android/kotlin/com/margelo/nitro/test/HybridTestViewSpec.kt',
   ]) {

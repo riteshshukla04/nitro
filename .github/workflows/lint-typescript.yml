@@ -71,9 +71,6 @@ jobs:
       - name: Run ESLint CI in benchmark
         working-directory: tests/react-native/apps/benchmark
         run: bun lint-ci
-      - name: Run ESLint CI in react-native-nitro-test-external
-        working-directory: tests/react-native/packages/react-native-nitro-test-external
-        run: bun lint-ci
       - name: Run ESLint CI in react-native-nitro-test
         working-directory: tests/react-native/packages/react-native-nitro-test
         run: bun lint-ci
@@ -92,9 +89,6 @@ jobs:
         run: bun lint
       - name: Run ESLint with auto-fix in benchmark
         working-directory: tests/react-native/apps/benchmark
-        run: bun lint
-      - name: Run ESLint with auto-fix in react-native-nitro-test-external
-        working-directory: tests/react-native/packages/react-native-nitro-test-external
         run: bun lint
       - name: Run ESLint with auto-fix in react-native-nitro-test
         working-directory: tests/react-native/packages/react-native-nitro-test

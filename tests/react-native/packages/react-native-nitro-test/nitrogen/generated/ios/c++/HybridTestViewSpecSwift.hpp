@@ -14,10 +14,14 @@ namespace NitroTest { class HybridTestViewSpec_cxx; }
 
 // Forward declaration of `ColorScheme` to properly resolve imports.
 namespace margelo::nitro::test { enum class ColorScheme; }
+// Forward declaration of `HybridTestViewSpec` to properly resolve imports.
+namespace margelo::nitro::test { class HybridTestViewSpec; }
 
 #include "ColorScheme.hpp"
 #include <functional>
 #include <optional>
+#include <memory>
+#include "HybridTestViewSpec.hpp"
 
 #include "NitroTest-Swift-Cxx-Umbrella.hpp"
 
@@ -107,6 +111,14 @@ namespace margelo::nitro::test {
 
   public:
     // Methods
+    inline bool getIsViewBlue(const std::shared_ptr<HybridTestViewSpec>& view) override {
+      auto __result = _swiftPart.getIsViewBlue(view);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
     inline double getOnDropViewCount() override {
       auto __result = _swiftPart.getOnDropViewCount();
       if (__result.hasError()) [[unlikely]] {

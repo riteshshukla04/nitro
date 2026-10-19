@@ -9,7 +9,6 @@ SWIFT_DIRS=(
   "tests/standalone/test-runner/ios"
   "tests/standalone/nitro-test-external/ios"
   "tests/react-native/packages/react-native-nitro-test/ios"
-  "tests/react-native/packages/react-native-nitro-test-external/ios"
 )
 
 if which swift >/dev/null; then

@@ -217,7 +217,6 @@ if (!manifest) {
       'tests/react-native/apps/example/ios/Podfile.lock',
       'tests/react-native/apps/benchmark/ios/Podfile.lock',
       'tests/react-native/packages/react-native-nitro-test/nitrogen/generated',
-      'tests/react-native/packages/react-native-nitro-test-external/nitrogen/generated',
     ])
     git(['diff', '--exit-code'])
     if (git(['ls-files', '--others', '--exclude-standard']))

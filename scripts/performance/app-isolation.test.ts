@@ -11,7 +11,6 @@ test('the benchmark app has no Harness or example UI dependencies', async () => 
     'react-native',
     'react-native-nitro-modules',
     'react-native-nitro-test',
-    'react-native-nitro-test-external',
   ])
   expect(JSON.stringify(manifest)).not.toMatch(/harness|navigation|safe-area/)
   expect(await read('tests/react-native/apps/benchmark/index.js')).toContain('BenchmarkApp')
