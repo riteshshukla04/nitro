@@ -10,7 +10,7 @@
 
 namespace margelo::nitro {
 
-HybridObject::HybridObject(const char* NON_NULL name) : HybridObjectPrototype(), _name(name) {
+HybridObject::HybridObject() {
 #ifdef NITRO_DEBUG
   HybridNitroModulesProxy::debug_notifyHybridObjectAllocated();
 #endif
@@ -23,11 +23,11 @@ HybridObject::~HybridObject() {
 }
 
 std::string HybridObject::toString() {
-  return "[HybridObject " + std::string(_name) + "]";
+  return "[HybridObject " + getName() + "]";
 }
 
 std::string HybridObject::getName() {
-  return _name;
+  return getHybridClass()->getName();
 }
 
 bool HybridObject::equals(const std::shared_ptr<HybridObject>& other) {
@@ -41,7 +41,7 @@ std::shared_ptr<HybridObject> HybridObject::shared() {
     return shared;
   }
   // We are not managed inside a shared_ptr..
-  throw std::runtime_error(std::string("HybridObject \"") + _name + "\" is not managed inside a std::shared_ptr - cannot access shared()!");
+  throw std::runtime_error(std::string("HybridObject \"") + getName() + "\" is not managed inside a std::shared_ptr - cannot access shared()!");
 }
 
 jsi::Value HybridObject::disposeRaw(jsi::Runtime& runtime, const jsi::Value& thisArg, const jsi::Value*, size_t) {
@@ -56,13 +56,13 @@ jsi::Value HybridObject::disposeRaw(jsi::Runtime& runtime, const jsi::Value& thi
   return jsi::Value::undefined();
 }
 
-void HybridObject::loadHybridMethods() {
-  registerHybrids(this, [](Prototype& prototype) {
-    prototype.registerHybridGetter("name", &HybridObject::getName);
-    prototype.registerHybridMethod("equals", &HybridObject::equals);
-    prototype.registerHybridMethod("toString", &HybridObject::toString);
-    prototype.registerRawHybridMethod("dispose", 0, &HybridObject::disposeRaw);
+const std::shared_ptr<const HybridClass>& HybridObject::Class::get() {
+  static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
+    clazz.registerHybridMethod("equals", &HybridObject::equals);
+    clazz.registerHybridMethod("toString", &HybridObject::toString);
+    clazz.registerRawHybridMethod("dispose", 0, &HybridObject::disposeRaw);
   });
+  return hybridClass;
 }
 
 jsi::Value HybridObject::toObject(jsi::Runtime& runtime) {
@@ -80,10 +80,11 @@ jsi::Value HybridObject::toObject(jsi::Runtime& runtime) {
   }
 
   // 2. Get the object's base prototype (global & shared)
-  jsi::Value prototype = getPrototype(runtime);
+  const JSClass& jsClass = getHybridClass()->getOrCreateJSClass(runtime);
+  jsi::Value prototype(runtime, jsClass.prototype);
 
   // 3. Create the object using Object.create(...)
-  jsi::Object object = CommonGlobals::Object::create(runtime, prototype);
+  jsi::Object object = jsi::Object::create(runtime, prototype);
 
   // 4. Assign NativeState to the object so the prototype can resolve the native methods
   object.setNativeState(runtime, shared());
@@ -93,7 +94,7 @@ jsi::Value HybridObject::toObject(jsi::Runtime& runtime) {
 
 #ifdef NITRO_DEBUG
   // 6. Assign a private __type property for debugging - this will be used so users know it's not just an empty object.
-  std::string typeName = "HybridObject<" + std::string(_name) + ">";
+  std::string typeName = "HybridObject<" + getName() + ">";
   CommonGlobals::Object::defineProperty(runtime, object, "__type",
                                         PlainPropertyDescriptor{
                                             // .configurable has to be true because this property is non-frozen
@@ -105,10 +106,8 @@ jsi::Value HybridObject::toObject(jsi::Runtime& runtime) {
 #endif
 
   // 7. Throw a jsi::WeakObject pointing to our object into cache so subsequent calls can use it from cache
-  {
-    JSICacheReference cache = JSICache::getOrCreateCache(runtime);
-    _objectCache[&runtime] = cache.makeShared(jsi::WeakObject(runtime, object));
-  }
+  JSICache& cache = JSICache::getOrCreateCache(runtime);
+  _objectCache[&runtime] = cache.makeShared(jsi::WeakObject(runtime, object));
 
   // 8. Return it!
   return object;

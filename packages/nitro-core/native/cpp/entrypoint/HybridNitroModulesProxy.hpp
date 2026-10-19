@@ -9,6 +9,7 @@
 
 #include "BoxedHybridObject.hpp"
 #include "HybridObject.hpp"
+#include "HybridClass.hpp"
 #include <memory>
 #include <string>
 
@@ -24,23 +25,27 @@ namespace margelo::nitro {
  */
 class HybridNitroModulesProxy final : public HybridObject {
 public:
-  explicit HybridNitroModulesProxy() : HybridObject(TAG) {}
+  HybridNitroModulesProxy() = default;
 
 public:
-  void loadHybridMethods() override;
+  struct Class {
+    using Base = HybridObject::Class;
+    static constexpr const char* name = "NitroModulesProxy";
+    static const std::shared_ptr<const HybridClass>& get();
+  };
 
 public:
-  // Hybrid Object Registry
-  std::shared_ptr<HybridObject> createHybridObject(const std::string& name);
-  bool hasHybridObject(const std::string& name);
-  std::vector<std::string> getAllHybridObjectNames();
+  // Hybrid Class Registry
+  jsi::Value getHybridClassRaw(jsi::Runtime& runtime, const jsi::Value&, const jsi::Value* args, size_t count);
+  bool hasHybridClass(const std::string& name);
+  std::vector<std::string> getAllHybridClassNames();
 
   // Helpers
   std::shared_ptr<BoxedHybridObject> box(const std::shared_ptr<HybridObject>& hybridObject);
   std::shared_ptr<HybridObject> updateMemorySize(const std::shared_ptr<HybridObject>& hybridObject);
   jsi::Value hasNativeState(jsi::Runtime& runtime, const jsi::Value& thisValue, const jsi::Value* args, size_t size);
   jsi::Value isHybridObject(jsi::Runtime& runtime, const jsi::Value& thisValue, const jsi::Value* args, size_t size);
-  std::shared_ptr<ArrayBuffer> createNativeArrayBuffer(double size);
+  ArrayBuffer createNativeArrayBuffer(double size);
 
   // Build Info
   std::string getBuildType();
@@ -51,8 +56,10 @@ public:
   static void debug_notifyHybridObjectAllocated();
   static void debug_notifyHybridObjectDeallocated();
 
-private:
-  static constexpr auto TAG = "NitroModulesProxy";
+protected:
+  const std::shared_ptr<const HybridClass>& getHybridClass() override {
+    return Class::get();
+  }
 };
 
 } // namespace margelo::nitro

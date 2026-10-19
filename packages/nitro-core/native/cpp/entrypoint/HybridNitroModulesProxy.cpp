@@ -6,45 +6,47 @@
 //
 
 #include "HybridNitroModulesProxy.hpp"
-#include "HybridObjectRegistry.hpp"
+#include "HybridClassRegistry.hpp"
 #include "JSIConverter.hpp"
 #include "NitroDefines.hpp"
 
 namespace margelo::nitro {
 
-void HybridNitroModulesProxy::loadHybridMethods() {
-  HybridObject::loadHybridMethods();
+const std::shared_ptr<const HybridClass>& HybridNitroModulesProxy::Class::get() {
+  static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
+    clazz.registerRawHybridMethod("getHybridClass", 1, &HybridNitroModulesProxy::getHybridClassRaw);
+    clazz.registerHybridMethod("hasHybridClass", &HybridNitroModulesProxy::hasHybridClass);
+    clazz.registerRawHybridMethod("isHybridObject", 1, &HybridNitroModulesProxy::isHybridObject);
+    clazz.registerHybridMethod("getAllHybridClassNames", &HybridNitroModulesProxy::getAllHybridClassNames);
 
-  registerHybrids(this, [](Prototype& prototype) {
-    prototype.registerHybridMethod("createHybridObject", &HybridNitroModulesProxy::createHybridObject);
-    prototype.registerHybridMethod("hasHybridObject", &HybridNitroModulesProxy::hasHybridObject);
-    prototype.registerRawHybridMethod("isHybridObject", 1, &HybridNitroModulesProxy::isHybridObject);
-    prototype.registerHybridMethod("getAllHybridObjectNames", &HybridNitroModulesProxy::getAllHybridObjectNames);
+    clazz.registerHybridMethod("box", &HybridNitroModulesProxy::box);
+    clazz.registerHybridMethod("updateMemorySize", &HybridNitroModulesProxy::updateMemorySize);
 
-    prototype.registerHybridMethod("box", &HybridNitroModulesProxy::box);
-    prototype.registerHybridMethod("updateMemorySize", &HybridNitroModulesProxy::updateMemorySize);
+    clazz.registerHybridMethod("createNativeArrayBuffer", &HybridNitroModulesProxy::createNativeArrayBuffer);
+    clazz.registerRawHybridMethod("hasNativeState", 1, &HybridNitroModulesProxy::hasNativeState);
 
-    prototype.registerHybridMethod("createNativeArrayBuffer", &HybridNitroModulesProxy::createNativeArrayBuffer);
-    prototype.registerRawHybridMethod("hasNativeState", 1, &HybridNitroModulesProxy::hasNativeState);
+    clazz.registerHybridGetter("buildType", &HybridNitroModulesProxy::getBuildType);
+    clazz.registerHybridGetter("version", &HybridNitroModulesProxy::getVersion);
 
-    prototype.registerHybridGetter("buildType", &HybridNitroModulesProxy::getBuildType);
-    prototype.registerHybridGetter("version", &HybridNitroModulesProxy::getVersion);
-
-    prototype.registerHybridMethod("debug_getTotalAllocatedHybridObjects", &HybridNitroModulesProxy::debug_getTotalAllocatedHybridObjects);
+    clazz.registerHybridMethod("debug_getTotalAllocatedHybridObjects", &HybridNitroModulesProxy::debug_getTotalAllocatedHybridObjects);
   });
+  return hybridClass;
 }
 
-// Hybrid Object Registry
-std::shared_ptr<HybridObject> HybridNitroModulesProxy::createHybridObject(const std::string& name) {
-  return HybridObjectRegistry::createHybridObject(name);
+// Hybrid Class Registry
+jsi::Value HybridNitroModulesProxy::getHybridClassRaw(jsi::Runtime& runtime, const jsi::Value&, const jsi::Value* args, size_t count) {
+  if (count != 1 || !args[0].isString()) {
+    throw jsi::JSError(runtime, "NitroModules.getHybridClass(name) expects one string argument.");
+  }
+  return HybridClassRegistry::getHybridClass(runtime, args[0].getString(runtime).utf8(runtime));
 }
 
-bool HybridNitroModulesProxy::hasHybridObject(const std::string& name) {
-  return HybridObjectRegistry::hasHybridObject(name);
+bool HybridNitroModulesProxy::hasHybridClass(const std::string& name) {
+  return HybridClassRegistry::hasHybridClass(name);
 }
 
-std::vector<std::string> HybridNitroModulesProxy::getAllHybridObjectNames() {
-  return HybridObjectRegistry::getAllHybridObjectNames();
+std::vector<std::string> HybridNitroModulesProxy::getAllHybridClassNames() {
+  return HybridClassRegistry::getAllHybridClassNames();
 }
 
 // Helpers
@@ -79,7 +81,7 @@ std::shared_ptr<HybridObject> HybridNitroModulesProxy::updateMemorySize(const st
   return hybridObject;
 }
 
-std::shared_ptr<ArrayBuffer> HybridNitroModulesProxy::createNativeArrayBuffer(double size) {
+ArrayBuffer HybridNitroModulesProxy::createNativeArrayBuffer(double size) {
   return ArrayBuffer::allocate(static_cast<size_t>(size));
 }
 

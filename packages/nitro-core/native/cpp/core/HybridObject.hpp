@@ -4,12 +4,14 @@
 
 #pragma once
 
-#include "HybridObjectPrototype.hpp"
+#include "BorrowingReference.hpp"
+#include "HybridClass.hpp"
 
 #include "NitroDefines.hpp"
 #include <jsi/jsi.h>
 #include <memory>
 #include <type_traits>
+#include <unordered_map>
 
 namespace margelo::nitro {
 
@@ -19,18 +21,40 @@ using namespace facebook;
  * Represents a C++ object that is exposed to JS.
  * `HybridObject`s can have native getters and setters, and normal methods.
  *
- * To implement a `HybridObject`, simply inherit from this class and override `loadHybridMethods`
- * to register the given getters, setters or methods.
+ * Generated specifications and Swift bridges declare a nested `Class` and override `getHybridClass`.
+ * The descriptor registers member pointers, while each JavaScript instance holds this object's NativeState.
  *
  * The new class can then be passed to JS using the `JSIConverter<HybridObject>`.
  */
-class HybridObject : public virtual jsi::NativeState, public HybridObjectPrototype, public std::enable_shared_from_this<HybridObject> {
+class HybridObject : public virtual jsi::NativeState, public std::enable_shared_from_this<HybridObject> {
+public:
+  /**
+   * Describes this HybridObject's JavaScript class.
+   *
+   * get() returns an immutable HybridClass describing instance methods, properties,
+   * the constructor, static methods, name, and base class.
+   * HybridClass materializes the constructor and instance prototype together per Runtime.
+   *
+   * Accessing this metadata never constructs a HybridObject instance. Class bindings
+   * can use it for construction, static methods, and instanceof without an instance.
+   *
+   * Each generated spec or Swift bridge declares its own Class with a JavaScript `name` and its
+   * `Base` class's Class, and overrides getHybridClass() to return Class::get().
+   * A Class does not inherit its base's Class, so leaving out `name` or `Base` fails to compile.
+   * Concrete native implementations inherit the Class of their generated spec or bridge.
+   */
+  struct Class {
+    using Base = void;
+    static constexpr const char* name = "HybridObject";
+    static const std::shared_ptr<const HybridClass>& get();
+  };
+
 public:
   /**
    * Create a new instance of a `HybridObject`.
-   * The given `name` will be used for logging and stringifying.
+   * Its name and bindings come from the shared HybridClass descriptor.
    */
-  explicit HybridObject(const char* NON_NULL name);
+  HybridObject();
   /**
    * Called when no more references to the given `HybridObject` exist in both C++ and JS.
    * JS might keep references for longer, as it is a garbage collected language.
@@ -44,17 +68,6 @@ public:
    * HybridObjects cannot be moved.
    */
   HybridObject(HybridObject&& move) = delete;
-  /**
-   * HybridObjects cannot be default-constructed!
-   * Use this instead;
-   * ```cpp
-   * MyHybridObject(): HybridObject(TAG) {}
-   * ```
-   */
-  HybridObject() {
-    throw std::runtime_error("Cannot default-construct HybridObject! "
-                             "Did you forget to add the `HybridObject(TAG)` base-constructor call to your Hybrid Object's constructor?");
-  }
 
 public:
   /**
@@ -124,28 +137,12 @@ protected:
   }
 
 protected:
-  /**
-   * Loads all native methods of this `HybridObject` to be exposed to JavaScript.
-   * The base implementation registers a `toString()` method and `name` property.
-   *
-   * Example:
-   *
-   * ```cpp
-   * int User::getAge() {
-   *   return 23;
-   * }
-   *
-   * void User::loadHybridMethods() {
-   *   HybridObject::loadHybridMethods();
-   *   registerHybridMethod("getAge", &User::getAge);
-   * }
-   * ```
-   */
-  virtual void loadHybridMethods() override;
+  /** Return the shared type descriptor used to expose this object to JavaScript. */
+  virtual const std::shared_ptr<const HybridClass>& getHybridClass() {
+    return Class::get();
+  }
 
 private:
-  static constexpr auto TAG = "HybridObject";
-  const char* NON_NULL _name = TAG;
   std::unordered_map<jsi::Runtime*, BorrowingReference<jsi::WeakObject>> _objectCache;
 };
 

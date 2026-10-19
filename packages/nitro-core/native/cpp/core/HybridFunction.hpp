@@ -8,13 +8,14 @@
 #pragma once
 
 namespace margelo::nitro {
-template <typename T, typename Enable>
+template <typename T>
 struct JSIConverter;
 } // namespace margelo::nitro
 
 #include "CountTrailingOptionals.hpp"
 #include "InstanceMethod.hpp"
 #include "JSIConverter.hpp"
+#include "JSIString.hpp"
 #include "NitroDefines.hpp"
 #include "NitroTypeInfo.hpp"
 #include "PropNameIDCache.hpp"
@@ -22,8 +23,11 @@ struct JSIConverter;
 #include <functional>
 #include <jsi/jsi.h>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <typeinfo>
+#include <utility>
 
 namespace margelo::nitro {
 
@@ -68,13 +72,21 @@ public:
 public:
   // functions
   inline jsi::Function toJSFunction(jsi::Runtime& runtime) const {
-    return jsi::Function::createFromHostFunction(runtime, PropNameIDCache::get(runtime, _name), static_cast<unsigned int>(_paramCount),
+    // Each class materializes its members once per Runtime, so caching their names would only grow the PropNameIDCache.
+    // Names are ASCII: Nitrogen rejects other names, and NITRO_DEBUG checks them in the constructor.
+    return jsi::Function::createFromHostFunction(runtime, jsi::PropNameID::forAscii(runtime, _name), static_cast<unsigned int>(_paramCount),
                                                  _function);
   }
 
 private:
   HybridFunction(jsi::HostFunctionType&& function, size_t paramCount, const std::string& name)
-      : _function(std::move(function)), _paramCount(paramCount), _name(name) {}
+      : _function(std::move(function)), _paramCount(paramCount), _name(name) {
+#ifdef NITRO_DEBUG
+    if (!isAscii(_name)) [[unlikely]] {
+      throw std::runtime_error("HybridFunction \"" + _name + "\" has a non-ASCII name. HybridObject class and member names must be ASCII.");
+    }
+#endif
+  }
 
 public:
   /**
@@ -84,6 +96,7 @@ public:
    * The object's `this` needs to be a `NativeState`.
    */
   template <typename THybrid, typename ReturnType, typename... Args>
+    requires((JSIDecodable<std::decay_t<Args>> && ...) && (std::is_void_v<ReturnType> || JSIEncodable<ReturnType>))
   static inline HybridFunction createHybridFunction(/* The name of the method */ const std::string& name,
                                                     /* The method on THybrid */ InstanceMethod<THybrid, ReturnType, Args...> method,
                                                     /* The type of the method */ FunctionKind kind) {
@@ -133,6 +146,29 @@ public:
     return HybridFunction(std::move(hostFunction), sizeof...(Args), name);
   }
 
+  /** Bind a static method or constructor factory with the same conversions as instance methods. */
+  template <typename ReturnType, typename... Args>
+    requires((JSIDecodable<std::decay_t<Args>> && ...) && (std::is_void_v<ReturnType> || JSIEncodable<ReturnType>))
+  static HybridFunction createStaticHybridFunction(const std::string& name, ReturnType (*NON_NULL function)(Args...)) {
+    jsi::HostFunctionType hostFunction = [name, function](jsi::Runtime& runtime, const jsi::Value&,
+                                                         const jsi::Value* args, size_t count) -> jsi::Value {
+      constexpr size_t maximum = sizeof...(Args);
+      constexpr size_t minimum = maximum - trailing_optionals_count_v<Args...>;
+      if (count < minimum || count > maximum) [[unlikely]] {
+        throw jsi::JSError(runtime, "`" + name + "` expected " + std::to_string(minimum) + " to " +
+                                       std::to_string(maximum) + " arguments, but received " + std::to_string(count) + "!");
+      }
+      try {
+        return callStaticFunction(function, runtime, args, count, std::index_sequence_for<Args...>{});
+      } catch (const std::exception& error) {
+        throw jsi::JSError(runtime, name + ": " + error.what());
+      } catch (...) {
+        throw jsi::JSError(runtime, "`" + name + "` threw an unknown " + TypeInfo::getCurrentExceptionName() + " error.");
+      }
+    };
+    return HybridFunction(std::move(hostFunction), sizeof...(Args), name);
+  }
+
   /**
    * Create a new `HybridFunction` that can be called from JS.
    * Unlike `createHybridFunction(...)`, this method does **not** perform any argument parsing or size checking.
@@ -158,6 +194,28 @@ public:
   }
 
 private:
+  template <typename T>
+  static inline T convertArgument(jsi::Runtime& runtime, const jsi::Value* NULLABLE args, size_t count, size_t index) {
+    if (index < count) [[likely]] {
+      return JSIConverter<T>::fromJSI(runtime, args[index]);
+    } else {
+      return JSIConverter<T>::fromJSI(runtime, jsi::Value::undefined());
+    }
+  }
+
+  template <typename ReturnType, typename... Args, size_t... Is>
+  static jsi::Value callStaticFunction(ReturnType (*NON_NULL function)(Args...), jsi::Runtime& runtime,
+                                        const jsi::Value* NULLABLE args, size_t count, std::index_sequence<Is...>) {
+    if constexpr (std::is_void_v<ReturnType>) {
+      function(convertArgument<std::decay_t<Args>>(runtime, args, count, Is)...);
+      return jsi::Value::undefined();
+    } else {
+      ReturnType result = function(convertArgument<std::decay_t<Args>>(runtime, args, count, Is)...);
+      return JSIConverter<std::remove_cvref_t<ReturnType>>::toJSI(runtime, std::forward<ReturnType>(result));
+    }
+  }
+
+private:
   /**
    * Calls the given method on the given instance with the given `jsi::Value` arguments by converting them to the desired target types.
    * The given method's return value will be converted to a `jsi::Value` again.
@@ -168,16 +226,14 @@ private:
                                       /* JS Runtime */ jsi::Runtime& runtime,
                                       /* JS Arguments */ const jsi::Value* NON_NULL args,
                                       /* JS Arguments count */ size_t argsSize, std::index_sequence<Is...>) {
-    static const jsi::Value defaultValue;
-
     if constexpr (std::is_void_v<ReturnType>) {
       // It's a void method.
-      (obj->*method)(JSIConverter<std::decay_t<Args>>::fromJSI(runtime, Is < argsSize ? args[Is] : defaultValue)...);
+      (obj->*method)(convertArgument<std::decay_t<Args>>(runtime, args, argsSize, Is)...);
       return jsi::Value::undefined();
     } else {
       // It's returning some C++ type, we need to convert that to a JSI value now.
-      ReturnType result = (obj->*method)(JSIConverter<std::decay_t<Args>>::fromJSI(runtime, Is < argsSize ? args[Is] : defaultValue)...);
-      return JSIConverter<ReturnType>::toJSI(runtime, std::forward<ReturnType>(result));
+      ReturnType result = (obj->*method)(convertArgument<std::decay_t<Args>>(runtime, args, argsSize, Is)...);
+      return JSIConverter<std::remove_cvref_t<ReturnType>>::toJSI(runtime, std::forward<ReturnType>(result));
     }
   }
 
@@ -229,21 +285,34 @@ private:
 #endif
 
     // 4. Try casting it to our desired target type.
-    std::shared_ptr<THybrid> hybridInstance = std::dynamic_pointer_cast<THybrid>(nativeState);
+    if constexpr (std::is_final_v<THybrid>) {
+      // A final receiver must be the complete object. Validate its exact type, then recover
+      // its address without searching the inheritance hierarchy, even through virtual bases.
+      jsi::NativeState* nativePointer = nativeState.get();
+      if (nativePointer == nullptr || typeid(*nativePointer) != typeid(THybrid)) [[unlikely]] {
+        throw jsi::JSError(runtime, "Cannot " + getHybridFuncDebugInfo<THybrid>(funcKind, funcName) +
+                                        " - `this` has a NativeState, but it's the wrong type!");
+      }
+      auto* pointer = static_cast<THybrid*>(dynamic_cast<void*>(nativePointer));
+      return std::shared_ptr<THybrid>(std::move(nativeState), pointer);
+    } else {
+      // Abstract specs and other extensible receivers still need to accept derived objects.
+      std::shared_ptr<THybrid> hybridInstance = std::dynamic_pointer_cast<THybrid>(nativeState);
 #ifdef NITRO_DEBUG
-    if (hybridInstance == nullptr) [[unlikely]] {
-      throw jsi::JSError(runtime, "Cannot " + getHybridFuncDebugInfo<THybrid>(funcKind, funcName) +
-                                      " - `this` has a NativeState, but it's the wrong type!");
-    }
+      if (hybridInstance == nullptr) [[unlikely]] {
+        throw jsi::JSError(runtime, "Cannot " + getHybridFuncDebugInfo<THybrid>(funcKind, funcName) +
+                                        " - `this` has a NativeState, but it's the wrong type!");
+      }
 #endif
-    return hybridInstance;
+      return hybridInstance;
+    }
   }
 
 private:
   template <typename THybrid>
   static inline std::string getHybridFuncFullName(FunctionKind kind, const std::string& registrationName,
                                                   THybrid* NULLABLE hybridInstance = nullptr) {
-    std::string typeName = hybridInstance != nullptr ? hybridInstance->getName() : TypeInfo::getFriendlyTypename<THybrid>(true);
+    std::string typeName = hybridInstance != nullptr ? hybridInstance->HybridObject::getName() : TypeInfo::getFriendlyTypename<THybrid>(true);
     switch (kind) {
       case FunctionKind::METHOD:
         return typeName + "." + registrationName + "(...)";
