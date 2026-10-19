@@ -82,11 +82,11 @@ struct RuntimeTests {
     try await run(name)
   }
 
-  // Swift Testing conditions apply to a test function, so keep the source
-  // suite's platform/build exclusions in a separate, explicitly disabled group.
+  // Swift Testing conditions apply to a test function, so keep platform/build
+  // exclusions in a separate, explicitly disabled group.
   @Test(
-    "Existing exclusions from main",
-    .disabled("See runtime-test-skips.json for the original platform/build exclusion reasons"),
+    "Platform/build exclusions",
+    .disabled("See runtime-test-skips.json for the platform/build exclusion reasons"),
     arguments: try RuntimeTests.testNames(skipped: true))
   func excludedJavaScript(_ name: String) async throws {
     try await run(name)

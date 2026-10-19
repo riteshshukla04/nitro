@@ -68,7 +68,7 @@ Run `bun docs start`, `bun docs typecheck`, or `bun docs build` for the Docusaur
 
 ## Before requesting review
 
-- Target `core-split` until the reorganization lands on `main`.
+- Target `main`.
 - Include a regression test for each fix, or describe the expected failure for a reproduction-only PR.
 - Build, typecheck, and run the relevant linters and native tests.
 - Commit generated bindings and report checks that could not run.

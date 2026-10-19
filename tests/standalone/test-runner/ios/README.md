@@ -2,7 +2,7 @@
 
 Run `bun test:ios` from the repository root with Xcode, an iOS simulator, CMake and Ninja installed. The command prepares the TypeScript tests and Nitrogen bindings, builds the pinned Hermes sources, and runs Swift Testing through `xcodebuild`.
 
-The project has three static framework targets, `NitroModules`, `NitroTest` and `NitroTestExternal`, and one test bundle. The external fixture remains a separate module so the migrated tests exercise generated bindings across module boundaries. Xcode supplies the simulator test runner. There is no application target or React Native dependency.
+The project has three static framework targets, `NitroModules`, `NitroTest` and `NitroTestExternal`, and one test bundle. The external fixture is a separate module so the tests exercise generated bindings across module boundaries. Xcode supplies the simulator test runner. There is no application target or React Native dependency.
 
 `NitroRuntimeTests.xcodeproj` uses synchronized folders to discover sources and generated bindings. The Core target compiles the sources directly from `packages/nitro-core/native/cpp` and `packages/nitro-core/native/apple`, without React Native source exclusions. The mixed Swift/C++ frameworks preserve the module names and headers emitted by Nitrogen. Hermes is a local Swift package wrapping an XCFramework built from its upstream CMake targets.
 

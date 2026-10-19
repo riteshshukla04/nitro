@@ -1,8 +1,8 @@
 <a href="https://nitro.margelo.com/docs/concepts/nitrogen">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/margelo/nitro/core-split/docs/static/img/banner-nitrogen-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/margelo/nitro/core-split/docs/static/img/banner-nitrogen-light.png" />
-    <img alt="Nitrogen" src="https://raw.githubusercontent.com/margelo/nitro/core-split/docs/static/img/banner-nitrogen-light.png" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/margelo/nitro/main/docs/static/img/banner-nitrogen-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/margelo/nitro/main/docs/static/img/banner-nitrogen-light.png" />
+    <img alt="Nitrogen" src="https://raw.githubusercontent.com/margelo/nitro/main/docs/static/img/banner-nitrogen-light.png" />
   </picture>
 </a>
 

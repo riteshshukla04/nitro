@@ -45,7 +45,7 @@ To run AddressSanitizer on an API 33 x86_64 emulator:
 ./gradlew :connectedDebugAndroidTest -PnitroTestAbi=x86_64 -PnitroSanitizer=address
 ```
 
-ASan instruments Core and the native fixtures/test host. The test APK includes the NDK's ASan runtime and startup wrapper; Hermes remains uninstrumented. Omit `-PnitroSanitizer` for a normal run. CI keeps ASan on API 33, the emulator image previously used for the sanitized Harness tests.
+ASan instruments Core and the native fixtures/test host. The test APK includes the NDK's ASan runtime and startup wrapper; Hermes remains uninstrumented. Omit `-PnitroSanitizer` for a normal run. CI runs ASan on API 33.
 
 `HybridObjectTest` reads the generated `runtime-tests.json` manifest and runs each JavaScript case as a named JUnit parameter. Adding a shared JS test requires no Kotlin changes. Missing, empty, malformed, or duplicate manifest entries fail discovery. JavaScript failures become JUnit assertion failures with the case name and stack. Existing platform and release exclusions from `runtime-test-skips.json` become JUnit assumption skips.
 

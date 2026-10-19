@@ -489,19 +489,6 @@ export function assertClean(cwd) {
     throw new Error('Release requires a clean checkout, including submodules')
 }
 
-export function removeReleaseRequestBranch(
-  requestRef,
-  { gitCommand = git } = {}
-) {
-  const existing = gitCommand([
-    'ls-remote',
-    '--heads',
-    'origin',
-    `refs/heads/${requestRef}`,
-  ])
-  if (existing) gitCommand(['push', 'origin', '--delete', requestRef])
-}
-
 export function assertCI(repository) {
   if (
     process.env.GITHUB_ACTIONS !== 'true' ||

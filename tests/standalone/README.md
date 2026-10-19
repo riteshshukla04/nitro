@@ -8,7 +8,6 @@ JUnit. All three are private workspace packages.
 The suites cover primitives, arrays, maps, variants, structs, callbacks,
 Promises, buffers, inheritance, object lifetime, and the Nitro registry.
 React Native integration and View tests live in `../react-native/`.
-See [MIGRATION.md](MIGRATION.md) for the source inventory and exclusions.
 
 ```text
 tests/standalone/
@@ -52,7 +51,7 @@ bun test:prepare
 `test:prepare` builds the workspace Nitrogen, typechecks the specs and tests,
 regenerates bindings, and bundles the JS into `test-runner/build/runtime-tests.js`.
 It also writes `test-runner/build/runtime-tests.json`, the case list used by both
-native runners, and `test-runner/build/runtime-test-skips.json`, the original
+native runners, and `test-runner/build/runtime-test-skips.json`, the
 platform/build exclusions. The bundle and manifests are generated together.
 Commit generated binding changes with their spec. The **Check Nitrogen output**
 job regenerates bindings for both test environments and checks for drift. It does
@@ -70,9 +69,7 @@ Core, the native fixtures, and the test host. Hermes stays uninstrumented.
 See the [iOS](test-runner/ios/README.md) and
 [Android](test-runner/android/README.md) guides for local sanitizer commands.
 
-All portable Harness cases now run in this suite with the sanitizer
-configurations above. React Native Harness keeps its integration and View tests
-without sanitizers.
+React Native Harness runs integration and View tests without sanitizers.
 
 ## Writing tests
 
@@ -139,9 +136,9 @@ The bundler reads literal keys through TypeScript, without evaluating the module
 or creating native objects in Bun. It rejects case maps with open string index
 signatures, empty suites, invalid callbacks, and exclusions for unknown tests.
 
-Migrated suites also export a literal `skips` object with `as const`. Each key
+Suites with exclusions export a literal `skips` object with `as const`. Each key
 matches a case key, and each value maps `ios`, `android`, or `release` to the
-original exclusion reason. JUnit reports these as assumptions; Swift Testing
+exclusion reason. JUnit reports these as assumptions; Swift Testing
 puts them in a separate disabled parameterized test. They are never counted as
 successful behavior checks. New regressions should fail normally.
 
@@ -167,8 +164,8 @@ An async case keeps that same runtime alive across every `await`. Put repeated
 calls, concurrent Promises, or cache-growth checks in one case when they must
 share runtime state. The suite checks concurrent native completions and a long
 Promise chain with per-iteration captured bindings. This host does not
-install timer APIs such as `setTimeout`. Migrated asynchronous helpers yield via
-the C++ fixture's native `wait` method. The host exposes `gc()` for the original
+install timer APIs such as `setTimeout`. Asynchronous helpers yield via
+the C++ fixture's native `wait` method. The host exposes `gc()` for
 lifetime tests and `__nitroTestPlatform` for platform-dependent assertions.
 
 Fulfillment passes. An assertion, JS exception, rejection, native exception, or
@@ -177,7 +174,7 @@ and JS stack. The helper returns a message across the native boundary rather tha
 exposing JSI values or throwing C++ exceptions into Swift. Bundle setup and test
 execution each get a 10-second timeout. Setup cannot consume the test's budget.
 `withTestTimeout(150_000, test)` gives the four 55,000-object allocation/disposal
-cases the previous Harness CI allowance. Other tests retain the default, and
+cases 150 seconds to complete. Other tests retain the default, and
 the override never extends bundle setup. Native runner contracts pass shorter
 explicit limits to check timeouts.
 Hermes interrupts synchronous JS loops and endless microtask chains in either
@@ -191,7 +188,7 @@ reported stack locations refer to the bundle, not the original TypeScript.
 Tests of the runner's failure and timeout paths ensure failures cannot silently
 pass. Native fixtures perform their Promise work on background threads.
 
-Cases must return or await all asynchronous work. The first host does not track
+Cases must return or await all asynchronous work. The host does not track
 unhandled rejections from work that a test starts and abandons. Its JS timeout
 cannot interrupt a blocking native function; CI also bounds the whole test job.
 
@@ -199,7 +196,7 @@ cannot interrupt a blocking native function; CI also bounds the whole test job.
 
 Hermes is built from the pinned public `static_h` source using upstream CMake
 targets. See [hermes/README.md](hermes/README.md) for updating the pin and building
-the engine. Nothing under `tests/` is included in either npm package.
+the engine. Nothing under `tests/` is included in the published npm packages.
 
 Bun is already pinned by the workspace and bundles TypeScript and Chai into one
 IIFE for the native host. Its `browser` target selects module resolution rules;

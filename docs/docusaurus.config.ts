@@ -109,7 +109,6 @@ const jsonLd = {
       url: homeUrl,
       sameAs: [
         'https://github.com/margelo/nitro',
-        'https://github.com/margelo/nitro',
         'https://www.npmjs.com/package/react-native-nitro-modules',
         'https://www.npmjs.com/package/nitrogen',
       ],

@@ -133,8 +133,7 @@ if (
   path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 ) {
   const root = fileURLToPath(new URL("../", import.meta.url));
-  const check =
-    process.argv.includes("--check") || process.argv.includes("--check-clean");
+  const check = process.argv.includes("--check");
   const { version, files } = syncCore(root, { check });
   console.log(
     `${check ? "Verified" : "Staged"} ${files} native files from workspace nitro-core ${version}.`,

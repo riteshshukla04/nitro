@@ -150,8 +150,7 @@ namespace {
       const auto bundleDeadline = Clock::now() + timeout;
       runtime->watchTimeLimit(timeoutMs);
       install(*runtime, dispatcher);
-      // The migrated tests need platform information and explicit collections,
-      // without React Native's Platform module or development globals.
+      // Expose platform information and explicit garbage collection to the tests.
 #ifdef __ANDROID__
       runtime->global().setProperty(*runtime, "__nitroTestPlatform", "android");
 #else

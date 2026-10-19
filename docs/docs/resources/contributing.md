@@ -19,7 +19,7 @@ The Nitro repository is a Bun monorepo:
 - `packages/react-native-nitro-modules/`: RN entry point and native build integration.
 - `tests/standalone/`: Core runtime tests without React Native.
 - `tests/react-native/apps/`: Example and benchmark apps.
-- `tests/react-native/packages/`: Two fixture libraries for runtime and cross-library tests.
+- `tests/react-native/packages/`: Benchmark objects and View fixtures.
 - `packages/template/`: The RN library template.
 
 ## Run Nitro Example
@@ -36,7 +36,7 @@ You need:
 
 ### 2. Clone the repo
 
-Clone [margelo/nitro](https://github.com/margelo/nitro) and navigate into the `nitro` folder. Target `core-split` until the reorganization lands on `main`.
+Clone [margelo/nitro](https://github.com/margelo/nitro) and navigate into the `nitro` folder. Target `main` for contributions.
 
 ### 3. Install dependencies
 
@@ -133,16 +133,16 @@ for repeat runs and measurement-only retries.
 
 ## Run Nitro Docs
 
-The Nitro docs ([nitro.margelo.com](https://nitro.margelo.com)) live in the `docs/` folder of [margelo/nitro](https://github.com/margelo/nitro/tree/core-split/docs) and are built with [Docusaurus](https://docusaurus.io). Until the reorganization lands on `main`, target `core-split`.
+The Nitro docs ([nitro.margelo.com](https://nitro.margelo.com)) live in the `docs/` folder of [margelo/nitro](https://github.com/margelo/nitro/tree/main/docs) and are built with [Docusaurus](https://docusaurus.io).
 
 To run the Nitro docs, follow these steps:
 
 ### 1. Install dependencies
 
-Clone Nitro's `core-split` branch and install dependencies from its repository root:
+Clone Nitro and install dependencies from its repository root:
 
 ```sh
-git clone --branch core-split https://github.com/margelo/nitro.git
+git clone https://github.com/margelo/nitro.git
 cd nitro
 bun install --frozen-lockfile --ignore-scripts
 ```

@@ -24,7 +24,6 @@ import {
   parseVersion,
   publishPackages,
   registryPackage,
-  removeReleaseRequestBranch,
   run,
   saveDraft,
   validateManifest,
@@ -1141,36 +1140,5 @@ test('a published-release checkpoint cannot be replaced even by its release-even
         execute: () => assert.fail('immutable checkpoint must be reused'),
       }),
     /checkpoint already exists/
-  )
-})
-
-test('request cleanup deletes an existing branch and succeeds when a prior run already deleted it', () => {
-  const request = 'release-request/main/0.38.0/latest/123'
-  const lookup = ['ls-remote', '--heads', 'origin', `refs/heads/${request}`]
-  for (const existing of ['', `${'a'.repeat(40)}\trefs/heads/${request}`]) {
-    const commands = []
-    removeReleaseRequestBranch(request, {
-      gitCommand: (args) => {
-        commands.push(args)
-        return args[0] === 'ls-remote' ? existing : ''
-      },
-    })
-    assert.deepEqual(
-      commands,
-      existing ? [lookup, ['push', 'origin', '--delete', request]] : [lookup]
-    )
-  }
-})
-
-test('request cleanup propagates remote lookup failures without attempting deletion', () => {
-  assert.throws(
-    () =>
-      removeReleaseRequestBranch('release-request/main/0.38.0/latest/123', {
-        gitCommand: (args) => {
-          assert.equal(args[0], 'ls-remote')
-          throw new Error('remote unavailable')
-        },
-      }),
-    /remote unavailable/
   )
 })

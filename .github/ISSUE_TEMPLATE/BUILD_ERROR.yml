@@ -76,7 +76,7 @@ body:
     attributes:
       label: Can you build the Nitro Modules Example app?
       description: >
-        Try the example app in [Nitro](https://github.com/margelo/nitro/tree/core-split/tests/react-native/apps/example) and check whether it reproduces the issue.
+        Try the example app in [Nitro](https://github.com/margelo/nitro/tree/main/tests/react-native/apps/example) and check whether it reproduces the issue.
         **Note:** If you don't try to build the example app, I most likely won't help you with your issue.
       options:
         - I didn't try (⚠️ your issue might get ignored & closed if you don't try this)

@@ -22,7 +22,7 @@ npm i react-native-nitro-modules
 cd ios && pod install
 ```
 
-The package re-exports the shared `nitro-core` API and installs it into the React Native runtime. Existing imports from `react-native-nitro-modules` remain supported.
+The package re-exports the shared `nitro-core` API and installs it into the React Native runtime.
 
 ### Inside a nitro module library
 

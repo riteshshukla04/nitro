@@ -18,7 +18,6 @@ import {
   publishPackages,
   readJSON,
   registryPackage,
-  removeReleaseRequestBranch,
   run,
   saveDraft,
   validateManifest,
@@ -31,16 +30,6 @@ import { checkNativeBuilds } from './native-checks.mjs'
 const root = fileURLToPath(new URL('../../', import.meta.url))
 process.chdir(root)
 const repository = 'margelo/nitro'
-const requestRef = process.env.RELEASE_REQUEST_REF
-const request = requestRef ? requestRef.split('/') : undefined
-if (
-  request &&
-  (request.length !== 5 ||
-    request[0] !== 'release-request' ||
-    !/^\d+$/.test(request[4]))
-) {
-  throw new Error('Invalid release request branch')
-}
 const automaticNightly = process.env.RELEASE_MODE === 'nightly'
 const releaseEventTag = process.env.RELEASE_EVENT_TAG || undefined
 let sourceCommit = git(['rev-parse', 'HEAD'])
@@ -52,12 +41,12 @@ const version = automaticNightly
     )
   : releaseEventTag
     ? versionFromTag(releaseEventTag)
-    : (request?.[2] ?? process.env.RELEASE_VERSION)
+    : process.env.RELEASE_VERSION
 parseVersion(version)
 const nightly = isNightly(version)
 const npmTag = npmTagFor(
   version,
-  automaticNightly ? 'nightly' : (request?.[3] ?? process.env.RELEASE_NPM_TAG)
+  automaticNightly ? 'nightly' : process.env.RELEASE_NPM_TAG
 )
 if (nightly !== (npmTag === 'nightly'))
   throw new Error('Nightly versions must use the nightly npm tag')
@@ -68,12 +57,10 @@ function reportCompletedRelease() {
     appendFileSync(process.env.GITHUB_OUTPUT, `tag=${tag}\n`)
 }
 const branch =
-  request?.[1] ||
   process.env.RELEASE_BRANCH ||
   process.env.GITHUB_REF_NAME ||
   git(['branch', '--show-current'])
-if (!['main', 'core-split'].includes(branch))
-  throw new Error('Release from main or core-split')
+if (branch !== 'main') throw new Error('Release from main')
 if (!dryRun) assertCI(repository)
 assertClean()
 git(['fetch', 'origin', branch, '--tags'])
@@ -262,6 +249,5 @@ if (dryRun) {
 }
 await publishPackages(manifest, directory)
 finishRelease(manifest)
-if (requestRef) removeReleaseRequestBranch(requestRef)
 reportCompletedRelease()
 console.log(`Released ${releasePackages.join(', ')} at ${version}`)

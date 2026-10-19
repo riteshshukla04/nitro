@@ -35,7 +35,7 @@ proxy.
 
 React Native applications should initialize Nitro through
 `react-native-nitro-modules`, which re-exports these APIs and handles native
-installation and worklets support. Existing imports remain valid:
+installation and worklets support:
 
 ```ts
 import { NitroModules, type HybridObject } from 'react-native-nitro-modules'
