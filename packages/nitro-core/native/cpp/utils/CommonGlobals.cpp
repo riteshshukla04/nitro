@@ -132,7 +132,7 @@ jsi::String CommonGlobals::JSON::stringify(jsi::Runtime& runtime, const jsi::Val
   const jsi::Function& stringifyFunc = getGlobalFunction(runtime, "JSON.stringify", [](jsi::Runtime& runtime) {
     return runtime.global().getPropertyAsObject(runtime, "JSON").getPropertyAsFunction(runtime, "stringify");
   });
-  return stringifyFunc.call(runtime, value).getString(runtime);
+  return stringifyFunc.call(runtime, value).asString(runtime);
 }
 
 // pragma MARK: CommonGlobals

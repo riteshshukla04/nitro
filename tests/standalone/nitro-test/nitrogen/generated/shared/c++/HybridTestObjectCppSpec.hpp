@@ -153,6 +153,11 @@ namespace margelo::nitro::test {
       virtual std::vector<std::variant<nitro::NullType, std::string>> bounceNulls(const std::vector<std::variant<nitro::NullType, std::string>>& strings) = 0;
       virtual std::vector<std::optional<std::variant<nitro::NullType, std::string>>> bounceOptionalNulls(const std::vector<std::optional<std::variant<nitro::NullType, std::string>>>& strings) = 0;
       virtual AnyJSON createMap() = 0;
+      virtual AnyJSON createJSON(const std::string& json) = 0;
+      virtual Promise<AnyJSON> createJSONAsync(const std::string& json) = 0;
+      virtual Promise<AnyJSON> createResolvedJSON(const std::string& json) = 0;
+      virtual Promise<AnyJSON> createPendingJSON() = 0;
+      virtual void resolvePendingJSONOnWorker(const std::string& json) = 0;
       virtual AnyJSON mapRoundtrip(const AnyJSON& map) = 0;
       virtual std::vector<std::string> getMapKeys(const AnyJSON& map) = 0;
       virtual AnyJSON mergeMaps(const AnyJSON& a, const AnyJSON& b) = 0;

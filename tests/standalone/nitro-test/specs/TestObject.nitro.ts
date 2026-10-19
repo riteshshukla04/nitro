@@ -212,6 +212,11 @@ export declare class TestObjectCpp extends HybridObject {
 
   // Maps
   createMap(): AnyJSON;
+  createJSON(json: string): AnyJSON;
+  createJSONAsync(json: string): Promise<AnyJSON>;
+  createResolvedJSON(json: string): Promise<AnyJSON>;
+  createPendingJSON(): Promise<AnyJSON>;
+  resolvePendingJSONOnWorker(json: string): void;
   mapRoundtrip(map: AnyJSON): AnyJSON;
   getMapKeys(map: AnyJSON): string[];
   mergeMaps(a: AnyJSON, b: AnyJSON): AnyJSON;

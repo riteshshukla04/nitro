@@ -51,6 +51,7 @@ private:
   bool _hasBooleanWritable = false;
   bool _isBooleanWritable = false;
   std::optional<Promise<double>> _pendingPromise;
+  std::optional<Promise<AnyJSON>> _pendingJSON;
   bool _isolatedBoolean = false;
   std::string _isTextValue;
 
@@ -126,6 +127,11 @@ public:
   std::vector<std::string> getMapKeys(const AnyJSON& map) override;
   AnyJSON mergeMaps(const AnyJSON& a, const AnyJSON& b) override;
   AnyJSON copyAnyMap(const AnyJSON& map) override;
+  AnyJSON createJSON(const std::string& json) override;
+  Promise<AnyJSON> createJSONAsync(const std::string& json) override;
+  Promise<AnyJSON> createResolvedJSON(const std::string& json) override;
+  Promise<AnyJSON> createPendingJSON() override;
+  void resolvePendingJSONOnWorker(const std::string& json) override;
   double funcThatThrows() override;
   Promise<void> funcThatThrowsBeforePromise() override;
   void throwError(const std::exception_ptr& error) override;

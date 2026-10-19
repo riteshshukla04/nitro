@@ -126,6 +126,11 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("bounceNulls", &HybridTestObjectCppSpec::bounceNulls);
       clazz.registerHybridMethod("bounceOptionalNulls", &HybridTestObjectCppSpec::bounceOptionalNulls);
       clazz.registerHybridMethod("createMap", &HybridTestObjectCppSpec::createMap);
+      clazz.registerHybridMethod("createJSON", &HybridTestObjectCppSpec::createJSON);
+      clazz.registerHybridMethod("createJSONAsync", &HybridTestObjectCppSpec::createJSONAsync);
+      clazz.registerHybridMethod("createResolvedJSON", &HybridTestObjectCppSpec::createResolvedJSON);
+      clazz.registerHybridMethod("createPendingJSON", &HybridTestObjectCppSpec::createPendingJSON);
+      clazz.registerHybridMethod("resolvePendingJSONOnWorker", &HybridTestObjectCppSpec::resolvePendingJSONOnWorker);
       clazz.registerHybridMethod("mapRoundtrip", &HybridTestObjectCppSpec::mapRoundtrip);
       clazz.registerHybridMethod("getMapKeys", &HybridTestObjectCppSpec::getMapKeys);
       clazz.registerHybridMethod("mergeMaps", &HybridTestObjectCppSpec::mergeMaps);

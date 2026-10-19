@@ -6,12 +6,12 @@
 //
 
 #include "HybridTestObjectCpp.hpp"
+#include "vendor/json/json.hpp"
 #include <NitroModules/AnyJSON.hpp>
 #include <NitroModules/NitroLogger.hpp>
 #include <NitroModules/ThreadPool.hpp>
 #include <chrono>
 #include <sstream>
-#include <iomanip>
 #include <thread>
 
 #include "HybridBase.hpp"
@@ -331,48 +331,82 @@ std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std:
   return map;
 }
 
-static std::string jsonString(const std::string& value) {
-  std::ostringstream json;
-  json << '"';
-  for (unsigned char character : value) {
-    if (character == '"' || character == '\\') {
-      json << '\\' << character;
-    } else if (character < 0x20) {
-      json << "\\u" << std::hex << std::setw(4) << std::setfill('0') << static_cast<unsigned>(character);
-    } else {
-      json << character;
-    }
-  }
-  json << '"';
-  return json.str();
-}
-
 AnyJSON HybridTestObjectCpp::createMap() {
-  std::ostringstream values;
-  values << std::setprecision(17) << getNumberValue() << ',' << std::boolalpha << getBoolValue() << ','
-         << jsonString(getStringValue()) << ',' << getInt64Value();
-  const std::string array = "[" + values.str() + "]";
-  std::ostringstream fields;
-  fields << std::setprecision(17) << "\"number\":" << getNumberValue() << ",\"bool\":" << std::boolalpha << getBoolValue()
-         << ",\"string\":" << jsonString(getStringValue()) << ",\"int64\":" << getInt64Value() << ",\"null\":null";
-  return AnyJSON{"{" + fields.str() + ",\"array\":" + array + ",\"object\":{" + fields.str() + ",\"array\":[" +
-                 values.str() + "," + array + "]}}"};
+  auto array = nlohmann::json::array({getNumberValue(), getBoolValue(), getStringValue(), getInt64Value()});
+  nlohmann::json object = {
+      {"number", getNumberValue()},
+      {"bool", getBoolValue()},
+      {"string", getStringValue()},
+      {"int64", getInt64Value()},
+      {"null", nullptr},
+      {"array", array},
+  };
+  auto nestedObject = object;
+  nestedObject["array"].push_back(array);
+  object["object"] = std::move(nestedObject);
+  return AnyJSON{object.dump()};
 }
 
 AnyJSON HybridTestObjectCpp::mapRoundtrip(const AnyJSON& map) {
   return map;
 }
 
-std::vector<std::string> HybridTestObjectCpp::getMapKeys(const AnyJSON&) {
-  throw std::runtime_error("AnyJSON does not expose a native C++ object API for getMapKeys().");
+std::vector<std::string> HybridTestObjectCpp::getMapKeys(const AnyJSON& map) {
+  const auto object = nlohmann::json::parse(map.stringRepresentation);
+  if (!object.is_object()) {
+    throw std::invalid_argument("getMapKeys() expects a JSON object.");
+  }
+  std::vector<std::string> keys;
+  keys.reserve(object.size());
+  for (const auto& [key, value] : object.items()) {
+    keys.push_back(key);
+  }
+  return keys;
 }
 
-AnyJSON HybridTestObjectCpp::mergeMaps(const AnyJSON&, const AnyJSON&) {
-  throw std::runtime_error("AnyJSON does not expose a native C++ object API for mergeMaps().");
+AnyJSON HybridTestObjectCpp::mergeMaps(const AnyJSON& a, const AnyJSON& b) {
+  auto first = nlohmann::json::parse(a.stringRepresentation);
+  const auto second = nlohmann::json::parse(b.stringRepresentation);
+  if (!first.is_object() || !second.is_object()) {
+    throw std::invalid_argument("mergeMaps() expects two JSON objects.");
+  }
+  first.update(second);
+  return AnyJSON{first.dump()};
 }
 
 AnyJSON HybridTestObjectCpp::copyAnyMap(const AnyJSON& map) {
   return map;
+}
+
+AnyJSON HybridTestObjectCpp::createJSON(const std::string& json) {
+  // Keep the text unvalidated so malformed input reaches JSIConverter<AnyJSON>::toJSI.
+  return AnyJSON{json};
+}
+
+Promise<AnyJSON> HybridTestObjectCpp::createJSONAsync(const std::string& json) {
+  return Promise<AnyJSON>::async([json]() { return AnyJSON{json}; });
+}
+
+Promise<AnyJSON> HybridTestObjectCpp::createResolvedJSON(const std::string& json) {
+  return Promise<AnyJSON>::resolved(AnyJSON{json});
+}
+
+Promise<AnyJSON> HybridTestObjectCpp::createPendingJSON() {
+  if (_pendingJSON) {
+    throw std::runtime_error("A pending JSON Promise is already waiting for completion.");
+  }
+  _pendingJSON = Promise<AnyJSON>::pending();
+  return _pendingJSON.value();
+}
+
+void HybridTestObjectCpp::resolvePendingJSONOnWorker(const std::string& json) {
+  if (!_pendingJSON) {
+    throw std::runtime_error("No pending JSON Promise is waiting for completion.");
+  }
+  // Only JS calls access the slot; the worker owns the extracted Promise.
+  auto promise = std::move(_pendingJSON.value());
+  _pendingJSON.reset();
+  ThreadPool::shared().run([promise = std::move(promise), json]() { promise.resolve(AnyJSON{json}); });
 }
 
 double HybridTestObjectCpp::funcThatThrows() {
