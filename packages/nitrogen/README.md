@@ -80,7 +80,7 @@ The `implementation` object identifies the native type and, for C++ or Kotlin, i
 | C++ | `{ include: '<MyImages/HybridImage.hpp>', className: 'HybridImage' }` |
 | Kotlin | `{ className: 'HybridImage' }` |
 
-C++ `namespace` and Kotlin `package` are optional arrays of segments within the declaring spec's own `nitro.json` project. Omit them or use `[]` for that project's `cxxNamespace` or `androidNamespace`. For a project configured with `['image']`, `['internal']` selects `margelo::nitro::image::internal` or `com.margelo.nitro.image.internal`. Imported specs use their owning project's config. These options cannot select a namespace or package outside that project, and `null` is invalid. The C++ `include` must contain angle brackets or double quotes, for example `'<MyImages/HybridImage.hpp>'` or `'"HybridImage.hpp"'`. Nitrogen uses that header and the fully qualified C++ class name; the header filename can differ from the class name. Kotlin metadata is typed and validated, but Android generation is not implemented yet.
+C++ `namespace` and Kotlin `package` are optional arrays of segments within the declaring spec's own `nitro.json` project. Omit them or use `[]` for that project's `cxxNamespace` or `androidNamespace`. For a project configured with `['image']`, `['internal']` selects `margelo::nitro::image::internal` or `com.margelo.nitro.image.internal`. Imported specs use their owning project's config. These options cannot select a namespace or package outside that project, and `null` is invalid. The C++ `include` must contain angle brackets or double quotes, for example `'<MyImages/HybridImage.hpp>'` or `'"HybridImage.hpp"'`. Nitrogen uses that header and the fully qualified C++ class name; the header filename can differ from the class name.
 
 Use `@iOS({ ... })` and `@Android({ ... })` to declare platform options. Decorators require TypeScript 5 or newer; standard decorators work without `experimentalDecorators`. Nitrogen reads literal objects, arrays, strings, and booleans from the source. Variables, spreads and computed values are unsupported. The imported helpers provide argument checking. The decorators are metadata for Nitrogen. They sit on declared classes, which compile to no JavaScript, so they never run. If one does run, it throws. That happens when the spec uses `class` instead of `declare class`, or when a transpiler emits decorator calls for declared classes, as swc does with decorators enabled. Compile `.nitro.ts` specs with tsc, esbuild, oxc or Babel instead of swc, or use the library's built output. Write a class's JSDoc above its decorators: editors don't show docs placed between a decorator and `export declare class` when hovering the class in the library's own sources.
 
@@ -344,8 +344,6 @@ The generated spec class redeclares every spec member without `override`. An int
 
 On the JVM, a spec property `width` compiles to a `getWidth()` method and, unless it's `readonly`, a `setWidth(value)` method. An interface function with one of those signatures, such as the Java getter `double getWidth()`, clashes with the property, and the property can't implement it. An interface property `width` clashes with a spec method `getWidth()` the same way.
 
-Android generation is not implemented yet. Nitrogen writes the Kotlin spec class, then stops at Android autolinking.
-
 ## Swift packages
 
 Put `Package.swift` next to `nitro.json` and call `addNitrogenTargets(to:)`:
@@ -417,7 +415,7 @@ Build with Swift 6.4's Swift Build backend or Xcode: the generated C++ bridge us
 
 Move constructor registration from `nitro.json.autolinking` into each spec's decorator `implementation` object and public constructor, then remove the `autolinking` field. Keep the namespace and build-module settings in `nitro.json`. Replace interface specs and `HybridObject<{ ... }>` platform arguments with decorated class declarations extending plain `HybridObject`. Use `allowInheritance: true` for inheritable specs, and `allowMultipleImplementations: true` for those bases. Use `export declare class` in `.nitro.ts` specs, add the `imports` entry, and run Nitrogen, which adds `export * from '#nitro/<ClassName>'` for each class. Import or re-export classes from their relative `.nitro` paths. Ordinary `.ts` and `.d.ts` files can still supply referenced types.
 
-Android/Kotlin generation is not implemented. Constructor and method overloads, rest parameters, static properties, generic specs and declaration merging are unsupported.
+Constructor and method overloads, rest parameters, static properties, generic specs and declaration merging are unsupported.
 
 Cross-package Swift class inheritance supports the class bindings described above. Reusing the same callback/promise helper types in multiple Swift modules still hits an existing helper-conformance generation limitation.
 

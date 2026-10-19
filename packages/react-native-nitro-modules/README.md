@@ -30,17 +30,26 @@ The package re-exports the shared `nitro-core` API and installs it into the Reac
 
 ### Inside a nitro module library
 
-If you are building a nitro module yourself, add [react-native-nitro-modules](https://npmjs.org/react-native-nitro-modules) as a `peerDependency` into your library's `package.json`:
+If you are building a Nitro module, declare `nitro-core` and `react-native-nitro-modules` as optional peer dependencies in your library's `package.json`:
 
 ```json
 {
-  ...
   "peerDependencies": {
-    ...
+    "nitro-core": "*",
     "react-native-nitro-modules": "*"
   },
+  "peerDependenciesMeta": {
+    "nitro-core": {
+      "optional": true
+    },
+    "react-native-nitro-modules": {
+      "optional": true
+    }
+  }
 }
 ```
+
+Also install both packages and Nitrogen as dev dependencies, keeping them on the same Nitro release version. The [library setup guide](../../docs/docs/getting-started/how-to-build-a-nitro-module.md#11-install-nitro-and-nitrogen) explains the optional peer configuration.
 
 Then install `react-native-nitro-modules` as a normal `dependency` in your library's `example/` app as seen above.
 
@@ -50,7 +59,7 @@ Then install `react-native-nitro-modules` as a normal `dependency` in your libra
 
 ### With Nitrogen
 
-When using Nitrogen, all the bindings are automatically generated. You only need to implement C++, Swift or Kotlin interfaces inside your codebase.
+Nitrogen generates the bindings and native specs. Implement the generated C++ abstract class, Swift protocol/base-class composition, or Kotlin abstract class in your codebase.
 
 ### Without Nitrogen
 
@@ -66,7 +75,11 @@ using namespace margelo::nitro;
 
 class MyHybridObject: public HybridObject {
 public:
-  explicit MyHybridObject(): HybridObject(TAG) {}
+  struct Class {
+    using Base = HybridObject::Class;
+    static constexpr const char* name = "MyHybrid";
+    static const std::shared_ptr<const HybridClass>& get();
+  };
 
 public:
   // Property (get)
@@ -77,39 +90,36 @@ public:
   double add(double left, double right) { return left + right; }
 
 public:
-  void loadHybridMethods() override {
-    // Call base method to make sure we properly inherit `toString()` and `equals()`
-    HybridObject::loadHybridMethods();
-    // Register all methods that need to be exposed to JS
-    registerHybrids(this, [](Prototype& prototype) {
-      prototype.registerHybridGetter("number", &MyHybridObject::getNumber);
-      prototype.registerHybridSetter("number", &MyHybridObject::setNumber);
-      prototype.registerHybridMethod("add", &MyHybridObject::add);
-    });
+  const std::shared_ptr<const HybridClass>& getHybridClass() override {
+    return Class::get();
   }
-
-private:
-  static constexpr auto TAG = "MyHybrid";
 };
-```
 
-The `MyHybridObject` can then be registered in the [`HybridObjectRegistry`](https://github.com/margelo/nitro/blob/main/packages/nitro-core/native/cpp/registry/HybridObjectRegistry.hpp) at app startup:
-
-```cpp
-#include <NitroModules/HybridObjectRegistry.hpp>
-
-// Call this at app startup to register the HybridObjects
-void load() {
-  HybridObjectRegistry::registerHybridObjectConstructor(
-    "MyHybrid",
-    []() -> std::shared_ptr<HybridObject> {
+const std::shared_ptr<const HybridClass>& MyHybridObject::Class::get() {
+  static const auto clazz = HybridClass::create<Class>([](HybridClass& clazz) {
+    clazz.registerHybridConstructor(+[]() {
       return std::make_shared<MyHybridObject>();
-    }
-  );
+    });
+    clazz.registerHybridGetter("number", &MyHybridObject::getNumber);
+    clazz.registerHybridSetter("number", &MyHybridObject::setNumber);
+    clazz.registerHybridMethod("add", &MyHybridObject::add);
+  });
+  return clazz;
 }
 ```
 
-Inside your `MyHybridObject`, you can use standard C++ types which will automatically be converted to JS using Nitro's [`JSIConverter<T>`](https://github.com/margelo/nitro/blob/main/packages/nitro-core/native/cpp/include/NitroModules/JSIConverter.hpp) interface.
+The `MyHybridObject` can then be registered in the [`HybridClassRegistry`](https://github.com/margelo/nitro/blob/v1/packages/nitro-core/native/cpp/include/NitroModules/HybridClassRegistry.hpp) at app startup:
+
+```cpp
+#include <NitroModules/HybridClassRegistry.hpp>
+
+// Register the class before JavaScript looks it up.
+void load() {
+  HybridClassRegistry::registerHybridClass("MyHybrid", MyHybridObject::Class::get());
+}
+```
+
+Inside your `MyHybridObject`, you can use standard C++ types which will automatically be converted to JS using Nitro's [`JSIConverter<T>`](https://github.com/margelo/nitro/blob/v1/packages/nitro-core/native/cpp/include/NitroModules/JSIConverter.hpp) interface.
 
 The following C++ / JS types are supported out of the box:
 

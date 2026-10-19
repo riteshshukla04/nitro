@@ -33,7 +33,7 @@ export const NitroUserConfigSchema = z.object({
      *
      * This will be used to generate Swift bridges, as those are always namespaced within the clang module.
      *
-     * If you are using CocoaPods, this should be the Pod name defined in the `.podspec`.
+     * Use the same name in the library's `swiftpmConfig` in package.json.
      * @example `NitroTest`
      */
     iosModuleName: z

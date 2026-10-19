@@ -27,7 +27,7 @@ std::shared_ptr<Dispatcher> dispatcher = ...
 margelo::nitro::install(runtime, dispatcher);
 ```
 
-Your `Dispatcher` implementation must properly implement `runAsync` and `runSync` to schedule calls on a Thread that can safely access the `jsi::Runtime`.
+Your `Dispatcher` must implement `runAsync` and `runSync` to schedule calls on the runtime's thread, and `isOnDispatcher` to report whether the current thread can access that runtime.
 
 :::tip
 If your Runtime can be accessed from any Thread, you can also skip Thread-hops here and just call the functions directly in your Dispatcher.
@@ -45,4 +45,4 @@ jsi::Runtime& runtime = ...
 margelo::nitro::install(runtime);
 ```
 
-In this case, all synchronous methods and properties remain in-tact, but any asynchronous hybrid methods (`Promise`) or callbacks will throw an error that Nitro does not have a `Dispatcher` to get back to the JS Thread.
+Synchronous methods, properties, and borrowed `Inline` callbacks still work. Passing an owning JavaScript `Callback` to native or returning a pending native `Promise` requires a `Dispatcher`. Already-settled native promises can be converted immediately.

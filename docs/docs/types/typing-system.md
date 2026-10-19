@@ -13,8 +13,10 @@ For example, a JS `number` will always be a `double` on the native side:
 <div className="side-by-side-block">
 
 ```ts title="Math.nitro.ts"
-interface Math
-  extends HybridObject<{ ios: 'c++' }> {
+import { type HybridObject, iOS } from 'nitro-core'
+
+@iOS(...)
+export declare class Math extends HybridObject {
   add(a: number, b: number): number
 }
 ```
@@ -26,7 +28,7 @@ interface Math
 class HybridMath : public HybridMathSpec {
 public:
   double add(double a, double b) override;
-}
+};
 ```
 
 </div>

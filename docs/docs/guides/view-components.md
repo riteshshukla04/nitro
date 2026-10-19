@@ -19,19 +19,22 @@ Nitro Views require React Native 0.88 or newer with the New Architecture.
 
 ### 1. Declaration
 
-To create a new Nitro View, declare its props and methods in a `*.nitro.ts` file, and create a type that specializes `HybridView<P, M>` - here `CameraView`:
+Declare a class extending `HybridView` in a `*.nitro.ts` file. Its writable properties become React props, and its methods are available through the native ref:
 
-```ts title="Camera.nitro.ts"
-import type { HybridView, HybridViewProps, HybridViewMethods } from 'react-native-nitro-modules'
+```ts title="CameraView.nitro.ts"
+import { iOS, type HybridView } from 'react-native-nitro-modules'
 
-export interface CameraProps extends HybridViewProps {
+@iOS({
+  language: 'swift',
+  implementation: { className: 'HybridCameraView' }
+})
+export declare class CameraView extends HybridView {
   enableFlash: boolean
 }
-export interface CameraMethods extends HybridViewMethods { }
-
-// highlight-next-line
-export type CameraView = HybridView<CameraProps, CameraMethods>
+export * from '#nitro/CameraView'
 ```
+
+Fabric creates the native view. Omit a public constructor from the spec.
 
 ### 2. Code Generation
 
@@ -60,12 +63,11 @@ Then, run [nitrogen](../concepts/nitrogen):
   </TabItem>
 </Tabs>
 
-This will create a C++ ShadowNode, with an iOS (Swift) and Android (Kotlin) interface, just like any other [Hybrid Object](../concepts/hybrid-objects).
-Additionally, a view config (`CameraViewConfig.json`) will be generated - this is required by Fabric.
+Nitrogen generates the native view bindings and the `CameraViewComponent` export, including its React props and ref types.
 
 ### 3. Implementation
 
-Now it's time to implement the View - simply create a new Swift/Kotlin class/file, extend from `HybridCameraViewSpec` and implement your `.enableFlash` property, as well as the common `.view` accessor:
+Now it's time to implement the View - simply create a new Swift/Kotlin class/file, implement `HybridCameraViewSpec` and implement your `.enableFlash` property, as well as the common `.view` accessor:
 
 <Tabs groupId="native-view-language">
   <TabItem value="swift" label="Swift" default>
@@ -92,33 +94,13 @@ Now it's time to implement the View - simply create a new Swift/Kotlin class/fil
   </TabItem>
 </Tabs>
 
-### 4. Autolink
+### 4. Link the generated sources
 
-Just like any other Hybrid Object, add the Hybrid View to your `nitro.json`'s autolinking configuration:
+The `@iOS` decorator's `implementation` selects `HybridCameraView` to automatically link the native class.
 
-```json title="nitro.json"
-{
-  // ...
-  "autolinking": {
-    "CameraView": {
-      "ios": {
-        "language": "swift",
-        "implementationClassName": "HybridCameraView"
-      },
-      "android": {
-        "language": "kotlin",
-        "implementationClassName": "HybridCameraView"
-      }
-    }
-  }
-}
-```
+#### 4.1. Register View Manager (Android)
 
-Now run nitrogen again.
-
-#### 4.1. Android: Register the View Manager
-
-On Android, you need to register the generated view manager in your React Native package:
+On Android, you additionally need to register the generated view manager in your React Native package:
 
 ```kotlin title="CameraPackage.kt"
 // ...
@@ -134,27 +116,15 @@ public class CameraPackage: BaseReactPackage() {
 }
 ```
 
-### 5. Initialization
+### 5. Render the component
 
-Then, to use the view in JavaScript, use `getHostComponent(..)`:
+Finally, import the generated component from the spec and render it:
 
-```ts
-import { getHostComponent } from 'react-native-nitro-modules'
-import CameraViewConfig from '../nitrogen/generated/shared/json/CameraViewConfig.json'
+```tsx
+import { CameraViewComponent } from './CameraView.nitro'
 
-export const Camera = getHostComponent<CameraProps, CameraMethods>(
-  'Camera',
-  () => CameraViewConfig
-)
-```
-
-### 6. Rendering
-
-And finally, render it:
-
-```jsx
 function App() {
-  return <Camera enableFlash={true} />
+  return <CameraViewComponent enableFlash={true} />
 }
 ```
 
@@ -168,8 +138,8 @@ For example, a custom `<ImageView>` component can be used to render custom `Imag
 <div className="side-by-side-block">
 
 ```ts title="Image.nitro.ts"
-export interface Image
-  extends HybridObject<{ ios: 'swift' }> {
+@iOS(...)
+export declare class Image extends HybridObject {
   readonly width: number
   readonly height: number
   save(): Promise<string>
@@ -181,22 +151,23 @@ export interface Image
 
 ```ts title="ImageView.nitro.ts"
 import { type Image } from './Image.nitro.ts'
-export interface ImageProps
-  extends HybridViewProps {
+@iOS(...)
+export declare class ImageView extends HybridView {
   image: Image
 }
-export type ImageView = HybridView<ImageProps>
+export * from '#nitro/ImageView'
 ```
 
 </div>
 </div>
 
-Then;
+Render the generated component with an existing image:
 
-```jsx
-function App() {
-  const image = await loadImage('https://...')
-  return <ImageView image={image} />
+```tsx
+import { ImageViewComponent } from './ImageView.nitro'
+
+function App({ image }: { image: Image }) {
+  return <ImageViewComponent image={image} />
 }
 ```
 
@@ -240,13 +211,15 @@ To batch prop changes, you can override `beforeUpdate()` and `afterUpdate()` in 
 Pass functions directly to Nitro View props:
 
 ```tsx
-export interface CameraProps extends HybridViewProps {
+@iOS(...)
+export declare class CameraView extends HybridView {
   onCaptured: (image: Image) => void
 }
-export type CameraView = HybridView<CameraProps>
+export * from '#nitro/CameraView'
 
+// In a component file, import CameraViewComponent from './CameraView.nitro'.
 function App() {
-  return <Camera onCaptured={(i) => console.log(i)} />
+  return <CameraViewComponent onCaptured={(image) => console.log(image)} />
 }
 ```
 
@@ -298,15 +271,15 @@ class HybridImageView: HybridImageViewSpec, RecyclableView {
 ## Methods
 
 Since every `HybridView` is also a `HybridObject`, methods can be directly called on the object.
-Assuming our `<Camera>` component has a `takePhoto()` function like so:
+Assuming our `<CameraViewComponent>` component has a `takePhoto()` function like so:
 
 ```ts
-export interface CameraProps extends HybridViewProps { ... }
-export interface CameraMethods extends HybridViewMethods {
+@iOS(...)
+export declare class CameraView extends HybridView {
+  enableFlash: boolean
   takePhoto(): Promise<Image>
 }
-
-export type CameraView = HybridView<CameraProps, CameraMethods>
+export * from '#nitro/CameraView'
 ```
 
 To call the function, you would need to get a reference to the `HybridObject` first using `hybridRef`:
@@ -314,9 +287,9 @@ To call the function, you would need to get a reference to the `HybridObject` fi
 ```jsx
 function App() {
   return (
-    <Camera
+    <CameraViewComponent
       hybridRef={(ref) => {
-        const image = ref.takePhoto()
+        void ref.takePhoto().then((image) => console.log(image))
       }}
     />
   )

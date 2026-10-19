@@ -14,17 +14,17 @@ Here are some tips to make your library even faster.
 
 Any dynamic types require runtime type checking, and cannot be optimized as good as statically known types (compile-time).
 
-### Untyped Maps
+### JSON values (`AnyJSON`)
 
-An [untyped map](../types/untyped-maps) (`AnyMap`) is not only untyped, but also in-efficient. If you can, avoid untyped maps:
+An [AnyJSON value](../types/any-json) is serialized as JSON when crossing the JS/native boundary. Use a typed struct when you know its fields:
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
 
 ```ts title="Bad ❌"
-interface BadDatabase
-  extends HybridObject<{ … }> {
-  getUser(): AnyMap
+@iOS(...)
+export declare class BadDatabase extends HybridObject {
+  getUser(): AnyJSON
 }
 ```
 
@@ -36,8 +36,8 @@ interface User {
   name: string
   age: number
 }
-interface GoodDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class GoodDatabase extends HybridObject {
   getUser(): User
 }
 ```
@@ -57,8 +57,8 @@ Those type-checks are very efficient so this is considered a micro-optimization,
 <div className="side-by-side-block">
 
 ```ts title="Bad ❌"
-interface BadDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class BadDatabase extends HybridObject {
   set(value: number | string): void
 }
 ```
@@ -67,8 +67,8 @@ interface BadDatabase
 <div className="side-by-side-block">
 
 ```ts title="Good ✅"
-interface GoodDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class GoodDatabase extends HybridObject {
   setNumber(value: number): void
   setString(value: string): void
 }
@@ -94,8 +94,8 @@ interface SetPayload {
   value: string
   onCompleted: () => void
 }
-interface BadDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class BadDatabase extends HybridObject {
   set(payload: SetPayload): void
 }
 ```
@@ -104,8 +104,8 @@ interface BadDatabase
 <div className="side-by-side-block">
 
 ```ts title="Good ✅"
-interface GoodDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class GoodDatabase extends HybridObject {
   set(key: string,
       value: string,
       onCompleted: () => void): void
@@ -126,8 +126,8 @@ In such cases, mark your function asynchronous by returning a [`Promise`](../typ
 <div className="side-by-side-block">
 
 ```ts title="Bad ❌"
-interface BadDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class BadDatabase extends HybridObject {
   writeLargeData(data: string): void
 }
 ```
@@ -136,8 +136,8 @@ interface BadDatabase
 <div className="side-by-side-block">
 
 ```ts title="Good ✅"
-interface GoodDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class GoodDatabase extends HybridObject {
   writeLargeData(data: string): Promise<void>
 }
 ```
@@ -158,8 +158,8 @@ For example, to return a large list of numbers we could use [array buffers](../t
 <div className="side-by-side-block">
 
 ```ts title="Bad ❌"
-interface BadDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class BadDatabase extends HybridObject {
   getAsBlob(): number[]
 }
 ```
@@ -168,8 +168,8 @@ interface BadDatabase
 <div className="side-by-side-block">
 
 ```ts title="Good ✅"
-interface GoodDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class GoodDatabase extends HybridObject {
   getAsBlob(): ArrayBuffer
 }
 ```
@@ -192,8 +192,8 @@ interface AllData {
 }
 
 
-interface BadDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class BadDatabase extends HybridObject {
   getAllData(): AllData
 }
 
@@ -207,13 +207,13 @@ const row = data.rows
 <div className="side-by-side-block">
 
 ```ts title="Good ✅"
-interface AllData
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class AllData extends HybridObject {
   findRowWithName(name: string): DataRow
 }
 
-interface GoodDatabase
-  extends HybridObject<{ … }> {
+@iOS(...)
+export declare class GoodDatabase extends HybridObject {
   getAllData(): AllData
 }
 
@@ -232,14 +232,19 @@ The **Good** example is significantly faster than **Bad** because the result of 
 ## Properly use `memorySize`
 
 Since Hybrid Objects are implemented in native code, the JS runtime does not know the memory size of such objects.
-To let the JavaScript runtime know about a Hybrid Object's actual size in memory, Nitro exposes a `memorySize` (or `getExternalMemoryPressure()`) API which you can use to give a rough estimation on the native object's memory size (including any heap allocations you perform):
+To let the JavaScript runtime know about a Hybrid Object's actual size in memory, Nitro exposes a `memorySize` (or `getExternalMemorySize()` in C++) API which you can use to estimate the native object's memory size, including any heap allocations you perform:
 
 ```swift
 class HybridImage : HybridImageSpec {
-  private var cgImage: CGImage
+  private let cgImage: CGImage
+
+  init(cgImage: CGImage) {
+    self.cgImage = cgImage
+    super.init()
+  }
+
   var memorySize: Int {
-    let imageSize = cgImage.width * cgImage.height * cgImage.bytesPerPixel
-    return imageSize
+    return cgImage.bytesPerRow * cgImage.height
   }
 }
 ```

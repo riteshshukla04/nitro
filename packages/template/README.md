@@ -20,4 +20,4 @@ The package pins Nitro and Nitrogen to the exact alpha version that created it. 
 - `nitrogen/generated` contains native bindings and the lazy JavaScript class exports. Commit it and include it in the published package.
 - `package.json` maps `#nitro/*` to the generated `.cjs` modules. Keep that mapping available to the compiled files as well as the source specs.
 
-React Native's SwiftPM autolinking uses `Package.swift` and `swiftpmConfig` from `package.json`. Nitrogen adds targets for the Swift sources in `ios/`, C++ sources in `cpp/`, and generated bindings. The metadata-only podspec lets React Native CLI discover the iOS dependency. Android has no implementation yet.
+React Native's SwiftPM autolinking uses `Package.swift` and `swiftpmConfig` from `package.json`. Nitrogen adds targets for the Swift sources in `ios/`, C++ sources in `cpp/`, and generated bindings. The metadata-only podspec lets React Native CLI discover the iOS dependency.

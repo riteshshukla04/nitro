@@ -51,11 +51,11 @@ export function escapeCppName(string: string): string {
  * The concept is as follows:
  * - If a `type` is easy to runtime-check in JSI (e.g. a `number` is just `.isNumber()`),
  * it should have a very low looselyness value returned here.
- * - If a `type` is hard to runtime-check in JSI (e.g. `AnyMap` can have any key),
+ * - If a `type` is hard to runtime-check in JSI (e.g. `AnyJSON` accepts several JSON value shapes),
  * it should have a very high looselyness value returned here.
  * - Type's looselyness values are compared against each other to determine in which
- * order they should be runtime type-checked - e.g. `AnyMap` should be last (as it can
- * always be `true` if it's just an `object`), and `Promise` should be sooner (as it can
+ * order they should be runtime type-checked - e.g. `AnyJSON` should be last (as it can
+ * match objects, arrays, or primitives), and `Promise` should be sooner (as it can
  * be `instanceof` checked)
  * - As a performance optimization, rank faster checks earlier (e.g. `isNumber()` before
  * `instanceof`, as `instanceof` requires global constructor lookup)

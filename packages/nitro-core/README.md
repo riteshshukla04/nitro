@@ -12,8 +12,8 @@ builds.
 ```ts
 import { HybridObject, iOS, Android } from 'nitro-core'
 
-@iOS({ language: 'swift' })
-@Android({ language: 'kotlin' })
+@iOS({ language: 'swift', allowMultipleImplementations: true })
+@Android({ language: 'kotlin', allowMultipleImplementations: true })
 export declare class Image extends HybridObject {
   readonly width: number
   readonly height: number

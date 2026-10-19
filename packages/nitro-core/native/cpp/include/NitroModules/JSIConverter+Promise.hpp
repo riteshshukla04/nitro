@@ -20,7 +20,7 @@ namespace margelo::nitro {
 
 using namespace facebook;
 
-  // Promise<T, std::exception> <> Promise<T>
+  // Native Promise<T> <> JavaScript Promise<T>
   template <typename TResult>
   struct JSIConverter<Promise<TResult>> final {
     static_assert(!std::is_void_v<TResult>, "Use the JSIConverter<Promise<void>> specialization!");

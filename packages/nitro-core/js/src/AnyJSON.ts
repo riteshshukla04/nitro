@@ -7,7 +7,7 @@
  * - Arrays of arrays or objects
  * - Objects of arrays or objects
  *
- * @note It is recommended to always use typed `interface`s instead of `AnyMap` for
+ * @note It is recommended to always use typed `interface`s instead of `AnyJSON` for
  * both type safety, as well as better performance.
  */
 export type AnyJSON =
