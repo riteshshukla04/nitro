@@ -1,3 +1,4 @@
+import { createSwiftHybridViewManager } from '../../views/swift/SwiftHybridViewManager.js'
 import { wrapSwiftType } from './wrapSwiftType.js'
 import { indent } from '../../utils.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
@@ -33,7 +34,12 @@ export function createSwiftHybridObject(
     ...hybridObjectType.baseTypes.flatMap((b) => b.getRequiredImports('swift')),
   ]
 
-  const protocolBaseClasses = conformances.map((conformance) => conformance.name)
+  const protocolBaseClasses = conformances.map(
+    (conformance) => conformance.name
+  )
+  if (spec.isHybridView) {
+    protocolBaseClasses.push('HybridView')
+  }
   const classBaseClasses: string[] = []
   if (spec.baseTypes.length > 0) {
     if (spec.baseTypes.length > 1) {
@@ -135,6 +141,9 @@ public typealias ${protocolName} = ${protocolName}_protocol & ${protocolName}_ba
     platform: 'ios',
   })
   files.push(...swiftBridge)
+  if (spec.isHybridView) {
+    files.push(...createSwiftHybridViewManager(spec))
+  }
   const types = [...getAllTypes(spec), hybridObjectType]
   const swiftTypes = types.map(wrapSwiftType)
   files.push(...swiftTypes.flatMap((type) => type.getExtraFiles()))

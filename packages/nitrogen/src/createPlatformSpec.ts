@@ -3,6 +3,8 @@ import type { SourceFile } from './syntax/SourceFile.js'
 import { createCppHybridObject } from './syntax/c++/CppHybridObject.js'
 import {
   isSomeHybridObject,
+  isHybridView,
+  isHybridViewBaseClass,
   type Platform,
   type HybridObjectPlatformOptions,
   getHybridObjectPlatformsForType,
@@ -57,6 +59,7 @@ function getHybridObjectSpec(
 ): HybridObjectSpec {
   const language = options.language
   const config = getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
+  const view = isHybridView(type)
 
   const symbol = type.getSymbolOrThrow()
   const name = symbol.getEscapedName()
@@ -98,6 +101,23 @@ function getHybridObjectSpec(
     )
   }
   const constructorDeclaration = constructors[0]
+  if (view) {
+    if (language === 'c++') {
+      throw new Error(
+        `${name}: HybridViews require a Swift or Kotlin view implementation.`
+      )
+    }
+    if (options.implementation == null) {
+      throw new Error(
+        `${name}: HybridViews require a concrete native implementation.`
+      )
+    }
+    if (constructorDeclaration?.getScope() === Scope.Public) {
+      throw new Error(
+        `${name}: React Native creates HybridViews. Omit the constructor or declare it protected.`
+      )
+    }
+  }
   if (constructorDeclaration?.getScope() === Scope.Public) {
     if (options.implementation == null) {
       throw new Error(
@@ -139,6 +159,7 @@ function getHybridObjectSpec(
   if (
     allowMultipleImplementations &&
     options.implementation != null &&
+    !view &&
     constructorParameters == null &&
     staticMethods.length === 0
   ) {
@@ -181,7 +202,7 @@ function getHybridObjectSpec(
   }
 
   const bases = getDirectBaseTypes(type)
-    .filter((t) => isSomeHybridObject(t))
+    .filter((t) => isSomeHybridObject(t) && !isHybridViewBaseClass(t))
     .map((baseType) => {
       const baseOptions = getHybridObjectPlatformsForType(baseType)[platform]
       if (baseOptions == null) {
@@ -232,6 +253,7 @@ function getHybridObjectSpec(
     allowMultipleImplementations: allowMultipleImplementations,
     allowInheritance: options.allowInheritance === true,
     name: name,
+    isHybridView: view,
     properties: properties,
     methods: methods,
     constructor: constructor,

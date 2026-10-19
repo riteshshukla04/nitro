@@ -224,14 +224,15 @@ export function isDirectlyAnyHybridObject(type: Type): boolean {
 }
 
 export function isHybridView(type: Type): boolean {
-  // HybridViews are type aliases for `HybridView`, and `Props & Methods` are just intersected together.
-  const unionTypes = type.getIntersectionTypes()
-  for (const union of unionTypes) {
-    const symbol = union.getSymbol()
-    if (symbol == null) return false
-    return symbol.getName() === 'HybridViewTag'
-  }
-  return false
+  return getDirectBaseTypes(type).some(
+    (base) => isHybridViewBaseClass(base) || isHybridView(base)
+  )
+}
+
+/** The React Native marker is supplied by the runtime, not generated as a spec. */
+export function isHybridViewBaseClass(type: Type): boolean {
+  const symbol = type.getSymbol() ?? type.getAliasSymbol()
+  return symbol?.getName() === 'HybridView'
 }
 
 /** Returns only the platforms explicitly configured on this class. */

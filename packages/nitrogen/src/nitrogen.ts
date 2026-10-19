@@ -8,7 +8,6 @@ import {
 import { mkdir } from 'fs/promises'
 import {
   isSomeHybridObject,
-  isHybridView,
   getHybridObjectLiteralOptions,
   parseHybridObjectPlatforms,
   type Platform,
@@ -36,7 +35,14 @@ import type { Autolinking } from './autolinking/Autolinking.js'
 import { createGitAttributes } from './createGitAttributes.js'
 import { NITROGEN_VERSION } from './config/nitrogenVersion.js'
 import type { HybridObjectSpec } from './syntax/HybridObjectSpec.js'
-import { writeHybridClassRuntime } from './createHybridClassRuntime.js'
+import {
+  writeHybridClassRuntime,
+  type HybridViewRuntimeSpec,
+} from './createHybridClassRuntime.js'
+import {
+  getHybridViewComponentName,
+  getHybridViewProperties,
+} from './views/CppHybridViewComponent.js'
 import { addHybridClassRuntimeStubs } from './hybridClassReExports.js'
 import {
   addMissingHybridClassReExports,
@@ -44,6 +50,7 @@ import {
   type HybridClassSpecFile,
 } from './addHybridClassReExports.js'
 import { getRuntimeImportsErrors } from './checkHybridClassRuntimeImports.js'
+import { getHybridViewExportErrors } from './checkHybridViewExports.js'
 import { getBobPackageScopeWarnings } from './checkBobPackageScopes.js'
 import {
   writeHybridClassManifest,
@@ -170,6 +177,10 @@ export async function runNitrogen({
   const nameErrors = [
     ...getHybridClassNameErrors(classDeclarations),
     ...getNonAsciiNameErrors(classDeclarations),
+    ...getHybridViewExportErrors({
+      sourceFiles: specSourceFiles,
+      outputDirectory: outputDirectory,
+    }),
   ]
   if (nameErrors.length > 0) {
     const messages = nameErrors.map((error) => error.message)
@@ -184,6 +195,7 @@ export async function runNitrogen({
   const filesAfter: string[] = []
   const specFiles: HybridClassSpecFile[] = []
   const hybridClasses: HybridClassManifestEntry[] = []
+  const views = new Map<string, HybridViewRuntimeSpec>()
 
   for (const sourceFile of specSourceFiles) {
     Logger.info(`⏳  Parsing ${sourceFile.getBaseName()}...`)
@@ -194,13 +206,6 @@ export async function runNitrogen({
       if (isSomeHybridObject(declaration.getType())) {
         throw new Error(
           `${declaration.getName()}: HybridObject interfaces are no longer supported. Use export declare class in a .nitro.ts spec.`
-        )
-      }
-    }
-    for (const declaration of sourceFile.getTypeAliases()) {
-      if (isHybridView(declaration.getType())) {
-        throw new Error(
-          `${declaration.getName()}: HybridView specs are not supported. Use a declared HybridObject class instead.`
         )
       }
     }
@@ -248,6 +253,15 @@ export async function runNitrogen({
             options
           )
           specsByPlatform[p].push(spec)
+          if (spec.isHybridView) {
+            const properties = getHybridViewProperties(spec)
+            views.set(spec.name, {
+              name: spec.name,
+              propertyNames: properties.map((property) => property.name),
+              sourceFilePath: sourceFile.getFilePath(),
+              componentName: getHybridViewComponentName(spec),
+            })
+          }
           return files
         })
         allFiles = deduplicateFiles(allFiles)
@@ -360,6 +374,7 @@ export async function runNitrogen({
   Logger.info(`📦  Generating JavaScript runtime modules...`)
   const runtimeFiles = await writeHybridClassRuntime({
     classNames: specFiles.flatMap((specFile) => specFile.classNames),
+    views: [...views.values()],
     outputDirectory: outputDirectory,
   })
   filesAfter.push(...runtimeFiles)

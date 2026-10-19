@@ -21,6 +21,7 @@ import { AnyJSONType } from './types/AnyJSONType.js'
 import { TupleType } from './types/TupleType.js'
 import {
   isSomeHybridObject,
+  isHybridViewBaseClass,
   isDirectlyAnyHybridObject,
   getHybridObjectPlatformsForType,
   type Language,
@@ -417,7 +418,7 @@ export function createType(
       // It is another HybridObject being referenced!
       const typename = getHybridObjectName(type)
       const baseTypes = getDirectBaseTypes(type)
-        .filter((t) => isSomeHybridObject(t))
+        .filter((t) => isSomeHybridObject(t) && !isHybridViewBaseClass(t))
         .map((b) => createType(language, b, false))
       const baseHybrids = baseTypes.filter((b) => b instanceof HybridObjectType)
       const sourceConfig =

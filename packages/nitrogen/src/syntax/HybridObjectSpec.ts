@@ -30,6 +30,7 @@ type NativePlatformSpec<L extends Language> = L extends Language
 export type HybridObjectSpec<L extends Language = Language> =
   NativePlatformSpec<L> & {
     name: string
+    isHybridView: boolean
     allowMultipleImplementations: boolean
     allowInheritance: boolean
     properties: Property[]

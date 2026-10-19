@@ -1,3 +1,4 @@
+import { createKotlinHybridViewManager } from '../../views/kotlin/KotlinHybridViewManager.js'
 import type { KotlinImplementedInterface } from 'nitro-core'
 import { indent } from '../../utils.js'
 import { getAllTypes } from '../getAllTypes.js'
@@ -56,7 +57,13 @@ export function createKotlinHybridObject(
     kotlinBase = baseHybrid.getCode('kotlin', { context: 'value' })
     cxxPartBase = `${kotlinBase}.CxxPart`
   } else {
-    kotlinBase = 'HybridObject'
+    kotlinBase = spec.isHybridView ? 'HybridView' : 'HybridObject'
+    if (spec.isHybridView) {
+      extraImports.push({
+        language: 'kotlin',
+        name: 'com.margelo.nitro.views.HybridView',
+      })
+    }
     cxxPartBase = 'HybridObject.CxxPart'
   }
   const interfaceNames = spec.implementedInterfaces.map(
@@ -141,6 +148,9 @@ abstract class ${name.HybridTSpec}: ${supertypes} {
   })
   files.push(...cppFiles)
   files.push(...extraFiles)
+  if (spec.isHybridView) {
+    files.push(...createKotlinHybridViewManager(spec))
+  }
 
   return files
 }

@@ -7,6 +7,8 @@
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroTest/private/HybridBenchmarkObjectSwiftKotlinSpecSwift.hpp>
+#include <NitroTest/private/HybridRecyclableTestViewSpecSwift.hpp>
+#include <NitroTest/private/HybridTestViewSpecSwift.hpp>
 
 namespace margelo::nitro::test::swift_bridge {
   Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double(const Callback_double& callback) noexcept {
@@ -34,6 +36,44 @@ namespace margelo::nitro::test::swift_bridge {
   void* NON_NULL get_std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_(const std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_& value) {
     auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpecSwift>(value);
     if (!wrapper) throw std::runtime_error("HybridBenchmarkObjectSwiftKotlinSpec is not implemented in Swift");
+    return wrapper->getSwiftPart().toUnsafe();
+  }
+
+  std__shared_ptr_HybridRecyclableTestViewSpec_ create_std__shared_ptr_HybridRecyclableTestViewSpec_(void* NON_NULL pointer) {
+    return std::make_shared<margelo::nitro::test::HybridRecyclableTestViewSpecSwift>(NitroTest::HybridRecyclableTestViewSpec_cxx::fromUnsafe(pointer));
+  }
+
+  void* NON_NULL get_std__shared_ptr_HybridRecyclableTestViewSpec_(const std__shared_ptr_HybridRecyclableTestViewSpec_& value) {
+    auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::HybridRecyclableTestViewSpecSwift>(value);
+    if (!wrapper) throw std::runtime_error("HybridRecyclableTestViewSpec is not implemented in Swift");
+    return wrapper->getSwiftPart().toUnsafe();
+  }
+
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void(const Callback_void& callback) noexcept {
+    try {
+      callback.callSync();
+      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withValue();
+    } catch (...) {
+      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
+    }
+  }
+
+  Callback_void create_Callback_void(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>()> closure) {
+    return Callback_void::make([closure = std::move(closure)]() -> void {
+      auto __result = closure();
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+    });
+  }
+
+  std__shared_ptr_HybridTestViewSpec_ create_std__shared_ptr_HybridTestViewSpec_(void* NON_NULL pointer) {
+    return std::make_shared<margelo::nitro::test::HybridTestViewSpecSwift>(NitroTest::HybridTestViewSpec_cxx::fromUnsafe(pointer));
+  }
+
+  void* NON_NULL get_std__shared_ptr_HybridTestViewSpec_(const std__shared_ptr_HybridTestViewSpec_& value) {
+    auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::HybridTestViewSpecSwift>(value);
+    if (!wrapper) throw std::runtime_error("HybridTestViewSpec is not implemented in Swift");
     return wrapper->getSwiftPart().toUnsafe();
   }
 } // namespace margelo::nitro::test::swift_bridge

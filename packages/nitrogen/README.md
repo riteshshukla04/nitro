@@ -138,7 +138,7 @@ nitrogen/generated/shared/javascript/
   Image.d.cts
 ```
 
-`Image.d.cts` is `export {}`, so TypeScript only sees the declared `Image` class in the spec. At runtime the declaration emits nothing, and `Image` comes from `Image.cjs`. The `.cjs` extension keeps the module CommonJS inside an ESM package. Each class gets a module named after it, so HybridObject class names must be unique within a library, ignoring case. A spec with several classes has one `export *` line per class. If a spec re-exports `#nitro/<Name>` but does not declare `<Name>`, for example after you rename a class, Nitrogen fails and names the line to remove.
+For an ordinary HybridObject, `Image.d.cts` is `export {}`, so TypeScript only sees the declared `Image` class in the spec. View declarations also export their generated component, props and ref types, as described below. At runtime the declaration emits nothing, and `Image` comes from `Image.cjs`. The `.cjs` extension keeps the module CommonJS inside an ESM package. Each class gets a module named after it, so HybridObject class names must be unique within a library, ignoring case. A spec with several classes has one `export *` line per class. If a spec re-exports `#nitro/<Name>` but does not declare `<Name>`, for example after you rename a class, Nitrogen fails and names the line to remove.
 
 `Image.cjs` fetches the native class in a getter on first access and caches it. Bundlers that re-export CommonJS through getters, such as Rolldown, keep classes lazy until they are used. Node's ESM loader reads CommonJS exports while importing, which fetches classes eagerly.
 
@@ -149,6 +149,71 @@ HybridObject headers also have module-qualified include paths. In handwritten C+
 Nitrogen only generates code for HybridObject classes. Other exports from a spec, such as types or helper functions, are ordinary TypeScript.
 
 Commit `nitrogen/generated` and include it when publishing, along with the `imports` entry, `nitro.json`, and the `.nitro.ts` specs with their referenced types. If you pass `--out`, the directory must be inside the package, and `#nitro/*` must map to `<out>/shared/javascript/*.cjs`. Nitrogen deletes files in its output directory that it did not generate, so do not put handwritten files there.
+
+## React Native views
+
+Declare a view class extending `HybridView` from `react-native-nitro-modules`:
+
+```ts
+import { iOS, type HybridView } from 'react-native-nitro-modules'
+
+@iOS({
+  language: 'swift',
+  implementation: { className: 'HybridTestView' },
+})
+export declare class TestView extends HybridView {
+  isBlue: boolean
+  onReady?: () => void
+  getOnDropViewCount(): number
+}
+
+export * from '#nitro/TestView'
+```
+
+Writable properties become React props, including callback properties such as `onReady`. Methods and readonly properties remain available on the native ref. Fabric creates the view, so omit its constructor or declare it protected. A view requires a concrete native implementation.
+
+Nitrogen adds `TestViewComponent` to the generated `TestView.cjs`. Its getter calls `getHostComponent` on first access and caches the result, independently of the lazy native class export. The generated `TestView.d.cts` imports the original spec and declares:
+
+```ts
+export type TestViewProps = ViewProps & Pick<TestView, 'isBlue' | 'onReady'>
+export type TestViewRef = TestView
+export declare const TestViewComponent: HostComponent<
+  TestViewProps & { hybridRef?: (view: TestViewRef) => void }
+>
+```
+
+The spec's `export *` exposes these generated declarations. Re-export the component and types from your package entry point by name:
+
+```ts
+export {
+  TestView,
+  TestViewComponent,
+  type TestViewProps,
+  type TestViewRef,
+} from './TestView.nitro'
+```
+
+Render the component and use `hybridRef` to access the native instance:
+
+```tsx
+<TestViewComponent
+  isBlue
+  hybridRef={(view) => console.log(view.getOnDropViewCount())}
+/>
+```
+
+`ref` retains React Native's host-instance behavior. The generated props also include ordinary `ViewProps`, such as `style` and `onLayout`. Consumers must enable `resolvePackageJsonImports` in their TypeScript configuration so `#nitro/*` declarations resolve; React Native's default TypeScript config disables it.
+
+When Metro compiles `.nitro.ts` sources, enable decorator parsing in the app's Babel config. The TypeScript transform removes declared classes and their decorators:
+
+```js
+module.exports = {
+  presets: ['module:@react-native/babel-preset'],
+  parserOpts: { plugins: ['decorators'] },
+}
+```
+
+Nitrogen generates Fabric registration and native prop updates alongside the class bindings. Swift implementations conform to the generated view spec and provide a `UIView`, with the existing update, drop and recycling hooks. Android generation remains unimplemented.
 
 ## Inline callbacks
 

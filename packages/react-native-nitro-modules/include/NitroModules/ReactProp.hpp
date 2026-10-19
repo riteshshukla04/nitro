@@ -14,6 +14,7 @@
 #include <react/renderer/core/RawValue.h>
 
 #include <memory>
+#include <optional>
 #include <utility>
 
 namespace margelo::nitro {
@@ -31,13 +32,12 @@ template <typename T>
 class ReactProp final {
 private:
   struct Entry final {
-    T value{};
+    std::optional<T> value;
     BorrowingReference<jsi::Value> jsiValue;
-    bool isProvided{false};
 
     Entry() = default;
     Entry(T&& value, BorrowingReference<jsi::Value>&& jsiValue)
-        : value(std::move(value)), jsiValue(std::move(jsiValue)), isProvided(true) {}
+        : value(std::in_place, std::move(value)), jsiValue(std::move(jsiValue)) {}
   };
 
   std::shared_ptr<const Entry> _entry;
@@ -57,8 +57,8 @@ public:
 
 public:
   [[nodiscard]]
-  const T& get() const noexcept {
-    return _entry->value;
+  const T& get() const {
+    return _entry->value.value();
   }
 
   [[nodiscard]]
@@ -73,7 +73,7 @@ public:
    */
   [[nodiscard]]
   bool isProvided() const noexcept {
-    return _entry->isProvided;
+    return _entry->value.has_value();
   }
 
 private:

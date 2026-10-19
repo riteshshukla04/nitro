@@ -145,7 +145,8 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
         name: "${cxxTargetName}",
         dependencies: nitroModuleDependencies + reactNativeDependencies,
         path: ".",
-        exclude: nitrogenExcludes(in: ".", keeping: cxxSourcesInTarget),
+        exclude: nitrogenExcludes(in: ".", keeping: cxxSourcesInTarget)
+            + ["${generatedDirectory}/shared/c++/include"],
         sources: cxxSourcesInTarget,
         publicHeadersPath: "${generatedDirectory}/shared/c++/include",
         cxxSettings: commonCxxSettings + cxxSettings
@@ -204,7 +205,8 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
             "${appleCxxTargetName}",
         ] + nitroModuleDependencies + reactNativeDependencies,
         path: "${iosDirectory}",
-        exclude: nitrogenExcludes(in: "${iosDirectory}", keeping: swiftBridgeSources),
+        exclude: nitrogenExcludes(in: "${iosDirectory}", keeping: swiftBridgeSources)
+            + ["c++/include"],
         sources: swiftBridgeSources,
         publicHeadersPath: "c++/include",
         cxxSettings: commonCxxSettings + swiftBridgeSettings + cxxSettings

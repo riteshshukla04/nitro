@@ -17,6 +17,22 @@
         },
         "language": "swift"
       }
+    },
+    "RecyclableTestView": {
+      "ios": {
+        "implementation": {
+          "className": "HybridRecyclableTestView"
+        },
+        "language": "swift"
+      }
+    },
+    "TestView": {
+      "ios": {
+        "implementation": {
+          "className": "HybridTestView"
+        },
+        "language": "swift"
+      }
     }
   }
 }

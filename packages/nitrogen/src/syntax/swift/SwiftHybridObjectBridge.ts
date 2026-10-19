@@ -183,6 +183,53 @@ self.__implementation = implementation
     )
   }
 
+  if (spec.isHybridView) {
+    const implementation = spec.implementation
+    if (implementation == null) {
+      throw new Error(
+        `${spec.name}: A HybridView needs a Swift implementation class.`
+      )
+    }
+    swiftMethodImplementations.push(
+      `
+// Fabric creates views on the UI thread, independently of JavaScript constructors.
+public static func create${spec.name}View() -> bridge.${bridgeNames.strong} {
+  return ${implementation.className}().getCxxWrapper().getCxxPart()
+}
+
+public static func is${spec.name}Recyclable() -> Bool {
+  return ${implementation.className}.self is any RecyclableView.Type
+}
+`.trim()
+    )
+    if (!spec.baseTypes.some((base) => base.isHybridView)) {
+      swiftMethodImplementations.push(
+        `
+public final func getView() -> UnsafeMutableRawPointer {
+  return Unmanaged.passRetained(__implementation.view).toOpaque()
+}
+
+public final func beforeUpdate() {
+  __implementation.beforeUpdate()
+}
+
+public final func afterUpdate() {
+  __implementation.afterUpdate()
+}
+
+public final func maybePrepareForRecycle() {
+  guard let recyclable = __implementation as? any RecyclableView else { return }
+  recyclable.prepareForRecycle()
+}
+
+public final func onDropView() {
+  __implementation.onDropView()
+}
+`.trim()
+      )
+    }
+  }
+
   const swiftBaseOverrides = baseHybridObjects.map((base) =>
     `
 // C++ uses the accessor for this spec. Keep base upcasts in Swift to avoid

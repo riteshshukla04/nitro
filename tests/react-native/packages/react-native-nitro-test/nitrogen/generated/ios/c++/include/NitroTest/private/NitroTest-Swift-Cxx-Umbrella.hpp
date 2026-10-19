@@ -44,3 +44,8 @@
 #include <NitroTest/HybridBenchmarkObjectSwiftKotlinSpec.hpp>
 #include <NitroTest/private/HybridBenchmarkObjectSwiftKotlinSpec_cxx-Swift.hpp>
 #include <NitroModules/Result.hpp>
+#include <NitroTest/HybridRecyclableTestViewSpec.hpp>
+#include <NitroTest/private/HybridRecyclableTestViewSpec_cxx-Swift.hpp>
+#include <NitroTest/private/ColorScheme-Swift.hpp>
+#include <NitroTest/HybridTestViewSpec.hpp>
+#include <NitroTest/private/HybridTestViewSpec_cxx-Swift.hpp>
