@@ -148,7 +148,7 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
         path: ".",
         exclude: nitrogenExcludes(in: ".", keeping: cxxSourcesInTarget),
         sources: cxxSourcesInTarget,
-        publicHeadersPath: "${generatedDirectory}/shared/c++",
+        publicHeadersPath: "${generatedDirectory}/shared/c++/include",
         cxxSettings: commonCxxSettings + cxxSettings
     )
 
@@ -194,8 +194,6 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
         "${autolinkingObjcSourceName}",
     ].filter { exists("${iosDirectory}/" + $0) }
     let swiftBridgeSettings: [CXXSetting] = [
-        .headerSearchPath("."),
-        .headerSearchPath("c++"),
         // Include Swift's generated header textually after the C++ declarations it uses.
         // Swift Build and Xcode provide the generated header directory.
         .unsafeFlags(["-I\${GENERATED_MODULEMAP_DIR}", "-fno-modules"]),
@@ -209,7 +207,7 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
         path: "${iosDirectory}",
         exclude: nitrogenExcludes(in: "${iosDirectory}", keeping: swiftBridgeSources),
         sources: swiftBridgeSources,
-        publicHeadersPath: "c++",
+        publicHeadersPath: "c++/include",
         cxxSettings: commonCxxSettings + swiftBridgeSettings + cxxSettings
     )
 

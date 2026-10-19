@@ -5,9 +5,9 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+PartialPerson.hpp"
-#include "PartialPerson.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+PartialPerson.hpp>
+#include <NitroTest/PartialPerson.hpp>
 
 namespace margelo::nitro {
 

@@ -5,16 +5,16 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+CoreTypesVariant.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/JSIConverter+CoreTypesVariant.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
-#include "WrappedJsStruct.hpp"
+#include <NitroTest/WrappedJsStruct.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/AnyJSON.hpp>
 #include <variant>
-#include "SwiftConverter+CoreTypesVariant.hpp"
+#include <NitroTest/private/SwiftConverter+CoreTypesVariant.hpp>
 
 namespace margelo::nitro {
 

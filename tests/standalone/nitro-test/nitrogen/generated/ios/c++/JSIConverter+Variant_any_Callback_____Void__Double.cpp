@@ -5,12 +5,12 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+Variant_any_Callback_____Void__Double.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/JSIConverter+Variant_any_Callback_____Void__Double.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <variant>
-#include "SwiftConverter+Variant_any_Callback_____Void__Double.hpp"
+#include <NitroTest/private/SwiftConverter+Variant_any_Callback_____Void__Double.hpp>
 
 namespace margelo::nitro {
 

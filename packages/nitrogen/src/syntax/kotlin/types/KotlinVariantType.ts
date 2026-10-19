@@ -1,3 +1,4 @@
+import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import type { GetCodeOptions, Type } from '../../types/Type.js'
@@ -84,7 +85,10 @@ export class KotlinVariantType extends VariantType implements KotlinType {
       case 'c++':
         imports.push({
           language: language,
-          declaration: { name: `${this.jniName}.hpp`, space: 'user' },
+          declaration: NitroConfig.current.getCxxHeader(
+            `${this.jniName}.hpp`,
+            'private'
+          ),
         })
         break
     }

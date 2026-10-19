@@ -126,8 +126,7 @@ export class HybridObjectType implements Type {
 
   getCppHeader(): { name: string; space: 'user' | 'system' } {
     const { HybridTSpec } = getHybridObjectName(this.hybridObjectName)
-    const moduleName = this.sourceConfig.getIosModuleName()
-    return this.sourceConfig.getCxxHeader(`${moduleName}/${HybridTSpec}.hpp`)
+    return this.sourceConfig.getCxxHeader(`${HybridTSpec}.hpp`)
   }
 
   getRequiredImports(language: Language): SourceImport[] {

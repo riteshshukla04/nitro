@@ -5,12 +5,12 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "Car.hpp"
+#include <NitroTest/Car.hpp>
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <string>
-#include "Powertrain.hpp"
-#include "Person.hpp"
+#include <NitroTest/Powertrain.hpp>
+#include <NitroTest/Person.hpp>
 #include <optional>
 #include <vector>
 #include <variant>

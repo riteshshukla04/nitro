@@ -1,13 +1,10 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
 import { capitalizeName, indent } from '../../utils.js'
-import {
-  createFileMetadataString,
-  isNotDuplicate,
-} from '../helpers.js'
+import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import { OptionalType } from '../types/OptionalType.js'
 import type { KotlinVariantType } from './types/KotlinVariantType.js'
-import { getImportCode } from '../getImportCode.js'
+import { getImportCode, getImportsCode } from '../getImportCode.js'
 
 export function createKotlinVariant(variant: KotlinVariantType): SourceFile[] {
   const publicVariant = variant.type
@@ -220,10 +217,19 @@ ${jniType} ${namespace}::${innerName}::getValue() const {
   const declarationIncludes = imports
     .map((i) => getImportCode(i, 'declaration'))
     .filter(isNotDuplicate)
-  const implementationIncludes = [
-    `#include "${jniName}.hpp"`,
-    ...imports.map((i) => getImportCode(i, 'implementation')),
-  ].filter(isNotDuplicate)
+  const implementationIncludes = getImportsCode(
+    [
+      {
+        language: 'c++',
+        declaration: NitroConfig.current.getCxxHeader(
+          `${jniName}.hpp`,
+          'private'
+        ),
+      },
+      ...imports,
+    ],
+    'implementation'
+  )
 
   const cppParameterType = publicVariant.getCode('c++', {
     context: 'parameter',
@@ -266,7 +272,7 @@ namespace ${cxxNamespace} {
   const fbjniImplementationCode = `
 ${createFileMetadataString(`${jniName}.cpp`)}
 
-${implementationIncludes.join('\n')}
+${implementationIncludes}
 
 namespace ${cxxNamespace} {
   ${indent(cppCreateImplementations.join('\n\n'), '  ')}

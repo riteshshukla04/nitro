@@ -1,3 +1,4 @@
+import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { GetCodeOptions } from '../../types/Type.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
@@ -50,7 +51,10 @@ export class KotlinEnumType extends EnumType implements KotlinType {
       case 'c++':
         imports.push({
           language: language,
-          declaration: { name: `${this.jniName}.hpp`, space: 'user' },
+          declaration: NitroConfig.current.getCxxHeader(
+            `${this.jniName}.hpp`,
+            'private'
+          ),
         })
         break
     }

@@ -34,7 +34,7 @@ export function createIOSAutolinking(specs: HybridObjectSpec[]): IOSAutolinking 
     name: 'module.modulemap',
     language: 'c++',
     platform: 'ios',
-    subdirectory: ['c++'],
+    subdirectory: ['c++', 'include'],
     content: `
 ${createFileMetadataString('module.modulemap')}
 

@@ -5,9 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+HybridPlatformObjectSpec_cxx.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-
+#include <NitroTest/private/JSIConverter+HybridPlatformObjectSpec_cxx.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 
 namespace margelo::nitro {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "HybridBenchmarkObjectCppSpec.hpp"
+#include <NitroTest/HybridBenchmarkObjectCppSpec.hpp>
 
 namespace margelo::nitro::test {
 

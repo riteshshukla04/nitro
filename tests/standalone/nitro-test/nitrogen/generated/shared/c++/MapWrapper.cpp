@@ -5,12 +5,12 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "MapWrapper.hpp"
+#include <NitroTest/MapWrapper.hpp>
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <string>
 #include <unordered_map>
-#include "SecondMapWrapper.hpp"
+#include <NitroTest/SecondMapWrapper.hpp>
 
 namespace margelo::nitro {
 

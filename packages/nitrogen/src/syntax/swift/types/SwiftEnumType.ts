@@ -92,11 +92,17 @@ export class SwiftEnumType extends EnumType implements SwiftType {
           imports.push(
             {
               language,
-              declaration: { name: `JSIConverter+${this.name}.hpp`, space: 'user' },
+              declaration: NitroConfig.current.getCxxHeader(
+                `JSIConverter+${this.name}.hpp`,
+                'private'
+              ),
             },
             {
               language,
-              declaration: { name: `SwiftConverter+${this.name}.hpp`, space: 'user' },
+              declaration: NitroConfig.current.getCxxHeader(
+                `SwiftConverter+${this.name}.hpp`,
+                'private'
+              ),
             }
           )
         }

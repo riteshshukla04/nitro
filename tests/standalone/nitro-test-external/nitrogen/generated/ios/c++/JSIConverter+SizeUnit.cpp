@@ -5,8 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+SizeUnit.hpp"
-#include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
+#include <NitroTestExternal/private/JSIConverter+SizeUnit.hpp>
+#include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/NitroHash.hpp>
 #include <NitroModules/JSIString.hpp>
 

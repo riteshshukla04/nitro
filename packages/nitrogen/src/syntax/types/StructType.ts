@@ -77,7 +77,9 @@ export class StructType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: this.declarationFile.name, space: 'user' },
+          declaration: NitroConfig.current.getCxxHeader(
+            this.declarationFile.name
+          ),
         })
         break
     }

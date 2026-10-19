@@ -4,9 +4,9 @@
 /// https://github.com/margelo/nitro
 /// Copyright © Marc Rousavy @ Margelo
 ///
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/Callback.hpp>
-#include "NitroTest/HybridBenchmarkObjectSwiftKotlinSpecSwift.hpp"
+#include <NitroTest/private/HybridBenchmarkObjectSwiftKotlinSpecSwift.hpp>
 
 namespace margelo::nitro::test::swift_bridge {
   Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double(const Callback_double& callback) noexcept {

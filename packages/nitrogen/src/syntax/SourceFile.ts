@@ -1,6 +1,8 @@
 import type { Language, Platform } from '../getPlatformSpecs.js'
 import type { Type } from './types/Type.js'
 
+export type CxxHeaderVisibility = 'public' | 'private'
+
 /**
  * Represents a file with source code, in a specific programming language.
  */
@@ -25,6 +27,11 @@ export interface SourceFile {
    * The platform this file can be used on or is created for. (e.g. `ios`)
    */
   platform: Platform | 'shared'
+  /**
+   * The include directory for a C++ header. Shared headers default to public;
+   * platform bridge headers default to private.
+   */
+  headerVisibility?: CxxHeaderVisibility
 }
 
 /**

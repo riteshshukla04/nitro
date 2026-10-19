@@ -5,8 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+Record_swift__String_swift__Optional_NitroTest__Variant_NullType_String_cxx_.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+Record_swift__String_swift__Optional_NitroTest__Variant_NullType_String_cxx_.hpp>
 #include <string>
 #include <NitroModules/Null.hpp>
 #include <variant>

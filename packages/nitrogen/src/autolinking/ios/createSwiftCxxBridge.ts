@@ -31,6 +31,13 @@ export function createSwiftCxxBridge(types: SwiftType[]): SourceFile[] {
     .map((i) => getImportCode(i, 'implementation'))
     .filter(isNotDuplicate)
   const definitions = implementations.map((i) => i.code).filter(isNotDuplicate)
+  const umbrellaInclude = getImportCode({
+    language: 'c++',
+    declaration: NitroConfig.current.getCxxHeader(
+      getUmbrellaHeaderName(),
+      'private'
+    ),
+  })
 
   return [
     {
@@ -56,7 +63,7 @@ namespace ${cppNamespace} {
       subdirectory: [],
       content: `
 ${createFileMetadataString(`${bridgeHeaderName}.cpp`)}
-#include "${getUmbrellaHeaderName()}"
+${umbrellaInclude}
 ${implementationIncludes.join('\n')}
 
 namespace ${cppNamespace} {

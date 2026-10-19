@@ -5,11 +5,11 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTestExternalAutolinking.hpp"
+#include <NitroTestExternal/NitroTestExternalAutolinking.hpp>
 #include <NitroModules/HybridClassRegistry.hpp>
 
-#include "NitroTestExternal/HybridBaseSpecSwift.hpp"
-#include "NitroTestExternal/HybridSomeExternalObjectSpecSwift.hpp"
+#include <NitroTestExternal/private/HybridBaseSpecSwift.hpp>
+#include <NitroTestExternal/private/HybridSomeExternalObjectSpecSwift.hpp>
 
 namespace margelo::nitro::test::external {
   void registerHybridClasses() {

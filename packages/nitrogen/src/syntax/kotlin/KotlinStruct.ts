@@ -108,6 +108,19 @@ data class ${structType.structName}(
     .map((i) => getImportCode(i, 'implementation'))
     .filter(isNotDuplicate)
     .sort()
+  const publicTypeInclude = getImportCode({
+    language: 'c++',
+    declaration: NitroConfig.current.getCxxHeader(
+      publicType.declarationFile.name
+    ),
+  })
+  const jniTypeInclude = getImportCode({
+    language: 'c++',
+    declaration: NitroConfig.current.getCxxHeader(
+      `${structType.jniName}.hpp`,
+      'private'
+    ),
+  })
 
   const fbjniCode = `
 ${createFileMetadataString(`${structType.jniName}.hpp`)}
@@ -115,7 +128,7 @@ ${createFileMetadataString(`${structType.jniName}.hpp`)}
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include "${publicType.declarationFile.name}"
+${publicTypeInclude}
 
 namespace ${cxxNamespace} {
 
@@ -150,7 +163,7 @@ namespace ${cxxNamespace} {
   const fbjniImplementationCode = `
 ${createFileMetadataString(`${structType.jniName}.cpp`)}
 
-#include "${structType.jniName}.hpp"
+${jniTypeInclude}
 
 ${implementationIncludes.join('\n')}
 

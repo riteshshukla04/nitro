@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "ExternalObjectStruct.hpp"
+#include <NitroTest/ExternalObjectStruct.hpp>
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <memory>

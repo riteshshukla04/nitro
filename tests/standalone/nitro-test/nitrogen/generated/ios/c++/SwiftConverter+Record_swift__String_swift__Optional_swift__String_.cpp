@@ -5,8 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+Record_swift__String_swift__Optional_swift__String_.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+Record_swift__String_swift__Optional_swift__String_.hpp>
 #include <string>
 #include <optional>
 #include <unordered_map>

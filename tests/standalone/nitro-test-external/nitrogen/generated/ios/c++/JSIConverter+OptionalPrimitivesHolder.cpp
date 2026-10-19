@@ -5,8 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+OptionalPrimitivesHolder.hpp"
-#include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
+#include <NitroTestExternal/private/JSIConverter+OptionalPrimitivesHolder.hpp>
+#include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 
 namespace margelo::nitro {

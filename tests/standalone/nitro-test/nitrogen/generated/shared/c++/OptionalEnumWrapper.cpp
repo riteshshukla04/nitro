@@ -5,11 +5,11 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "OptionalEnumWrapper.hpp"
+#include <NitroTest/OptionalEnumWrapper.hpp>
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <optional>
-#include "Powertrain.hpp"
+#include <NitroTest/Powertrain.hpp>
 
 namespace margelo::nitro {
 

@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JsStyleStruct.hpp"
+#include <NitroTest/JsStyleStruct.hpp>
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <NitroModules/Callback.hpp>

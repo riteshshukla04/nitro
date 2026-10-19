@@ -3,6 +3,7 @@ import { capitalizeName, indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { KotlinEnumType } from './types/KotlinEnumType.js'
+import { getImportCode } from '../getImportCode.js'
 
 export function createKotlinEnum(enumType: KotlinEnumType): SourceFile[] {
   const members = enumType.enumMembers.map(
@@ -35,6 +36,12 @@ enum class ${enumType.enumName}(@DoNotStrip @Keep val value: Int) {
     enumType.enumName
   )
   const cppToJniConverterCode = getCppToJniConverterCode('value', enumType)
+  const enumInclude = getImportCode({
+    language: 'c++',
+    declaration: NitroConfig.current.getCxxHeader(
+      enumType.declarationFile.name
+    ),
+  })
 
   const fbjniCode = `
 ${createFileMetadataString(`${enumType.jniName}.hpp`)}
@@ -42,7 +49,7 @@ ${createFileMetadataString(`${enumType.jniName}.hpp`)}
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include "${enumType.declarationFile.name}"
+${enumInclude}
 
 namespace ${cxxNamespace} {
 

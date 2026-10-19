@@ -1,4 +1,5 @@
 import { createSwiftConverter, getSwiftConverter } from './SwiftConverter.js'
+import { NitroConfig } from '../../config/NitroConfig.js'
 import { wrapSwiftType } from './wrapSwiftType.js'
 import { capitalizeName, indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
@@ -182,7 +183,10 @@ switch (value.index()) {
         ...variantType.getRequiredImports('c++'),
         {
           language: 'c++',
-          declaration: { name: `SwiftConverter+${type.name}.hpp`, space: 'user' },
+          declaration: NitroConfig.current.getCxxHeader(
+            `SwiftConverter+${type.name}.hpp`,
+            'private'
+          ),
         },
       ],
       fromJSI: jsToSwiftConverterCode,

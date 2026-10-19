@@ -5,9 +5,9 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest/HybridChildSpec.hpp"
+#include <NitroTest/HybridChildSpec.hpp>
 #include <string>
-#include "Car.hpp"
+#include <NitroTest/Car.hpp>
 #include <variant>
 
 

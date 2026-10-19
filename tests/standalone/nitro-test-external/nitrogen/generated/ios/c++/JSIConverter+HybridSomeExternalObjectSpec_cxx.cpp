@@ -5,9 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+HybridSomeExternalObjectSpec_cxx.hpp"
-#include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
-
+#include <NitroTestExternal/private/JSIConverter+HybridSomeExternalObjectSpec_cxx.hpp>
+#include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
 
 namespace margelo::nitro {
 

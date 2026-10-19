@@ -4,43 +4,43 @@
 /// https://github.com/margelo/nitro
 /// Copyright © Marc Rousavy @ Margelo
 ///
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 
-#include "JSIConverter+SizeUnit.hpp"
-#include "SwiftConverter+SizeUnit.hpp"
-#include "JSIConverter+Size.hpp"
-#include "SwiftConverter+Size.hpp"
+#include <NitroTest/private/JSIConverter+SizeUnit.hpp>
+#include <NitroTest/private/SwiftConverter+SizeUnit.hpp>
+#include <NitroTest/private/JSIConverter+Size.hpp>
+#include <NitroTest/private/SwiftConverter+Size.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/SwiftResult.hpp>
-#include "NitroTest/HybridBaseSpecSwift.hpp"
-#include "NitroTest/HybridChildSpecSwift.hpp"
+#include <NitroTest/private/HybridBaseSpecSwift.hpp>
+#include <NitroTest/private/HybridChildSpecSwift.hpp>
 #include <memory>
-#include "NitroTest/HybridChildSpec.hpp"
+#include <NitroTest/HybridChildSpec.hpp>
 #include <NitroModules/NitroDefines.hpp>
-#include "NitroTest/HybridBaseSpec.hpp"
-#include "NitroTest/HybridPlatformObjectSpecSwift.hpp"
-#include "JSIConverter+Powertrain.hpp"
-#include "SwiftConverter+Powertrain.hpp"
+#include <NitroTest/HybridBaseSpec.hpp>
+#include <NitroTest/private/HybridPlatformObjectSpecSwift.hpp>
+#include <NitroTest/private/JSIConverter+Powertrain.hpp>
+#include <NitroTest/private/SwiftConverter+Powertrain.hpp>
 #include <NitroModules/JSIConverter+SwiftArray.hpp>
 #include <NitroModules/JSIConverter+SwiftOptional.hpp>
 #include <NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/JSIConverter+SwiftString.hpp>
-#include "JSIConverter+Person.hpp"
-#include "SwiftConverter+Person.hpp"
-#include "JSIConverter+Variant_Double_String.hpp"
-#include "SwiftConverter+Variant_Double_String.hpp"
-#include "JSIConverter+Car.hpp"
-#include "SwiftConverter+Car.hpp"
+#include <NitroTest/private/JSIConverter+Person.hpp>
+#include <NitroTest/private/SwiftConverter+Person.hpp>
+#include <NitroTest/private/JSIConverter+Variant_Double_String.hpp>
+#include <NitroTest/private/SwiftConverter+Variant_Double_String.hpp>
+#include <NitroTest/private/JSIConverter+Car.hpp>
+#include <NitroTest/private/SwiftConverter+Car.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <exception>
-#include <NitroTestExternal-Swift-Cxx-Bridge.hpp>
+#include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Bridge.hpp>
 #include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
-#include "NitroTest/HybridTestObjectSwiftKotlinSpecSwift.hpp"
-#include "NitroTest/HybridTestObjectSwiftKotlinSpec.hpp"
-#include "JSIConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp"
-#include "SwiftConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp"
+#include <NitroTest/private/HybridTestObjectSwiftKotlinSpecSwift.hpp>
+#include <NitroTest/HybridTestObjectSwiftKotlinSpec.hpp>
+#include <NitroTest/private/JSIConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp>
+#include <NitroTest/private/SwiftConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp>
 
 namespace margelo::nitro::test::swift_bridge {
   Promise_NitroTest__Size create_Promise_NitroTest__Size() { return Promise_NitroTest__Size::pending(); }

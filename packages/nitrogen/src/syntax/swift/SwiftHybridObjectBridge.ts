@@ -11,13 +11,12 @@ import { SwiftHybridObjectType } from './types/SwiftHybridObjectType.js'
 import { SwiftInstanceMethod } from './SwiftInstanceMethod.js'
 import { SwiftStaticMethod } from './SwiftStaticMethod.js'
 import { SwiftConstructor } from './SwiftConstructor.js'
-import { getImportsCode } from '../getImportCode.js'
+import { getImportCode, getImportsCode } from '../getImportCode.js'
 import {
   getProtocolConformanceImports,
   getSwiftImports,
 } from './getSwiftImports.js'
 import type { SwiftMethodBridge } from './SwiftMethodHelpers.js'
-import { createModuleHeader } from '../c++/createModuleHeader.js'
 
 function getCxxPartName(type: HybridObjectType): string {
   const name = getHybridObjectName(type.hybridObjectName).HybridTSpecSwift
@@ -419,6 +418,17 @@ private:
     ],
     'implementation'
   )
+  const cppUmbrellaInclude = getImportCode({
+    language: 'c++',
+    declaration: spec.config.getCxxHeader(getUmbrellaHeaderName(), 'private'),
+  })
+  const cppImplementationInclude = getImportCode({
+    language: 'c++',
+    declaration: spec.config.getCxxHeader(
+      `${hybridObjectNames.HybridTSpecSwift}.hpp`,
+      'private'
+    ),
+  })
   const cppHeaderCode = `
 ${createFileMetadataString(`${hybridObjectNames.HybridTSpecSwift}.hpp`)}
 
@@ -428,7 +438,7 @@ ${cppImports}
 ${cppBaseImports}
 
 // This implementation header is consumed only by C++ translation units.
-#include "${getUmbrellaHeaderName()}"
+${cppUmbrellaInclude}
 
 namespace ${cppNamespace} {
 
@@ -454,7 +464,7 @@ const std::shared_ptr<const HybridClass>& ${hybridObjectNames.HybridTSpecSwift}:
   const cppImplementationCode = `
 ${createFileMetadataString(`${hybridObjectNames.HybridTSpecSwift}.cpp`)}
 
-#include "${hybridObjectNames.HybridTSpecSwift}.hpp"
+${cppImplementationInclude}
 #include <NitroModules/SwiftConverter.hpp>
 #include <NitroModules/SwiftResult.hpp>
 #include <optional>
@@ -480,11 +490,6 @@ namespace ${cppNamespace} {
       platform: 'ios',
       subdirectory: [],
     },
-    createModuleHeader({
-      name: `${hybridObjectNames.HybridTSpecSwift}.hpp`,
-      moduleName: swiftModuleName,
-      platform: 'ios',
-    }),
     {
       name: `${hybridObjectNames.HybridTSpecSwift}.cpp`,
       content: cppImplementationCode,

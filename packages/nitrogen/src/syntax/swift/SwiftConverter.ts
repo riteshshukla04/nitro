@@ -1,6 +1,7 @@
 import type { Type } from '../types/Type.js'
 import { wrapSwiftType } from './wrapSwiftType.js'
 import { getUmbrellaHeaderName } from '../../autolinking/ios/createSwiftUmbrellaHeader.js'
+import { NitroConfig } from '../../config/NitroConfig.js'
 import { indent } from '../../utils.js'
 import { getImportsCode } from '../getImportCode.js'
 import { createFileMetadataString } from '../helpers.js'
@@ -56,8 +57,26 @@ export function createSwiftConverter({
   }
   const cppImports = type.getRequiredImports('c++')
   const declarationIncludes = getImportsCode(cppImports, 'declaration')
+  const implementationImports: SourceImport[] = [
+    {
+      language: 'c++',
+      declaration: NitroConfig.current.getCxxHeader(
+        getUmbrellaHeaderName(),
+        'private'
+      ),
+    },
+    {
+      language: 'c++',
+      declaration: NitroConfig.current.getCxxHeader(
+        `${converterName}.hpp`,
+        'private'
+      ),
+    },
+    ...cppImports,
+    ...imports,
+  ]
   const implementationIncludes = getImportsCode(
-    [...cppImports, ...imports],
+    implementationImports,
     'implementation'
   )
 
@@ -84,8 +103,6 @@ namespace margelo::nitro {
   const cppImplementationCode = `
 ${createFileMetadataString(`${converterName}.cpp`)}
 
-#include "${getUmbrellaHeaderName()}"
-#include "${converterName}.hpp"
 ${implementationIncludes}
 
 namespace margelo::nitro {

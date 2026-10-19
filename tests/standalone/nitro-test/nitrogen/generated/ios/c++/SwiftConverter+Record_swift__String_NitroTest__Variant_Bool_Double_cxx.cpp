@@ -5,8 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+Record_swift__String_NitroTest__Variant_Bool_Double_cxx.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+Record_swift__String_NitroTest__Variant_Bool_Double_cxx.hpp>
 #include <string>
 #include <variant>
 #include <unordered_map>

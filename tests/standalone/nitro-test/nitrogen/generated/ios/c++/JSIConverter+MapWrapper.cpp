@@ -5,8 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+MapWrapper.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/JSIConverter+MapWrapper.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 
 namespace margelo::nitro {

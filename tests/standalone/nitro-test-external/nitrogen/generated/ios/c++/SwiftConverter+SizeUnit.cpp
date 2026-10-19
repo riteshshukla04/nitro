@@ -5,9 +5,9 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+SizeUnit.hpp"
-#include "SizeUnit.hpp"
+#include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
+#include <NitroTestExternal/private/SwiftConverter+SizeUnit.hpp>
+#include <NitroTestExternal/SizeUnit.hpp>
 #include <NitroModules/NitroDefines.hpp>
 
 namespace margelo::nitro {

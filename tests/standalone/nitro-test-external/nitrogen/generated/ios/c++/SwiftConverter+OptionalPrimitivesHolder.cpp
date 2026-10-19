@@ -5,9 +5,9 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+OptionalPrimitivesHolder.hpp"
-#include "OptionalPrimitivesHolder.hpp"
+#include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
+#include <NitroTestExternal/private/SwiftConverter+OptionalPrimitivesHolder.hpp>
+#include <NitroTestExternal/OptionalPrimitivesHolder.hpp>
 
 namespace margelo::nitro {
 

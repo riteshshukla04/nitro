@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridPlatformObjectSpecSwift.hpp"
+#include <NitroTest/private/HybridPlatformObjectSpecSwift.hpp>
 #include <NitroModules/SwiftConverter.hpp>
 #include <NitroModules/SwiftResult.hpp>
 #include <optional>

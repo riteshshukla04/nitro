@@ -5,9 +5,9 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+JsStyleStruct.hpp"
-#include "JsStyleStruct.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+JsStyleStruct.hpp>
+#include <NitroTest/JsStyleStruct.hpp>
 
 namespace margelo::nitro {
 

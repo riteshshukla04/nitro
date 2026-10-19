@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "HybridTestObjectCppSpec.hpp"
+#include <NitroTest/HybridTestObjectCppSpec.hpp>
 #include <jsi/jsi.h>
 
 namespace margelo::nitro::test {

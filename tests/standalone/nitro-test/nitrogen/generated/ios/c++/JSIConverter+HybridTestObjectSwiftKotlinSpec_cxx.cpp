@@ -5,9 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-
+#include <NitroTest/private/JSIConverter+HybridTestObjectSwiftKotlinSpec_cxx.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 
 namespace margelo::nitro {
 

@@ -52,7 +52,7 @@ export function createKotlinHybridClassBindings(
   const adapters: string[] = []
   imports.push({
     language: 'c++',
-    declaration: { name: `${JHybridTSpec}.hpp`, space: 'user' },
+    declaration: spec.config.getCxxHeader(`${JHybridTSpec}.hpp`, 'private'),
   })
   for (const callable of callables) {
     const { cppMethods } = callable.createBridge()

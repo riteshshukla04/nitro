@@ -8,7 +8,7 @@
 #pragma once
 
 #include "HybridBase.hpp"
-#include "HybridChildSpec.hpp"
+#include <NitroTest/HybridChildSpec.hpp>
 
 namespace margelo::nitro::test {
 

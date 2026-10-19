@@ -12,5 +12,5 @@
 // uses, so Swift files that import this module can name the namespace.
 #include <NitroTestExternalAppleCxx/NitroTestExternalAppleCxx.h>
 
-#include <NitroTestAppleCxx/NitroTestAutolinking.hpp>
-#include "../../../c++/NitroTest-Swift-Cxx-Bridge.hpp"
+#include "../../../c++/include/NitroTest/NitroTestAutolinking.hpp"
+#include "../../../c++/include/NitroTest/private/NitroTest-Swift-Cxx-Bridge.hpp"

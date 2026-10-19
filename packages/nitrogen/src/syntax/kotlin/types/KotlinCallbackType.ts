@@ -1,3 +1,4 @@
+import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import {
@@ -115,7 +116,10 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
         imports.push(
           {
             language: language,
-            declaration: { name: `${this.jniName}.hpp`, space: 'user' },
+            declaration: NitroConfig.current.getCxxHeader(
+              `${this.jniName}.hpp`,
+              'private'
+            ),
           },
           {
             language: language,

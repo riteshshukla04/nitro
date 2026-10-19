@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridTestObjectSwiftKotlinSpecSwift.hpp"
+#include <NitroTest/private/HybridTestObjectSwiftKotlinSpecSwift.hpp>
 #include <NitroModules/SwiftConverter.hpp>
 #include <NitroModules/SwiftResult.hpp>
 #include <optional>

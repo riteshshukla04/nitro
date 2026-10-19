@@ -5,10 +5,10 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "WrappedJsStruct.hpp"
+#include <NitroTest/WrappedJsStruct.hpp>
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
-#include "JsStyleStruct.hpp"
+#include <NitroTest/JsStyleStruct.hpp>
 #include <vector>
 
 namespace margelo::nitro {

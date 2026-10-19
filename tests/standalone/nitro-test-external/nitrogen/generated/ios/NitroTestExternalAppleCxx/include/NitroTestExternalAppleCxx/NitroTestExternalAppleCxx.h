@@ -7,5 +7,5 @@
 
 #pragma once
 
-#include <NitroTestExternalAppleCxx/NitroTestExternalAutolinking.hpp>
-#include "../../../c++/NitroTestExternal-Swift-Cxx-Bridge.hpp"
+#include "../../../c++/include/NitroTestExternal/NitroTestExternalAutolinking.hpp"
+#include "../../../c++/include/NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Bridge.hpp"

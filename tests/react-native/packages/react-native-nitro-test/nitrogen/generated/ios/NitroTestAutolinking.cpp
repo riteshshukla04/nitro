@@ -5,11 +5,11 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTestAutolinking.hpp"
+#include <NitroTest/NitroTestAutolinking.hpp>
 #include <NitroModules/HybridClassRegistry.hpp>
 
-#include "NitroTest/HybridBenchmarkObjectCppSpec.hpp"
-#include "NitroTest/HybridBenchmarkObjectSwiftKotlinSpecSwift.hpp"
+#include <NitroTest/HybridBenchmarkObjectCppSpec.hpp>
+#include <NitroTest/private/HybridBenchmarkObjectSwiftKotlinSpecSwift.hpp>
 
 namespace margelo::nitro::test {
   void registerHybridClasses() {

@@ -88,7 +88,7 @@ func addNitrogenTargets(
         path: ".",
         exclude: nitrogenExcludes(in: ".", keeping: cxxSourcesInTarget),
         sources: cxxSourcesInTarget,
-        publicHeadersPath: "nitrogen/generated/shared/c++",
+        publicHeadersPath: "nitrogen/generated/shared/c++/include",
         cxxSettings: commonCxxSettings + cxxSettings
     )
 
@@ -134,8 +134,6 @@ func addNitrogenTargets(
         "NitroTestAutolinking.mm",
     ].filter { exists("nitrogen/generated/ios/" + $0) }
     let swiftBridgeSettings: [CXXSetting] = [
-        .headerSearchPath("."),
-        .headerSearchPath("c++"),
         // Include Swift's generated header textually after the C++ declarations it uses.
         // Swift Build and Xcode provide the generated header directory.
         .unsafeFlags(["-I${GENERATED_MODULEMAP_DIR}", "-fno-modules"]),
@@ -149,7 +147,7 @@ func addNitrogenTargets(
         path: "nitrogen/generated/ios",
         exclude: nitrogenExcludes(in: "nitrogen/generated/ios", keeping: swiftBridgeSources),
         sources: swiftBridgeSources,
-        publicHeadersPath: "c++",
+        publicHeadersPath: "c++/include",
         cxxSettings: commonCxxSettings + swiftBridgeSettings + cxxSettings
     )
 

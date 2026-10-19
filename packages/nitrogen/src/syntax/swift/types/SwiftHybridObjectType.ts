@@ -126,10 +126,7 @@ export class SwiftHybridObjectType
   /** The header declaring the C++ class that wraps this Swift implementation. */
   getCxxPartHeader(): { name: string; space: 'user' | 'system' } {
     const { HybridTSpecSwift } = getHybridObjectName(this.hybridObjectName)
-    const moduleName = this.sourceConfig.getIosModuleName()
-    return this.sourceConfig.getCxxHeader(
-      `${moduleName}/${HybridTSpecSwift}.hpp`
-    )
+    return this.sourceConfig.getCxxHeader(`${HybridTSpecSwift}.hpp`, 'private')
   }
 
   override getCode(language: Language, options: GetCodeOptions): string {
@@ -174,11 +171,17 @@ export class SwiftHybridObjectType
             imports.push(
               {
                 language,
-                declaration: { name: `JSIConverter+${this.name}.hpp`, space: 'user' },
+                declaration: this.sourceConfig.getCxxHeader(
+                  `JSIConverter+${this.name}.hpp`,
+                  'private'
+                ),
               },
               {
                 language,
-                declaration: { name: `SwiftConverter+${this.name}.hpp`, space: 'user' },
+                declaration: this.sourceConfig.getCxxHeader(
+                  `SwiftConverter+${this.name}.hpp`,
+                  'private'
+                ),
               }
             )
           }
@@ -229,7 +232,8 @@ export class SwiftHybridObjectType
         {
           language: 'c++',
           declaration: type.sourceConfig.getCxxHeader(
-            `${type.sourceConfig.getSwiftBridgeHeaderName()}.hpp`
+            `${type.sourceConfig.getSwiftBridgeHeaderName()}.hpp`,
+            'private'
           ),
         },
       ]

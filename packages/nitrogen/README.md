@@ -326,6 +326,8 @@ For `ios.iosModuleName: "NitroImage"`, the helper adds the `NitroImage` library 
 - `NitroImage`: your Swift sources in `ios/` and the specs in `nitrogen/generated/ios/swift`.
 - `NitroImageSwiftBridge`: the generated C++ wrappers and autolinking sources.
 
+Generated C++ headers live in `include/<Module>/` below their `shared/c++` or `ios/c++` directory. Public headers declare user types, HybridObject specs, and autolinking functions. Internal bridge and converter headers live in `include/<Module>/private/`. These directories contain the declarations themselves, without forwarding headers. Include generated types with their module prefix, for example `#include <NitroImage/Size.hpp>`.
+
 Pass `swiftSources` and `cxxSources` to use other source paths. Paths are relative to the package root; paths that don't exist are skipped. C++ source paths are also added to the header search paths:
 
 ```swift

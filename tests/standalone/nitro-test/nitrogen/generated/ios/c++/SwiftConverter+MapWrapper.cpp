@@ -5,9 +5,9 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+MapWrapper.hpp"
-#include "MapWrapper.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+MapWrapper.hpp>
+#include <NitroTest/MapWrapper.hpp>
 
 namespace margelo::nitro {
 

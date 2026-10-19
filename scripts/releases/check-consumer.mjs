@@ -152,7 +152,7 @@ export function checkConsumer(tarballs) {
   });
   const header = path.join(
     consumer,
-    "nitrogen/generated/shared/c++/HybridMathSpec.hpp",
+    "nitrogen/generated/shared/c++/include/ReleaseCheck/HybridMathSpec.hpp",
   );
   if (!existsSync(header) || !readFileSync(header, "utf8").includes("add("))
     throw new Error("Packed Nitrogen did not generate the consumer spec");
@@ -242,7 +242,7 @@ function checkReactNativeConsumer(packed, version) {
   );
   for (const file of [
     "shared/c++/views/HybridTestViewComponent.cpp",
-    "shared/c++/HybridBenchmarkObjectCppSpec.hpp",
+    "shared/c++/include/NitroTest/HybridBenchmarkObjectCppSpec.hpp",
     "ios/swift/HybridBenchmarkObjectSwiftKotlinSpec.swift",
     "android/kotlin/com/margelo/nitro/test/HybridBenchmarkObjectSwiftKotlinSpec.kt",
     "ios/swift/HybridTestViewSpec.swift",

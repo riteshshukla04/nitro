@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridTestObjectCppSpec.hpp"
+#include <NitroTest/HybridTestObjectCppSpec.hpp>
 
 namespace margelo::nitro::test {
 

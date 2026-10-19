@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "OptionalWrapper.hpp"
+#include <NitroTest/OptionalWrapper.hpp>
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <NitroModules/ArrayBuffer.hpp>

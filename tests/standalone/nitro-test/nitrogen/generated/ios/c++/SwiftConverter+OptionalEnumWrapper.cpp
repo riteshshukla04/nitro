@@ -5,9 +5,9 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+OptionalEnumWrapper.hpp"
-#include "OptionalEnumWrapper.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+OptionalEnumWrapper.hpp>
+#include <NitroTest/OptionalEnumWrapper.hpp>
 
 namespace margelo::nitro {
 

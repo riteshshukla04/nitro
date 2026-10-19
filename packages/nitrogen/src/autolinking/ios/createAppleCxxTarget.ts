@@ -23,6 +23,8 @@ export function createAppleCxxTarget(
   const bridgeHeaderName = `${NitroConfig.current.getSwiftBridgeHeaderName()}.hpp`
   // Headers in <Module>AppleCxx/include/<Module>AppleCxx/ reach ios/ through three parents.
   const iosDirectory = '../../..'
+  // AppleCxx is built before SwiftBridge, so it accesses the declarations directly.
+  const headerDirectory = `${iosDirectory}/c++/include/${moduleName}`
   let dependencyIncludes: string
   if (moduleDependencies.length > 0) {
     const includes = moduleDependencies.map((config) => {
@@ -44,15 +46,8 @@ ${createFileMetadataString(`${targetName}.h`)}
 
 #pragma once
 ${dependencyIncludes}
-#include <${targetName}/${autolinkingHeaderName}>
-#include "${iosDirectory}/c++/${bridgeHeaderName}"
-  `.trim()
-  const autolinkingHeaderCode = `
-${createFileMetadataString(autolinkingHeaderName)}
-
-#pragma once
-
-#include "${iosDirectory}/${autolinkingHeaderName}"
+#include "${headerDirectory}/${autolinkingHeaderName}"
+#include "${headerDirectory}/private/${bridgeHeaderName}"
   `.trim()
   const implementationCode = `
 ${createFileMetadataString(`${targetName}.cpp`)}
@@ -67,13 +62,6 @@ ${createFileMetadataString(`${targetName}.cpp`)}
       content: umbrellaHeaderCode,
       language: 'c++',
       name: `${targetName}.h`,
-      platform: 'ios',
-      subdirectory: includeDirectory,
-    },
-    {
-      content: autolinkingHeaderCode,
-      language: 'c++',
-      name: autolinkingHeaderName,
       platform: 'ios',
       subdirectory: includeDirectory,
     },

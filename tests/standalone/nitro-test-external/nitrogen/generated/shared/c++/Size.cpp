@@ -5,10 +5,10 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "Size.hpp"
+#include <NitroTestExternal/Size.hpp>
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
-#include "SizeUnit.hpp"
+#include <NitroTestExternal/SizeUnit.hpp>
 
 namespace margelo::nitro {
 

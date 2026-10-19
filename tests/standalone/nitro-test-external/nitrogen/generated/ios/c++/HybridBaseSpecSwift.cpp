@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridBaseSpecSwift.hpp"
+#include <NitroTestExternal/private/HybridBaseSpecSwift.hpp>
 #include <NitroModules/SwiftConverter.hpp>
 #include <NitroModules/SwiftResult.hpp>
 #include <optional>

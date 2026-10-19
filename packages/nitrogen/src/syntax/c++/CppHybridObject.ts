@@ -1,5 +1,5 @@
 import type { SourceFile, SourceImport } from '../SourceFile.js'
-import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
+import { createFileMetadataString } from '../helpers.js'
 import { indent } from '../../utils.js'
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
@@ -12,7 +12,6 @@ import {
   type HybridClassBindings,
 } from './CppHybridClassBindings.js'
 import { createKotlinHybridClassBindings } from '../kotlin/KotlinHybridClassBindings.js'
-import { createModuleHeader } from './createModuleHeader.js'
 
 export function createCppHybridObject(
   spec: HybridObjectSpec,
@@ -67,9 +66,10 @@ export function createCppHybridObject(
       })
     ),
   ]
-  const cppDeclarationIncludes = declarationImports
-    .map((i) => getImportCode(i, 'declaration'))
-    .filter(isNotDuplicate)
+  const cppDeclarationIncludes = getImportsCode(
+    declarationImports,
+    'declaration'
+  )
   const cxxNamespace = spec.config.getCxxNamespace('c++')
   const name = getHybridObjectName(spec.name)
   let bindings: HybridClassBindings | undefined
@@ -93,10 +93,11 @@ export function createCppHybridObject(
     language: 'c++',
     declaration: new HybridObjectType(spec).getCppHeader(),
   }
-  const cppImplementationIncludes = [
-    getImportCode(specImport),
-    ...memberImports.map((i) => getImportCode(i, 'implementation')),
-  ].filter(isNotDuplicate)
+  const cppSpecInclude = getImportCode(specImport)
+  const cppImplementationIncludes = getImportsCode(
+    [specImport, ...memberImports],
+    'implementation'
+  )
 
   const properties = spec.properties.map((p) =>
     p.getCode('c++', { virtual: true })
@@ -124,7 +125,7 @@ ${createFileMetadataString(`${name.HybridTSpec}.hpp`)}
 
 #pragma once
 
-${cppDeclarationIncludes.join('\n')}
+${cppDeclarationIncludes}
 
 namespace ${cxxNamespace} {
 
@@ -205,7 +206,7 @@ clazz.registerHybridMethod("${method.name}", &${name.HybridTSpec}::${method.name
   const cppBodyCode = `
 ${createFileMetadataString(`${name.HybridTSpec}.cpp`)}
 
-#include "${name.HybridTSpec}.hpp"
+${cppSpecInclude}
 
 namespace ${cxxNamespace} {
 
@@ -217,7 +218,7 @@ namespace ${cxxNamespace} {
   const cppHybridClassCode = `
 ${createFileMetadataString(hybridClassFileName)}
 
-${cppImplementationIncludes.join('\n')}
+${cppImplementationIncludes}
 ${cppClassIncludes}
 
 namespace ${cxxNamespace} {
@@ -242,13 +243,6 @@ namespace ${cxxNamespace} {
     language: 'c++',
     platform: 'shared',
   })
-  files.push(
-    createModuleHeader({
-      name: `${name.HybridTSpec}.hpp`,
-      moduleName: spec.config.getIosModuleName(),
-      platform: 'shared',
-    })
-  )
   files.push({
     content: cppBodyCode,
     name: `${name.HybridTSpec}.cpp`,

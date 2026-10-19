@@ -5,9 +5,9 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest/HybridBaseSpec.hpp"
-#include "Size.hpp"
-#include "SizeUnit.hpp"
+#include <NitroTest/HybridBaseSpec.hpp>
+#include <NitroTest/Size.hpp>
+#include <NitroTest/SizeUnit.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>

@@ -6,7 +6,7 @@
 ///
 
 #import <Foundation/Foundation.h>
-#include "NitroTestAutolinking.hpp"
+#include <NitroTest/NitroTestAutolinking.hpp>
 
 /**
  * Registers all HybridObject classes of NitroTest

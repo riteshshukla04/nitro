@@ -5,11 +5,11 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+Variant_WeirdNumbersEnum_Bool.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "WeirdNumbersEnum.hpp"
+#include <NitroTest/private/JSIConverter+Variant_WeirdNumbersEnum_Bool.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/WeirdNumbersEnum.hpp>
 #include <variant>
-#include "SwiftConverter+Variant_WeirdNumbersEnum_Bool.hpp"
+#include <NitroTest/private/SwiftConverter+Variant_WeirdNumbersEnum_Bool.hpp>
 
 namespace margelo::nitro {
 

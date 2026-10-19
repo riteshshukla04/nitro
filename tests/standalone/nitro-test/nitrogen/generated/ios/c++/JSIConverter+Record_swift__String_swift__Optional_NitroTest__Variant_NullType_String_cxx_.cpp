@@ -5,8 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+Record_swift__String_swift__Optional_NitroTest__Variant_NullType_String_cxx_.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/JSIConverter+Record_swift__String_swift__Optional_NitroTest__Variant_NullType_String_cxx_.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/JSIConverter+SwiftDictionary.hpp>
 
 namespace margelo::nitro {

@@ -5,10 +5,10 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+HybridBenchmarkObjectSwiftKotlinSpec_cxx.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+HybridBenchmarkObjectSwiftKotlinSpec_cxx.hpp>
 #include <memory>
-#include "NitroTest/HybridBenchmarkObjectSwiftKotlinSpec.hpp"
+#include <NitroTest/HybridBenchmarkObjectSwiftKotlinSpec.hpp>
 
 namespace margelo::nitro {
 

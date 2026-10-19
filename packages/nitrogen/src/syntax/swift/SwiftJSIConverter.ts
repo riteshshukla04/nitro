@@ -1,8 +1,9 @@
 import { getUmbrellaHeaderName } from '../../autolinking/ios/createSwiftUmbrellaHeader.js'
+import { NitroConfig } from '../../config/NitroConfig.js'
 import { indent } from '../../utils.js'
-import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
+import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile, SourceImport } from '../SourceFile.js'
-import { getImportCode } from '../getImportCode.js'
+import { getImportsCode } from '../getImportCode.js'
 
 interface SwiftJSIConverterImplementation {
   name: string
@@ -25,7 +26,27 @@ export function createSwiftJSIConverter({
   imports,
 }: SwiftJSIConverterImplementation): SourceFile[] {
   const converterName = `JSIConverter+${name}`
-  const includes = imports.map((i) => getImportCode(i, 'implementation')).filter(isNotDuplicate)
+  const implementationImports: SourceImport[] = [
+    {
+      language: 'c++',
+      declaration: NitroConfig.current.getCxxHeader(
+        `${converterName}.hpp`,
+        'private'
+      ),
+    },
+    {
+      language: 'c++',
+      declaration: NitroConfig.current.getCxxHeader(
+        getUmbrellaHeaderName(),
+        'private'
+      ),
+    },
+    ...imports,
+  ]
+  const implementationIncludes = getImportsCode(
+    implementationImports,
+    'implementation'
+  )
   return [
     {
       name: `${converterName}.hpp`,
@@ -61,9 +82,7 @@ namespace margelo::nitro {
       content: `
 ${createFileMetadataString(`${converterName}.cpp`)}
 
-#include "${converterName}.hpp"
-#include "${getUmbrellaHeaderName()}"
-${includes.join('\n')}
+${implementationIncludes}
 
 namespace margelo::nitro {
 

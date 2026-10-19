@@ -5,13 +5,13 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+StringOrExternal.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/JSIConverter+StringOrExternal.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <memory>
 #include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
 #include <string>
 #include <variant>
-#include "SwiftConverter+StringOrExternal.hpp"
+#include <NitroTest/private/SwiftConverter+StringOrExternal.hpp>
 
 namespace margelo::nitro {
 

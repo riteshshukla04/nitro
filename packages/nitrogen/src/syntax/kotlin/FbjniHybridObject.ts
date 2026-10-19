@@ -1,7 +1,7 @@
 import { indent } from '../../utils.js'
 import { getAllTypes } from '../getAllTypes.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
-import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
+import { createFileMetadataString } from '../helpers.js'
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
 import type { SourceFile, SourceImport } from '../SourceFile.js'
 import type { Type } from '../types/Type.js'
@@ -11,7 +11,7 @@ import {
   KotlinInstanceMethod,
 } from './KotlinInstanceMethod.js'
 import { wrapKotlinType } from './wrapKotlinType.js'
-import { getImportCode } from '../getImportCode.js'
+import { getImportsCode } from '../getImportCode.js'
 
 export function createFbjniHybridObject(spec: HybridObjectSpec): SourceFile[] {
   const name = getHybridObjectName(spec.name)
@@ -70,19 +70,18 @@ export function createFbjniHybridObject(spec: HybridObjectSpec): SourceFile[] {
     cxxPartBaseClass = `${baseTypename}::CxxPart`
     constructorCalls.push(`${baseTypename}(javaPart)`)
   }
-  const cppImports: SourceImport<'c++'>[] = []
+  const cppImports: SourceImport<'c++'>[] = [
+    {
+      language: 'c++',
+      declaration: spec.config.getCxxHeader(`${name.HybridTSpec}.hpp`),
+    },
+  ]
   for (const base of spec.baseTypes) {
     const { JHybridTSpec } = getHybridObjectName(base.name)
 
-    const headerName = base.config.isExternalConfig
-      ? `${base.config.getAndroidCxxLibName()}/${JHybridTSpec}.hpp`
-      : `${JHybridTSpec}.hpp`
     cppImports.push({
       language: 'c++',
-      declaration: {
-        name: headerName,
-        space: base.config.isExternalConfig ? 'system' : 'user',
-      },
+      declaration: base.config.getCxxHeader(`${JHybridTSpec}.hpp`, 'private'),
     })
   }
 
@@ -93,9 +92,7 @@ ${createFileMetadataString(`${name.HybridTSpec}.hpp`)}
 
 #include <NitroModules/JHybridObject.hpp>
 #include <fbjni/fbjni.h>
-#include "${name.HybridTSpec}.hpp"
-
-${cppImports.map((i) => getImportCode(i, 'declaration')).join('\n')}
+${getImportsCode(cppImports, 'declaration')}
 
 namespace ${cxxNamespace} {
 
@@ -151,7 +148,10 @@ namespace ${cxxNamespace} {
     className: `${name.JHybridTSpec}::CxxPart`,
     import: {
       language: 'c++',
-      declaration: { name: `${name.JHybridTSpec}.hpp`, space: 'user' },
+      declaration: spec.config.getCxxHeader(
+        `${name.JHybridTSpec}.hpp`,
+        'private'
+      ),
     },
   })
 
@@ -178,15 +178,24 @@ namespace ${cxxNamespace} {
   const jniImports = allTypes
     .map((type) => wrapKotlinType(type))
     .flatMap((t) => t.getRequiredImports('c++'))
-  const cppImplementationIncludes = [
-    `#include "${name.JHybridTSpec}.hpp"`,
-    ...jniImports.map((i) => getImportCode(i, 'implementation')),
-  ].filter(isNotDuplicate)
+  const cppImplementationIncludes = getImportsCode(
+    [
+      {
+        language: 'c++',
+        declaration: spec.config.getCxxHeader(
+          `${name.JHybridTSpec}.hpp`,
+          'private'
+        ),
+      },
+      ...jniImports,
+    ],
+    'implementation'
+  )
 
   const cppImplCode = `
 ${createFileMetadataString(`${name.JHybridTSpec}.cpp`)}
 
-${cppImplementationIncludes.join('\n')}
+${cppImplementationIncludes}
 
 namespace ${cxxNamespace} {
 

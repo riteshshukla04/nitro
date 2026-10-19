@@ -98,10 +98,7 @@ package.targets += [
     ],
     path: "tests/standalone/test-runner/cpp",
     publicHeadersPath: ".",
-    cxxSettings: cxxSettings + [
-      .headerSearchPath("../../nitro-test/nitrogen/generated/ios"),
-      .headerSearchPath("../../nitro-test-external/nitrogen/generated/ios"),
-    ]
+    cxxSettings: cxxSettings
   ),
   .target(
     name: "NitroTestRunnerBridge",
@@ -139,13 +136,14 @@ func addFixtureTargets(
 ) {
   let generated = "\(directory)/nitrogen/generated"
   let ios = "\(generated)/ios"
-  let cxxSources = ["\(generated)/shared/c++", "\(directory)/cpp"].filter(exists)
+  let userCxxSources = ["\(directory)/cpp"].filter(exists)
+  let cxxSources = ["\(generated)/shared/c++"] + userCxxSources
   let swiftSources = ["\(directory)/ios", "\(ios)/swift"]
   let exposedModules = ["NitroModules"] + swiftModules
   let exposedFlags = exposedModules.flatMap {
     ["-Xfrontend", "-clang-header-expose-module", "-Xfrontend", "\($0)=\($0)-Swift.h"]
   }
-  let userHeaderFlags = cxxSources.map {
+  let userHeaderFlags = userCxxSources.map {
     "-I" + URL(fileURLWithPath: Context.packageDirectory).appendingPathComponent($0).path
   }
   let bridgeSources = [
@@ -159,7 +157,7 @@ func addFixtureTargets(
       path: ".",
       exclude: excludes(keeping: cxxSources),
       sources: cxxSources,
-      publicHeadersPath: "\(generated)/shared/c++",
+      publicHeadersPath: "\(generated)/shared/c++/include",
       cxxSettings: cxxSettings + [.unsafeFlags(userHeaderFlags)]
     ),
     .target(
@@ -182,9 +180,9 @@ func addFixtureTargets(
       dependencies: [.target(name: name), .target(name: "\(name)AppleCxx"), "NitroModulesSwiftBridge"] + dependencies,
       path: ios,
       sources: bridgeSources,
-      publicHeadersPath: "c++",
+      publicHeadersPath: "c++/include",
       cxxSettings: cxxSettings + bridgeSettings + [
-        .headerSearchPath("."), .headerSearchPath("c++"), .unsafeFlags(userHeaderFlags),
+        .unsafeFlags(userHeaderFlags),
       ]
     ),
   ]

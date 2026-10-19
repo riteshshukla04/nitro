@@ -4,17 +4,17 @@
 /// https://github.com/margelo/nitro
 /// Copyright © Marc Rousavy @ Margelo
 ///
-#include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
+#include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
 
-#include "JSIConverter+SizeUnit.hpp"
-#include "SwiftConverter+SizeUnit.hpp"
-#include "JSIConverter+Size.hpp"
-#include "SwiftConverter+Size.hpp"
+#include <NitroTestExternal/private/JSIConverter+SizeUnit.hpp>
+#include <NitroTestExternal/private/SwiftConverter+SizeUnit.hpp>
+#include <NitroTestExternal/private/JSIConverter+Size.hpp>
+#include <NitroTestExternal/private/SwiftConverter+Size.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/SwiftResult.hpp>
-#include "NitroTestExternal/HybridBaseSpecSwift.hpp"
-#include "NitroTestExternal/HybridSomeExternalObjectSpecSwift.hpp"
+#include <NitroTestExternal/private/HybridBaseSpecSwift.hpp>
+#include <NitroTestExternal/private/HybridSomeExternalObjectSpecSwift.hpp>
 
 namespace margelo::nitro::test::external::swift_bridge {
   Promise_NitroTestExternal__Size create_Promise_NitroTestExternal__Size() { return Promise_NitroTestExternal__Size::pending(); }

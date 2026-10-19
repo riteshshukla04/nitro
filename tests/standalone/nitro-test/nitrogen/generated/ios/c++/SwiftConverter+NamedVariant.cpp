@@ -5,10 +5,10 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+NamedVariant.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+NamedVariant.hpp>
 #include <string>
-#include "Car.hpp"
+#include <NitroTest/Car.hpp>
 #include <variant>
 
 namespace margelo::nitro {

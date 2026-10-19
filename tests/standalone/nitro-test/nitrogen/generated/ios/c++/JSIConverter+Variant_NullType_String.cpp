@@ -5,12 +5,12 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+Variant_NullType_String.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/JSIConverter+Variant_NullType_String.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/Null.hpp>
 #include <string>
 #include <variant>
-#include "SwiftConverter+Variant_NullType_String.hpp"
+#include <NitroTest/private/SwiftConverter+Variant_NullType_String.hpp>
 
 namespace margelo::nitro {
 

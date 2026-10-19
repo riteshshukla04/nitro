@@ -1,8 +1,8 @@
 #include "TestRuntime.hpp"
 
 #ifdef __APPLE__
-#include "NitroTestAutolinking.hpp"
-#include "NitroTestExternalAutolinking.hpp"
+#include <NitroTest/NitroTestAutolinking.hpp>
+#include <NitroTestExternal/NitroTestExternalAutolinking.hpp>
 #endif
 
 #include <NitroModules/Dispatcher.hpp>

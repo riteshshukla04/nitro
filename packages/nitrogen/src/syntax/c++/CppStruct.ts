@@ -4,11 +4,11 @@ import type {
   SourceImport,
 } from '../SourceFile.js'
 import { indent } from '../../utils.js'
-import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
+import { createFileMetadataString } from '../helpers.js'
 import type { NamedType } from '../types/Type.js'
 import { NitroConfig } from '../../config/NitroConfig.js'
 import type { GetCallbackCodeOptions } from '../types/CallbackType.js'
-import { getImportCode } from '../getImportCode.js'
+import { getImportsCode } from '../getImportCode.js'
 
 export function createCppStruct(
   typename: string,
@@ -111,6 +111,10 @@ export function createCppStruct(
   const implementationImports: SourceImport[] = [
     {
       language: 'c++',
+      declaration: NitroConfig.current.getCxxHeader(`${typename}.hpp`),
+    },
+    {
+      language: 'c++',
       declaration: {
         name: 'NitroModules/JSIHelpers.hpp',
         space: 'system',
@@ -125,13 +129,14 @@ export function createCppStruct(
     },
     ...includedTypes,
   ]
-  const cppDeclarationIncludes = declarationImports
-    .map((i) => getImportCode(i, 'declaration'))
-    .filter(isNotDuplicate)
-  const cppImplementationIncludes = [
-    `#include "${typename}.hpp"`,
-    ...implementationImports.map((i) => getImportCode(i, 'implementation')),
-  ].filter(isNotDuplicate)
+  const cppDeclarationIncludes = getImportsCode(
+    declarationImports,
+    'declaration'
+  )
+  const cppImplementationIncludes = getImportsCode(
+    implementationImports,
+    'implementation'
+  )
   const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
 
   const cppCode = `
@@ -139,7 +144,7 @@ ${createFileMetadataString(`${typename}.hpp`)}
 
 #pragma once
 
-${cppDeclarationIncludes.join('\n')}
+${cppDeclarationIncludes}
 
 namespace ${cxxNamespace} {
 
@@ -175,7 +180,7 @@ namespace margelo::nitro {
   const cppImplementationCode = `
 ${createFileMetadataString(`${typename}.cpp`)}
 
-${cppImplementationIncludes.join('\n')}
+${cppImplementationIncludes}
 
 namespace margelo::nitro {
 

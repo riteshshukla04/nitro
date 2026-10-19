@@ -5,11 +5,11 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+Variant_Double_String.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/JSIConverter+Variant_Double_String.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <string>
 #include <variant>
-#include "SwiftConverter+Variant_Double_String.hpp"
+#include <NitroTest/private/SwiftConverter+Variant_Double_String.hpp>
 
 namespace margelo::nitro {
 

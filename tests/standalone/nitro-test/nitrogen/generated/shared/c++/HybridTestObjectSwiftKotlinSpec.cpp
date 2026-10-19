@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridTestObjectSwiftKotlinSpec.hpp"
+#include <NitroTest/HybridTestObjectSwiftKotlinSpec.hpp>
 
 namespace margelo::nitro::test {
 

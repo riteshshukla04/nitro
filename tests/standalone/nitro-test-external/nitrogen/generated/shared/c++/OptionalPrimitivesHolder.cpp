@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "OptionalPrimitivesHolder.hpp"
+#include <NitroTestExternal/OptionalPrimitivesHolder.hpp>
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <optional>

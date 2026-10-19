@@ -5,8 +5,8 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+StringOrExternal.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+StringOrExternal.hpp>
 #include <memory>
 #include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
 #include <string>

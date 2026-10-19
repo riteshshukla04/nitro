@@ -5,10 +5,10 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+Variant_Bool_Double.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/JSIConverter+Variant_Bool_Double.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <variant>
-#include "SwiftConverter+Variant_Bool_Double.hpp"
+#include <NitroTest/private/SwiftConverter+Variant_Bool_Double.hpp>
 
 namespace margelo::nitro {
 

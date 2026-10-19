@@ -5,9 +5,9 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+HardwareBufferFormat.hpp"
-#include "HardwareBufferFormat.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+HardwareBufferFormat.hpp>
+#include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroModules/NitroDefines.hpp>
 
 namespace margelo::nitro {

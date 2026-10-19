@@ -5,11 +5,11 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest/HybridBenchmarkObjectCppSpec.hpp"
+#include <NitroTest/HybridBenchmarkObjectCppSpec.hpp>
 #include <memory>
 #include <string>
 #include <vector>
-#include "Car.hpp"
+#include <NitroTest/Car.hpp>
 #include <unordered_map>
 #include <optional>
 #include <variant>

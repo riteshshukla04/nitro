@@ -5,10 +5,10 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+HybridBaseSpec_cxx.hpp"
+#include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
+#include <NitroTestExternal/private/SwiftConverter+HybridBaseSpec_cxx.hpp>
 #include <memory>
-#include "NitroTestExternal/HybridBaseSpec.hpp"
+#include <NitroTestExternal/HybridBaseSpec.hpp>
 
 namespace margelo::nitro {
 

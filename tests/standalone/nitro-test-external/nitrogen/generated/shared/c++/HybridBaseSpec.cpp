@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridBaseSpec.hpp"
+#include <NitroTestExternal/HybridBaseSpec.hpp>
 
 namespace margelo::nitro::test::external {
 

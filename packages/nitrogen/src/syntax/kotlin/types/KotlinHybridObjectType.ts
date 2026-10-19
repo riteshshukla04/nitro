@@ -71,20 +71,13 @@ export class KotlinHybridObjectType
     switch (language) {
       case 'c++': {
         const name = getHybridObjectName(this.hybridObjectName)
-        if (this.sourceConfig.isExternalConfig) {
-          imports.push({
-            language: language,
-            declaration: {
-              name: `${this.sourceConfig.getAndroidCxxLibName()}/${name.JHybridTSpec}.hpp`,
-              space: 'system',
-            },
-          })
-        } else {
-          imports.push({
-            language: language,
-            declaration: { name: `${name.JHybridTSpec}.hpp`, space: 'user' },
-          })
-        }
+        imports.push({
+          language: language,
+          declaration: this.sourceConfig.getCxxHeader(
+            `${name.JHybridTSpec}.hpp`,
+            'private'
+          ),
+        })
         break
       }
     }

@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "HybridChildSpec.hpp"
+#include <NitroTest/HybridChildSpec.hpp>
 
 namespace margelo::nitro::test {
 

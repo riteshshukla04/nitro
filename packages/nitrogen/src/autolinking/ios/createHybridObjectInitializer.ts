@@ -1,5 +1,5 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
-import { getImportsCode } from '../../syntax/getImportCode.js'
+import { getImportCode, getImportsCode } from '../../syntax/getImportCode.js'
 import { createFileMetadataString } from '../../syntax/helpers.js'
 import type { SourceFile, SourceImport } from '../../syntax/SourceFile.js'
 import { indent } from '../../utils.js'
@@ -25,6 +25,12 @@ export function createHybridObjectInitializer(
   }
 
   const includes = getImportsCode(cppImports, 'implementation')
+  const autolinkingInclude = getImportCode({
+    language: 'c++',
+    declaration: NitroConfig.current.getCxxHeader(
+      `${autolinkingClassName}.hpp`
+    ),
+  })
 
   const cppHeaderCode = `
 ${createFileMetadataString(`${autolinkingClassName}.hpp`)}
@@ -40,7 +46,7 @@ namespace ${namespace} {
   const cppImplementationCode = `
 ${createFileMetadataString(`${autolinkingClassName}.cpp`)}
 
-#include "${autolinkingClassName}.hpp"
+${autolinkingInclude}
 #include <NitroModules/HybridClassRegistry.hpp>
 
 ${includes}
@@ -59,7 +65,7 @@ namespace ${namespace} {
 ${createFileMetadataString(`${autolinkingClassName}.mm`)}
 
 #import <Foundation/Foundation.h>
-#include "${autolinkingClassName}.hpp"
+${autolinkingInclude}
 
 /**
  * Registers all HybridObject classes of ${NitroConfig.current.getIosModuleName()}
@@ -83,7 +89,8 @@ ${createFileMetadataString(`${autolinkingClassName}.mm`)}
       language: 'c++',
       name: `${autolinkingClassName}.hpp`,
       platform: 'ios',
-      subdirectory: [],
+      subdirectory: ['c++'],
+      headerVisibility: 'public',
     },
     {
       content: cppImplementationCode,

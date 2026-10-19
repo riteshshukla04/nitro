@@ -5,13 +5,13 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "JSIConverter+Variant__any_HybridTestObjectSwiftKotlinSpec__Person.hpp"
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
+#include <NitroTest/private/JSIConverter+Variant__any_HybridTestObjectSwiftKotlinSpec__Person.hpp>
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
 #include <memory>
-#include "NitroTest/HybridTestObjectSwiftKotlinSpec.hpp"
-#include "Person.hpp"
+#include <NitroTest/HybridTestObjectSwiftKotlinSpec.hpp>
+#include <NitroTest/Person.hpp>
 #include <variant>
-#include "SwiftConverter+Variant__any_HybridTestObjectSwiftKotlinSpec__Person.hpp"
+#include <NitroTest/private/SwiftConverter+Variant__any_HybridTestObjectSwiftKotlinSpec__Person.hpp>
 
 namespace margelo::nitro {
 

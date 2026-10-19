@@ -5,39 +5,39 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest/HybridTestObjectSwiftKotlinSpec.hpp"
+#include <NitroTest/HybridTestObjectSwiftKotlinSpec.hpp>
 #include <string>
 #include <NitroModules/Null.hpp>
 #include <optional>
 #include <variant>
 #include <vector>
-#include "Powertrain.hpp"
-#include "OldEnum.hpp"
-#include "TruckPowertrain.hpp"
+#include <NitroTest/Powertrain.hpp>
+#include <NitroTest/OldEnum.hpp>
+#include <NitroTest/TruckPowertrain.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <memory>
-#include "Person.hpp"
-#include "PartialPerson.hpp"
-#include "Car.hpp"
-#include "NitroTest/HybridChildSpec.hpp"
+#include <NitroTest/Person.hpp>
+#include <NitroTest/PartialPerson.hpp>
+#include <NitroTest/Car.hpp>
+#include <NitroTest/HybridChildSpec.hpp>
 #include <NitroModules/AnyJSON.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <unordered_map>
-#include "MapWrapper.hpp"
+#include <NitroTest/MapWrapper.hpp>
 #include <exception>
 #include <NitroModules/InlineCallback.hpp>
-#include "JsStyleStruct.hpp"
-#include "WrappedJsStruct.hpp"
-#include "OptionalWrapper.hpp"
-#include "OptionalCallback.hpp"
-#include "OptionalEnumWrapper.hpp"
-#include "HardwareBufferFormat.hpp"
-#include "WeirdNumbersEnum.hpp"
-#include "NitroTest/HybridBaseSpec.hpp"
+#include <NitroTest/JsStyleStruct.hpp>
+#include <NitroTest/WrappedJsStruct.hpp>
+#include <NitroTest/OptionalWrapper.hpp>
+#include <NitroTest/OptionalCallback.hpp>
+#include <NitroTest/OptionalEnumWrapper.hpp>
+#include <NitroTest/HardwareBufferFormat.hpp>
+#include <NitroTest/WeirdNumbersEnum.hpp>
+#include <NitroTest/HybridBaseSpec.hpp>
 #include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
-#include "ExternalObjectStruct.hpp"
+#include <NitroTest/ExternalObjectStruct.hpp>
 
 
 namespace margelo::nitro::test {

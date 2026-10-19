@@ -5,9 +5,9 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest-Swift-Cxx-Umbrella.hpp"
-#include "SwiftConverter+WeirdNumbersEnum.hpp"
-#include "WeirdNumbersEnum.hpp"
+#include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/SwiftConverter+WeirdNumbersEnum.hpp>
+#include <NitroTest/WeirdNumbersEnum.hpp>
 #include <NitroModules/NitroDefines.hpp>
 
 namespace margelo::nitro {

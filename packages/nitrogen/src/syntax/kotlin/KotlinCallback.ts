@@ -4,7 +4,7 @@ import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import { addJNINativeRegistration } from './JNINativeRegistrations.js'
 import type { KotlinCallbackType } from './types/KotlinCallbackType.js'
-import { getImportCode } from '../getImportCode.js'
+import { getImportCode, getImportsCode } from '../getImportCode.js'
 import { CallbackType } from '../types/CallbackType.js'
 
 export function createKotlinCallback(
@@ -212,10 +212,19 @@ return ${cppResult};
   const declarationIncludes = imports
     .map((i) => getImportCode(i, 'declaration'))
     .filter(isNotDuplicate)
-  const implementationIncludes = [
-    `#include "${jniName}.hpp"`,
-    ...imports.map((i) => getImportCode(i, 'implementation')),
-  ].filter(isNotDuplicate)
+  const implementationIncludes = getImportsCode(
+    [
+      {
+        language: 'c++',
+        declaration: NitroConfig.current.getCxxHeader(
+          `${jniName}.hpp`,
+          'private'
+        ),
+      },
+      ...imports,
+    ],
+    'implementation'
+  )
 
   const fbjniCode = `
 ${createFileMetadataString(`${jniName}.hpp`)}
@@ -284,7 +293,7 @@ namespace ${cxxNamespace} {
   const fbjniImplementationCode = `
 ${createFileMetadataString(`${jniName}.cpp`)}
 
-${implementationIncludes.join('\n')}
+${implementationIncludes}
 
 namespace ${cxxNamespace} {
 
@@ -319,7 +328,10 @@ namespace ${cxxNamespace} {
     className: `${jniName}_cxx`,
     import: {
       language: 'c++',
-      declaration: { name: `${jniName}.hpp`, space: 'user' },
+      declaration: NitroConfig.current.getCxxHeader(
+        `${jniName}.hpp`,
+        'private'
+      ),
     },
   })
 

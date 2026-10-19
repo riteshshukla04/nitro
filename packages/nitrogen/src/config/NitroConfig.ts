@@ -2,6 +2,7 @@ import chalk from 'chalk'
 import { readUserConfig } from './getConfig.js'
 import { ANDROID_BASE_NAMESPACE, CXX_BASE_NAMESPACE } from './namespaces.js'
 import type { NitroUserConfig } from './NitroUserConfig.js'
+import type { CxxHeaderVisibility } from '../syntax/SourceFile.js'
 
 /**
  * Represents the properly parsed `nitro.json` config of the current executing directory.
@@ -121,14 +122,25 @@ export class NitroConfig {
 
   /**
    * Get the include of a generated C++ header that belongs to this module.
-   * Swift packages expose another module's headers by file name, through the
-   * public header paths of its `<Module>Cxx` and `<Module>SwiftBridge` targets.
    */
-  getCxxHeader(fileName: string): { name: string; space: 'user' | 'system' } {
+  getCxxHeader(
+    fileName: string,
+    visibility: CxxHeaderVisibility = 'public'
+  ): { name: string; space: 'system' } {
+    const directory = this.getCxxHeaderDirectory(visibility).slice(1)
     return {
-      name: fileName,
-      space: this.isExternalConfig ? 'system' : 'user',
+      name: [...directory, fileName].join('/'),
+      space: 'system',
     }
+  }
+
+  /** Get the directory where this module's C++ headers are generated. */
+  getCxxHeaderDirectory(visibility: CxxHeaderVisibility): string[] {
+    const directory = ['include', this.getIosModuleName()]
+    if (visibility === 'private') {
+      directory.push('private')
+    }
+    return directory
   }
 
   getSwiftBridgeHeaderName(): string {

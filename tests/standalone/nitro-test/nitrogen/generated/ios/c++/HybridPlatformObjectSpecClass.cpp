@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-#include "NitroTest/HybridPlatformObjectSpec.hpp"
+#include <NitroTest/HybridPlatformObjectSpec.hpp>
 #include <string>
 
 
