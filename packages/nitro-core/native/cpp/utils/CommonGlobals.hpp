@@ -105,18 +105,6 @@ public:
   };
 
   /**
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
-   */
-  class Date final {
-  public:
-    Date() = delete;
-    ~Date() = delete;
-
-    static jsi::Value callConstructor(jsi::Runtime& runtime, double msSinceEpoch);
-    static bool isInstanceOf(jsi::Runtime& runtime, const jsi::Object& object);
-  };
-  
-  /**
    * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
    */
   class Error final {
@@ -141,7 +129,6 @@ public:
 private:
   friend Object;
   friend Promise;
-  friend Date;
   friend Error;
   friend JSON;
 

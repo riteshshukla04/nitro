@@ -59,7 +59,6 @@ Pod::Spec.new do |s|
     "cpp/views/ViewPropsHolderState.hpp",
     # Public Apple-specific headers that will be exposed in modulemap (for Swift)
     "apple/core/utils/Result.hpp",
-    "apple/core/utils/DateToChronoDate.hpp",
     "apple/core/utils/RuntimeError.hpp",
     "apple/core/utils/StringBufferConsumer.hpp",
     "apple/core/utils/SwiftValueCallbacks.hpp",

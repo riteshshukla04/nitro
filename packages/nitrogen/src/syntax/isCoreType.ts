@@ -32,10 +32,6 @@ export function isArrayBuffer(type: TSMorphType): boolean {
   return isSymbol(type, 'ArrayBuffer')
 }
 
-export function isDate(type: TSMorphType): boolean {
-  return isSymbol(type, 'Date')
-}
-
 export function isAnyJSON(type: TSMorphType): boolean {
   return isSymbol(type, 'AnyJSON')
 }

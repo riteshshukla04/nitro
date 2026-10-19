@@ -174,7 +174,6 @@ struct JSIConverter<std::monostate> final {
 #include "JSIConverter+AnyJSON.hpp"
 #include "JSIConverter+ArrayBuffer.hpp"
 #include "JSIConverter+Callback.hpp"
-#include "JSIConverter+Date.hpp"
 #include "JSIConverter+Exception.hpp"
 #include "JSIConverter+Function.hpp"
 #include "JSIConverter+HostObject.hpp"

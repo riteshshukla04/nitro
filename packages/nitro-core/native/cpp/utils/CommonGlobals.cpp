@@ -118,19 +118,6 @@ bool CommonGlobals::Promise::isInstanceOf(jsi::Runtime& runtime, const jsi::Obje
   return object.instanceOf(runtime, promiseCtor);
 }
 
-// pragma MARK: Date
-
-jsi::Value CommonGlobals::Date::callConstructor(jsi::Runtime& runtime, double msSinceEpoch) {
-  const jsi::Function& dateCtor =
-      getGlobalFunction(runtime, "Date", [](jsi::Runtime& runtime) { return runtime.global().getPropertyAsFunction(runtime, "Date"); });
-  return dateCtor.callAsConstructor(runtime, {jsi::Value(msSinceEpoch)});
-}
-bool CommonGlobals::Date::isInstanceOf(jsi::Runtime& runtime, const jsi::Object& object) {
-  const jsi::Function& dateCtor =
-      getGlobalFunction(runtime, "Date", [](jsi::Runtime& runtime) { return runtime.global().getPropertyAsFunction(runtime, "Date"); });
-  return object.instanceOf(runtime, dateCtor);
-}
-
 // pragma MARK: Error
 
 bool CommonGlobals::Error::isInstanceOf(jsi::Runtime& runtime, const jsi::Object& object) {

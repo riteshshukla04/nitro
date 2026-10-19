@@ -28,13 +28,11 @@ import {
 import { AnyHybridObjectType } from './types/AnyHybridObjectType.js'
 import { ErrorType } from './types/ErrorType.js'
 import { getDirectBaseTypes, getHybridObjectNitroModuleConfig } from '../utils.js'
-import { DateType } from './types/DateType.js'
 import { NitroConfig } from '../config/NitroConfig.js'
 import { CustomType } from './types/CustomType.js'
 import {
   isArrayBuffer,
   isCustomType,
-  isDate,
   isError,
   isInlineCallback,
   isAnyJSON,
@@ -350,9 +348,6 @@ export function createType(
     } else if (isAnyJSON(type)) {
       // AnyJSON
       return new AnyJSONType()
-    } else if (isDate(type)) {
-      // Date
-      return new DateType()
     } else if (isError(type)) {
       // Error
       return new ErrorType()

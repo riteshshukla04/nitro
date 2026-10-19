@@ -23,7 +23,6 @@ export type TypeKind =
   | 'struct'
   | 'tuple'
   | 'variant'
-  | 'date'
   | 'void'
   | 'unsafe-void-pointer'
   | 'swift-result'

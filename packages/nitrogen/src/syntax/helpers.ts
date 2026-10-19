@@ -104,9 +104,6 @@ function getTypeLooselyness(type: Type): number {
     case 'tuple':
       // We have `.isArray()` and `canConvert<T>()`
       return 1
-    case 'date':
-      // We have `instanceof Date`
-      return 2
     case 'error':
       // We have `instanceof Error`
       return 2

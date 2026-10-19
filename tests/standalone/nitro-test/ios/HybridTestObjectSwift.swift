@@ -337,13 +337,6 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     return boo ?? false
   }
 
-  func add1Hour(date: Date) throws -> Date {
-    let oneHourInSeconds = 1.0 * 60 * 60
-    return date + oneHourInSeconds
-  }
-  func currentDate() throws -> Date {
-    return .now
-  }
 
   func bounceMap(map: [String: Variant_Bool_Double]) throws -> [String: Variant_Bool_Double] {
     return map

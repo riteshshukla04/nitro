@@ -419,13 +419,6 @@ bool HybridTestObjectCpp::tryTrailingOptional(double /* num */, const std::strin
   return boo.has_value() ? boo.value() : false;
 }
 
-std::chrono::system_clock::time_point HybridTestObjectCpp::add1Hour(std::chrono::system_clock::time_point date) {
-  return date + std::chrono::hours(1);
-}
-std::chrono::system_clock::time_point HybridTestObjectCpp::currentDate() {
-  return std::chrono::system_clock::now();
-}
-
 std::variant<double, std::string>
 HybridTestObjectCpp::passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) {
   if (std::holds_alternative<std::string>(either)) {

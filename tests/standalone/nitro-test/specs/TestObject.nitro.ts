@@ -122,7 +122,6 @@ type CoreTypesVariant =
   | Promise<number>
   | ((value: number) => void)
   | WrappedJsStruct
-  | Date
   | AnyJSON;
 
 // Prefer `interface` + `extends` over `type` so TS doesn't flatten it
@@ -244,10 +243,6 @@ export declare class TestObjectCpp extends HybridObject {
 
   // Variants
   someVariant: number | string;
-
-  // Dates
-  add1Hour(date: Date): Date;
-  currentDate(): Date;
 
   // Promises
   calculateFibonacciSync(value: number): Int64;
@@ -508,10 +503,6 @@ export declare class TestObjectSwiftKotlin extends HybridObject {
 
   // Variants
   someVariant: number | string;
-
-  // Dates
-  add1Hour(date: Date): Date;
-  currentDate(): Date;
 
   // Promises
   calculateFibonacciSync(value: number): Int64;

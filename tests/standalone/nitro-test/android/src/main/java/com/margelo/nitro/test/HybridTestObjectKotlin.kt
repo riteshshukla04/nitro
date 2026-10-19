@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import java.time.Instant
 
 @Keep
 @DoNotStrip
@@ -162,14 +161,7 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     return strings
   }
 
-  override fun currentDate(): java.time.Instant {
-    return Instant.now()
-  }
 
-  override fun add1Hour(date: Instant): Instant {
-    val oneHourInSeconds = 1L * 60 * 60
-    return date.plusSeconds(oneHourInSeconds)
-  }
 
   override fun createMap(): AnyMap {
     val map = AnyMap()

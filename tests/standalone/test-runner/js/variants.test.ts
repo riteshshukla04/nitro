@@ -178,13 +178,6 @@ export const cases = {
       });
     },
 
-    "bounceComplexVariant(...) bounces a Date": (testObject) => {
-      const date = new Date();
-      const result = testObject.bounceComplexVariant(date);
-      expect(result).to.be.instanceOf(Date);
-      expect(result).to.deep.equal(date);
-    },
-
     "createChild().bounceVariant(...) bounces a string": (testObject) => {
       expect(
         Object.is(testObject.createChild().bounceVariant("hello!"), "hello!"),

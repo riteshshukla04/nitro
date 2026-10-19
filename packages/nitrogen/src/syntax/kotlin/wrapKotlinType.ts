@@ -15,7 +15,6 @@ import { KotlinArrayBufferType } from './types/KotlinArrayBufferType.js'
 import { KotlinArrayType } from './types/KotlinArrayType.js'
 import { KotlinBooleanType } from './types/KotlinBooleanType.js'
 import { KotlinCallbackType } from './types/KotlinCallbackType.js'
-import { KotlinDateType } from './types/KotlinDateType.js'
 import { KotlinEnumType } from './types/KotlinEnumType.js'
 import { KotlinErrorType } from './types/KotlinErrorType.js'
 import { KotlinHybridObjectType } from './types/KotlinHybridObjectType.js'
@@ -55,8 +54,6 @@ export function wrapKotlinType(
       return new KotlinStringType()
     case 'null':
       return new KotlinNullType()
-    case 'date':
-      return new KotlinDateType()
     case 'array-buffer':
       return new KotlinArrayBufferType()
     case 'error':

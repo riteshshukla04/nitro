@@ -15,7 +15,7 @@ namespace margelo::nitro::test {
 using namespace facebook;
 
 using ComplexVariant = std::variant<std::shared_ptr<ArrayBuffer>, std::function<void(double /* value */)>, WrappedJsStruct,
-                                    std::shared_ptr<Promise<double>>, std::chrono::system_clock::time_point, std::shared_ptr<AnyMap>>;
+                                    std::shared_ptr<Promise<double>>, std::shared_ptr<AnyMap>>;
 
 using StringOrExternal = std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>;
 
@@ -132,8 +132,6 @@ public:
   std::string tryMiddleParam(double num, std::optional<bool> boo, const std::string& str) override;
   std::optional<Powertrain> tryOptionalEnum(std::optional<Powertrain> value) override;
   bool tryTrailingOptional(double num, const std::string& str, std::optional<bool> boo) override;
-  std::chrono::system_clock::time_point add1Hour(std::chrono::system_clock::time_point date) override;
-  std::chrono::system_clock::time_point currentDate() override;
   std::variant<double, std::string>
   passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) override;
 

@@ -3,12 +3,6 @@ import { casesForTestObjects } from "./utils/cases";
 
 import { debugOnly } from "./utils/helpers";
 
-const BASE_DATE = new Date();
-
-const ONE_HOUR_IN_MS = 1000 * 60 * 60;
-
-const DATE_PLUS_1H = new Date(BASE_DATE.getTime() + ONE_HOUR_IN_MS);
-
 const INT64_MAX = 9223372036854775807n;
 // 2^63 - 1
 const INT64_MIN = -9223372036854775808n;
@@ -124,67 +118,6 @@ export const cases = {
       // @ts-expect-error
       expect(() => testObject.bounceNull(undefined)).to.throw(
         `${testObject.constructor.name}.bounceNull(...)`,
-      );
-    },
-  }),
-  ...casesForTestObjects("Dates", {
-    "currentDate() returns a Date": (testObject) => {
-      expect(testObject.currentDate()).to.be.instanceOf(Date);
-    },
-
-    "add1Hour(...) adds one hour": (testObject) => {
-      expect(testObject.add1Hour(BASE_DATE)).to.deep.equal(DATE_PLUS_1H);
-    },
-
-    "currentDate() is within 10ms of the JS Date": (testObject) => {
-      const nativeNow = testObject.currentDate();
-      const jsNow = new Date();
-      const msDiff = Math.abs(jsNow.getTime() - nativeNow.getTime());
-      expect(msDiff).to.be.lessThan(10);
-    },
-
-    "add1Hour(...) handles the Unix epoch": (testObject) => {
-      expect(testObject.add1Hour(new Date(0))).to.deep.equal(
-        new Date("1970-01-01T01:00:00.000Z"),
-      );
-    },
-
-    "add1Hour(...) handles dates before the Unix epoch": (testObject) => {
-      expect(
-        testObject.add1Hour(new Date("1900-01-01T00:00:00.000Z")),
-      ).to.deep.equal(new Date("1900-01-01T01:00:00.000Z"));
-    },
-
-    "add1Hour(...) keeps the milliseconds of a present-day date": (
-      testObject,
-    ) => {
-      expect(
-        testObject.add1Hour(new Date("2024-02-29T12:34:56.789Z")),
-      ).to.deep.equal(new Date("2024-02-29T13:34:56.789Z"));
-    },
-
-    // TODO: Fix in Nitro - on Swift this returns 1970-01-01T00:59:59.998Z (1 ms off).
-    // Date+fromChrono.swift / DateToChronoDate.hpp convert via floating-point
-    // seconds and truncate with duration_cast instead of rounding to whole ms.
-
-    "add1Hour(...) keeps millisecond precision right before the epoch": (
-      testObject,
-    ) => {
-      expect(
-        testObject.add1Hour(new Date("1969-12-31T23:59:59.999Z")),
-      ).to.deep.equal(new Date("1970-01-01T00:59:59.999Z"));
-    },
-
-    "add1Hour(...) does not mutate its argument": (testObject) => {
-      const date = new Date(0);
-      testObject.add1Hour(date);
-      expect(date).to.deep.equal(new Date(0));
-    },
-
-    "add1Hour(...) throws for a number instead of a Date": (testObject) => {
-      // @ts-expect-error
-      expect(() => testObject.add1Hour(0)).to.throw(
-        `${testObject.constructor.name}.add1Hour(...): ${debugOnly('Value "0" is not a Date')}`,
       );
     },
   }),
@@ -569,10 +502,6 @@ export const cases = {
 };
 
 export const skips = {
-  "Dates / TestObjectSwiftKotlin / add1Hour(...) keeps millisecond precision right before the epoch":
-    {
-      ios: "Fix in Nitro - on Swift this returns 1970-01-01T00:59:59.998Z (1 ms off). Date+fromChrono.swift / DateToChronoDate.hpp convert via floating-point seconds and truncate with duration_cast instead of rounding to whole ms.",
-    },
   "String edge cases / TestObjectSwiftKotlin / stringValue roundtrips an embedded NUL character":
     {
       android:
