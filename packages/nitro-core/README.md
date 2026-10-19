@@ -6,7 +6,7 @@ The package contains native sources in `native/{cpp,apple,android}/`, TypeScript
 sources in `js/src/`, and compiled JavaScript and declarations in `js/lib/`.
 Native sources and JS use the same package version. Core has no React Native
 dependency. Views, TurboModules, and React Native dispatchers live in
-`react-native-nitro-modules`, which stages Core sources for CocoaPods and Android
+`react-native-nitro-modules`, which stages Core sources for SwiftPM and Android
 builds.
 
 ```ts

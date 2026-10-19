@@ -148,7 +148,7 @@ async function runNitrogenCommand(
     }
 
     console.log(
-      `‼️   ${text} - ${chalk.bold('you need to run `pod install`/sync gradle to update files!')}`
+      `‼️   ${text} - ${chalk.bold('refresh SwiftPM (`npx react-native spm` for React Native) or sync Gradle to update files!')}`
     )
   }
   const promises = danglingFiles.map(async (file) => {

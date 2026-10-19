@@ -150,7 +150,7 @@ This will always generate a shared C++ interface, and then optionall also Swift 
 ⛓️   Setting up build configs for autolinking...
 🎉  Generated 1/1 HybridObject in 0.6s!
 💡  Your code is in ./nitrogen/generated
-‼️  Added 8 files - you need to run `pod install`/sync gradle to update files!
+‼️  Added 8 files - refresh SwiftPM (`npx react-native spm` for React Native) or sync Gradle to update files!
 ```
 
 :::important

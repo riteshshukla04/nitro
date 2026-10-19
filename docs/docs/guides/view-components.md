@@ -12,7 +12,7 @@ Such views can be rendered within React Native apps using [Fabric](https://react
 The key difference to a Fabric view is that it uses Nitro for prop parsing, which is more lightweight, performant and flexible.
 
 :::note
-Nitro Views require **react-native 0.78.0** or higher, and require the new architecture.
+Nitro Views require React Native 0.88 or newer with the New Architecture.
 :::
 
 ## Create a Nitro View

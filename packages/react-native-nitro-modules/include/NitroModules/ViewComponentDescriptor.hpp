@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <NitroModules/RawPropsCompat.hpp>
-
 #include <concepts>
 #include <memory>
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
@@ -36,7 +34,7 @@ class ViewComponentDescriptor final : public react::ConcreteComponentDescriptor<
 
 public:
   explicit ViewComponentDescriptor(const react::ComponentDescriptorParameters& parameters)
-      : Base(parameters, RawPropsCompat::makePropsParser()) {}
+      : Base(parameters) {}
 
 public:
   /**

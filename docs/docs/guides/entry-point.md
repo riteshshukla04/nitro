@@ -9,9 +9,7 @@ Nitro is built on top of JSI - while the primary target is React Native, Nitro e
 
 In React Native apps, Nitro makes use of the [autolinking functionality](https://github.com/react-native-community/cli/blob/main/docs/autolinking.md) provided by RN CLI.
 
-`react-native-nitro-modules` requires React Native 0.78 or higher with the New Architecture. Importing the package resolves its TurboModule, which synchronously installs Nitro through React Native's JSI bindings hook: `installJSIBindingsWithRuntime:callInvoker:` on iOS and `getBindingsInstaller()` on Android.
-
-React Native passes the JavaScript runtime and its `CallInvoker` to the installation callback. Nitro wraps the invoker in a `Dispatcher` and installs `NitroModulesProxy` before the import completes.
+Nitro V1 requires React Native 0.88 or newer with the New Architecture. Importing `react-native-nitro-modules` resolves its TurboModule. React Native then calls the native JSI bindings hook with the runtime and CallInvoker, which Nitro uses to install its proxy and dispatcher before initializing the JavaScript API.
 
 ## Manually registering Nitro
 

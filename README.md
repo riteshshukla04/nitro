@@ -45,13 +45,13 @@ const result = math.add(5, 3)
 
 ## Installation
 
-The React Native package requires the New Architecture. See the [minimum requirements](https://nitro.margelo.com/docs/getting-started/minimum-requirements) before installing.
+Nitro V1 requires React Native 0.88 or newer with the New Architecture. Install the alpha package in your app:
 
-Install [react-native-nitro-modules](https://npmjs.org/react-native-nitro-modules) from npm:
 ```sh
-npm i react-native-nitro-modules
-cd ios && pod install
+npm i react-native-nitro-modules@alpha
 ```
+
+For iOS, use Swift Package Manager and run `npx react-native spm` from the app directory. See the [installation guide](./packages/react-native-nitro-modules/README.md#installation) for existing CocoaPods projects.
 
 ## Documentation
 

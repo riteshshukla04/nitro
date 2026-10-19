@@ -9,7 +9,6 @@
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
-#include <NitroModules/RawPropsCompat.hpp>
 #include <jsi/jsi.h>
 
 #include <react/renderer/core/RawProps.h>
@@ -90,7 +89,7 @@ public:
   static ReactProp<T> fromRawValue(const char* viewName, const char* propName, const react::RawProps& rawProps,
                                    const ReactProp<T>& previousProp) {
     try {
-      const react::RawValue* rawValue = RawPropsCompat::at(rawProps, propName);
+      const react::RawValue* rawValue = rawProps.at(propName);
       if (rawValue == nullptr) {
         // This RawValue pack does not contain our prop, so skip it - it's still the same from before
         return previousProp;

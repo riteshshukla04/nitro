@@ -14,17 +14,19 @@ It uses JSI to generate C++ templates that can bridge virtually any JS type to a
 
 ## Installation
 
-Nitro requires React Native's New Architecture. See the [minimum requirements](https://nitro.margelo.com/docs/getting-started/minimum-requirements) before installing.
+Nitro V1 requires React Native 0.88 or newer with the New Architecture. iOS builds use Swift Package Manager and require Swift 6.4 or newer.
 
 ### Inside an app
 
-Install [react-native-nitro-modules](https://npmjs.org/react-native-nitro-modules) as a `dependency` in your react-native app:
+Install the alpha package as a dependency in your React Native app:
+
 ```sh
-npm i react-native-nitro-modules
-cd ios && pod install
+npm i react-native-nitro-modules@alpha
 ```
 
-The package re-exports the shared `nitro-core` API and installs it into the React Native runtime.
+For iOS, run `npx react-native spm` from the app directory, then open the app's `.xcodeproj` in Xcode. If the project already uses CocoaPods, convert it with `npx react-native spm add --deintegrate` first. That conversion requires CocoaPods to remove its existing integration. Subsequent builds use SwiftPM.
+
+The package re-exports the shared `nitro-core` API and installs it into the React Native runtime through React Native's JSI bindings hooks.
 
 ### Inside a nitro module library
 

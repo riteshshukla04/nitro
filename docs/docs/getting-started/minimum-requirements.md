@@ -1,5 +1,5 @@
 ---
-description: Check the React Native, iOS, Android, Swift, Kotlin, Gradle, and C++ requirements needed to use Nitro Modules.
+description: Check the React Native, iOS, Android, and Swift requirements needed to use Nitro Modules.
 ---
 
 import Tabs from '@theme/Tabs';
@@ -7,22 +7,19 @@ import TabItem from '@theme/TabItem';
 
 # Minimum Requirements
 
-Nitro is a Framework built on top of newer APIs like `jsi::NativeState`.
-The React Native package requires the New Architecture. Make sure your app meets the minimum requirements:
+Nitro V1's React Native package requires React Native 0.88 or newer with the New Architecture.
 
 <Tabs groupId="platform">
   <TabItem value="ios" label="iOS" default>
-    - react-native 0.78 or higher
-    - Xcode 16.4 or higher
-    - Swift 5.9 or higher
+    - iOS 16 or higher
+    - Xcode with Swift 6.4 or higher
+    - Swift Package Manager integration (`npx react-native spm`)
   </TabItem>
   <TabItem value="android" label="Android">
-    - react-native 0.78 or higher
-    - `compileSdkVersion` 34 or higher
-    - `ndkVersion` 27 or higher
+    Use the Android SDK, NDK, and Gradle versions required by your React Native release.
   </TabItem>
 </Tabs>
 
-If your React Native version allows opting out of the New Architecture, set `newArchEnabled=true` in `android/gradle.properties` and run `RCT_NEW_ARCH_ENABLED=1 bundle exec pod install` in your `ios` directory. Rebuild the app after changing these settings.
+For an existing CocoaPods project, run `npx react-native spm add --deintegrate` from the app directory to convert its iOS integration. This step requires CocoaPods to remove its existing integration. Nitro's podspec contains discovery metadata for the React Native CLI; native builds use SwiftPM.
 
-Standalone `nitro-core` projects do not depend on React Native or its architecture settings.
+Standalone `nitro-core` projects do not depend on React Native.

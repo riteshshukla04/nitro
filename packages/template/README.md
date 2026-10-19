@@ -1,6 +1,6 @@
 # $$packageName$$
 
-This Nitro V1 starter includes an `Example` class and its Swift implementation.
+This Nitro V1 starter includes an `Example` class and its Swift implementation. It requires React Native 0.88 or newer with the New Architecture, and Swift 6.4 or newer for iOS builds.
 
 Install dependencies, then run `npm run specs` to generate native bindings and compile TypeScript. Nitrogen runs first because the spec re-exports its generated JavaScript class through `#nitro/Example`.
 

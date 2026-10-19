@@ -11,7 +11,7 @@ A **Nitro Module** is a library built with Nitro. It may contain one or more [**
 
 ## Structure
 
-A Nitro Module contains the usual react-native library structure, with `ios/` and `android/` folders, a `package.json`, and a `*.podspec` file for iOS.
+A Nitro Module contains native source folders, a `package.json`, and a `Package.swift` for iOS. Its `swiftpmConfig` entry enables React Native's SwiftPM autolinking. A metadata-only `*.podspec` lets React Native CLI discover the iOS dependency.
 In addition to the base react-native library template, a Nitro Module also contains:
 
 - A TypeScript setup
@@ -24,7 +24,7 @@ In addition to the base react-native library template, a Nitro Module also conta
 To create a new Nitro Module, simply run `nitrogen init <moduleName>`:
 
 ```sh
-npx nitrogen@latest init react-native-math
+npx nitrogen@alpha init react-native-math
 ```
 
 ### 2. Implement your Hybrid Objects
