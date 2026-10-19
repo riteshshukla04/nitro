@@ -194,6 +194,8 @@ if (!manifest) {
   ])
   run('bun', ['run', 'test:release'])
   run('bun', ['run', 'build'])
+  // Link workspace CLIs now that their build outputs exist.
+  run('bun', ['install', '--ignore-scripts', '--frozen-lockfile'])
   run('bun', ['run', 'typecheck'])
   checkNativeBuilds(root)
   const packages = releasePackages.map((name) =>
