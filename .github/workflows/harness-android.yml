@@ -1,10 +1,16 @@
 name: Harness Android
 
 concurrency:
-  group: harness-android-${{ github.ref }}
+  group: harness-android-${{ inputs.ref && github.run_id || github.ref }}
   cancel-in-progress: ${{ github.ref_name != 'main' }}
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact commit to validate
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       device_api_level:
@@ -20,23 +26,6 @@ on:
         description: "AVD name"
         required: false
         type: string
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/harness-android.yml'
-      - 'packages/nitro-core/**'
-      - 'packages/nitrogen/**'
-      - 'packages/react-native-nitro-modules/**'
-      - 'tests/react-native/**'
-      - 'scripts/sync-core.mjs'
-      - 'scripts/core-package.mjs'
-      - 'scripts/set-version.mjs'
-      - 'package.json'
-      - 'bun.lock'
-      - 'bunfig.toml'
-      - 'scripts/releases/**'
-      - 'config/**'
   pull_request:
     paths:
       - '.github/workflows/harness-android.yml'
@@ -69,6 +58,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ inputs.ref || github.sha }}
           fetch-depth: 1
 
       - name: Reclaim disk space

@@ -29,6 +29,14 @@ export const readJSON = (file) => JSON.parse(readFileSync(file, 'utf8'))
 export const writeJSON = (file, value) =>
   writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`)
 
+export function assertValidatedCommit(commit, validatedCommit) {
+  if (
+    !/^[a-f0-9]{40}$/.test(validatedCommit ?? '') ||
+    validatedCommit !== commit
+  )
+    throw new Error(`Required CI has not validated release commit ${commit}`)
+}
+
 // npm normalizes build metadata. Reject it so tags, manifests and registry versions agree.
 export function parseVersion(version) {
   if (typeof version !== 'string' || version.length > 256)

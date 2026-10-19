@@ -15,6 +15,7 @@ import { releasePackages } from './packages.mjs'
 import { corePackageFiles, verifyCorePackage } from './package-layout.mjs'
 import {
   assertPublishedPackages,
+  assertValidatedCommit,
   compareVersions,
   fileIntegrity,
   finishRelease,
@@ -30,6 +31,25 @@ import {
   validateManifest,
   versionFromTag,
 } from './lib.mjs'
+
+test('publication requires CI for the resolved release commit', () => {
+  const releaseCommit = 'a'.repeat(40)
+  const newerMainCommit = 'b'.repeat(40)
+  assert.doesNotThrow(() =>
+    assertValidatedCommit(releaseCommit, releaseCommit)
+  )
+  for (const validated of [
+    undefined,
+    '',
+    releaseCommit.slice(0, 12),
+    newerMainCommit,
+  ]) {
+    assert.throws(
+      () => assertValidatedCommit(releaseCommit, validated),
+      /Required CI has not validated release commit/
+    )
+  }
+})
 
 test('unstaged release changes fail with their file paths', (t) => {
   const directory = mkdtempSync(path.join(os.tmpdir(), 'nitro-release-git-'))

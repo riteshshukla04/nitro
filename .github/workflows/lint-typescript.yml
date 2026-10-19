@@ -4,23 +4,12 @@ permissions:
   contents: read
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/lint-typescript.yml'
-      - 'config/**'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - '**/*.js'
-      - '**/*.mjs'
-      - '**/*.cjs'
-      - 'eslint.config.mjs'
-      - '**/*.jsx'
-      - '**/*.json'
-      - 'bun.lock'
-      - 'bunfig.toml'
-      - '**/package.json'
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact commit to validate
+        required: true
+        type: string
   pull_request:
     paths:
       - '.github/workflows/lint-typescript.yml'
@@ -43,6 +32,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json
@@ -58,6 +49,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json

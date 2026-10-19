@@ -1,10 +1,16 @@
 name: Harness iOS
 
 concurrency:
-  group: harness-ios-${{ github.ref }}
+  group: harness-ios-${{ inputs.ref && github.run_id || github.ref }}
   cancel-in-progress: ${{ github.ref_name != 'main' }}
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact commit to validate
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       device_model:
@@ -22,23 +28,6 @@ on:
         required: false
         default: "26.5"
         type: string
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/harness-ios.yml'
-      - 'packages/nitro-core/**'
-      - 'packages/nitrogen/**'
-      - 'packages/react-native-nitro-modules/**'
-      - 'tests/react-native/**'
-      - 'scripts/sync-core.mjs'
-      - 'scripts/core-package.mjs'
-      - 'scripts/set-version.mjs'
-      - 'package.json'
-      - 'bun.lock'
-      - 'bunfig.toml'
-      - 'scripts/releases/**'
-      - 'config/**'
   pull_request:
     paths:
       - '.github/workflows/harness-ios.yml'
@@ -70,6 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ inputs.ref || github.sha }}
           fetch-depth: 1
 
       - uses: oven-sh/setup-bun@v2

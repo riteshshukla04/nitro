@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import {
   assertCI,
   assertClean,
+  assertValidatedCommit,
   compareVersions,
   downloadRelease,
   finishRelease,
@@ -25,7 +26,6 @@ import {
 } from './lib.mjs'
 import { checkConsumer } from './check-consumer.mjs'
 import { releasePackages, versionedFiles } from './packages.mjs'
-import { checkNativeBuilds } from './native-checks.mjs'
 
 const root = fileURLToPath(new URL('../../', import.meta.url))
 process.chdir(root)
@@ -170,8 +170,14 @@ if (exists) {
     if (await registryPackage(name, version))
       throw new Error(`${name}@${version} already exists on npm`)
   }
-  run('node', ['scripts/set-version.mjs', version])
 }
+
+if (!dryRun)
+  assertValidatedCommit(
+    git(['rev-parse', 'HEAD']),
+    process.env.RELEASE_VALIDATED_COMMIT
+  )
+if (!exists) run('node', ['scripts/set-version.mjs', version])
 
 if (!manifest) {
   run('bun', [
@@ -184,7 +190,6 @@ if (!manifest) {
   // Link workspace CLIs now that their build outputs exist.
   run('bun', ['install', '--ignore-scripts', '--frozen-lockfile'])
   run('bun', ['run', 'typecheck'])
-  checkNativeBuilds(root)
   const packages = releasePackages.map((name) =>
     packPackage(path.join(root, 'packages', name), directory)
   )
@@ -198,13 +203,7 @@ if (!manifest) {
   if (!exists) {
     git(['config', 'user.name', 'Marc Rousavy'])
     git(['config', 'user.email', 'me@mrousavy.com'])
-    git([
-      'add',
-      ...versionedFiles,
-      'tests/react-native/apps/example/ios/Podfile.lock',
-      'tests/react-native/apps/benchmark/ios/Podfile.lock',
-      'tests/react-native/packages/react-native-nitro-test/nitrogen/generated',
-    ])
+    git(['add', ...versionedFiles])
     git(['diff', '--exit-code'])
     if (git(['ls-files', '--others', '--exclude-standard']))
       throw new Error('Release generated unexpected untracked files')

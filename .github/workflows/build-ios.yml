@@ -1,23 +1,12 @@
 name: Build React Native iOS
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/build-ios.yml'
-      - 'packages/nitro-core/**'
-      - 'packages/nitrogen/**'
-      - 'packages/react-native-nitro-modules/**'
-      - 'tests/react-native/**'
-      - 'scripts/sync-core.mjs'
-      - 'scripts/core-package.mjs'
-      - 'scripts/set-version.mjs'
-      - 'package.json'
-      - 'bun.lock'
-      - 'bunfig.toml'
-      - 'scripts/releases/**'
-      - 'config/**'
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact commit to validate
+        required: true
+        type: string
   pull_request:
     paths:
       - '.github/workflows/build-ios.yml'
@@ -51,6 +40,8 @@ jobs:
             use_frameworks: ""   # intentionally unset
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json

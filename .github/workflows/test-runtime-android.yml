@@ -1,21 +1,13 @@
 name: Test standalone runtime (Android)
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact commit to validate
+        required: true
+        type: string
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/test-runtime-android.yml"
-      - "packages/nitro-core/**"
-      - "packages/nitrogen/**"
-      - "tests/standalone/**"
-      - "package.json"
-      - "bun.lock"
-      - "bunfig.toml"
-      - "scripts/releases/**"
-      - "config/**"
-      - "scripts/set-version.mjs"
-      - ".gitmodules"
   pull_request:
     paths:
       - ".github/workflows/test-runtime-android.yml"
@@ -34,7 +26,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: runtime-android-${{ github.ref }}
+  group: runtime-android-${{ inputs.ref && github.run_id || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -57,6 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ inputs.ref || github.sha }}
           submodules: recursive
       - uses: oven-sh/setup-bun@v2
         with:

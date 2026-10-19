@@ -1,24 +1,12 @@
 name: Check Nitrogen output
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'packages/nitrogen/**'
-      - 'packages/nitro-core/**'
-      - 'packages/react-native-nitro-modules/**'
-      - 'tests/standalone/nitro-test/**'
-      - 'tests/standalone/nitro-test-external/**'
-      - 'tests/react-native/packages/**'
-      - 'config/**'
-      - '**/package.json'
-      - 'bun.lock'
-      - 'bunfig.toml'
-      - 'scripts/releases/**'
-      - 'scripts/sync-core.mjs'
-      - 'scripts/core-package.mjs'
-      - 'scripts/set-version.mjs'
-      - '.github/workflows/run-nitrogen.yml'
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact commit to validate
+        required: true
+        type: string
   pull_request:
     paths:
       - 'packages/nitrogen/**'
@@ -49,6 +37,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json
