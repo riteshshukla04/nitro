@@ -80,10 +80,7 @@
         "nitro-core": "1.0.0-alpha.0",
       },
       "devDependencies": {
-        "@react-native/jest-preset": "0.88.0",
-        "@types/jest": "*",
         "@types/react": "^19.3.0",
-        "jest": "*",
         "react": "19.3.0",
         "react-native": "0.88.0",
         "react-native-builder-bob": "^0.41.0",
@@ -91,7 +88,7 @@
       },
       "peerDependencies": {
         "react": "*",
-        "react-native": "*",
+        "react-native": ">=0.78.0",
       },
     },
     "scripts": {
