@@ -4,7 +4,7 @@ include_guard(GLOBAL)
 # shared test options, without React Native.
 function(nitro_add_test_hermes)
   get_filename_component(tests_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/.." ABSOLUTE)
-  set(hermes_source "${tests_dir}/vendor/hermes")
+  set(hermes_source "${tests_dir}/hermes/hermes")
   set(host_compilers "${tests_dir}/.build/hermes/host/ImportHostCompilers.cmake")
   if(NOT EXISTS "${hermes_source}/CMakeLists.txt")
     message(FATAL_ERROR "Initialize Hermes with git submodule update --init --recursive")

@@ -113,7 +113,7 @@ When adding a reproduction, follow the rules in [CONTRIBUTING.md](https://github
 
 ### Reproduce a runtime error
 
-Add portable runtime assertions to [`tests/standalone/runtime/js/`](https://github.com/margelo/nitro/tree/main/tests/standalone/runtime/js/). Run `bun test:ios` or `bun test:android` from the repository root. These suites run through Swift Testing and JUnit, including sanitizer configurations in CI.
+Add portable runtime assertions to [`tests/standalone/test-runner/js/`](https://github.com/margelo/nitro/tree/main/tests/standalone/test-runner/js/). Run `bun test:ios` or `bun test:android` from the repository root. These suites run through Swift Testing and JUnit, including sanitizer configurations in CI.
 
 For React Native integration or View regressions, add an assertion to the Harness files in [`tests/react-native/apps/example/__tests__/`](https://github.com/margelo/nitro/tree/main/tests/react-native/apps/example/__tests__). Run `bun test:react-native:ios` or `bun test:react-native:android`. Harness keeps eight View tests and four integration checks; portable cases have moved to the standalone runner.
 

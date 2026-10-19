@@ -1,10 +1,13 @@
 # Hermes for native tests
 
-`tests/standalone/vendor/hermes` pins a commit from the public Hermes `static_h` branch. Normal builds use that commit. Initialize it from the repository root:
+`tests/standalone/hermes/hermes` pins a commit from the public Hermes `static_h` branch. Normal builds use that commit. Initialize it from the repository root:
 
 ```sh
-git submodule update --init --recursive
+git submodule update --init --recursive -- tests/standalone/hermes/hermes
 ```
+
+The nested `hermes/` directory contains the upstream checkout; the files beside
+it configure the standalone test builds.
 
 The test builds use Hermes' CMake source lists and its bundled JSI. Use the Bun version pinned in the root `package.json`, and install CMake, Ninja and Python 3. Build the host bytecode compiler with:
 

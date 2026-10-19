@@ -3,7 +3,7 @@ plugins {
 }
 
 def repositoryRoot = file('../../../..')
-def hermesRoot = file('../../vendor/hermes')
+def hermesRoot = file('../hermes')
 def prefabHeaders = layout.buildDirectory.dir('prefab-headers')
 
 android {

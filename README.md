@@ -60,7 +60,7 @@ cd ios && pod install
 - [**nitrogen**/README.md](./packages/nitrogen/README.md)
 - [**react-native-nitro-modules**/README.md](./packages/react-native-nitro-modules/README.md)
 - [**react-native-nitro-test** example module](./tests/react-native/packages/react-native-nitro-test/README.md)
-- [`TestObject.nitro.ts` example playground](./tests/react-native/packages/react-native-nitro-test/src/specs/TestObject.nitro.ts)
+- [`TestObject.nitro.ts` HybridObject test specs](./tests/standalone/nitro-test/specs/TestObject.nitro.ts)
 
 ## Supported Platforms
 

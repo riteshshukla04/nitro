@@ -6,12 +6,12 @@ This local Android library builds `packages/nitro-core/native` without React Nat
 
 The module depends on the local `:hermes` project for JSI and on fbjni for Java/C++ interop. Core and test libraries link the same Hermes shared library, so neither embeds another engine or JSI copy.
 
-The runtime test project's `settings.gradle` includes both dependencies. From `tests/standalone/runtime/android`, build the core library with:
+The runtime test project's `settings.gradle` includes both dependencies. From `tests/standalone/test-runner/android`, build the core library with:
 
 ```sh
 ./gradlew :nitro-core:assembleDebug
 ```
 
-Its toolchain and `nitroTestAbi` setting come from the surrounding Gradle build. See the [runtime test instructions](../../runtime/android/README.md) for setup and emulator commands.
+Its toolchain and `nitroTestAbi` setting come from the surrounding Gradle build. See the [runtime test instructions](../../test-runner/android/README.md) for setup and emulator commands.
 
 Call `com.margelo.nitro.testing.NitroCore.initialize()` once before using fbjni-backed classes or loading a fixture library. This sets up fbjni's `NativeLoader` with a `SystemDelegate` and loads `NitroModules`. The delegate forwards to Android's standard `System.loadLibrary`.

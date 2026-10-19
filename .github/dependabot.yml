@@ -58,7 +58,7 @@ updates:
       - "/tests/react-native/packages/react-native-nitro-test-external/android/"
       - "/tests/react-native/apps/example/android/"
       - "/tests/react-native/apps/benchmark/android/"
-      - "/tests/standalone/runtime/android/"
+      - "/tests/standalone/test-runner/android/"
     schedule:
       interval: "daily"
     labels:

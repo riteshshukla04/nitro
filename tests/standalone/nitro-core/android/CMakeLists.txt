@@ -29,5 +29,5 @@ target_compile_options(NitroModules PRIVATE -frtti -fexceptions -Wall -Wextra)
 target_include_directories(NitroModules PRIVATE ${NITRO_INCLUDE_DIRECTORIES})
 target_link_libraries(NitroModules PUBLIC hermes::hermesvm fbjni::fbjni android log)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../runtime/android/sanitizer.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../test-runner/android/sanitizer.cmake")
 nitro_apply_test_sanitizer(NitroModules)

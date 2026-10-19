@@ -69,7 +69,7 @@ jobs:
       - name: Read Hermes build cache inputs
         id: hermes
         run: |
-          echo "revision=$(git -C tests/standalone/vendor/hermes rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "revision=$(git -C tests/standalone/hermes/hermes rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           toolchain=$({ xcodebuild -version; xcrun --sdk iphonesimulator --show-sdk-version; cmake --version; ninja --version; echo "$GITHUB_WORKSPACE"; } | shasum -a 256 | cut -d ' ' -f 1)
           echo "toolchain=$toolchain" >> "$GITHUB_OUTPUT"
       - name: Cache Hermes simulator XCFramework
@@ -77,7 +77,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: tests/standalone/.build/hermes/NitroTestHermes.xcframework
-          key: hermes-ios-${{ runner.os }}-${{ runner.arch }}-${{ steps.hermes.outputs.revision }}-${{ steps.hermes.outputs.toolchain }}-${{ hashFiles('tests/standalone/hermes/build.mjs', 'tests/standalone/hermes/options.cmake', 'tests/standalone/runtime/ios/config.json') }}
+          key: hermes-ios-${{ runner.os }}-${{ runner.arch }}-${{ steps.hermes.outputs.revision }}-${{ steps.hermes.outputs.toolchain }}-${{ hashFiles('tests/standalone/hermes/build.mjs', 'tests/standalone/hermes/options.cmake', 'tests/standalone/test-runner/ios/config.json') }}
       - name: Install workspace
         run: bun install --frozen-lockfile --ignore-scripts
       - name: Prepare runtime test fixtures
@@ -88,9 +88,9 @@ jobs:
           SANITIZER: ${{ matrix.sanitizer.value }}
         run: |
           if [ "$HERMES_CACHE_HIT" = 'true' ]; then
-            bun tests/standalone/runtime/ios/run.mjs --sanitizer "$SANITIZER" --skip-hermes-build
+            bun tests/standalone/test-runner/ios/run.mjs --sanitizer "$SANITIZER" --skip-hermes-build
           else
-            bun tests/standalone/runtime/ios/run.mjs --sanitizer "$SANITIZER"
+            bun tests/standalone/test-runner/ios/run.mjs --sanitizer "$SANITIZER"
           fi
       - name: Upload test results
         if: always()
@@ -99,8 +99,8 @@ jobs:
           name: runtime-ios-results-${{ matrix.sanitizer.name }}
           path: |
             tests/standalone/.build/ios/${{ matrix.sanitizer.value }}/results/
-            tests/standalone/runtime/build/runtime-tests.js
-            tests/standalone/runtime/build/runtime-tests.js.map
-            tests/standalone/runtime/build/runtime-tests.json
-            tests/standalone/runtime/build/runtime-test-skips.json
+            tests/standalone/test-runner/build/runtime-tests.js
+            tests/standalone/test-runner/build/runtime-tests.js.map
+            tests/standalone/test-runner/build/runtime-tests.json
+            tests/standalone/test-runner/build/runtime-test-skips.json
           if-no-files-found: ignore

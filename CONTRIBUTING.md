@@ -25,7 +25,7 @@ For Core-only iteration, install with `bun install --frozen-lockfile --ignore-sc
 The standalone environment in `tests/standalone/` runs portable Nitro behavior tests in Hermes through Swift Testing on an iOS simulator and instrumented JUnit on Android. Add runtime regressions that do not need React Native here. Initialize its pinned engine before native tests:
 
 ```sh
-git submodule update --init --recursive -- tests/standalone/vendor/hermes
+git submodule update --init --recursive -- tests/standalone/hermes/hermes
 bun test:ios
 bun test:android
 ```

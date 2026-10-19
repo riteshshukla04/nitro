@@ -83,7 +83,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Read pinned Hermes revision
         id: hermes
-        run: echo "revision=$(git -C tests/standalone/vendor/hermes rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        run: echo "revision=$(git -C tests/standalone/hermes/hermes rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/cache@v6
         with:
           path: tests/standalone/.build/hermes/host
@@ -91,7 +91,7 @@ jobs:
       - run: bun install --frozen-lockfile --ignore-scripts
       - run: bun test:prepare
       - name: Build test APK
-        working-directory: tests/standalone/runtime/android
+        working-directory: tests/standalone/test-runner/android
         run: ./gradlew :assembleDebugAndroidTest -PnitroTestAbi=x86_64 -PnitroSanitizer=${{ matrix.sanitizer.flag }} --no-daemon
       - name: Run JUnit tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -100,17 +100,17 @@ jobs:
           arch: x86_64
           target: google_apis
           disable-animations: true
-          script: cd tests/standalone/runtime/android && ./gradlew :connectedDebugAndroidTest -PnitroTestAbi=x86_64 -PnitroSanitizer=${{ matrix.sanitizer.flag }} --no-daemon
+          script: cd tests/standalone/test-runner/android && ./gradlew :connectedDebugAndroidTest -PnitroTestAbi=x86_64 -PnitroSanitizer=${{ matrix.sanitizer.flag }} --no-daemon
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: runtime-android-results-${{ matrix.sanitizer.name }}
           path: |
-            tests/standalone/runtime/android/build/reports/androidTests
-            tests/standalone/runtime/android/build/outputs/androidTest-results
-            tests/standalone/runtime/build/runtime-tests.js
-            tests/standalone/runtime/build/runtime-tests.js.map
-            tests/standalone/runtime/build/runtime-tests.json
-            tests/standalone/runtime/build/runtime-test-skips.json
+            tests/standalone/test-runner/android/build/reports/androidTests
+            tests/standalone/test-runner/android/build/outputs/androidTest-results
+            tests/standalone/test-runner/build/runtime-tests.js
+            tests/standalone/test-runner/build/runtime-tests.js.map
+            tests/standalone/test-runner/build/runtime-tests.json
+            tests/standalone/test-runner/build/runtime-test-skips.json
           if-no-files-found: ignore

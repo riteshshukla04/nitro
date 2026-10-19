@@ -7,8 +7,8 @@ on:
       - 'packages/nitrogen/**'
       - 'packages/nitro-core/**'
       - 'packages/react-native-nitro-modules/**'
-      - 'tests/standalone/runtime/**'
-      - 'tests/standalone/external/**'
+      - 'tests/standalone/nitro-test/**'
+      - 'tests/standalone/nitro-test-external/**'
       - 'tests/react-native/packages/**'
       - 'config/**'
       - '**/package.json'
@@ -24,8 +24,8 @@ on:
       - 'packages/nitrogen/**'
       - 'packages/nitro-core/**'
       - 'packages/react-native-nitro-modules/**'
-      - 'tests/standalone/runtime/**'
-      - 'tests/standalone/external/**'
+      - 'tests/standalone/nitro-test/**'
+      - 'tests/standalone/nitro-test-external/**'
       - 'tests/react-native/packages/**'
       - 'config/**'
       - '**/package.json'
@@ -58,8 +58,8 @@ jobs:
         shell: bash
         run: |
           paths=(
-            tests/standalone/runtime/nitrogen/generated
-            tests/standalone/external/nitrogen/generated
+            tests/standalone/nitro-test/nitrogen/generated
+            tests/standalone/nitro-test-external/nitrogen/generated
             tests/react-native/packages/react-native-nitro-test/nitrogen/generated
             tests/react-native/packages/react-native-nitro-test-external/nitrogen/generated
           )

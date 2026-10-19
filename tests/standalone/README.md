@@ -1,7 +1,10 @@
-# Native runtime tests
+# Standalone HybridObject tests
 
-`runtime/` exercises Nitro through Hermes, C++ fixtures, and generated
-Swift/Kotlin bindings. The same TypeScript cases run on iOS and Android.
+`nitro-test/` contains the C++, Swift and Kotlin HybridObjects used by the tests.
+`nitro-test-external/` supplies a separate module for cross-library cases.
+`test-runner/` runs the shared TypeScript tests through Hermes, Swift Testing and
+JUnit. All three are private workspace packages.
+
 The suites cover primitives, arrays, maps, variants, structs, callbacks,
 Promises, buffers, inheritance, object lifetime, and the Nitro registry.
 React Native integration and View tests live in `../react-native/`.
@@ -9,21 +12,24 @@ See [MIGRATION.md](MIGRATION.md) for the source inventory and exclusions.
 
 ```text
 tests/standalone/
-  runtime/
-    specs/                # Nitrogen inputs, importing nitro-core
-    js/                   # Shared TypeScript behavior tests
-    cpp/                  # Hermes runtime and dispatcher
-    fixtures/             # C++ HybridObject implementations
-    nitrogen/generated/   # Committed Nitrogen output
-    ios/                  # Swift fixtures and Swift Testing target
-    android/              # Kotlin fixtures and instrumented JUnit tests
-    package.json          # Private workspace, never published
-    tsconfig.json
-  external/               # Separate Swift/Kotlin module for cross-module tests
-  hermes/                 # Engine build helpers, Swift package and Android library
-  nitro-core/android/     # Local Gradle/Prefab adapter for the core sources
-  vendor/hermes/          # Public Hermes static_h submodule, pinned by Git
-  .build/                 # Ignored native build products
+  nitro-test/
+    specs/                 # HybridObject specs, importing nitro-core
+    src/                   # Package exports for fixture types
+    cpp/                   # C++ implementations
+    ios/                   # Swift implementations
+    android/               # Kotlin implementations and native library
+    nitrogen/generated/    # Committed Nitrogen output
+  nitro-test-external/      # Separate Swift/Kotlin fixture module
+  test-runner/
+    js/                    # Shared TypeScript behavior tests
+    scripts/               # Test discovery and bundling
+    cpp/                   # Hermes runtime and dispatcher
+    ios/                   # Xcode project and Swift Testing suite
+    android/               # Gradle project and instrumented JUnit suite
+  hermes/                  # Engine build helpers and platform libraries
+    hermes/                # Public Hermes static_h submodule, pinned by Git
+  nitro-core/android/      # Local Gradle/Prefab adapter for the core sources
+  .build/                  # Ignored native build products
 ```
 
 The platform folders are named for their execution target. Android runs on an
@@ -38,15 +44,15 @@ Use the Bun version in the root `package.json`, CMake and Ninja. Initialize
 the pinned engine explicitly; ordinary package installation does not fetch it:
 
 ```sh
-git submodule update --init --recursive -- tests/standalone/vendor/hermes
+git submodule update --init --recursive -- tests/standalone/hermes/hermes
 bun install --frozen-lockfile
 bun test:prepare
 ```
 
 `test:prepare` builds the workspace Nitrogen, typechecks the specs and tests,
-regenerates bindings, and bundles the JS into `runtime/build/runtime-tests.js`.
-It also writes `runtime/build/runtime-tests.json`, the case list used by both
-native runners, and `runtime/build/runtime-test-skips.json`, the original
+regenerates bindings, and bundles the JS into `test-runner/build/runtime-tests.js`.
+It also writes `test-runner/build/runtime-tests.json`, the case list used by both
+native runners, and `test-runner/build/runtime-test-skips.json`, the original
 platform/build exclusions. The bundle and manifests are generated together.
 Commit generated binding changes with their spec. The **Check Nitrogen output**
 job regenerates bindings for both test environments and checks for drift. It does
@@ -61,8 +67,8 @@ their reports on failure.
 CI runs normal, AddressSanitizer (ASan), and ThreadSanitizer (TSan) configurations
 on iOS, and normal and ASan configurations on Android. Sanitized builds instrument
 Core, the native fixtures, and the test host. Hermes stays uninstrumented.
-See the [iOS](runtime/ios/README.md) and
-[Android](runtime/android/README.md) guides for local sanitizer commands.
+See the [iOS](test-runner/ios/README.md) and
+[Android](test-runner/android/README.md) guides for local sanitizer commands.
 
 All portable Harness cases now run in this suite with the sanitizer
 configurations above. React Native Harness keeps its integration and View tests
@@ -87,13 +93,13 @@ The spec uses Nitro's `Int64` type for the return value, which is a `bigint` in 
 Typechecking catches invalid test calls; it does not replace runtime assertions or
 future generator-specific tests in `packages/nitrogen/tests/`.
 
-Export a named, zero-argument function from any `runtime/js/**/*.test.ts` file.
+Export a named, zero-argument function from any `test-runner/js/**/*.test.ts` file.
 It can return `void` or `Promise<void>`:
 
 ```ts
 import { expect } from "chai";
 import { getNitroModules } from "nitro-core";
-import type { TestObjectSwiftKotlin } from "../specs/TestObject.nitro";
+import type { TestObjectSwiftKotlin } from "nitro-test";
 
 export async function fibonacci(): Promise<void> {
   const object = getNitroModules().createHybridObject<TestObjectSwiftKotlin>(
@@ -209,8 +215,8 @@ source filters or copied runtime implementation are needed. React Native adapter
 live in `packages/react-native-nitro-modules`; their integration coverage runs in
 `tests/react-native/`.
 
-On Android, the runtime project depends on local `hermes` and `nitro-core` Gradle
-libraries. Each owns its native build and exposes headers through Prefab. The
-runtime project compiles only the test host and generated fixtures. The core
+On Android, `test-runner` depends on the local `hermes`, `nitro-core`, `nitro-test`,
+and `nitro-test-external` Gradle libraries. Each owns its native build and exposes
+headers through Prefab. The runner compiles the Hermes host and its JNI bridge. The core
 adapter in `nitro-core/android/` demonstrates building the existing sources
 without the React Native bootstrap; it is not a published package.

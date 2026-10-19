@@ -42,11 +42,11 @@ split from the original React Native comparison. The two JS runner checks and
 the native runner contract tests remain alongside these suites. The Promise
 runner check uses `TestObjectSwiftKotlin`. The original boolean/Fibonacci
 placeholder fixture and its three cases are removed; the full fixtures are
-defined in `runtime/specs/TestObject.nitro.ts`.
+defined in `nitro-test/specs/TestObject.nitro.ts`.
 
 ## Exclusions and adaptations
 
-- Harness keeps all eight `nitro.views.harness.tsx` cases for React Native
+- Harness keeps all nine `nitro.views.harness.tsx` cases for React Native
   rendering, view refs, Fabric, and recycling. Their specs and native
   implementations stay in the React Native fixtures, including `getIsViewBlue`.
 - The standalone `PlatformObject` case checks that the OS version is a nonempty
@@ -54,7 +54,7 @@ defined in `runtime/specs/TestObject.nitro.ts`.
 - Standalone registry expectations omit the two view registrations, and version
   checks use `nitro-core`. Harness retains the React Native registry and package
   version checks, plus the installed Core proxy and constructor identity check.
-  These four integration checks and the eight View cases are its remaining tests.
+  These four integration checks and the nine View cases are its remaining tests.
 - HardwareBuffer tests remain: Android platform APIs do not require React Native.
 - The external fixture remains a separate native module, preserving tests of
   cross-module HybridObjects and optional primitives.

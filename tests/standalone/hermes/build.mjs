@@ -1,4 +1,12 @@
-import { cpSync, mkdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { availableParallelism, arch, platform } from "node:os";
 import { dirname, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -6,7 +14,7 @@ import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 
 const tests = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const source = resolve(tests, "vendor/hermes");
+const source = resolve(tests, "hermes/hermes");
 const options = resolve(tests, "hermes/options.cmake");
 const output = resolve(tests, ".build/hermes");
 const { values, positionals } = parseArgs({
@@ -52,7 +60,20 @@ function run(command, commandArgs) {
   }
 }
 
+function prepareBuildDirectory(directory) {
+  const cache = resolve(directory, "CMakeCache.txt");
+  if (!existsSync(cache)) return;
+  const configuredSource = readFileSync(cache, "utf8").match(
+    /^CMAKE_HOME_DIRECTORY:INTERNAL=(.*)$/m,
+  )?.[1];
+  if (configuredSource && resolve(configuredSource) !== source) {
+    console.log(`Resetting Hermes build directory after source moved: ${directory}`);
+    rmSync(directory, { recursive: true, force: true });
+  }
+}
+
 const host = resolve(output, "host");
+prepareBuildDirectory(host);
 run("cmake", [
   "-C",
   options,
@@ -77,6 +98,7 @@ run("cmake", [
 
 if (target === "ios") {
   const build = resolve(output, `ios-simulator-${architecture}`);
+  prepareBuildDirectory(build);
   run("cmake", [
     "-C",
     options,

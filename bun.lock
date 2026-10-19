@@ -205,21 +205,32 @@
         "react-native-nitro-modules",
       ],
     },
-    "tests/standalone/external": {
+    "tests/standalone/nitro-test": {
+      "name": "nitro-test",
+      "version": "0.0.0",
+      "devDependencies": {
+        "nitro-core": "workspace:*",
+        "nitro-test-external": "workspace:*",
+        "nitrogen": "workspace:*",
+      },
+    },
+    "tests/standalone/nitro-test-external": {
       "name": "nitro-test-external",
       "version": "0.0.0",
       "devDependencies": {
         "nitro-core": "workspace:*",
+        "nitrogen": "workspace:*",
       },
     },
-    "tests/standalone/runtime": {
-      "name": "nitro-runtime-tests",
+    "tests/standalone/test-runner": {
+      "name": "nitro-test-runner",
       "version": "0.0.0",
       "devDependencies": {
         "@types/chai": "5.2.3",
         "chai": "5.3.3",
         "nitro-core": "workspace:*",
-        "nitrogen": "workspace:*",
+        "nitro-test": "workspace:*",
+        "nitro-test-external": "workspace:*",
       },
     },
   },
@@ -3087,9 +3098,11 @@
 
     "nitro-docs": ["nitro-docs@workspace:docs"],
 
-    "nitro-runtime-tests": ["nitro-runtime-tests@workspace:tests/standalone/runtime"],
+    "nitro-test": ["nitro-test@workspace:tests/standalone/nitro-test"],
 
-    "nitro-test-external": ["nitro-test-external@workspace:tests/standalone/external"],
+    "nitro-test-external": ["nitro-test-external@workspace:tests/standalone/nitro-test-external"],
+
+    "nitro-test-runner": ["nitro-test-runner@workspace:tests/standalone/test-runner"],
 
     "nitrogen": ["nitrogen@workspace:packages/nitrogen"],
 
