@@ -9,6 +9,11 @@
 
 #include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
+#include "Size.hpp"
+#include "SizeUnit.hpp"
+#include <NitroModules/Promise.hpp>
+#include <NitroModules/Callback.hpp>
+#include <functional>
 
 namespace margelo::nitro::test::external {
 
@@ -47,7 +52,9 @@ namespace margelo::nitro::test::external {
 
     public:
       // Methods
-
+      virtual Size bounceSize(const Size& size) = 0;
+      virtual SizeUnit bounceSizeUnit(SizeUnit unit) = 0;
+      virtual Promise<Size> mapSize(const Size& size, const Callback<Size(const Size& /* size */)>& callback) = 0;
 
     protected:
       // Hybrid Setup

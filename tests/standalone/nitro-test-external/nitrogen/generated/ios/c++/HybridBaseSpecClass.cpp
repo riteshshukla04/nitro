@@ -6,6 +6,11 @@
 ///
 
 #include "NitroTestExternal/HybridBaseSpec.hpp"
+#include "Size.hpp"
+#include "SizeUnit.hpp"
+#include <NitroModules/Promise.hpp>
+#include <NitroModules/Callback.hpp>
+#include <functional>
 
 
 namespace margelo::nitro::test::external {
@@ -15,6 +20,9 @@ namespace margelo::nitro::test::external {
   const std::shared_ptr<const HybridClass>& HybridBaseSpec::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
       clazz.registerHybridGetter("baseValue", &HybridBaseSpec::getBaseValue);
+      clazz.registerHybridMethod("bounceSize", &HybridBaseSpec::bounceSize);
+      clazz.registerHybridMethod("bounceSizeUnit", &HybridBaseSpec::bounceSizeUnit);
+      clazz.registerHybridMethod("mapSize", &HybridBaseSpec::mapSize);
     });
     return hybridClass;
   }

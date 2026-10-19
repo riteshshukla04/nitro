@@ -5,10 +5,67 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 #include "NitroTestExternal-Swift-Cxx-Umbrella.hpp"
+
+#include "JSIConverter+SizeUnit.hpp"
+#include "SwiftConverter+SizeUnit.hpp"
+#include "JSIConverter+Size.hpp"
+#include "SwiftConverter+Size.hpp"
+#include <NitroModules/Promise.hpp>
+#include <NitroModules/Callback.hpp>
+#include <NitroModules/SwiftResult.hpp>
 #include "NitroTestExternal/HybridBaseSpecSwift.hpp"
 #include "NitroTestExternal/HybridSomeExternalObjectSpecSwift.hpp"
 
 namespace margelo::nitro::test::external::swift_bridge {
+  Promise_NitroTestExternal__Size create_Promise_NitroTestExternal__Size() { return Promise_NitroTestExternal__Size::pending(); }
+
+  void reject_Promise_NitroTestExternal__Size(const Promise_NitroTestExternal__Size& promise, std::exception_ptr error) { promise.reject(std::move(error)); }
+
+  void listenRejected_Promise_NitroTestExternal__Size(const Promise_NitroTestExternal__Size& promise, std::function<void(const std::exception_ptr&)> listener) { promise.addOnRejectedListener(std::move(listener)); }
+
+  void resolve_Promise_NitroTestExternal__Size(const Promise_NitroTestExternal__Size& promise, const void* NON_NULL value) {
+    promise.resolve(NitroModules::copySwiftValue<NitroTestExternal::Size>(value));
+  }
+
+  void listen_Promise_NitroTestExternal__Size(const Promise_NitroTestExternal__Size& promise, std::function<void(const void* NON_NULL)> listener) {
+    promise.addOnResolvedListener([listener = std::move(listener)](const NitroTestExternal::Size& value) {
+      NitroModules::withSwiftValue(value, [&](const void* pointer) {
+        listener(pointer);
+      });
+    });
+  }
+
+  Result<void, margelo::nitro::test::external::swift_bridge::ResultTag> callSync_Callback_NitroTestExternal__Size_NitroTestExternal__Size(const Callback_NitroTestExternal__Size_NitroTestExternal__Size& callback, const void* NON_NULL param0, void* NON_NULL __outResult) noexcept {
+    try {
+      NitroModules::initializeSwiftValue(__outResult, callback.callSync(NitroModules::copySwiftValue<NitroTestExternal::Size>(param0)));
+      return Result<void, margelo::nitro::test::external::swift_bridge::ResultTag>::withValue();
+    } catch (...) {
+      return Result<void, margelo::nitro::test::external::swift_bridge::ResultTag>::withError(std::current_exception());
+    }
+  }
+
+  Promise<NitroTestExternal::Size> callAsync_Callback_NitroTestExternal__Size_NitroTestExternal__Size(const Callback_NitroTestExternal__Size_NitroTestExternal__Size& callback, const void* NON_NULL param0) {
+    return callback.callAsync(NitroModules::copySwiftValue<NitroTestExternal::Size>(param0));
+  }
+
+  void callAndForget_Callback_NitroTestExternal__Size_NitroTestExternal__Size(const Callback_NitroTestExternal__Size_NitroTestExternal__Size& callback, const void* NON_NULL param0) {
+    callback.callAndForget(NitroModules::copySwiftValue<NitroTestExternal::Size>(param0));
+  }
+
+  Callback_NitroTestExternal__Size_NitroTestExternal__Size create_Callback_NitroTestExternal__Size_NitroTestExternal__Size(std::function<Result<void, margelo::nitro::test::external::swift_bridge::ResultTag>(const void* NON_NULL param0, void* NON_NULL __outResult)> closure) {
+    return Callback_NitroTestExternal__Size_NitroTestExternal__Size::make([closure = std::move(closure)](const NitroTestExternal::Size& param0) -> NitroTestExternal::Size {
+      auto __result = borrowSwiftValue(param0, [&](const void* param0) {
+        return withSwiftResult<NitroTestExternal::Size>([&](void* __outResult) {
+          return closure(param0, __outResult);
+        });
+      });
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      return std::move(__result.value());
+    });
+  }
+
   std__shared_ptr_HybridBaseSpec_ create_std__shared_ptr_HybridBaseSpec_(void* NON_NULL pointer) {
     return std::make_shared<margelo::nitro::test::external::HybridBaseSpecSwift>(NitroTestExternal::HybridBaseSpec_cxx::fromUnsafe(pointer));
   }

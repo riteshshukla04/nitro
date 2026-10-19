@@ -2,8 +2,12 @@ import { expect } from "chai";
 import { casesForTestObjects, namedCases, recordCallback } from "./utils/cases";
 
 import { NitroModules } from "nitro-core";
-import { Base } from "nitro-test";
-import { Base as ExternalBase } from "nitro-test-external";
+import { Base, SizeUnit, type Size } from "nitro-test";
+import {
+  Base as ExternalBase,
+  SizeUnit as ExternalSizeUnit,
+  type Size as ExternalSize,
+} from "nitro-test-external";
 import { HybridSomeExternalObject } from "./utils/testObjects";
 
 import { debugOnly } from "./utils/helpers";
@@ -13,6 +17,19 @@ const INT64_MIN = -(2n ** 63n);
 const INT64_MAX = 2n ** 63n - 1n;
 
 const UINT64_MAX = 2n ** 64n - 1n;
+
+const LOCAL_SIZE: Size = {
+  width: 640,
+  height: 480,
+  unit: SizeUnit.Pixels,
+};
+
+const EXTERNAL_SIZE: ExternalSize = {
+  width: 1920,
+  height: 1080,
+  unit: ExternalSizeUnit.Pixels,
+  scale: 2,
+};
 
 export const cases = {
   ...namedCases("Namespaced HybridObjects", {
@@ -48,6 +65,59 @@ export const cases = {
         expect(object.constructor.name).to.equal("Base");
         expect(object.toString()).to.equal("[HybridObject Base]");
       }
+    },
+  }),
+  ...namedCases("Namespaced custom types", {
+    "same-named structs preserve each module's fields": () => {
+      expect(new Base().bounceSize(LOCAL_SIZE)).to.deep.equal(LOCAL_SIZE);
+      expect(new ExternalBase().bounceSize(EXTERNAL_SIZE)).to.deep.equal(
+        EXTERNAL_SIZE,
+      );
+    },
+
+    "same-named enums preserve each module's members and values": () => {
+      const local = new Base();
+      const external = new ExternalBase();
+      expect(local.bounceSizeUnit(SizeUnit.Points)).to.equal(SizeUnit.Points);
+      expect(local.bounceSizeUnit(SizeUnit.Pixels)).to.equal(SizeUnit.Pixels);
+      expect(external.bounceSizeUnit(ExternalSizeUnit.Pixels)).to.equal(
+        ExternalSizeUnit.Pixels,
+      );
+      expect(external.bounceSizeUnit(ExternalSizeUnit.Normalized)).to.equal(
+        ExternalSizeUnit.Normalized,
+      );
+    },
+
+    "callbacks and promises use their module's struct and enum": async () => {
+      let localCalls = 0;
+      let externalCalls = 0;
+      const localResult: Size = {
+        width: 320,
+        height: 240,
+        unit: SizeUnit.Points,
+      };
+      const externalResult: ExternalSize = {
+        width: 1,
+        height: 1,
+        unit: ExternalSizeUnit.Normalized,
+        scale: 3,
+      };
+      const [local, external] = await Promise.all([
+        new Base().mapSize(LOCAL_SIZE, (size) => {
+          localCalls += 1;
+          expect(size).to.deep.equal(LOCAL_SIZE);
+          return localResult;
+        }),
+        new ExternalBase().mapSize(EXTERNAL_SIZE, (size) => {
+          externalCalls += 1;
+          expect(size).to.deep.equal(EXTERNAL_SIZE);
+          return externalResult;
+        }),
+      ]);
+      expect(localCalls).to.equal(1);
+      expect(externalCalls).to.equal(1);
+      expect(local).to.deep.equal(localResult);
+      expect(external).to.deep.equal(externalResult);
     },
   }),
   ...namedCases("SomeExternalObject optional primitives", {

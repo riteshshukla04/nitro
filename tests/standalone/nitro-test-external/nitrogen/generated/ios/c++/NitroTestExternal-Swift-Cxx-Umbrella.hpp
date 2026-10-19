@@ -27,6 +27,12 @@
 #endif
 
 
+#include "JSIConverter+SizeUnit.hpp"
+#include "SwiftConverter+SizeUnit.hpp"
+#include "JSIConverter+Size.hpp"
+#include "SwiftConverter+Size.hpp"
+#include <NitroModules/Promise.hpp>
+#include <NitroModules/Callback.hpp>
 #include <memory>
 #include "NitroTestExternal/HybridBaseSpec.hpp"
 #include "JSIConverter+HybridBaseSpec_cxx.hpp"

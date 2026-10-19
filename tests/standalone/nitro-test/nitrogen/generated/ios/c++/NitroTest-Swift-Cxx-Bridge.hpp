@@ -6,6 +6,12 @@
 ///
 #pragma once
 
+// Forward declaration of `SizeUnit` to properly resolve imports.
+namespace NitroTest { class SizeUnit; }
+// Forward declaration of `Size` to properly resolve imports.
+namespace NitroTest { class Size; }
+#include <NitroModules/Promise.hpp>
+#include <NitroModules/Callback.hpp>
 // Forward declaration of `HybridBaseSpec_cxx` to properly resolve imports.
 namespace NitroTest { class HybridBaseSpec_cxx; }
 #include <NitroModules/Result.hpp>
@@ -37,11 +43,9 @@ namespace NitroTest { class Variant_NullType_String_cxx; }
 namespace NitroTest { class OldEnum; }
 // Forward declaration of `TruckPowertrain` to properly resolve imports.
 namespace NitroTest { class TruckPowertrain; }
-#include <NitroModules/Callback.hpp>
 // Forward declaration of `PartialPerson` to properly resolve imports.
 namespace NitroTest { class PartialPerson; }
 namespace NitroModules { class AnyJSON; }
-#include <NitroModules/Promise.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 // Forward declaration of `Variant_Bool_Double_cxx` to properly resolve imports.
 namespace NitroTest { class Variant_Bool_Double_cxx; }
@@ -116,13 +120,26 @@ namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpec; }
 namespace margelo::nitro::test { class HybridTestObjectSwiftKotlinSpec; }
 
 namespace margelo::nitro::test::swift_bridge {
+  using Promise_NitroTest__Size = Promise<NitroTest::Size>;
+  Promise_NitroTest__Size create_Promise_NitroTest__Size();
+  void reject_Promise_NitroTest__Size(const Promise_NitroTest__Size& promise, std::exception_ptr error);
+  void listenRejected_Promise_NitroTest__Size(const Promise_NitroTest__Size& promise, std::function<void(const std::exception_ptr&)> listener);
+  void resolve_Promise_NitroTest__Size(const Promise_NitroTest__Size& promise, const void* NON_NULL value);
+  void listen_Promise_NitroTest__Size(const Promise_NitroTest__Size& promise, std::function<void(const void* NON_NULL)> listener);
+  // Distinct specializations prevent duplicate Swift metadata across module headers.
+  struct ResultTag {};
+  using Result_void = Result<void, margelo::nitro::test::swift_bridge::ResultTag>;
+  using Callback_NitroTest__Size_NitroTest__Size = Callback<NitroTest::Size(const NitroTest::Size&)>;
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_NitroTest__Size_NitroTest__Size(const Callback_NitroTest__Size_NitroTest__Size& callback, const void* NON_NULL param0, void* NON_NULL __outResult) noexcept;
+  Promise<NitroTest::Size> callAsync_Callback_NitroTest__Size_NitroTest__Size(const Callback_NitroTest__Size_NitroTest__Size& callback, const void* NON_NULL param0);
+  void callAndForget_Callback_NitroTest__Size_NitroTest__Size(const Callback_NitroTest__Size_NitroTest__Size& callback, const void* NON_NULL param0);
+  Callback_NitroTest__Size_NitroTest__Size create_Callback_NitroTest__Size_NitroTest__Size(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0, void* NON_NULL __outResult)> closure);
   using std__shared_ptr_HybridBaseSpec_ = std::shared_ptr<HybridBaseSpec>;
   using std__weak_ptr_HybridBaseSpec_ = std::weak_ptr<HybridBaseSpec>;
   inline std__weak_ptr_HybridBaseSpec_ weakify_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value) { return value; }
   std__shared_ptr_HybridBaseSpec_ create_std__shared_ptr_HybridBaseSpec_(void* NON_NULL pointer);
   void* NON_NULL get_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value);
-  // Distinct specializations prevent duplicate Swift metadata across module headers.
-  struct ResultTag {};
+  using Result_Promise_NitroTest__Size_ = Result<Promise<NitroTest::Size>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_void_ = Result<void*, margelo::nitro::test::swift_bridge::ResultTag>;
   using std__shared_ptr_HybridChildSpec_ = std::shared_ptr<HybridChildSpec>;
   using std__weak_ptr_HybridChildSpec_ = std::weak_ptr<HybridChildSpec>;
@@ -130,7 +147,6 @@ namespace margelo::nitro::test::swift_bridge {
   std__shared_ptr_HybridChildSpec_ create_std__shared_ptr_HybridChildSpec_(void* NON_NULL pointer);
   void* NON_NULL get_std__shared_ptr_HybridChildSpec_(const std__shared_ptr_HybridChildSpec_& value);
   std::shared_ptr<HybridBaseSpec> upcast_Child_to_Base(const std__shared_ptr_HybridChildSpec_& value);
-  using Result_void = Result<void, margelo::nitro::test::swift_bridge::ResultTag>;
   using std__shared_ptr_HybridPlatformObjectSpec_ = std::shared_ptr<HybridPlatformObjectSpec>;
   using std__weak_ptr_HybridPlatformObjectSpec_ = std::weak_ptr<HybridPlatformObjectSpec>;
   inline std__weak_ptr_HybridPlatformObjectSpec_ weakify_std__shared_ptr_HybridPlatformObjectSpec_(const std__shared_ptr_HybridPlatformObjectSpec_& value) { return value; }

@@ -38,6 +38,12 @@
 #endif
 
 
+#include "JSIConverter+SizeUnit.hpp"
+#include "SwiftConverter+SizeUnit.hpp"
+#include "JSIConverter+Size.hpp"
+#include "SwiftConverter+Size.hpp"
+#include <NitroModules/Promise.hpp>
+#include <NitroModules/Callback.hpp>
 #include <memory>
 #include "NitroTest/HybridBaseSpec.hpp"
 #include "JSIConverter+HybridBaseSpec_cxx.hpp"
@@ -70,11 +76,9 @@
 #include "SwiftConverter+OldEnum.hpp"
 #include "JSIConverter+TruckPowertrain.hpp"
 #include "SwiftConverter+TruckPowertrain.hpp"
-#include <NitroModules/Callback.hpp>
 #include "JSIConverter+PartialPerson.hpp"
 #include "SwiftConverter+PartialPerson.hpp"
 #include <NitroModules/JSIConverter+SwiftAnyJSON.hpp>
-#include <NitroModules/Promise.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include "JSIConverter+Variant_Bool_Double.hpp"
 #include "SwiftConverter+Variant_Bool_Double.hpp"

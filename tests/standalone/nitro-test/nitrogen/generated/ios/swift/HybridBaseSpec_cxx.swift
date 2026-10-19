@@ -130,6 +130,35 @@ open class HybridBaseSpec_cxx {
 
   // Methods
 
+  public final func bounceSize(size: Size, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+    do {
+      let value = try __implementation.bounceSize(size: size)
+      __outResult.assumingMemoryBound(to: Size.self).initialize(to: value)
+      return bridge.Result_void.withValue()
+    } catch {
+      return bridge.Result_void.withError(error.toCpp())
+    }
+  }
+
+  public final func bounceSizeUnit(unit: SizeUnit, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+    do {
+      let value = try __implementation.bounceSizeUnit(unit: unit)
+      __outResult.assumingMemoryBound(to: SizeUnit.self).initialize(to: value)
+      return bridge.Result_void.withValue()
+    } catch {
+      return bridge.Result_void.withError(error.toCpp())
+    }
+  }
+
+  public final func mapSize(size: Size, callback: margelo.nitro.test.swift_bridge.Callback_NitroTest__Size_NitroTest__Size) -> bridge.Result_Promise_NitroTest__Size_ {
+    do {
+      let value = try __implementation.mapSize(size: size, callback: callback)
+      return bridge.Result_Promise_NitroTest__Size_.withValue(value.toCpp())
+    } catch {
+      return bridge.Result_Promise_NitroTest__Size_.withError(error.toCpp())
+    }
+  }
+
   // Constructor
 
   public class func constructor() -> bridge.Result_void_ {

@@ -61,6 +61,12 @@ namespace margelo::nitro::test {
     double getBaseValue() override;
     double getBaseValue_Swift();
     // Methods
+    Size bounceSize(const Size& size) override;
+    NitroTest::Size bounceSize_Swift(const NitroTest::Size& size);
+    SizeUnit bounceSizeUnit(SizeUnit unit) override;
+    NitroTest::SizeUnit bounceSizeUnit_Swift(NitroTest::SizeUnit unit);
+    Promise<Size> mapSize(const Size& size, const Callback<Size(const Size& /* size */)>& callback) override;
+    Promise<NitroTest::Size> mapSize_Swift(const NitroTest::Size& size, const Callback<NitroTest::Size(const NitroTest::Size&)>& callback);
     // Constructor
     static std::shared_ptr<HybridBaseSpec> constructor();
     static NitroTest::HybridBaseSpec_cxx constructor_Swift();
