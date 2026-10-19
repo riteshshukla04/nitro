@@ -115,6 +115,118 @@ export declare class GoodDatabase extends HybridObject {
 </div>
 </div>
 
+## Use inline callbacks when possible
+
+If a callback is only used during the current native call, mark it as [`Inline<...>`](../types/callbacks#inline-callbacks):
+
+<div className="side-by-side-container">
+<div className="side-by-side-block">
+
+```ts title="Bad ❌"
+import { type HybridObject, iOS } from 'nitro-core'
+
+@iOS(...)
+export declare class BadDatabase extends HybridObject {
+  forEachRow(callback: (row: Row) => void): void
+}
+```
+
+</div>
+<div className="side-by-side-block">
+
+```ts title="Good ✅"
+import { type HybridObject, type Inline, iOS } from 'nitro-core'
+
+@iOS(...)
+export declare class GoodDatabase extends HybridObject {
+  forEachRow(callback: Inline<(row: Row) => void>): void
+}
+```
+
+</div>
+</div>
+
+In Swift and C++, this lets Nitro borrow the JS function for the duration of the call, avoiding the allocations needed to keep an ordinary `Callback` alive for later. Calling it inline also skips the Dispatcher and calls JS directly.
+
+This only makes sense if you actually execute the callback inline, before the native method returns and on the calling JS Runtime's Thread.
+If you need to store it or call it from another Thread, use an ordinary callback or call `escape()` first. Escaping creates an owning `Callback` again, so always escaping an `Inline<...>` callback loses this optimization.
+
+## Use static methods for stateless functions
+
+If a method does not need any instance state, make it `static`:
+
+<div className="side-by-side-container">
+<div className="side-by-side-block">
+
+```ts title="Bad ❌"
+@iOS(...)
+export declare class BadHasher extends HybridObject {
+  constructor()
+  hash(data: ArrayBuffer): string
+}
+export * from '#nitro/BadHasher'
+
+const hasher = new BadHasher()
+const hash = hasher.hash(data)
+```
+
+</div>
+<div className="side-by-side-block">
+
+```ts title="Good ✅"
+@iOS(...)
+export declare class GoodHasher extends HybridObject {
+  static hash(data: ArrayBuffer): string
+}
+export * from '#nitro/GoodHasher'
+
+const hash = GoodHasher.hash(data)
+```
+
+</div>
+</div>
+
+Every instance call has to look up the native object behind `this`, check its type, and keep it alive for the duration of the call.
+Static methods skip that work. You also avoid creating a Hybrid Object just to call a stateless function.
+
+This reduces the overhead of the call itself - it does not make the actual hashing code faster. Keep instance methods when your object has state, like an open database connection or a configured image decoder.
+Static methods require a concrete [`implementation`](../concepts/platform-decorators#concrete-implementations) in the platform decorators.
+
+## Use concrete implementations and disable inheritance
+
+If your Hybrid Object has one known native implementation, specify it in the platform decorator. Only enable inheritance or multiple implementations when you actually need them:
+
+```ts title="Image.nitro.ts"
+import { type HybridObject, iOS } from 'nitro-core'
+
+@iOS({
+  language: 'swift',
+  implementation: { className: 'HybridImage' },
+  allowInheritance: false
+})
+export declare class Image extends HybridObject {
+  readonly width: number
+  readonly height: number
+}
+export * from '#nitro/Image'
+```
+
+In Swift, a concrete `implementation` lets the bridge hold `HybridImage` directly, instead of going through an `any HybridImageSpec` protocol value on each call. This gives the compiler more opportunities to optimize calls to your implementation.
+
+With `allowInheritance: false`, Nitrogen also generates final Swift and C++ bridge classes. Nitro can then check the receiver's exact type instead of searching its inheritance hierarchy when calling an instance method.
+`allowInheritance` is already `false` by default, so you can also just omit it.
+
+These are small optimizations that matter most for methods called very often. Benchmark your code to see how much they affect your library.
+
+## Avoid repeated native downcasts
+
+If you do need multiple implementations, you might find yourself repeatedly downcasting a Hybrid Object to access its native properties - for example, `image as? HybridImage` to get its underlying `UIImage`.
+
+Put those shared native properties in a Swift protocol or Kotlin interface, and add it through `protocolConformances` or `implementedInterfaces`.
+Now every implementation has to provide those properties, and your native code can access them directly without checking which concrete class it received.
+
+See [Additional native interface/protocol conformances](../concepts/platform-decorators#additional-native-interfaceprotocol-conformances) for an example.
+
 ## Use Threading/Asynchronous Promises
 
 By default, every function in Nitro is fully synchronous.
