@@ -18,6 +18,7 @@ import {
   compareVersions,
   fileIntegrity,
   finishRelease,
+  git,
   isNightly,
   nightlyVersion,
   npmTagFor,
@@ -29,6 +30,32 @@ import {
   validateManifest,
   versionFromTag,
 } from './lib.mjs'
+
+test('unstaged release changes fail with their file paths', (t) => {
+  const directory = mkdtempSync(path.join(os.tmpdir(), 'nitro-release-git-'))
+  t.after(() => rmSync(directory, { recursive: true, force: true }))
+  git(['init', '--quiet'], { cwd: directory })
+  for (const file of ['version.txt', 'unexpected-project.pbxproj']) {
+    writeFileSync(path.join(directory, file), 'before\n')
+  }
+  git(['add', '.'], { cwd: directory })
+  for (const file of ['version.txt', 'unexpected-project.pbxproj']) {
+    writeFileSync(path.join(directory, file), 'after\n')
+  }
+  git(['add', 'version.txt'], { cwd: directory })
+
+  assert.throws(
+    () => git(['diff', '--exit-code'], { cwd: directory }),
+    (error) => {
+      assert.match(error.message, /git diff --exit-code failed \(1\)/)
+      assert.match(error.message, /unexpected-project\.pbxproj/)
+      assert.doesNotMatch(error.message, /version\.txt/)
+      return true
+    }
+  )
+  git(['add', 'unexpected-project.pbxproj'], { cwd: directory })
+  assert.equal(git(['diff', '--exit-code'], { cwd: directory }), '')
+})
 
 function installedCoreFixture(t) {
   const directory = mkdtempSync(path.join(os.tmpdir(), 'nitro-packed-core-'))

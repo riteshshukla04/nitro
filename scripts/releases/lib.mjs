@@ -15,8 +15,9 @@ export function run(command, args, { cwd, capture = false, input, env } = {}) {
   })
   if (result.error) throw result.error
   if (result.status !== 0) {
+    const output = [result.stdout, result.stderr].filter(Boolean).join('\n')
     throw new Error(
-      `${command} ${args.join(' ')} failed (${result.status})\n${result.stderr ?? ''}`
+      `${command} ${args.join(' ')} failed (${result.status})\n${output}`
     )
   }
   return result.stdout?.trim() ?? ''
