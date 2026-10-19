@@ -23,15 +23,7 @@ std::string TypeInfo::getCurrentExceptionName() {
 }
 
 std::string TypeInfo::replaceRegex(const std::string& original, const std::string& pattern, const std::string& replacement) {
-  static std::unordered_map<std::string, std::regex> cache;
-
-  auto found = cache.find(pattern);
-  if (found != cache.end()) {
-    return std::regex_replace(original, found->second, replacement);
-  }
-
   std::regex regex(pattern);
-  cache.emplace(pattern, regex);
   return std::regex_replace(original, regex, replacement);
 }
 

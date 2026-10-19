@@ -4,14 +4,10 @@
 
 #pragma once
 
-// Forward declare a few of the common types that might have cyclic includes.
-namespace margelo::nitro {
-template <typename T, typename Enable>
-struct JSIConverter;
-} // namespace margelo::nitro
-
+#include <concepts>
 #include <jsi/jsi.h>
 #include <type_traits>
+#include <utility>
 #include <variant>
 
 namespace margelo::nitro {
@@ -19,44 +15,37 @@ namespace margelo::nitro {
 using namespace facebook;
 
 /**
- * The JSIConverter<T> class can convert any type from and to a jsi::Value.
- * It uses templates to statically create fromJSI/toJSI methods, and will throw compile-time errors
- * if a given type is not convertable.
- * Value types, custom types (HybridObject), and even functions with any number of arguments/types are supported.
- * This type can be extended by just creating a new template for JSIConverter in a header.
+ * Specialize JSIConverter<T> to provide fromJSI, toJSI, and optional canConvert operations.
+ * Unsupported types expose no operations so the conversion concepts evaluate to false.
  */
-template <typename T, typename Enable = void>
+template <typename T>
 struct JSIConverter final {
   JSIConverter() = delete;
+};
 
-  /**
-   * Converts the given `jsi::Value` to type `T`.
-   * By default, this static-asserts.
-   */
-  static inline T fromJSI(jsi::Runtime&, const jsi::Value&) {
-    static_assert(always_false<T>::value, "This type is not supported by the JSIConverter!");
-    return T();
-  }
-  /**
-   * Converts `T` to a `jsi::Value`.
-   * By default, this static-asserts.
-   */
-  static inline jsi::Value toJSI(jsi::Runtime&, T) {
-    static_assert(always_false<T>::value, "This type is not supported by the JSIConverter!");
-    return jsi::Value::undefined();
-  }
-  /**
-   * Returns whether the given `jsi::Value` can be converted to `T`.
-   * This involves runtime type-checks.
-   * By default, this returns `false`.
-   */
-  static inline bool canConvert(jsi::Runtime&, const jsi::Value&) {
-    return false;
-  }
+/** Requires conversion from a JSI value to T. */
+template <typename T>
+concept JSIDecodable = requires(jsi::Runtime& runtime, const jsi::Value& value) {
+  { JSIConverter<T>::fromJSI(runtime, value) } -> std::same_as<T>;
+};
 
-private:
-  template <typename>
-  struct always_false : std::false_type {};
+/**
+ * Requires conversion to a JSI value with T's value category preserved.
+ * Use JSIEncodable<T> for an rvalue and JSIEncodable<const T&> for a const lvalue.
+ */
+template <typename T>
+concept JSIEncodable = requires(jsi::Runtime& runtime, T&& value) {
+  { JSIConverter<std::remove_cvref_t<T>>::toJSI(runtime, std::forward<T>(value)) } -> std::convertible_to<jsi::Value>;
+};
+
+/** Requires both decoding T and encoding an rvalue of T. */
+template <typename T>
+concept JSIConvertible = JSIDecodable<T> && JSIEncodable<T>;
+
+// Runtime type checks are needed for union selection, but are optional for direct decoding.
+template <typename T>
+concept JSITypeCheckable = requires(jsi::Runtime& runtime, const jsi::Value& value) {
+  { JSIConverter<T>::canConvert(runtime, value) } -> std::same_as<bool>;
 };
 
 // int <> number
@@ -181,8 +170,10 @@ struct JSIConverter<std::monostate> final {
 
 } // namespace margelo::nitro
 
-#include "JSIConverter+AnyMap.hpp"
+// Extension headers include this header before their declarations so their constraints can use these concepts.
+#include "JSIConverter+AnyJSON.hpp"
 #include "JSIConverter+ArrayBuffer.hpp"
+#include "JSIConverter+Callback.hpp"
 #include "JSIConverter+Date.hpp"
 #include "JSIConverter+Exception.hpp"
 #include "JSIConverter+Function.hpp"

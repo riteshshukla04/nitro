@@ -4,15 +4,8 @@
 
 #pragma once
 
-// Forward declare a few of the common types that might have cyclic includes.
-namespace margelo::nitro {
-template <typename T, typename Enable>
-struct JSIConverter;
-} // namespace margelo::nitro
-
 #include "JSIConverter.hpp"
-
-#include "AnyMap.hpp"
+#include <array>
 #include <jsi/jsi.h>
 #include <vector>
 
@@ -23,7 +16,9 @@ using namespace facebook;
 // std::vector<T> <> T[]
 template <typename ElementType>
 struct JSIConverter<std::vector<ElementType>> final {
-  static inline std::vector<ElementType> fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+  static inline std::vector<ElementType> fromJSI(jsi::Runtime& runtime, const jsi::Value& arg)
+    requires(JSIDecodable<ElementType> && std::constructible_from<ElementType, ElementType>)
+  {
     jsi::Array array = arg.asObject(runtime).asArray(runtime);
     size_t length = array.size(runtime);
 
@@ -35,16 +30,32 @@ struct JSIConverter<std::vector<ElementType>> final {
     }
     return vector;
   }
-  static inline jsi::Value toJSI(jsi::Runtime& runtime, const std::vector<ElementType>& vector) {
-    jsi::Array array(runtime, vector.size());
-    for (size_t i = 0; i < vector.size(); i++) {
-      jsi::Value value = JSIConverter<ElementType>::toJSI(runtime, vector[i]);
-      array.setValueAtIndex(runtime, i, std::move(value));
+  static inline jsi::Value toJSI(jsi::Runtime& runtime, const std::vector<ElementType>& vector)
+    requires requires(jsi::Runtime& rt, const std::vector<ElementType>& value) {
+      { JSIConverter<ElementType>::toJSI(rt, value[0]) } -> std::convertible_to<jsi::Value>;
+    }
+  {
+    jsi::Array array(runtime, 0);
+    if (vector.empty()) {
+      return array;
+    }
+    // Convert all items first and append them with a single push(...) - filling a pre-sized array
+    // with setValueAtIndex(...) is much slower, as each item goes through the engine's slow path.
+    // Small vectors use a stack buffer to avoid a heap allocation.
+    constexpr size_t kInlineCapacity = 8;
+    if (vector.size() <= kInlineCapacity) {
+      std::array<jsi::Value, kInlineCapacity> values;
+      pushItems(runtime, array, vector, values.data());
+    } else {
+      std::vector<jsi::Value> values(vector.size());
+      pushItems(runtime, array, vector, values.data());
     }
     return array;
   }
 
-  static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+  static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value)
+    requires JSITypeCheckable<ElementType>
+  {
     if (!value.isObject()) {
       return false;
     }
@@ -63,6 +74,17 @@ struct JSIConverter<std::vector<ElementType>> final {
     // But we don't want to do that for performance reasons - let's just assume the user doesn't make this mistake.
     jsi::Value firstElement = array.getValueAtIndex(runtime, 0);
     return JSIConverter<ElementType>::canConvert(runtime, firstElement);
+  }
+
+private:
+  static inline void pushItems(jsi::Runtime& runtime, jsi::Array& array, const std::vector<ElementType>& vector, jsi::Value* values)
+    requires JSIEncodable<const std::vector<ElementType>&>
+  {
+    for (size_t i = 0; i < vector.size(); i++) {
+      values[i] = JSIConverter<ElementType>::toJSI(runtime, vector[i]);
+    }
+    // The pointer has to be const, otherwise this resolves to the variadic push(Args&&...) overload.
+    array.push(runtime, static_cast<const jsi::Value*>(values), vector.size());
   }
 };
 

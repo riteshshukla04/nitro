@@ -8,141 +8,131 @@
 #include "Promise.hpp"
 
 namespace margelo::nitro {
+  
+  Promise<void>::Promise(): _state(std::make_shared<State>()) { }
 
-Promise<void>::~Promise() {
-  if (isPending()) [[unlikely]] {
-    std::runtime_error error("Timeouted: Promise<void> was destroyed!");
-    reject(std::make_exception_ptr(error));
+  Promise<void> Promise<void>::async(std::function<void()>&& run) {
+    auto promise = pending();
+    ThreadPool::shared().run([run = std::move(run), promise]() {
+      try {
+        run();
+        promise.resolve();
+      } catch (...) {
+        promise.reject(std::current_exception());
+      }
+    });
+    return promise;
   }
-}
 
-std::shared_ptr<Promise<void>> Promise<void>::create() {
-  return std::shared_ptr<Promise<void>>(new Promise());
-}
+  Promise<void> Promise<void>::awaitFuture(std::future<void>&& future) {
+    auto sharedFuture = std::make_shared<std::future<void>>(std::move(future));
+    return async([sharedFuture = std::move(sharedFuture)]() { sharedFuture->get(); });
+  }
 
-std::shared_ptr<Promise<void>> Promise<void>::async(std::function<void()>&& run) {
-  auto promise = create();
-  ThreadPool::shared().run([run = std::move(run), promise]() {
-    try {
-      // Run the code, then resolve.
-      run();
-      promise->resolve();
-    } catch (...) {
-      // It threw an error.
-      promise->reject(std::current_exception());
+  Promise<void>::State::~State() {
+    if (!isResolved && !error) {
+      Logger::log(LogLevel::Warning, "Promise", "Promise<void> was destroyed while it's still pending - it's now dangling!");
+      error = std::make_exception_ptr(std::runtime_error("Timeouted! Promise<void> was destroyed in native."));
+      for (const auto& listener : onRejectedListeners) {
+        listener(error);
+      }
     }
-  });
-  return promise;
-}
-
-std::shared_ptr<Promise<void>> Promise<void>::awaitFuture(std::future<void>&& future) {
-  auto sharedFuture = std::make_shared<std::future<void>>(std::move(future));
-  return async([sharedFuture = std::move(sharedFuture)]() { sharedFuture->get(); });
-}
-
-std::shared_ptr<Promise<void>> Promise<void>::resolved() {
-  auto promise = create();
-  promise->resolve();
-  return promise;
-}
-std::shared_ptr<Promise<void>> Promise<void>::rejected(const std::exception_ptr& error) {
-  auto promise = create();
-  promise->reject(error);
-  return promise;
-}
-
-void Promise<void>::resolve() {
-#ifdef NITRO_DEBUG
-  assertPromiseState(*this, PromiseTask::WANTS_TO_RESOLVE);
-#endif
-  std::vector<OnResolvedFunc> listeners;
-  std::vector<OnRejectedFunc> dropped;
-  {
-    std::unique_lock lock(_mutex);
-    _isResolved = true;
-    listeners = std::move(_onResolvedListeners);
-    dropped = std::move(_onRejectedListeners);
-  }
-  for (const auto& onResolved : listeners) {
-    onResolved();
-  }
-}
-
-void Promise<void>::reject(const std::exception_ptr& exception) {
-  if (exception == nullptr) [[unlikely]] {
-    throw std::runtime_error("Cannot reject Promise<void> with a null exception_ptr!");
   }
 
-#ifdef NITRO_DEBUG
-  assertPromiseState(*this, PromiseTask::WANTS_TO_REJECT);
-#endif
-  std::vector<OnRejectedFunc> listeners;
-  std::vector<OnResolvedFunc> dropped;
-  {
-    std::unique_lock lock(_mutex);
-    _error = exception;
-    listeners = std::move(_onRejectedListeners);
-    dropped = std::move(_onResolvedListeners);
-  }
-  for (const auto& onRejected : listeners) {
-    onRejected(exception);
-  }
-}
+  void Promise<void>::resolve() const {
+    // Keep the state alive even if a listener destroys this Promise.
+    const auto state = _state;
+    std::unique_lock lock(state->mutex);
+    assert(!state->isResolved && "Promise<void> cannot be resolved twice!");
+    assert(!state->error && "Promise<void> cannot be resolved when it already has been rejected!");
+    state->isResolved = true;
+    auto listeners = std::move(state->onResolvedListeners);
+    auto dropped = std::move(state->onRejectedListeners);
 
-void Promise<void>::addOnResolvedListener(OnResolvedFunc&& onResolved) {
-  std::unique_lock lock(_mutex);
-  if (isResolved(lock)) {
+    lock.unlock();
+    for (const auto& onResolved : listeners) {
+      onResolved();
+    }
+  }
+  
+  void Promise<void>::reject(TError&& error) const {
+    if (error == nullptr) [[unlikely]] {
+      throw std::runtime_error("Cannot reject Promise<void> with a null exception_ptr!");
+    }
+
+    // Keep the state alive even if a listener destroys this Promise.
+    const auto state = _state;
+    std::unique_lock lock(state->mutex);
+    assert(!state->error && "Promise<void> cannot be rejected twice!");
+    assert(!state->isResolved && "Promise<void> cannot be reject when it already has been resolved!");
+    state->error = std::move(error);
+    auto listeners = std::move(state->onRejectedListeners);
+    auto dropped = std::move(state->onResolvedListeners);
+    const TError& rejected = state->error;
+
+    lock.unlock();
+    for (const auto& onRejected : listeners) {
+      onRejected(rejected);
+    }
+  }
+  
+void Promise<void>::addOnResolvedListener(OnResolvedFunc onResolved) const {
+  std::unique_lock lock(_state->mutex);
+  if (_state->isResolved) {
+    // It's already resolved - call callback now
     lock.unlock();
     onResolved();
+  } else if (_state->error) {
+    // It's already rejected - just drop the callback and ignore.
   } else {
-    _onResolvedListeners.push_back(std::move(onResolved));
+    // It's pending - let's queue the callback for later
+    _state->onResolvedListeners.push_back(std::move(onResolved));
   }
 }
-void Promise<void>::addOnResolvedListener(const OnResolvedFunc& onResolved) {
-  std::unique_lock lock(_mutex);
-  if (isResolved(lock)) {
+  
+void Promise<void>::addOnRejectedListener(OnRejectedFunc onRejected) const {
+  std::unique_lock lock(_state->mutex);
+  if (_state->error) {
+    // It's already rejected - call callback now
+    const auto state = _state;
     lock.unlock();
-    onResolved();
+    onRejected(state->error);
+  } else if (_state->isResolved) {
+    // It's already rejected - just drop the callback and ignore.
   } else {
-    _onResolvedListeners.push_back(onResolved);
-  }
-}
-void Promise<void>::addOnRejectedListener(OnRejectedFunc&& onRejected) {
-  std::unique_lock lock(_mutex);
-  if (isRejected(lock)) {
-    std::exception_ptr error = _error;
-    lock.unlock();
-    onRejected(error);
-  } else {
-    // Promise is not yet rejected, put the listener in our queue.
-    _onRejectedListeners.push_back(std::move(onRejected));
-  }
-}
-void Promise<void>::addOnRejectedListener(const OnRejectedFunc& onRejected) {
-  std::unique_lock lock(_mutex);
-  if (isRejected(lock)) {
-    std::exception_ptr error = _error;
-    lock.unlock();
-    onRejected(error);
-  } else {
-    // Promise is not yet rejected, put the listener in our queue.
-    _onRejectedListeners.push_back(onRejected);
+    // It's pending - let's queue the callback for later
+    _state->onRejectedListeners.push_back(std::move(onRejected));
   }
 }
 
-std::future<void> Promise<void>::await() {
+std::future<void> Promise<void>::await() const {
   auto promise = std::make_shared<std::promise<void>>();
+  auto future = promise->get_future();
   addOnResolvedListener([promise]() { promise->set_value(); });
-  addOnRejectedListener([promise](const std::exception_ptr& error) { promise->set_exception(error); });
-  return promise->get_future();
+  addOnRejectedListener([promise](const TError& error) { promise->set_exception(error); });
+  return future;
 }
 
-const std::exception_ptr& Promise<void>::getError() const {
-  std::unique_lock lock(_mutex);
-  if (!isRejected(lock)) {
-    throw std::runtime_error("Cannot get error when Promise<void> is not yet rejected!");
+[[nodiscard]]
+bool Promise<void>::isPending() const {
+  std::unique_lock lock(_state->mutex);
+  return !_state->isResolved && !_state->error;
+}
+
+[[nodiscard]]
+bool Promise<void>::isResolved() const {
+  std::unique_lock lock(_state->mutex);
+  return _state->isResolved;
+}
+
+[[nodiscard]]
+const Promise<void>::TError* Promise<void>::getErrorOrNull() const {
+  std::unique_lock lock(_state->mutex);
+  if (_state->error) {
+    return &(_state->error);
+  } else {
+    return nullptr;
   }
-  return _error;
 }
 
 } // namespace margelo::nitro

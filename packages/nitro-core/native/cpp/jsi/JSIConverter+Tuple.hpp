@@ -4,14 +4,7 @@
 
 #pragma once
 
-// Forward declare a few of the common types that might have cyclic includes.
-namespace margelo::nitro {
-template <typename T, typename Enable>
-struct JSIConverter;
-} // namespace margelo::nitro
-
 #include "JSIConverter.hpp"
-
 #include "NitroTypeInfo.hpp"
 #include <jsi/jsi.h>
 #include <memory>
@@ -24,7 +17,9 @@ using namespace facebook;
 // std::tuple<A, B, C> <> [A, B, C]
 template <typename... Types>
 struct JSIConverter<std::tuple<Types...>> final {
-  static inline std::tuple<Types...> fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+  static inline std::tuple<Types...> fromJSI(jsi::Runtime& runtime, const jsi::Value& value)
+    requires((JSIDecodable<Types> && std::constructible_from<Types, Types>) && ...)
+  {
     jsi::Object object = value.asObject(runtime);
     jsi::Array array = object.asArray(runtime);
     if (array.size(runtime) != sizeof...(Types)) [[unlikely]] {
@@ -36,13 +31,17 @@ struct JSIConverter<std::tuple<Types...>> final {
     return copyArrayItemsToTuple(runtime, array, std::index_sequence_for<Types...>{});
   }
 
-  static inline jsi::Value toJSI(jsi::Runtime& runtime, const std::tuple<Types...>& tuple) {
-    jsi::Array array(runtime, sizeof...(Types));
+  static inline jsi::Value toJSI(jsi::Runtime& runtime, const std::tuple<Types...>& tuple)
+    requires(JSIEncodable<const Types&> && ...)
+  {
+    jsi::Array array(runtime, 0);
     copyTupleItemsToArray(runtime, array, tuple, std::index_sequence_for<Types...>{});
     return array;
   }
 
-  static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+  static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value)
+    requires(JSITypeCheckable<Types> && ...)
+  {
     if (!value.isObject()) {
       return false;
     }
@@ -56,21 +55,25 @@ struct JSIConverter<std::tuple<Types...>> final {
       return false;
     }
 
-    return canConvertRecursive<Types...>(runtime, array, 0);
+    if constexpr (sizeof...(Types) == 0) {
+      return true;
+    } else {
+      return canConvertRecursive<Types...>(runtime, array, 0);
+    }
   }
 
 private:
   template <std::size_t... Is>
   static inline std::tuple<Types...> copyArrayItemsToTuple(jsi::Runtime& runtime, const jsi::Array& array, std::index_sequence<Is...>) {
-    return std::make_tuple(JSIConverter<Types>::fromJSI(runtime, array.getValueAtIndex(runtime, Is))...);
+    return std::tuple<Types...>(JSIConverter<Types>::fromJSI(runtime, array.getValueAtIndex(runtime, Is))...);
   }
 
   template <std::size_t... Is>
   static inline void copyTupleItemsToArray(jsi::Runtime& runtime, jsi::Array& array, const std::tuple<Types...>& tuple,
                                            std::index_sequence<Is...>) {
-    ((array.setValueAtIndex(runtime, Is,
-                            JSIConverter<std::tuple_element_t<Is, std::tuple<Types...>>>::toJSI(runtime, std::get<Is>(tuple)))),
-     ...);
+    // Append all items with a single push(...), which is much faster than setValueAtIndex(...) on a pre-sized array.
+    array.push(runtime,
+               {JSIConverter<std::remove_cvref_t<std::tuple_element_t<Is, std::tuple<Types...>>>>::toJSI(runtime, std::get<Is>(tuple))...});
   }
 
   template <typename T>

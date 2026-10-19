@@ -29,11 +29,6 @@ struct promise_type<Promise<T>> {
   using type = T;
   using is_promise = std::true_type;
 };
-template <typename T>
-struct promise_type<std::shared_ptr<Promise<T>>> {
-  using type = T;
-  using is_promise = std::true_type;
-};
 
 template <typename T>
 using promise_type_v = typename promise_type<std::remove_reference_t<T>>::type;

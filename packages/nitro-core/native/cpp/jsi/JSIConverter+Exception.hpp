@@ -4,12 +4,6 @@
 
 #pragma once
 
-// Forward declare a few of the common types that might have cyclic includes.
-namespace margelo::nitro {
-template <typename T, typename Enable>
-struct JSIConverter;
-} // namespace margelo::nitro
-
 #include "CommonGlobals.hpp"
 #include "JSIConverter.hpp"
 #include "NitroTypeInfo.hpp"
@@ -38,13 +32,11 @@ struct JSIConverter<std::exception_ptr> final {
     try {
       std::rethrow_exception(exception);
     } catch (const std::exception& e) {
-      jsi::JSError error(runtime, e.what());
-      return jsi::Value(runtime, error.value());
+      return runtime.createError(jsi::String::createFromUtf8(runtime, e.what()));
     } catch (...) {
       // Some unknown exception was thrown - maybe an Objective-C error?
       std::string errorName = TypeInfo::getCurrentExceptionName();
-      jsi::JSError error(runtime, "Unknown " + errorName + " error.");
-      return jsi::Value(runtime, error.value());
+      return runtime.createError(jsi::String::createFromUtf8(runtime, "Unknown " + errorName + " error."));
     }
   }
   static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {

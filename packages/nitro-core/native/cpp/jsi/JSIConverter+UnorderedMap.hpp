@@ -4,15 +4,7 @@
 
 #pragma once
 
-// Forward declare a few of the common types that might have cyclic includes.
-namespace margelo::nitro {
-template <typename T, typename Enable>
-struct JSIConverter;
-} // namespace margelo::nitro
-
 #include "JSIConverter.hpp"
-
-#include "AnyMap.hpp"
 #include "JSIHelpers.hpp"
 #include "PropNameIDCache.hpp"
 #include <jsi/jsi.h>
@@ -25,7 +17,9 @@ using namespace facebook;
 // std::unordered_map<std::string, T> <> Record<string, T>
 template <typename ValueType>
 struct JSIConverter<std::unordered_map<std::string, ValueType>> final {
-  static inline std::unordered_map<std::string, ValueType> fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+  static inline std::unordered_map<std::string, ValueType> fromJSI(jsi::Runtime& runtime, const jsi::Value& arg)
+    requires(JSIDecodable<ValueType> && std::constructible_from<ValueType, ValueType>)
+  {
     jsi::Object object = arg.asObject(runtime);
     jsi::Array propertyNames = object.getPropertyNames(runtime);
     size_t length = propertyNames.size(runtime);
@@ -39,16 +33,20 @@ struct JSIConverter<std::unordered_map<std::string, ValueType>> final {
     }
     return map;
   }
-  static inline jsi::Value toJSI(jsi::Runtime& runtime, const std::unordered_map<std::string, ValueType>& map) {
+  static inline jsi::Value toJSI(jsi::Runtime& runtime, const std::unordered_map<std::string, ValueType>& map)
+    requires JSIEncodable<const ValueType&>
+  {
     jsi::Object object(runtime);
     for (const auto& [key, value] : map) {
-      jsi::Value jsValue = JSIConverter<ValueType>::toJSI(runtime, value);
+      jsi::Value jsValue = JSIConverter<std::remove_cvref_t<ValueType>>::toJSI(runtime, value);
       object.setProperty(runtime, PropNameIDCache::get(runtime, key), std::move(jsValue));
     }
     return object;
   }
 
-  static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+  static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value)
+    requires JSITypeCheckable<ValueType>
+  {
     if (!value.isObject()) {
       return false;
     }
@@ -58,15 +56,12 @@ struct JSIConverter<std::unordered_map<std::string, ValueType>> final {
     }
 
     jsi::Array propNames = object.getPropertyNames(runtime);
-    size_t size = propNames.size(runtime);
-    for (size_t i = 0; i < size; i++) {
-      std::string key = propNames.getValueAtIndex(runtime, i).asString(runtime).utf8(runtime);
-      jsi::Value propValue = object.getProperty(runtime, PropNameIDCache::get(runtime, key));
-      if (!JSIConverter<ValueType>::canConvert(runtime, propValue)) {
-        return false;
-      }
+    if (propNames.size(runtime) == 0) {
+      return true;
     }
-    return true;
+    jsi::Value firstKey = propNames.getValueAtIndex(runtime, 0);
+    jsi::Value firstValue = object.getProperty(runtime, firstKey);
+    return JSIConverter<ValueType>::canConvert(runtime, firstValue);
   }
 };
 

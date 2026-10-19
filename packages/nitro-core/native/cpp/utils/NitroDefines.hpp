@@ -68,6 +68,8 @@
 #define SWIFT_PRIVATE
 #define SWIFT_COMPUTED_PROPERTY
 #define SWIFT_NONCOPYABLE
+#define SWIFT_NONESCAPABLE
+#define SWIFT_RETURNS_INDEPENDENT_VALUE
 #endif
 
 #endif /* NitroDefines_h */

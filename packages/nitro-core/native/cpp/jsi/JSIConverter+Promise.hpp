@@ -4,20 +4,15 @@
 
 #pragma once
 
-// Forward declare a few of the common types that might have cyclic includes.
-namespace margelo::nitro {
-
-template <typename T, typename Enable>
-struct JSIConverter;
-} // namespace margelo::nitro
-
 #include "CommonGlobals.hpp"
+#include "Dispatcher.hpp"
 #include "JSIConverter.hpp"
 #include "NitroTypeInfo.hpp"
 #include "Null.hpp"
 #include "Promise.hpp"
 #include "PropNameIDCache.hpp"
 #include <exception>
+#include <functional>
 #include <jsi/jsi.h>
 #include <memory>
 
@@ -25,82 +20,88 @@ namespace margelo::nitro {
 
 using namespace facebook;
 
-// Promise<T, std::exception> <> Promise<T>
-template <typename TResult>
-struct JSIConverter<std::shared_ptr<Promise<TResult>>> final {
-  static inline std::shared_ptr<Promise<TResult>> fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    // Create new Promise and prepare onResolved / onRejected callbacks
-    auto promise = Promise<TResult>::create();
-    auto thenCallback = [&]() {
-      if constexpr (std::is_void_v<TResult>) {
-        // void: resolve()
-        // std::monostate is used as a placeholder for the first argument
-        return JSIConverter<std::function<void(std::monostate)>>::toJSI(runtime, [=](std::monostate) { promise->resolve(); });
-      } else {
-        // T: resolve(T)
-        return JSIConverter<std::function<void(TResult)>>::toJSI(runtime, [=](const TResult& result) { promise->resolve(result); });
-      }
-    }();
-    auto catchCallback = JSIConverter<std::function<void(std::exception_ptr)>>::toJSI(
-        runtime, [=](const std::exception_ptr& exception) { promise->reject(exception); });
+  // Promise<T, std::exception> <> Promise<T>
+  template <typename TResult>
+  struct JSIConverter<Promise<TResult>> final {
+    static_assert(!std::is_void_v<TResult>, "Use the JSIConverter<Promise<void>> specialization!");
+    using TError = typename Promise<TResult>::TError;
 
-    // Chain .then listeners on JS Promise (onResolved and onRejected)
-    jsi::Object jsPromise = value.asObject(runtime);
-    jsi::Function thenFn = jsPromise.getProperty(runtime, PropNameIDCache::get(runtime, "then")).asObject(runtime).getFunction(runtime);
-    thenFn.callWithThis(runtime, jsPromise, thenCallback, catchCallback);
+    static inline Promise<TResult> fromJSI(jsi::Runtime& runtime, const jsi::Value& value)
+      requires(JSIDecodable<TResult> && std::constructible_from<TResult, TResult>)
+    {
+      // Create new Promise and prepare onResolved / onRejected callbacks
+      auto promise = Promise<TResult>::pending();
+      auto thenCallback = JSIConverter<std::function<void(TResult)>>::toJSI(
+          runtime, [promise](TResult result) { promise.resolve(std::move(result)); }, "then");
+      auto catchCallback =
+          JSIConverter<std::function<void(TError)>>::toJSI(runtime, [promise](TError error) { promise.reject(std::move(error)); }, "catch");
 
-    return promise;
-  }
+      // Chain .then listeners on JS Promise (onResolved and onRejected)
+      jsi::Object jsPromise = value.asObject(runtime);
+      jsi::Function thenFn = jsPromise.getProperty(runtime, PropNameIDCache::get(runtime, "then")).asObject(runtime).getFunction(runtime);
+      thenFn.callWithThis(runtime, jsPromise, thenCallback, catchCallback);
 
-  static inline jsi::Value toJSI(jsi::Runtime& runtime, const std::shared_ptr<Promise<TResult>>& promise) {
-    if (promise->isPending()) {
-      // Get Promise ctor from global
-      jsi::HostFunctionType executor = [promise](jsi::Runtime& runtime, const jsi::Value&, const jsi::Value* arguments,
-                                                 size_t) -> jsi::Value {
-        // Add resolver listener
-        if constexpr (std::is_void_v<TResult>) {
-          // It's resolving to void.
-          auto resolver = JSIConverter<std::function<void()>>::fromJSI(runtime, arguments[0]);
-          promise->addOnResolvedListener(std::move(resolver));
-        } else {
-          // It's a type.
-          auto resolver = JSIConverter<std::function<void(TResult)>>::fromJSI(runtime, arguments[0]);
-          promise->addOnResolvedListener(std::move(resolver));
-        }
-        // Add rejecter listener
-        auto rejecter = JSIConverter<std::function<void(std::exception_ptr)>>::fromJSI(runtime, arguments[1]);
-        promise->addOnRejectedListener(std::move(rejecter));
-
-        return jsi::Value::undefined();
-      };
-      return CommonGlobals::Promise::callConstructor(runtime, std::move(executor));
-    } else if (promise->isResolved()) {
-      // Promise is already resolved - just return immediately
-      if constexpr (std::is_void_v<TResult>) {
-        // It's resolving to void.
-        return CommonGlobals::Promise::resolved(runtime);
-      } else {
-        // It's resolving to a type.
-        jsi::Value result = JSIConverter<TResult>::toJSI(runtime, promise->getResult());
-        return CommonGlobals::Promise::resolved(runtime, std::move(result));
-      }
-    } else if (promise->isRejected()) {
-      // Promise is already rejected - just return immediately
-      jsi::Value error = JSIConverter<std::exception_ptr>::toJSI(runtime, promise->getError());
-      return CommonGlobals::Promise::rejected(runtime, std::move(error));
-    } else {
-      std::string typeName = TypeInfo::getFriendlyTypename<TResult>(true);
-      throw std::runtime_error("Promise<" + typeName + "> has invalid state!");
+      return promise;
     }
-  }
 
-  static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    if (!value.isObject()) {
-      return false;
+    static inline jsi::Value toJSI(jsi::Runtime& runtime, const Promise<TResult>& promise)
+      requires(JSIEncodable<const TResult&> && JSIEncodable<TResult>)
+    {
+      if (const TResult* result = promise.getResultOrNull()) {
+        // It's already resolved!
+        jsi::Value jsResult = JSIConverter<std::remove_cvref_t<TResult>>::toJSI(runtime, *result);
+        return CommonGlobals::Promise::resolved(runtime, std::move(jsResult));
+      } else if (const TError* error = promise.getErrorOrNull()) {
+        // It's already rejected!
+        jsi::Value jsError = JSIConverter<TError>::toJSI(runtime, *error);
+        return CommonGlobals::Promise::rejected(runtime, std::move(jsError));
+      } else {
+        // It's pending, add listeners for later.
+        jsi::HostFunctionType executor = [promise](jsi::Runtime& runtime, const jsi::Value&, const jsi::Value* arguments,
+                                                   size_t) -> jsi::Value {
+          auto resolver = JSIConverter<Callback<void(TResult)>>::fromJSI(runtime, arguments[0]);
+          auto rejecter = JSIConverter<Callback<void(TError)>>::fromJSI(runtime, arguments[1]);
+          std::weak_ptr<Dispatcher> weakDispatcher = Dispatcher::getRuntimeGlobalDispatcher(runtime);
+          // Add resolver listener
+          promise.addOnResolvedListener([weakDispatcher, resolver, rejecter](const TResult& result) {
+            std::shared_ptr<Dispatcher> dispatcher = weakDispatcher.lock();
+            if (!dispatcher) [[unlikely]] {
+              // The Runtime is gone, so there is no JS Promise left to resolve.
+              return;
+            }
+            dispatcher->runAsync([resolver, rejecter, result = TResult(result)]() mutable {
+              try {
+                resolver.callSync(std::move(result));
+              } catch (...) {
+                // Converting the result can fail, e.g. for an invalid `AnyJSON`.
+                rejecter.callAndForget(std::current_exception());
+              }
+            });
+          });
+          // Add rejecter listener
+          promise.addOnRejectedListener([rejecter = std::move(rejecter)](const TError& error) { rejecter.callAndForget(error); });
+
+          return jsi::Value::undefined();
+        };
+        return CommonGlobals::Promise::callConstructor(runtime, std::move(executor));
+      }
     }
-    jsi::Object object = value.getObject(runtime);
-    return CommonGlobals::Promise::isInstanceOf(runtime, object);
-  }
-};
+
+    static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+      if (!value.isObject()) {
+        return false;
+      }
+      jsi::Object object = value.getObject(runtime);
+      return CommonGlobals::Promise::isInstanceOf(runtime, object);
+    }
+  };
+
+  // Promise<void> <> Promise<undefined>
+  template <>
+  struct JSIConverter<Promise<void>> final {
+    static Promise<void> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const Promise<void>& promise);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
 
 } // namespace margelo::nitro

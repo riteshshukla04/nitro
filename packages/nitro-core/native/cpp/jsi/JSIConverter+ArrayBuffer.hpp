@@ -4,21 +4,11 @@
 
 #pragma once
 
-// Forward declare a few of the common types that might have cyclic includes.
-namespace margelo::nitro {
-class ArrayBuffer;
-class JSICache;
-
-template <typename T, typename Enable>
-struct JSIConverter;
-} // namespace margelo::nitro
-
 #include "JSIConverter.hpp"
-
 #include "ArrayBuffer.hpp"
-#include "IsSharedPtrTo.hpp"
 #include "JSICache.hpp"
 #include "NitroDefines.hpp"
+#include <cassert>
 #include <jsi/jsi.h>
 #include <memory>
 #include <type_traits>
@@ -27,16 +17,10 @@ namespace margelo::nitro {
 
 using namespace facebook;
 
-struct MutableBufferNativeState final : public jsi::NativeState {
-public:
-  explicit MutableBufferNativeState(const std::shared_ptr<jsi::MutableBuffer>& buffer) : buffer(buffer) {}
-  std::shared_ptr<jsi::MutableBuffer> buffer;
-};
-
 // MutableBuffer <> ArrayBuffer
-template <typename T>
-struct JSIConverter<T, std::enable_if_t<is_shared_ptr_to_v<T, jsi::MutableBuffer>>> final {
-  static inline std::shared_ptr<ArrayBuffer> fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+template <>
+struct JSIConverter<ArrayBuffer> final {
+  static inline ArrayBuffer fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
 #ifdef NITRO_DEBUG
     if (!arg.isObject()) [[unlikely]] {
       throw std::invalid_argument("Value \"" + arg.toString(runtime).utf8(runtime) +
@@ -53,47 +37,37 @@ struct JSIConverter<T, std::enable_if_t<is_shared_ptr_to_v<T, jsi::MutableBuffer
                                   "Are you maybe passing a TypedArray (e.g. Uint8Array)? Try to pass its `.buffer` value.");
     }
 #endif
-    if (object.hasNativeState<MutableBufferNativeState>(runtime)) {
-      // It already is a NativeBuffer! Let's get the jsi::MutableBuffer from the jsi::NativeState...
-      auto mutableBufferHolder = object.getNativeState<MutableBufferNativeState>(runtime);
-      auto mutableBuffer = mutableBufferHolder->buffer;
-      if (auto arrayBuffer = std::dynamic_pointer_cast<ArrayBuffer>(mutableBuffer)) [[likely]] {
-        return arrayBuffer;
-      }
+
+    jsi::ArrayBuffer jsArrayBuffer = std::move(object).getArrayBuffer(runtime);
+    if (auto mutableBuffer = jsArrayBuffer.tryGetMutableBuffer(runtime)) {
+      return ArrayBuffer(std::move(mutableBuffer));
     }
 
-    BorrowingReference<jsi::ArrayBuffer> borrowingArrayBuffer;
-    {
-      JSICacheReference cache = JSICache::getOrCreateCache(runtime);
-      borrowingArrayBuffer = cache.makeShared(object.getArrayBuffer(runtime));
-    }
+    JSICache& cache = JSICache::getOrCreateCache(runtime);
+    BorrowingReference<jsi::ArrayBuffer> borrowingArrayBuffer = cache.makeShared(std::move(jsArrayBuffer));
 
-    return std::make_shared<JSArrayBuffer>(runtime, borrowingArrayBuffer);
+    JSArrayBuffer jsBuffer(runtime, std::move(borrowingArrayBuffer));
+    return ArrayBuffer(std::move(jsBuffer));
   }
-  static inline jsi::Value toJSI(jsi::Runtime& runtime, const std::shared_ptr<jsi::MutableBuffer>& buffer) {
-    if (auto jsBuffer = std::dynamic_pointer_cast<JSArrayBuffer>(buffer)) {
-      // It already is a JSBuffer! Let's try to just get its existing jsi::Value...
-      auto jsValue = jsBuffer->getJSReference();
-      if (jsValue != nullptr) [[likely]] {
-        return jsi::Value(runtime, *jsValue);
+  
+  static inline jsi::Value toJSI(jsi::Runtime& runtime, const ArrayBuffer& buffer) {
+    if (auto* jsBuffer = std::get_if<JSArrayBuffer>(&buffer._impl)) {
+      // It's already a JS ArrayBuffer! Just return as-is (copy the reference).
+      assert(&runtime == &jsBuffer->_runtime.get() && "Cannot reuse a JS ArrayBuffer across different JS Runtimes!");
+      jsi::ArrayBuffer& arrayBuffer = *jsBuffer->_jsReference;
+      return jsi::Value(runtime, arrayBuffer);
+    } else {
+      // It's a native buffer! Return jsi::ArrayBuffer from NativeBuffer.
+      auto& nativeBuffer = std::get<NativeArrayBuffer>(buffer._impl);
+      jsi::ArrayBuffer arrayBuffer = jsi::ArrayBuffer(runtime, nativeBuffer);
+      size_t size = nativeBuffer->size();
+      if (size > 0) {
+        arrayBuffer.setExternalMemoryPressure(runtime, size);
       }
+      return std::move(arrayBuffer);
     }
-
-    // 1. Create jsi::ArrayBuffer
-    jsi::ArrayBuffer arrayBuffer(runtime, buffer);
-    // 2. Wrap jsi::MutableBuffer in jsi::NativeState holder & attach it
-    auto mutableBufferHolder = std::make_shared<MutableBufferNativeState>(buffer);
-    arrayBuffer.setNativeState(runtime, mutableBufferHolder);
-    // 3. Notify the JS VM about memory retained outside of its heap
-    if (auto nitroBuffer = std::dynamic_pointer_cast<ArrayBuffer>(buffer)) {
-      size_t externalMemorySize = nitroBuffer->getExternalMemorySize();
-      if (externalMemorySize > 0) {
-        arrayBuffer.setExternalMemoryPressure(runtime, externalMemorySize);
-      }
-    }
-    // 4. Return jsi::ArrayBuffer (with jsi::NativeState) to JS
-    return arrayBuffer;
   }
+  
   static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
     if (value.isObject()) {
       jsi::Object object = value.getObject(runtime);
