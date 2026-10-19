@@ -5,10 +5,9 @@
 #pragma once
 
 #include <NitroModules/BorrowingReference.hpp>
-#include "IsFunctionProp.hpp"
+#include <NitroModules/JSICache.hpp>
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/NitroDefines.hpp>
-#include <NitroModules/PropNameIDCache.hpp>
 #include <jsi/jsi.h>
 
 #include <react/renderer/core/RawProps.h>
@@ -97,20 +96,13 @@ public:
 
       auto [runtime, value] = static_cast<std::pair<jsi::Runtime*, jsi::Value>>(*rawValue);
 
-      if constexpr (IsFunctionProp<std::remove_cv_t<T>>::value) {
-        // React Native cannot transport functions as regular props. Nitrogen
-        // wraps them as `{ f: function }`, so we unwrap `f` before converting
-        // and caching the JSI value.
-        value = value.asObject(*runtime).getProperty(*runtime, PropNameIDCache::get(*runtime, "f"));
-      }
-
       if (previousProp.equals(*runtime, value)) {
         // jsi::Value hasn't changed - no need to convert it again!
         return previousProp;
       }
       // The new `value` differs from our previous value, so let's convert it using JSIConverter and cache it
       T converted = JSIConverter<T>::fromJSI(*runtime, value);
-      JSICacheReference cache = JSICache::getOrCreateCache(*runtime);
+      JSICache& cache = JSICache::getOrCreateCache(*runtime);
       BorrowingReference<jsi::Value> cached = cache.makeShared(std::move(value));
       return ReactProp<T>(std::move(converted), std::move(cached));
     } catch (const std::exception& exception) {

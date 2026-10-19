@@ -48,9 +48,11 @@ export interface HybridViewProps {
  * function App() {
  *   const ref = useRef<ScrollView>(null)
  *   useLayoutEffect(() => {
- *     ref.current.scrollTo(400)
+ *     ref.current?.scrollTo(400)
  *   }, [])
- *   return <HybridScrollView hybridRef={ref} />
+ *   return (
+ *     <HybridScrollView hybridRef={(view) => { ref.current = view }} />
+ *   )
  * }
  * ```
  */
@@ -72,9 +74,11 @@ export interface HybridViewMethods {}
  * function App() {
  *   const ref = useRef<ScrollViewRef>(null)
  *   useLayoutEffect(() => {
- *     ref.current.scrollTo(400)
+ *     ref.current?.scrollTo(400)
  *   }, [])
- *   return <ScrollView hybridRef={ref} />
+ *   return (
+ *     <ScrollView hybridRef={(view) => { ref.current = view }} />
+ *   )
  * }
  * ```
  */

@@ -235,12 +235,9 @@ To batch prop changes, you can override `beforeUpdate()` and `afterUpdate()` in 
   </TabItem>
 </Tabs>
 
-### Callbacks have to be wrapped
+### Callbacks
 
-Whereas Nitro allows passing JS functions to native code directly, React Native core doesn't allow that. Instead, functions are wrapped in an event listener registry, and a simple boolean is passed to the native side.
-Unfortunately React Native's renderer does not yet allow changing this behaviour, so functions cannot be passed directly to Nitro Views. As a workaround, Nitro requires you to wrap each function in an object, which bypasses React Native's conversion.
-
-To simplify this, Nitro exposes the `callback(...)` method:
+Pass functions directly to Nitro View props:
 
 ```tsx
 export interface CameraProps extends HybridViewProps {
@@ -249,16 +246,9 @@ export interface CameraProps extends HybridViewProps {
 export type CameraView = HybridView<CameraProps>
 
 function App() {
-  // diff-remove
   return <Camera onCaptured={(i) => console.log(i)} />
-  // diff-add
-  return <Camera onCaptured={callback((i) => console.log(i))} />
 }
 ```
-
-:::info
-We are working on a fix here: [facebook/react #32119](https://github.com/facebook/react/pull/32119)
-:::
 
 ### Recycling
 
@@ -325,14 +315,12 @@ To call the function, you would need to get a reference to the `HybridObject` fi
 function App() {
   return (
     <Camera
-      hybridRef={callback((ref) => {
+      hybridRef={(ref) => {
         const image = ref.takePhoto()
-      })}
+      }}
     />
   )
 }
 ```
-
-> Note: If you're wondering about the `callback(...)` syntax, see ["Callbacks have to be wrapped"](#callbacks-have-to-be-wrapped).
 
 The `ref` from within `hybridRef`'s callback is pointing to the `HybridObject` directly - you can also pass this around freely.

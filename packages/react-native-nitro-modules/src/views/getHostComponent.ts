@@ -41,48 +41,21 @@ interface DefaultHybridViewProps<RefType> {
   /**
    * A `ref` to the {@linkcode HybridObject} this Hybrid View is rendering.
    *
-   * The `hybridRef` property expects a stable Ref object received from `useRef` or `createRef`.
+   * Receives the native HybridView instance as a function prop.
    * @example
    * ```jsx
    * function App() {
    *   return (
    *     <HybridScrollView
-   *       hybridRef={callback((ref) => {
-   *         ref.current.scrollTo(400)
-   *       })}
+   *       hybridRef={(ref) => {
+   *         ref.scrollTo(400)
+   *       }}
    *     />
    *   )
    * }
    * ```
-   * @note If you're wondering about the `callback(...)` syntax, see
-   * ["Callbacks have to be wrapped"](https://nitro.margelo.com/docs/guides/view-components#callbacks-have-to-be-wrapped).
    */
   hybridRef?: (ref: RefType) => void
-}
-
-/**
- * Wraps a callback function in a Nitro-compatible object format.
- *
- * @note Due to a React limitation, functions cannot be passed to native directly
- * because RN converts them to booleans (`true`). As a workaround,
- * Nitro requires you to wrap each function using `callback(...)`,
- * which bypasses React Native's conversion.
- * Please see the [Callbacks have to be wrapped](https://nitro.margelo.com/docs/guides/view-components#callbacks-have-to-be-wrapped) section for more information.
- *
- * @type {Object} NitroViewWrappedCallback
- * @property {T} f - The wrapped callback function
- */
-export type NitroViewWrappedCallback<T extends Function | undefined> = { f: T }
-
-// Due to a React limitation, functions cannot be passed to native directly
-// because RN converts them to booleans (`true`). Nitro knows this and just
-// wraps functions as objects - the original function is stored in `f`.
-type WrapFunctionsInObjects<Props> = {
-  [K in keyof Props]: Props[K] extends Function
-    ? NitroViewWrappedCallback<Props[K]>
-    : Props[K] extends Function | undefined
-      ? NitroViewWrappedCallback<Props[K]>
-      : Props[K]
 }
 
 /**
@@ -90,23 +63,20 @@ type WrapFunctionsInObjects<Props> = {
  *
  * @note Every React Native view has a {@linkcode DefaultHybridViewProps.hybridRef hybridRef} which can be used to gain access
  *       to the underlying Nitro {@linkcode HybridView}.
- * @note Every function/callback is wrapped as a `{ f: … }` object. Use {@linkcode callback | callback(...)} for this.
  * @note Every method can be called on the Ref. Including setting properties directly.
  */
 export type ReactNativeView<
   Props extends HybridViewProps,
   Methods extends HybridViewMethods,
 > = HostComponent<
-  WrapFunctionsInObjects<
-    DefaultHybridViewProps<HybridView<Props, Methods>> & Props
-  > &
-    ViewProps
+  DefaultHybridViewProps<HybridView<Props, Methods>> & Props & ViewProps
 >
 
 type ValidAttributes<Props> = ViewConfig<Props>['validAttributes']
 /**
  * Wraps all valid attributes of {@linkcode TProps} using Nitro's
- * default `diff` and `process` functions.
+ * default `diff` and `process` functions. The identity processor preserves
+ * function props as raw JSI values instead of React Native event markers.
  */
 function wrapValidAttributes<TProps>(
   attributes: ValidAttributes<TProps>
