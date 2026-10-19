@@ -20,7 +20,7 @@
     "tests/react-native/apps/*"
   ],
   "scripts": {
-    "postinstall": "bun run build && bun install --ignore-scripts --frozen-lockfile",
+    "postinstall": "bun run build",
     "build": "bun run build:core && bun nitro-rn build && bun nitro-rn-test build",
     "bootstrap": "bun install --frozen-lockfile",
     "typecheck": "bun nitro typecheck && bun nitrogen typecheck && bun nitro-rn typecheck && bun nitro-test-external typecheck && bun nitro-test typecheck && bun nitro-test-runner typecheck && bun nitro-rn-test typecheck && bun example typecheck && bun benchmark typecheck && bun docs typecheck",
@@ -37,7 +37,7 @@
     "check-versions": "bun --filter @nitro/scripts check-versions",
     "test:release": "bun --filter @nitro/scripts test:release",
     "docs": "bun --filter nitro-docs",
-    "test:prepare": "bun run build:core && bun install --ignore-scripts --frozen-lockfile && bun nitro-test-runner prepare-tests",
+    "test:prepare": "bun run build:core && bun nitro-test-runner prepare-tests",
     "test:ios": "bun test:prepare && bun nitro-test-runner test:ios",
     "test:android": "bun test:prepare && bun nitro-test-runner test:android",
     "build:core": "bun --filter @nitro/scripts build:core",

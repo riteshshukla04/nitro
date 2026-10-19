@@ -7,12 +7,13 @@
   "source": "src/index",
   "type": "module",
   "files": [
+    "bin",
     "lib",
     "src",
     "README.md",
     "LICENSE"
   ],
-  "bin": "./lib/index.js",
+  "bin": "./bin/nitrogen.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/margelo/nitro.git",
@@ -40,11 +41,11 @@
     "chalk": "^5.3.0",
     "nitro-core": "1.0.0-alpha.0",
     "ts-morph": "^28.0.0",
-    "yargs": "^18.0.0",
+    "yargs": "^18.1.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
-    "@types/yargs": "^17.0.33"
+    "@types/yargs": "^17.0.35"
   }
 }

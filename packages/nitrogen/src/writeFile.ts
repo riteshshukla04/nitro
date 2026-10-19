@@ -21,7 +21,11 @@ export async function writeFile(
   await fs.mkdir(dir, { recursive: true })
 
   // Write file
-  await fs.writeFile(filepath, file.content.trim() + '\n', 'utf8')
+  await fs.writeFile(
+    filepath,
+    file.content.replaceAll(/[ \t]+$/gm, '').trim() + '\n',
+    'utf8'
+  )
 
   return filepath
 }

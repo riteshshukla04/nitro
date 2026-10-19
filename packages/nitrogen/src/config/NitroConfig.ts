@@ -1,14 +1,7 @@
 import chalk from 'chalk'
 import { readUserConfig } from './getConfig.js'
-import type {
-  AutolinkingAndroidImplementation,
-  AutolinkingIOSImplementation,
-  AutolinkingPlatformImplementation,
-  NitroUserConfig,
-} from './NitroUserConfig.js'
-
-const CXX_BASE_NAMESPACE = ['margelo', 'nitro']
-const ANDROID_BASE_NAMESPACE = ['com', 'margelo', 'nitro']
+import { ANDROID_BASE_NAMESPACE, CXX_BASE_NAMESPACE } from './namespaces.js'
+import type { NitroUserConfig } from './NitroUserConfig.js'
 
 /**
  * Represents the properly parsed `nitro.json` config of the current executing directory.
@@ -107,59 +100,8 @@ export class NitroConfig {
   }
 
   /**
-   * Get the autolinking configuration of all HybridObjects.
-   * Those will be generated and default-constructed.
-   */
-  getAutolinkedHybridObjects(): NitroUserConfig['autolinking'] {
-    return this.config.autolinking
-  }
-
-  getPlatformAutolinkedImplementation(
-    hybridObjectName: string,
-    platform: string
-  ): AutolinkingPlatformImplementation | undefined {
-    const objectConfig = this.config.autolinking[hybridObjectName]
-    if (objectConfig == null) {
-      return undefined
-    }
-
-    // "all" applies to every platform and should automatically include
-    // future platforms without having to expand explicit key lists here.
-    if (objectConfig.all != null) {
-      return objectConfig.all
-    }
-    return objectConfig[platform]
-  }
-
-  getIosAutolinkedImplementation(
-    hybridObjectName: string
-  ): AutolinkingIOSImplementation | undefined {
-    const objectConfig = this.config.autolinking[hybridObjectName]
-    if (objectConfig == null) {
-      return undefined
-    }
-    if (objectConfig.all != null) {
-      return objectConfig.all
-    }
-    return objectConfig.ios
-  }
-
-  getAndroidAutolinkedImplementation(
-    hybridObjectName: string
-  ): AutolinkingAndroidImplementation | undefined {
-    const objectConfig = this.config.autolinking[hybridObjectName]
-    if (objectConfig == null) {
-      return undefined
-    }
-    if (objectConfig.all != null) {
-      return objectConfig.all
-    }
-    return objectConfig.android
-  }
-
-  /**
    * Get the paths that will be ignored when loading the TypeScript project.
-   * In most cases, this just contains `node_modules/`.
+   * `node_modules` is always ignored, so it doesn't need to be listed here.
    */
   getIgnorePaths(): string[] {
     return this.config.ignorePaths ?? []
@@ -172,12 +114,24 @@ export class NitroConfig {
     )
   }
 
+  /**
+   * Get the include of a generated C++ header that belongs to this module.
+   * Swift packages expose another module's headers by file name, through the
+   * public header paths of its `<Module>Cxx` and `<Module>SwiftBridge` targets.
+   */
+  getCxxHeader(fileName: string): { name: string; space: 'user' | 'system' } {
+    return {
+      name: fileName,
+      space: this.isExternalConfig ? 'system' : 'user',
+    }
+  }
+
   getSwiftBridgeHeaderName(): string {
     const moduleName = this.getIosModuleName()
     return `${moduleName}-Swift-Cxx-Bridge`
   }
 
   getSwiftBridgeNamespace(language: 'c++' | 'swift'): string {
-    return this.getCxxNamespace(language, 'bridge', 'swift')
+    return this.getCxxNamespace(language, 'swift_bridge')
   }
 }
