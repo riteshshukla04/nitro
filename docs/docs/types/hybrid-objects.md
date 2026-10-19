@@ -48,7 +48,7 @@ class HybridCamera: HybridCameraSpec {
 
 ## Interface-level abstraction
 
-With [`allowMultipleImplementations: true`](../concepts/platform-decorators#allowmultipleimplementations), `Image` can have different native implementations:
+With [`allowMultipleImplementations: true`](../concepts/platform-decorators#multiple-implementations), `Image` can have different native implementations:
 
 ```swift
 class HybridUIImage: HybridImageSpec {
