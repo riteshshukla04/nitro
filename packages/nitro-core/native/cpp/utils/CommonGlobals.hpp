@@ -33,7 +33,7 @@ struct ComputedPropertyDescriptor {
   jsi::Function set;
 };
 
-enum class KnownGlobalPropertyName { DISPATCHER, JSI_CACHE, NITRO_MODULES_PROXY };
+enum class KnownGlobalPropertyName { NITRO_MODULES_PROXY };
 
 class CommonGlobals final {
 public:
@@ -62,12 +62,6 @@ public:
   public:
     Object() = delete;
     ~Object() = delete;
-
-    /**
-     * Create a new `jsi::Object` with the given `prototype`.
-     * Uses a native implementation if possible.
-     */
-    static jsi::Object create(jsi::Runtime& runtime, const jsi::Value& prototype);
 
     /**
      * Define a plain property on the given `object` with the given `propertyName`.
@@ -121,7 +115,7 @@ public:
     static jsi::Value callConstructor(jsi::Runtime& runtime, double msSinceEpoch);
     static bool isInstanceOf(jsi::Runtime& runtime, const jsi::Object& object);
   };
-
+  
   /**
    * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
    */
@@ -132,12 +126,24 @@ public:
 
     static bool isInstanceOf(jsi::Runtime& runtime, const jsi::Object& object);
   };
+  
+  /**
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON
+   */
+  class JSON final {
+  public:
+    JSON() = delete;
+    ~JSON() = delete;
+
+    static jsi::String stringify(jsi::Runtime& runtime, const jsi::Value& value);
+  };
 
 private:
   friend Object;
   friend Promise;
   friend Date;
   friend Error;
+  friend JSON;
 
 private:
   /**
@@ -151,8 +157,7 @@ private:
                                                 std::function<jsi::Function(jsi::Runtime&)> getFunction);
 
 private:
-  using FunctionCache = std::unordered_map<std::string, BorrowingReference<jsi::Function>>;
-  static std::unordered_map<jsi::Runtime*, FunctionCache> _cache;
+  using FunctionCache = std::unordered_map<std::string, jsi::Function>;
 };
 
 } // namespace margelo::nitro

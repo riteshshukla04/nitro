@@ -38,7 +38,7 @@ public:
     }
   }
 
-  WeakReference(WeakReference&& ref) : _value(ref._value), _state(ref._state) {
+  WeakReference(WeakReference&& ref) noexcept : _value(ref._value), _state(ref._state) {
     // Remove state from other WeakReference after moving since it's now stale data
     ref._value = nullptr;
     ref._state = nullptr;
@@ -49,8 +49,7 @@ public:
       return *this;
 
     if (_state != nullptr) {
-      _state->weakRefCount--;
-      maybeDestroy();
+      release();
     }
 
     _value = ref._value;
@@ -67,8 +66,7 @@ public:
 
     if (_state != nullptr) {
       // destroy previous pointer
-      _state->weakRefCount--;
-      maybeDestroy();
+      release();
     }
 
     _value = ref._value;
@@ -83,37 +81,42 @@ public:
 
   ~WeakReference() {
     if (_state != nullptr) {
-      _state->weakRefCount--;
-      maybeDestroy();
+      release();
     }
   }
 
   /**
-   * Try to lock the weak reference to a borrowing reference, or `nullptr` if it has already been deleted.
+   * Try to lock the weak reference to a borrowing reference, or an empty reference if this weak reference is empty
+   * or the value has already been deleted.
    */
   [[nodiscard]]
   BorrowingReference<T> lock() const;
+
+  /**
+   * Get whether the value this weak reference points to has already been deleted, or whether this weak reference is empty.
+   * If this returns `true` for a non-empty weak reference, `lock()` will never return a value again.
+   */
+  [[nodiscard]]
+  bool isExpired() const noexcept {
+    return _state == nullptr || _state->isDeleted;
+  }
 
 public:
   friend class BorrowingReference<T>;
 
 private:
-  void maybeDestroy() {
-    if (_state->strongRefCount == 0 && _state->weakRefCount == 0) {
-      // free the full memory if there are no more references at all
-      if (!_state->isDeleted) [[unlikely]] {
-        std::string typeName = TypeInfo::getFriendlyTypename<T>(true);
-        throw std::runtime_error("WeakReference<" + typeName + "> encountered a stale `_value` - BorrowingReference<" + typeName +
-                                 "> should've already deleted this!");
-      }
+  void release() {
+    if (_state->decrementWeakRefCount()) {
+      // free the full memory if there are no more references at all.
+      // the strong references share one weak reference, so the value has already been deleted at this point.
       delete _state;
-      _state = nullptr;
     }
+    _state = nullptr;
   }
 
 private:
   T* NULLABLE _value;
-  ReferenceState* NON_NULL _state;
+  ReferenceState* NULLABLE _state;
 };
 
 } // namespace margelo::nitro

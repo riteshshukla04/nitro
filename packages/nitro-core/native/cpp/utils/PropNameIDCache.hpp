@@ -31,7 +31,7 @@ public:
 
   /**
    * Get a `jsi::PropNameID` for the given `std::string` value.
-   * - The `std::string` must be an ASCII string.
+   * - The `std::string` must be a UTF-8 string.
    * - The `jsi::PropNameID` is only valid within the callee's current
    *   synchronous scope, and must be non-escaping.
    */
@@ -50,8 +50,7 @@ public:
   }
 
 private:
-  using CacheMap = std::unordered_map<std::string, BorrowingReference<jsi::PropNameID>>;
-  static std::unordered_map<jsi::Runtime*, CacheMap> _cache;
+  using CacheMap = std::unordered_map<std::string, jsi::PropNameID>;
 };
 
 } // namespace margelo::nitro

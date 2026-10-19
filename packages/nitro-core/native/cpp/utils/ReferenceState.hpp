@@ -18,6 +18,11 @@ namespace margelo::nitro {
  * The state tracks the amount of strong- and weak- references to any kind of value,
  * including an extra `isDeleted` flag that specifies whether the value has been force-deleted.
  *
+ * Like the control block of a `std::shared_ptr`, all strong references together hold one weak reference,
+ * so `weakRefCount` is the number of `WeakReference`s plus one while `strongRefCount` is greater than zero.
+ * This way exactly one reference (the last `WeakReference`, or the last `BorrowingReference`) sees `weakRefCount`
+ * drop to zero and deletes the state, even if they are released on different Threads.
+ *
  * Also, a `mutex` allows for thread-safe access of the `isDeleted` flag.
  */
 struct ReferenceState {
@@ -34,7 +39,15 @@ struct ReferenceState {
     return oldRefCount <= 1;
   }
 
-  explicit ReferenceState() : strongRefCount(1), weakRefCount(0), isDeleted(false) {}
+  /**
+   * Decrements the weak ref count by one, and returns whether the state should be deleted.
+   */
+  inline bool decrementWeakRefCount() {
+    size_t oldRefCount = weakRefCount.fetch_sub(1);
+    return oldRefCount <= 1;
+  }
+
+  explicit ReferenceState() : strongRefCount(1), weakRefCount(1), isDeleted(false) {}
 };
 
 } // namespace margelo::nitro

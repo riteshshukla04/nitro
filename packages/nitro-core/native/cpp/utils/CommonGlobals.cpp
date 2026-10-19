@@ -6,32 +6,19 @@
 //
 
 #include "CommonGlobals.hpp"
-#include "JSICache.hpp"
 #include "JSIHelpers.hpp"
 #include "NitroDefines.hpp"
 #include "PropNameIDCache.hpp"
+#include "RuntimeData.hpp"
 
 namespace margelo::nitro {
 
 using namespace facebook;
 
-std::unordered_map<jsi::Runtime*, CommonGlobals::FunctionCache> CommonGlobals::_cache;
+// Identifies the cached global functions in a jsi::Runtime's runtime data.
+static constexpr jsi::UUID RUNTIME_DATA_UUID{0xaf898054, 0xabce, 0x43db, 0xa651, 0x9424aa9a5347};
 
 // pragma MARK: Object
-
-jsi::Object CommonGlobals::Object::create(jsi::Runtime& runtime, const jsi::Value& prototype) {
-  // Detect the JSI API directly so standalone runtimes can use it too.
-  return [&]<typename Object = jsi::Object>() {
-    if constexpr (requires { Object::create(runtime, prototype); }) {
-      return Object::create(runtime, prototype);
-    } else {
-      const jsi::Function& createFn = getGlobalFunction(runtime, "Object.create", [](jsi::Runtime& runtime) {
-        return runtime.global().getPropertyAsObject(runtime, "Object").getPropertyAsFunction(runtime, "create");
-      });
-      return createFn.call(runtime, prototype).getObject(runtime);
-    }
-  }();
-}
 
 void CommonGlobals::Object::defineProperty(jsi::Runtime& runtime, const jsi::Object& object, const char* propertyName,
                                            PlainPropertyDescriptor&& descriptor) {
@@ -97,21 +84,24 @@ jsi::Value CommonGlobals::Promise::resolved(jsi::Runtime& runtime) {
   const jsi::Function& resolvedFunc = getGlobalFunction(runtime, "Promise.resolve", [](jsi::Runtime& runtime) {
     return runtime.global().getPropertyAsObject(runtime, "Promise").getPropertyAsFunction(runtime, "resolve");
   });
-  auto promiseCtor = runtime.global().getPropertyAsObject(runtime, "Promise");
+  const jsi::Function& promiseCtor = getGlobalFunction(
+      runtime, "Promise", [](jsi::Runtime& runtime) { return runtime.global().getPropertyAsFunction(runtime, "Promise"); });
   return resolvedFunc.callWithThis(runtime, promiseCtor);
 }
 jsi::Value CommonGlobals::Promise::resolved(jsi::Runtime& runtime, jsi::Value&& value) {
   const jsi::Function& resolvedFunc = getGlobalFunction(runtime, "Promise.resolve", [](jsi::Runtime& runtime) {
     return runtime.global().getPropertyAsObject(runtime, "Promise").getPropertyAsFunction(runtime, "resolve");
   });
-  auto promiseCtor = runtime.global().getPropertyAsObject(runtime, "Promise");
+  const jsi::Function& promiseCtor = getGlobalFunction(
+      runtime, "Promise", [](jsi::Runtime& runtime) { return runtime.global().getPropertyAsFunction(runtime, "Promise"); });
   return resolvedFunc.callWithThis(runtime, promiseCtor, {std::move(value)});
 }
 jsi::Value CommonGlobals::Promise::rejected(jsi::Runtime& runtime, jsi::Value&& error) {
   const jsi::Function& rejectedFunc = getGlobalFunction(runtime, "Promise.reject", [](jsi::Runtime& runtime) {
     return runtime.global().getPropertyAsObject(runtime, "Promise").getPropertyAsFunction(runtime, "reject");
   });
-  auto promiseCtor = runtime.global().getPropertyAsObject(runtime, "Promise");
+  const jsi::Function& promiseCtor = getGlobalFunction(
+      runtime, "Promise", [](jsi::Runtime& runtime) { return runtime.global().getPropertyAsFunction(runtime, "Promise"); });
   return rejectedFunc.callWithThis(runtime, promiseCtor, {std::move(error)});
 }
 
@@ -149,6 +139,15 @@ bool CommonGlobals::Error::isInstanceOf(jsi::Runtime& runtime, const jsi::Object
   return object.instanceOf(runtime, errorCtor);
 }
 
+// pragma MARK: JSON
+
+jsi::String CommonGlobals::JSON::stringify(jsi::Runtime& runtime, const jsi::Value& value) {
+  const jsi::Function& stringifyFunc = getGlobalFunction(runtime, "JSON.stringify", [](jsi::Runtime& runtime) {
+    return runtime.global().getPropertyAsObject(runtime, "JSON").getPropertyAsFunction(runtime, "stringify");
+  });
+  return stringifyFunc.call(runtime, value).getString(runtime);
+}
+
 // pragma MARK: CommonGlobals
 
 void CommonGlobals::defineGlobal(jsi::Runtime& runtime, KnownGlobalPropertyName name, jsi::Value&& value) {
@@ -171,10 +170,6 @@ void CommonGlobals::defineGlobal(jsi::Runtime& runtime, KnownGlobalPropertyName 
 
 const char* CommonGlobals::getKnownGlobalPropertyNameString(KnownGlobalPropertyName name) {
   switch (name) {
-    case KnownGlobalPropertyName::DISPATCHER:
-      return "__nitroDispatcher";
-    case KnownGlobalPropertyName::JSI_CACHE:
-      return "__nitroJsiCache";
     case KnownGlobalPropertyName::NITRO_MODULES_PROXY:
       return "NitroModulesProxy";
   }
@@ -187,31 +182,22 @@ const jsi::PropNameID& CommonGlobals::getKnownGlobalPropertyName(jsi::Runtime& r
 const jsi::Function& CommonGlobals::getGlobalFunction(jsi::Runtime& runtime, const char* key,
                                                       std::function<jsi::Function(jsi::Runtime&)> getFunction) {
   // Let's try to find the function in cache
-  FunctionCache& functionCache = _cache[&runtime];
+  FunctionCache& functionCache = RuntimeData::getOrCreate(runtime, RUNTIME_DATA_UUID, [] { return FunctionCache(); });
   std::string stringKey = key;
   auto iterator = functionCache.find(stringKey);
-  if (iterator != functionCache.end()) {
-    // We found it! Let's check if the reference is still valid...
-    BorrowingReference<jsi::Function> function = iterator->second;
-    if (function != nullptr) [[likely]] {
-      // It's still alive - let's use it from cache!
-      return *function;
-    }
+  if (iterator != functionCache.end()) [[likely]] {
+    // We found it! Let's use it from cache!
+    return iterator->second;
   }
 
   // We haven't found the function with the given key in cache - so let's get it:
   jsi::Function function = getFunction(runtime);
 
   // Let's throw it in cache!
-  BorrowingReference<jsi::Function> sharedFunction;
-  {
-    JSICacheReference jsiCache = JSICache::getOrCreateCache(runtime);
-    sharedFunction = jsiCache.makeShared(std::move(function));
-  }
-  functionCache[stringKey] = sharedFunction;
+  auto inserted = functionCache.try_emplace(std::move(stringKey), std::move(function));
 
   // And now return:
-  return *sharedFunction;
+  return inserted.first->second;
 }
 
 } // namespace margelo::nitro

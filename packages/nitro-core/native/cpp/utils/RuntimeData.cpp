@@ -1,0 +1,21 @@
+//
+//  RuntimeData.cpp
+//  NitroModules
+//
+//  Created by Marc Rousavy on 15.10.26.
+//
+
+#include "RuntimeData.hpp"
+
+namespace margelo::nitro {
+
+#ifdef NITRO_DEBUG
+// Its address identifies this copy of Nitro Modules. It is writable, so the linker never merges it with another copy's.
+static char nitroModulesCopy;
+
+const void* RuntimeData::getNitroModulesCopyIdentifier() {
+  return &nitroModulesCopy;
+}
+#endif
+
+} // namespace margelo::nitro

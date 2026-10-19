@@ -27,6 +27,9 @@ namespace margelo::nitro {
  *
  * A `BorrowingReference<T>` can be weakified, which gives the user a `WeakReference<T>`.
  * A `WeakReference<T>` can be locked to get a `BorrowingReference<T>` again, assuming it has not been deleted yet.
+ *
+ * Default-constructed, moved-from, and reset (`ref = {}`) references have no value or shared state.
+ * Weakifying them returns an empty reference; `destroy()` is a no-op.
  */
 template <typename T>
 class BorrowingReference final {
@@ -53,11 +56,7 @@ public:
 
     if (_state != nullptr) {
       // destroy previous pointer
-      bool shouldDestroy = _state->decrementStrongRefCount();
-      if (shouldDestroy) {
-        forceDestroyValue();
-      }
-      maybeDestroyState();
+      release();
     }
 
     _value = ref._value;
@@ -70,21 +69,27 @@ public:
     return *this;
   }
 
-private:
-  // WeakReference<T> -> BorrowingReference<T> Lock-constructor
-  explicit BorrowingReference(const WeakReference<T>& ref) : _value(ref._value), _state(ref._state) {
-    _state->strongRefCount++;
+  BorrowingReference& operator=(BorrowingReference&& ref) noexcept {
+    if (this == &ref)
+      return *this;
+
+    if (_state != nullptr) {
+      // destroy previous pointer
+      release();
+    }
+
+    _value = ref._value;
+    _state = ref._state;
+    ref._value = nullptr;
+    ref._state = nullptr;
+
+    return *this;
   }
 
 private:
-  // BorrowingReference<C> -> BorrowingReference<T> Cast-constructor
-  template <typename OldT>
-  BorrowingReference(T* NULLABLE value, const BorrowingReference<OldT>& originalRef) : _value(value), _state(originalRef._state) {
-    _state->strongRefCount++;
-  }
-
-  template <typename C>
-  friend class BorrowingReference;
+  // WeakReference<T> -> BorrowingReference<T> Lock-constructor.
+  // Adopts the strong reference that `WeakReference<T>::lock()` already acquired.
+  explicit BorrowingReference(const WeakReference<T>& ref) : _value(ref._value), _state(ref._state) {}
 
 public:
   ~BorrowingReference() {
@@ -94,20 +99,7 @@ public:
     }
 
     // decrement strong ref count on destroy
-    bool shouldDestroy = _state->decrementStrongRefCount();
-    if (shouldDestroy) {
-      forceDestroyValue();
-    }
-    maybeDestroyState();
-  }
-
-public:
-  /**
-   * Casts this `BorrowingReference<T>` to a `BorrowingReference<C>`.
-   */
-  template <typename C>
-  BorrowingReference<C> as() {
-    return BorrowingReference<C>(static_cast<C*>(_value), *this);
+    release();
   }
 
 public:
@@ -132,6 +124,10 @@ public:
    * This can even be called if there are still multiple strong references to the value.
    */
   void destroy() {
+    if (_state == nullptr) {
+      return;
+    }
+
     std::unique_lock lock(_state->mutex);
 
     forceDestroyValue();
@@ -192,12 +188,17 @@ public:
   }
 
 private:
-  void maybeDestroyState() {
-    if (_state->strongRefCount == 0 && _state->weakRefCount == 0) {
-      // free the full memory if there are no more references at all
-      delete _state;
-      _state = nullptr;
+  void release() {
+    bool shouldDestroy = _state->decrementStrongRefCount();
+    if (shouldDestroy) {
+      // we were the last strong reference - delete the value, then drop the weak reference all strong references share
+      forceDestroyValue();
+      if (_state->decrementWeakRefCount()) {
+        // free the full memory if there are no more references at all
+        delete _state;
+      }
     }
+    _state = nullptr;
   }
 
   void forceDestroyValue() {
@@ -215,7 +216,7 @@ public:
 
 private:
   T* NULLABLE _value;
-  ReferenceState* NON_NULL _state;
+  ReferenceState* NULLABLE _state;
 };
 
 } // namespace margelo::nitro
