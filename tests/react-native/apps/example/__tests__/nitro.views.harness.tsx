@@ -321,6 +321,62 @@ describe('TestView', () => {
     expectRed(resizedCapture.pixelCoverage)
   })
 
+  it('updates and removes base View props without changing Nitro props', async () => {
+    const viewRef = deferred<TestViewRef>()
+    const stableHybridRef = callback((view: TestViewRef) =>
+      viewRef.resolve(view)
+    )
+    const stableSomeCallback = callback(fn())
+    const renderView = (testID?: string, accessibilityLabel?: string) => (
+      <TestView
+        testID={testID}
+        accessibilityLabel={accessibilityLabel}
+        style={INITIAL_SIZE}
+        hybridRef={stableHybridRef}
+        isBlue={true}
+        hasBeenCalled={false}
+        int64Value={INITIAL_INT64_VALUE}
+        colorScheme="dark"
+        someCallback={stableSomeCallback}
+      />
+    )
+
+    const renderResult = await render(
+      renderView('base-props-initial', 'Initial base props'),
+      { timeout: RENDER_TIMEOUT }
+    )
+    const view = await viewRef.promise
+    await screen.findByTestId('base-props-initial')
+    await screen.findByAccessibilityLabel('Initial base props')
+
+    await renderResult.rerender(
+      renderView('base-props-updated', 'Updated base props')
+    )
+    await screen.findByTestId('base-props-updated')
+    await screen.findByAccessibilityLabel('Updated base props')
+    expect(screen.queryByTestId('base-props-initial')).toBeNull()
+    expect(screen.queryByAccessibilityLabel('Initial base props')).toBeNull()
+
+    await renderResult.rerender(renderView(undefined, 'Updated base props'))
+    await waitUntil(() => screen.queryByTestId('base-props-updated') === null, {
+      timeout: RENDER_TIMEOUT,
+    })
+    expect(
+      screen.queryByAccessibilityLabel('Updated base props')
+    ).not.toBeNull()
+
+    await renderResult.rerender(
+      renderView('base-props-restored', 'Restored base props')
+    )
+    await screen.findByTestId('base-props-restored')
+    await screen.findByAccessibilityLabel('Restored base props')
+    expect(screen.queryByAccessibilityLabel('Updated base props')).toBeNull()
+    expect(view.isBlue).toBe(true)
+    expect(view.int64Value).toBe(INITIAL_INT64_VALUE)
+    expect(view.getIsBlueSetterCallCount()).toBe(1)
+    expect(view.getOnDropViewCount()).toBe(0)
+  })
+
   it('preserves an omitted native default while applying another prop', async () => {
     const viewRef = deferred<TestViewRef>()
     const stableHybridRef = callback((view: TestViewRef) =>

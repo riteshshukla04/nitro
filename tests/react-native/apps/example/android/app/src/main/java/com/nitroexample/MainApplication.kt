@@ -14,6 +14,9 @@ import com.facebook.react.internal.featureflags.ReactNativeFeatureFlagsProvider
 
 private val stableFlagsWithNitroViewRecycling: ReactNativeFeatureFlagsProvider =
   object : ReactNativeFeatureFlagsProvider by ReactNativeFeatureFlagsOverrides_RNOSS_Stable_Android() {
+    // Exercise descriptor-driven base View props on RN versions that still default to the constructor path.
+    override fun enableExclusivePropsUpdateAndroid(): Boolean = true
+
     override fun enablePreparedTextLayout(): Boolean = false
 
     override fun enableViewRecycling(): Boolean = true
