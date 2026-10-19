@@ -79,6 +79,6 @@ lib/
 
 # Staged from packages/nitro-core by bun sync-core
 /cpp/core/
-/ios/core/
+/apple/core/
 /android/core/
 /LICENSE

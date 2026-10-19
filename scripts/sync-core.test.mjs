@@ -79,7 +79,7 @@ test("stages workspace sources without dependencies and cleans only generated di
   put("packages/react-native-nitro-modules/src/index.ts", "// RN integration");
   const adapters = [
     "cpp/views/HybridView.hpp",
-    "ios/views/HybridView.swift",
+    "apple/views/HybridView.swift",
     "android/src/main/java/NitroModules.kt",
   ];
   for (const file of adapters)
@@ -87,7 +87,7 @@ test("stages workspace sources without dependencies and cleans only generated di
   put("packages/nitro-core/native/cpp/cache.o", "build cache");
   assert.deepEqual(syncCore(root), { version: "1.2.3", files: 5 });
   assert.equal(
-    readFileSync(path.join(wrapper, "ios/core/HybridObject.swift"), "utf8"),
+    readFileSync(path.join(wrapper, "apple/core/HybridObject.swift"), "utf8"),
     "// Swift source\n",
   );
   assert.equal(
@@ -110,7 +110,7 @@ test("stages workspace sources without dependencies and cleans only generated di
   assert.throws(() => syncCore(root, { check: true }), /stale/);
   syncCore(root);
   put(
-    "packages/react-native-nitro-modules/ios/core/HybridObject.swift",
+    "packages/react-native-nitro-modules/apple/core/HybridObject.swift",
     "// independently changed",
   );
   assert.throws(() => syncCore(root, { check: true }), /differs/);
@@ -142,7 +142,7 @@ test("uses workspace changes even when an older core package is installed", (t) 
   assert.throws(() => syncCore(root, { check: true }), /differs/);
   syncCore(root);
   assert.equal(
-    readFileSync(path.join(wrapper, "ios/core/HybridObject.swift"), "utf8"),
+    readFileSync(path.join(wrapper, "apple/core/HybridObject.swift"), "utf8"),
     "// edited source\n",
   );
 });

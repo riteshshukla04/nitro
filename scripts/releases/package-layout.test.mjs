@@ -29,7 +29,7 @@ function fixture(t) {
       [
         ...reactNativePackageFiles,
         'cpp/core/core/HybridObject.hpp',
-        'ios/core/core/HybridObject.swift',
+        'apple/core/core/HybridObject.swift',
       ],
     ],
   ]) {
@@ -69,7 +69,7 @@ test('packed RN adapter contains matching JS/native package versions and core so
 test('consumer checks reject stale staged RN implementation even when versions match', (t) => {
   const { core, wrapper } = fixture(t)
   writeFileSync(
-    path.join(wrapper, 'ios/core/core/HybridObject.swift'),
+    path.join(wrapper, 'apple/core/core/HybridObject.swift'),
     'stale source'
   )
   assert.throws(

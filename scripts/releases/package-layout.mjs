@@ -27,7 +27,7 @@ export const reactNativePackageFiles = [
   'apple/nitro_pod_utils.rb',
   'cpp/core/entrypoint/InstallNitro.hpp',
   'cpp/core/utils/NitroDefines.hpp',
-  'ios/views/HybridView.swift',
+  'apple/views/HybridView.swift',
   'android/src/main/cpp/JNIOnLoad.cpp',
   'android/core/main/cpp/NitroOnLoad.cpp',
   'android/build.gradle',
@@ -144,7 +144,7 @@ export function verifyReactNativePackage(directory, coreDirectory, options) {
   for (const [source, target] of [
     ['native/cpp/utils/NitroDefines.hpp', 'cpp/core/utils/NitroDefines.hpp'],
     ['native/cpp/core/HybridObject.hpp', 'cpp/core/core/HybridObject.hpp'],
-    ['native/apple/core/HybridObject.swift', 'ios/core/core/HybridObject.swift'],
+    ['native/apple/core/HybridObject.swift', 'apple/core/core/HybridObject.swift'],
     [
       'native/android/src/main/cpp/NitroOnLoad.cpp',
       'android/core/main/cpp/NitroOnLoad.cpp',

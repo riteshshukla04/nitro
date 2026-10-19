@@ -25,11 +25,11 @@ Pod::Spec.new do |s|
     # Shared C++ codebase
     "cpp/**/*.{h,hpp}",
     "cpp/**/*.{c,cpp}",
-    # iOS codebase
-    "ios/**/*.{h,hpp}",
-    "ios/**/*.{c,cpp}",
-    "ios/**/*.{m,mm}",
-    "ios/**/*.swift",
+    # Apple codebase
+    "apple/**/*.{h,hpp}",
+    "apple/**/*.{c,cpp}",
+    "apple/**/*.{m,mm}",
+    "apple/**/*.swift",
   ]
   s.public_header_files = [
     # Public C++ headers will be exposed in modulemap (for Swift)
@@ -56,14 +56,14 @@ Pod::Spec.new do |s|
     "cpp/views/ReactProp.hpp",
     "cpp/views/ViewComponentDescriptor.hpp",
     "cpp/views/ViewPropsHolderState.hpp",
-    # Public iOS-specific headers that will be exposed in modulemap (for Swift)
-    "ios/core/core/ArrayBufferHolder.hpp",
-    "ios/core/core/PromiseHolder.hpp",
-    "ios/core/utils/AnyMapUtils.hpp",
-    "ios/core/utils/Result.hpp",
-    "ios/core/utils/DateToChronoDate.hpp",
-    "ios/core/utils/RuntimeError.hpp",
-    "ios/core/utils/SwiftClosure.hpp",
+    # Public Apple-specific headers that will be exposed in modulemap (for Swift)
+    "apple/core/core/ArrayBufferHolder.hpp",
+    "apple/core/core/PromiseHolder.hpp",
+    "apple/core/utils/AnyMapUtils.hpp",
+    "apple/core/utils/Result.hpp",
+    "apple/core/utils/DateToChronoDate.hpp",
+    "apple/core/utils/RuntimeError.hpp",
+    "apple/core/utils/SwiftClosure.hpp",
   ]
 
   xcconfig = {

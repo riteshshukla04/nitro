@@ -257,14 +257,14 @@ export const cases = {
       expect(testObject.copyAnyMap(NESTED_MAP)).to.deep.equal(NESTED_MAP);
     },
 
-    // TODO: Fix in Nitro - Swift `AnyValue.fromAny(...)` (ios/core/AnyMap.swift) does not unwrap a nested `Optional<Any>.none` from `toAny()`, so on Swift copyAnyMap throws "Value Optional(nil) cannot be represented as AnyValue!"
+    // TODO: Fix in Nitro - Swift `AnyValue.fromAny(...)` (packages/nitro-core/native/apple/core/AnyMap.swift) does not unwrap a nested `Optional<Any>.none` from `toAny()`, so on Swift copyAnyMap throws "Value Optional(nil) cannot be represented as AnyValue!"
 
     "copyAnyMap(...) keeps null inside arrays": (testObject) => {
       const map = { array: [null, 1, null] };
       expect(testObject.copyAnyMap(map)).to.deep.equal(map);
     },
 
-    // TODO: Fix in Nitro - Swift `AnyValue.fromAny(...)` (ios/core/AnyMap.swift) does not unwrap a nested `Optional<Any>.none` from `toAny()`, so on Swift copyAnyMap throws "Value Optional(nil) cannot be represented as AnyValue!"
+    // TODO: Fix in Nitro - Swift `AnyValue.fromAny(...)` (packages/nitro-core/native/apple/core/AnyMap.swift) does not unwrap a nested `Optional<Any>.none` from `toAny()`, so on Swift copyAnyMap throws "Value Optional(nil) cannot be represented as AnyValue!"
 
     "copyAnyMap(...) keeps null inside objects": (testObject) => {
       const map = { object: { a: null, b: 1 } };
@@ -494,10 +494,10 @@ export const cases = {
 export const skips = {
   "AnyMap values / TestObjectSwiftKotlin / copyAnyMap(...) keeps null inside arrays":
     {
-      ios: 'Fix in Nitro - Swift `AnyValue.fromAny(...)` (ios/core/AnyMap.swift) does not unwrap a nested `Optional<Any>.none` from `toAny()`, so on Swift copyAnyMap throws "Value Optional(nil) cannot be represented as AnyValue!"',
+      ios: 'Fix in Nitro - Swift `AnyValue.fromAny(...)` (packages/nitro-core/native/apple/core/AnyMap.swift) does not unwrap a nested `Optional<Any>.none` from `toAny()`, so on Swift copyAnyMap throws "Value Optional(nil) cannot be represented as AnyValue!"',
     },
   "AnyMap values / TestObjectSwiftKotlin / copyAnyMap(...) keeps null inside objects":
     {
-      ios: 'Fix in Nitro - Swift `AnyValue.fromAny(...)` (ios/core/AnyMap.swift) does not unwrap a nested `Optional<Any>.none` from `toAny()`, so on Swift copyAnyMap throws "Value Optional(nil) cannot be represented as AnyValue!"',
+      ios: 'Fix in Nitro - Swift `AnyValue.fromAny(...)` (packages/nitro-core/native/apple/core/AnyMap.swift) does not unwrap a nested `Optional<Any>.none` from `toAny()`, so on Swift copyAnyMap throws "Value Optional(nil) cannot be represented as AnyValue!"',
     },
 } as const;
