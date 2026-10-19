@@ -55,6 +55,28 @@ namespace ${namespace} {
 } // namespace ${namespace}
   `.trim()
 
+  const objcImplementationCode = `
+${createFileMetadataString(`${autolinkingClassName}.mm`)}
+
+#import <Foundation/Foundation.h>
+#include "${autolinkingClassName}.hpp"
+
+/**
+ * Registers all HybridObject classes of ${NitroConfig.current.getIosModuleName()}
+ * when the app loads, so JS can look them up by name.
+ */
+@interface ${autolinkingClassName} : NSObject
+@end
+
+@implementation ${autolinkingClassName}
+
++ (void)load {
+  ${namespace}::registerHybridClasses();
+}
+
+@end
+  `.trim()
+
   return [
     {
       content: cppHeaderCode,
@@ -67,6 +89,13 @@ namespace ${namespace} {
       content: cppImplementationCode,
       language: 'c++',
       name: `${autolinkingClassName}.cpp`,
+      platform: 'ios',
+      subdirectory: [],
+    },
+    {
+      content: objcImplementationCode,
+      language: 'c++',
+      name: `${autolinkingClassName}.mm`,
       platform: 'ios',
       subdirectory: [],
     },
