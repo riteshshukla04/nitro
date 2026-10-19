@@ -90,12 +90,13 @@ export function checkConsumer(tarballs) {
     if (existsSync(path.join(consumer, 'node_modules', name)))
       throw new Error(`Unexpected dependency: ${name}`)
   }
+  const mockRuntime = `globalThis.NitroModulesProxy = { version: ${JSON.stringify(version)}, getHybridClass: () => class {} };`
   run(
     'node',
     [
       '--input-type=module',
       '-e',
-      "import { getInstalledNitro } from 'nitro-core'; if (getInstalledNitro() !== undefined) throw Error('Unexpected runtime')",
+      `${mockRuntime} const { NitroModules } = await import('nitro-core'); if (NitroModules !== globalThis.NitroModulesProxy) throw Error('Unexpected runtime')`,
     ],
     { cwd: consumer }
   )
@@ -103,7 +104,7 @@ export function checkConsumer(tarballs) {
     'node',
     [
       '-e',
-      "if (require('nitro-core').getInstalledNitro() !== undefined) throw Error('Unexpected runtime')",
+      `${mockRuntime} if (require('nitro-core').NitroModules !== globalThis.NitroModulesProxy) throw Error('Unexpected runtime')`,
     ],
     { cwd: consumer }
   )
@@ -171,10 +172,10 @@ function checkReactNativeConsumer(packed, version) {
     name: 'nitro-rn-release-consumer',
     private: true,
     dependencies: {
-      'react': app.dependencies.react,
+      react: app.dependencies.react,
       'react-native': app.dependencies['react-native'],
       '@types/react': wrapper.devDependencies['@types/react'],
-      'typescript': readJSON(path.join(root, 'package.json')).devDependencies
+      typescript: readJSON(path.join(root, 'package.json')).devDependencies
         .typescript,
       ...Object.fromEntries(
         Object.entries(packed).map(([name, file]) => [name, `file:${file}`])

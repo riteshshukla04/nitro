@@ -1,13 +1,6 @@
 import type { TurboModule } from 'react-native'
 import { TurboModuleRegistry } from 'react-native'
 import { ModuleNotFoundError } from '../ModuleNotFoundError'
-import {
-  assertNitroVersion,
-  getInstalledNitro,
-  getNitroModules,
-  isRuntimeAlive,
-  warnIfNitroVersionMismatch,
-} from 'nitro-core'
 
 interface Spec extends TurboModule {
   /**
@@ -18,13 +11,9 @@ interface Spec extends TurboModule {
   install(): string | undefined
 }
 
-let nitroModules = getInstalledNitro()
-
 // Reuse the existing proxy when the same JS runtime evaluates Nitro again,
 // such as when react-native-harness loads a dedicated test bundle.
-if (nitroModules != null) {
-  assertNitroVersion(nitroModules)
-} else {
+if (globalThis.NitroModulesProxy == null) {
   // 1. Get (and initialize) the TurboModule
   let turboModule: Spec | undefined
   try {
@@ -40,20 +29,10 @@ if (nitroModules != null) {
   }
 
   // 3. Find `NitroModulesProxy` in `global`
-  nitroModules = getInstalledNitro()
-  if (nitroModules == null) {
+  if (globalThis.NitroModulesProxy == null) {
     const cause = new Error(
       'NitroModules was installed, but `global.NitroModulesProxy` was null!'
     )
     throw new ModuleNotFoundError(cause)
   }
 }
-
-export const NitroModules = getNitroModules()
-
-// Double-check native version
-if (__DEV__) {
-  warnIfNitroVersionMismatch(NitroModules)
-}
-
-export { isRuntimeAlive }

@@ -1,20 +1,16 @@
 import { describe, expect, it } from 'react-native-harness'
-import {
-  getHybridObjectConstructor,
-  NitroModules,
-} from 'react-native-nitro-modules'
+import { HybridObject, NitroModules } from 'react-native-nitro-modules'
 import nitroModulesPackage from 'react-native-nitro-modules/package.json'
 import {
-  getHybridObjectConstructor as getCoreHybridObjectConstructor,
-  getInstalledNitro,
+  HybridObject as CoreHybridObject,
   NitroModules as CoreNitroModules,
 } from 'nitro-core'
 
 describe('nitro-core integration', () => {
-  it('shares the installed native proxy and constructor helper with React Native', () => {
-    expect(NitroModules).toBe(getInstalledNitro())
+  it('shares the installed native proxy and native classes with React Native', () => {
+    expect(NitroModules).toBe(globalThis.NitroModulesProxy)
     expect(CoreNitroModules).toBe(NitroModules)
-    expect(getCoreHybridObjectConstructor).toBe(getHybridObjectConstructor)
+    expect(CoreHybridObject).toBe(HybridObject)
   })
 })
 

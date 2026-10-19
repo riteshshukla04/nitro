@@ -95,13 +95,10 @@ It can return `void` or `Promise<void>`:
 
 ```ts
 import { expect } from "chai";
-import { getNitroModules } from "nitro-core";
-import type { TestObjectSwiftKotlin } from "nitro-test";
+import { TestObjectSwiftKotlin } from "nitro-test";
 
 export async function fibonacci(): Promise<void> {
-  const object = getNitroModules().createHybridObject<TestObjectSwiftKotlin>(
-    "TestObjectSwiftKotlin",
-  );
+  const object = new TestObjectSwiftKotlin();
   expect(await object.calculateFibonacciAsync(10)).to.equal(55n);
 }
 ```
