@@ -33,10 +33,7 @@ export function createSwiftUmbrellaHeader(
   )
   const bridgeInclude = getImportCode({
     language: 'c++',
-    declaration: NitroConfig.current.getCxxHeader(
-      `${moduleName}-Swift-Cxx-Bridge.hpp`,
-      'private'
-    ),
+    declaration: NitroConfig.current.getAppleCxxHeader(),
   })
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.

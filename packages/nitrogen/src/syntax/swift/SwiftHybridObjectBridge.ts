@@ -201,7 +201,10 @@ ${swiftMemberAccess} override func getCxxPart() -> bridge.${getHybridObjectBridg
   const conformances = conformanceTypes.flatMap((conformanceType) =>
     new SwiftHybridObjectType(conformanceType).getProtocolConformances()
   )
-  const conformanceImports = getProtocolConformanceImports(conformances, 'internal')
+  const conformanceImports = getProtocolConformanceImports(
+    conformances,
+    'internal'
+  )
   const swiftImports = getImportsCode([
     { language: 'swift', name: 'NitroModules', access: 'internal' },
     { language: 'swift', name: 'CxxStdlib', access: 'internal' },
@@ -227,7 +230,7 @@ ${swiftImports}
 ${swiftClassDeclaration} ${hybridObjectNames.HybridTSpecCxx}${swiftSuperclass} {
   /**
    * The Swift <> C++ bridge's namespace (\`${spec.config.getSwiftBridgeNamespace('c++')}\`)
-   * from \`${swiftModuleName}-Swift-Cxx-Bridge.hpp\`.
+   * from \`${spec.config.getAppleCxxHeader().name}\`.
    * This contains specialized C++ templates, and C++ helper functions that can be accessed from Swift.
    */
   public typealias bridge = ${spec.config.getSwiftBridgeNamespace('swift')}

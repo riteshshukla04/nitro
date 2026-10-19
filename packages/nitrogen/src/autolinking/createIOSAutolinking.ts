@@ -14,7 +14,9 @@ import { getModuleDependencies } from '../syntax/getModuleDependencies.js'
 
 interface IOSAutolinking extends Autolinking {}
 
-export function createIOSAutolinking(specs: HybridObjectSpec[]): IOSAutolinking {
+export function createIOSAutolinking(
+  specs: HybridObjectSpec[]
+): IOSAutolinking {
   const swiftTypes = getAllKnownTypes('swift').map(wrapSwiftType)
   const moduleDependencies = getModuleDependencies(
     specs.filter((spec) => spec.language === 'swift'),
@@ -29,7 +31,10 @@ export function createIOSAutolinking(specs: HybridObjectSpec[]): IOSAutolinking 
   // https://github.com/swiftlang/swift/pull/93293.
   const swiftForeignTypeMetadata = createSwiftForeignTypeMetadata(swiftTypes)
   const hybridObjectInitializer = createHybridObjectInitializer(specs)
-  const appleCxxTarget = createAppleCxxTarget(moduleDependencies)
+  const appleCxxTarget = createAppleCxxTarget({
+    moduleDependencies: moduleDependencies,
+    bridgeDeclarations: swiftCxxBridge.declarations,
+  })
   const swiftBridgeModuleMap: SourceFile = {
     name: 'module.modulemap',
     language: 'c++',
@@ -49,7 +54,7 @@ module ${NitroConfig.current.getIosModuleName()}SwiftBridge {
   return {
     platform: 'ios',
     sourceFiles: [
-      ...swiftCxxBridge,
+      swiftCxxBridge.implementation,
       swiftUmbrellaHeader,
       ...swiftForeignTypeMetadata,
       swiftBridgeModuleMap,

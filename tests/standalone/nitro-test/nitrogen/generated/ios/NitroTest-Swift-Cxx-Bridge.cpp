@@ -29,7 +29,7 @@
 #include <NitroModules/InlineCallback.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <exception>
-#include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Bridge.hpp>
+#include <NitroTestExternalAppleCxx/NitroTestExternalAppleCxx.h>
 #include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
 #include <NitroTest/private/HybridTestObjectSwiftKotlinSpecSwift.hpp>
 #include <NitroTest/HybridTestObjectSwiftKotlinSpec.hpp>

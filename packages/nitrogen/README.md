@@ -326,9 +326,11 @@ For `ios.iosModuleName: "NitroImage"`, the helper adds the `NitroImage` library 
 - `NitroImage`: your Swift sources in `ios/` and the specs in `nitrogen/generated/ios/swift`.
 - `NitroImageSwiftBridge`: the generated C++ wrappers and autolinking sources.
 
-Generated C++ headers live in `include/<Module>/` below their `shared/c++` or `ios/c++` directory. Public headers declare user types, HybridObject specs, and autolinking functions. Internal bridge and converter headers live in `include/<Module>/private/`. These directories contain the declarations themselves, without forwarding headers. Include generated types with their module prefix, for example `#include <NitroImage/Size.hpp>`.
+Generated C++ headers live in `include/<Module>/` below their `shared/c++` or `ios/c++` directory. Public headers declare user types, HybridObject specs, and autolinking functions. Swift wrapper and converter headers live in `include/<Module>/private/`. These directories contain the declarations themselves, without forwarding headers. Include generated types with their module prefix, for example `#include <NitroImage/Size.hpp>`.
 
 Each generated Swift type has a private converter pair, such as `Size-Swift.hpp` and `Size-Swift.cpp`. The header forward-declares the Swift type and declares its `JSIConverter` and `SwiftConverter` specializations. The implementation includes the private Swift umbrella to access the complete Swift type.
+
+The public `<Module>AppleCxx.h` header contains the C++ bridge declarations that Swift imports. Their definitions remain in `<Module>-Swift-Cxx-Bridge.cpp`. The private `<Module>-Swift-Cxx-Umbrella.hpp` includes the generated Swift definitions for C++ implementations and must never be imported from Swift.
 
 Pass `swiftSources` and `cxxSources` to use other source paths. Paths are relative to the package root; paths that don't exist are skipped. C++ source paths are also added to the header search paths:
 

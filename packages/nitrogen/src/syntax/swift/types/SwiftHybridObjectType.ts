@@ -144,7 +144,10 @@ export class SwiftHybridObjectType
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   getClangImporterName(context: TypeContext): string {
-    return getClangImporterReferenceName(`${this.moduleName}.${this.name}`, context)
+    return getClangImporterReferenceName(
+      `${this.moduleName}.${this.name}`,
+      context
+    )
   }
 
   get requiredCppHelpers(): CppHelper[] {
@@ -200,7 +203,9 @@ export class SwiftHybridObjectType
       },
     ]
     const pointer = new SwiftRetainedPointerType(this)
-    const pointerParameterType = pointer.getCode('c++', { context: 'parameter' })
+    const pointerParameterType = pointer.getCode('c++', {
+      context: 'parameter',
+    })
     const pointerReturnType = pointer.getCode('c++', { context: 'return' })
     const createSignature = `${bridge.strong} ${bridge.create}(${pointerParameterType} pointer)`
     const getSignature = `${pointerReturnType} ${bridge.get}(const ${bridge.strong}& value)`
@@ -222,10 +227,7 @@ export class SwiftHybridObjectType
       implementationImports = [
         {
           language: 'c++',
-          declaration: type.sourceConfig.getCxxHeader(
-            `${type.sourceConfig.getSwiftBridgeHeaderName()}.hpp`,
-            'private'
-          ),
+          declaration: type.sourceConfig.getAppleCxxHeader(),
         },
       ]
     } else {

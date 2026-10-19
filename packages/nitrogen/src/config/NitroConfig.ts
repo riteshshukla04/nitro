@@ -143,9 +143,22 @@ export class NitroConfig {
     return directory
   }
 
-  getSwiftBridgeHeaderName(): string {
+  getAppleCxxTargetName(): string {
+    return `${this.getIosModuleName()}AppleCxx`
+  }
+
+  /** Get the public C++ bridge declarations that this module exposes to Swift. */
+  getAppleCxxHeader(): { name: string; space: 'system' } {
+    const targetName = this.getAppleCxxTargetName()
+    return {
+      name: `${targetName}/${targetName}.h`,
+      space: 'system',
+    }
+  }
+
+  getSwiftBridgeSourceName(): string {
     const moduleName = this.getIosModuleName()
-    return `${moduleName}-Swift-Cxx-Bridge`
+    return `${moduleName}-Swift-Cxx-Bridge.cpp`
   }
 
   getSwiftBridgeNamespace(language: 'c++' | 'swift'): string {

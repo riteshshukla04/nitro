@@ -1,65 +1,68 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
 import { createFileMetadataString } from '../../syntax/helpers.js'
-import type { SourceFile } from '../../syntax/SourceFile.js'
+import type { SourceFile, SourceImport } from '../../syntax/SourceFile.js'
+import type { CppHelper } from '../../syntax/c++/CppHelper.js'
+import { getImportCode, getImportsCode } from '../../syntax/getImportCode.js'
 
-/**
- * Gets the name of the C++ target that Swift imports to access the C++ bridge.
- */
-export function getAppleCxxTargetName(config = NitroConfig.current): string {
-  return `${config.getIosModuleName()}AppleCxx`
+interface AppleCxxTargetOptions {
+  moduleDependencies: NitroConfig[]
+  bridgeDeclarations: CppHelper['header']
 }
 
 /**
  * Creates the sources of the `<Module>AppleCxx` Swift package target.
- * Its public umbrella header exposes the C++ bridge declarations to Swift
- * and the autolinking header to C++ consumers.
+ * Its public header declares the C++ bridge that Swift imports.
  */
-export function createAppleCxxTarget(
-  moduleDependencies: NitroConfig[]
-): SourceFile[] {
-  const moduleName = NitroConfig.current.getIosModuleName()
-  const targetName = getAppleCxxTargetName()
-  const autolinkingHeaderName = `${moduleName}Autolinking.hpp`
-  const bridgeHeaderName = `${NitroConfig.current.getSwiftBridgeHeaderName()}.hpp`
-  // Headers in <Module>AppleCxx/include/<Module>AppleCxx/ reach ios/ through three parents.
-  const iosDirectory = '../../..'
-  // AppleCxx is built before SwiftBridge, so it accesses the declarations directly.
-  const headerDirectory = `${iosDirectory}/c++/include/${moduleName}`
+export function createAppleCxxTarget({
+  moduleDependencies,
+  bridgeDeclarations,
+}: AppleCxxTargetOptions): SourceFile[] {
+  const targetName = NitroConfig.current.getAppleCxxTargetName()
   let dependencyIncludes: string
   if (moduleDependencies.length > 0) {
-    const includes = moduleDependencies.map((config) => {
-      const dependencyTargetName = getAppleCxxTargetName(config)
-      return `#include <${dependencyTargetName}/${dependencyTargetName}.h>`
-    })
+    const imports: SourceImport[] = moduleDependencies.map((config) => ({
+      language: 'c++',
+      declaration: config.getAppleCxxHeader(),
+    }))
+    const includes = getImportsCode(imports, 'declaration')
     dependencyIncludes = `
 // Each Nitro module declares parts of the margelo::nitro namespace, and Swift
 // treats the namespace as owned by one of them. Re-export the modules this one
 // uses, so Swift files that import this module can name the namespace.
-${includes.join('\n')}
-`
+${includes}
+`.trim()
   } else {
     dependencyIncludes = ''
   }
+  const declarationIncludes = getImportsCode(
+    bridgeDeclarations.requiredImports,
+    'declaration'
+  )
+  const headerInclude = getImportCode({
+    language: 'c++',
+    declaration: NitroConfig.current.getAppleCxxHeader(),
+  })
 
-  const umbrellaHeaderCode = `
+  const headerCode = `
 ${createFileMetadataString(`${targetName}.h`)}
 
 #pragma once
 ${dependencyIncludes}
-#include "${headerDirectory}/${autolinkingHeaderName}"
-#include "${headerDirectory}/private/${bridgeHeaderName}"
+${declarationIncludes}
+
+${bridgeDeclarations.code}
   `.trim()
   const implementationCode = `
 ${createFileMetadataString(`${targetName}.cpp`)}
 
 // Swift packages require at least one source file per C++ target.
-#include <${targetName}/${targetName}.h>
+${headerInclude}
   `.trim()
 
   const includeDirectory = [targetName, 'include', targetName]
   return [
     {
-      content: umbrellaHeaderCode,
+      content: headerCode,
       language: 'c++',
       name: `${targetName}.h`,
       platform: 'ios',

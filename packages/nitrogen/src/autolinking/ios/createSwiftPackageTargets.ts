@@ -1,6 +1,5 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
 import { indent } from '../../utils.js'
-import { getAppleCxxTargetName } from './createAppleCxxTarget.js'
 
 export const SWIFT_PACKAGE_SECTION_BEGIN = '// nitrogen:begin'
 export const SWIFT_PACKAGE_SECTION_END = '// nitrogen:end'
@@ -43,10 +42,10 @@ export function createSwiftPackageTargets({
 }: SwiftPackageTargetsOptions): string {
   const moduleName = NitroConfig.current.getIosModuleName()
   const cxxTargetName = `${moduleName}Cxx`
-  const appleCxxTargetName = getAppleCxxTargetName()
+  const appleCxxTargetName = NitroConfig.current.getAppleCxxTargetName()
   const swiftBridgeTargetName = `${moduleName}SwiftBridge`
   const iosDirectory = `${generatedDirectory}/ios`
-  const bridgeSourceName = `${NitroConfig.current.getSwiftBridgeHeaderName()}.cpp`
+  const bridgeSourceName = NitroConfig.current.getSwiftBridgeSourceName()
   const autolinkingSourceName = `${moduleName}Autolinking.cpp`
   const autolinkingObjcSourceName = `${moduleName}Autolinking.mm`
   const nitroModules = NITRO_MODULES_PACKAGE_NAME

@@ -5,12 +5,18 @@ import {
   isNotDuplicate,
 } from '../../syntax/helpers.js'
 import type { SourceFile } from '../../syntax/SourceFile.js'
+import type { CppHelper } from '../../syntax/c++/CppHelper.js'
 import type { SwiftType } from '../../syntax/swift/types/SwiftType.js'
 import { getUmbrellaHeaderName } from './createSwiftUmbrellaHeader.js'
-import { getImportCode } from '../../syntax/getImportCode.js'
+import { getImportCode, getImportsCode } from '../../syntax/getImportCode.js'
 
-export function createSwiftCxxBridge(types: SwiftType[]): SourceFile[] {
-  const bridgeHeaderName = NitroConfig.current.getSwiftBridgeHeaderName()
+interface SwiftCxxBridge {
+  declarations: CppHelper['header']
+  implementation: SourceFile
+}
+
+export function createSwiftCxxBridge(types: SwiftType[]): SwiftCxxBridge {
+  const bridgeSourceName = NitroConfig.current.getSwiftBridgeSourceName()
   const cppNamespace = NitroConfig.current.getSwiftBridgeNamespace('c++')
   const helpers = types.flatMap((type) => type.requiredCppHelpers)
   const headerImports = [
@@ -20,16 +26,16 @@ export function createSwiftCxxBridge(types: SwiftType[]): SourceFile[] {
   const declarations = helpers
     .map((helper) => helper.header.code)
     .filter(isNotDuplicate)
-  const declarationIncludes = headerImports
-    .map((i) => getImportCode(i, 'declaration'))
-    .filter(isNotDuplicate)
   const implementations = helpers.flatMap((helper) =>
     helper.implementation == null ? [] : [helper.implementation]
   )
-  const implementationIncludes = implementations
-    .flatMap((i) => i.requiredImports)
-    .map((i) => getImportCode(i, 'implementation'))
-    .filter(isNotDuplicate)
+  const implementationImports = implementations.flatMap(
+    (i) => i.requiredImports
+  )
+  const implementationIncludes = getImportsCode(
+    implementationImports,
+    'implementation'
+  )
   const definitions = implementations.map((i) => i.code).filter(isNotDuplicate)
   const umbrellaInclude = getImportCode({
     language: 'c++',
@@ -39,37 +45,31 @@ export function createSwiftCxxBridge(types: SwiftType[]): SourceFile[] {
     ),
   })
 
-  return [
-    {
-      name: `${bridgeHeaderName}.hpp`,
-      language: 'c++',
-      platform: 'ios',
-      subdirectory: ['c++'],
-      content: `
-${createFileMetadataString(`${bridgeHeaderName}.hpp`)}
-#pragma once
-
-${declarationIncludes.join('\n')}
-
+  const declarationCode = `
 namespace ${cppNamespace} {
   ${indent(declarations.join('\n'), '  ')}
 } // namespace ${cppNamespace}
-`.trim(),
+`.trim()
+
+  return {
+    declarations: {
+      code: declarationCode,
+      requiredImports: headerImports,
     },
-    {
-      name: `${bridgeHeaderName}.cpp`,
+    implementation: {
+      name: bridgeSourceName,
       language: 'c++',
       platform: 'ios',
       subdirectory: [],
       content: `
-${createFileMetadataString(`${bridgeHeaderName}.cpp`)}
+${createFileMetadataString(bridgeSourceName)}
 ${umbrellaInclude}
-${implementationIncludes.join('\n')}
+${implementationIncludes}
 
 namespace ${cppNamespace} {
   ${indent(definitions.join('\n\n'), '  ')}
 } // namespace ${cppNamespace}
 `.trim(),
     },
-  ]
+  }
 }
