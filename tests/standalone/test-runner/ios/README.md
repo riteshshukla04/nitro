@@ -35,6 +35,11 @@ resolve to the same package sources used by the command-line runner.
 `RuntimeTests.swift` loads the JavaScript and case manifests from the test bundle in the Xcode project, or from `Bundle.module` when running
 the package tests directly. `NitroTestRunnerBridge` exports the Objective-C++ test entry point to Swift.
 
+`run.mjs` boots the simulator, builds with `xcodebuild build-for-testing`, then runs `test-without-building` from the generated `.xctestrun`
+file, so the Swift package graph is only resolved once. `--derived-data PATH` moves DerivedData outside the repository. CI uses it, builds
+with one job per CPU core, and moves `node_modules` out of the repository first: Xcode enumerates every file under a local Swift package,
+and this package is the repository root.
+
 Simulator OS, device, architecture, build jobs and deployment target defaults live in [`config.json`](config.json). By default, the runner
 selects the newest installed iOS 26 simulator and the host architecture. Override them on the command line:
 
