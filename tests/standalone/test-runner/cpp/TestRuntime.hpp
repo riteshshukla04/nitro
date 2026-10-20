@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace margelo::nitro::testing {
@@ -42,6 +43,8 @@ struct TestGroupReport {
   double casesMs = 0;
   // Destroying runtimes, which finalizes everything their cases created.
   double teardownMs = 0;
+  // Each failed case with the first line of its failure.
+  std::vector<std::pair<std::string, std::string>> failedCases = {};
 };
 
 struct TestSchedulerOptions {
@@ -55,6 +58,9 @@ struct TestSchedulerOptions {
   std::function<void(const std::function<void()>& body)> caseScope;
   // Runs on the worker thread after a group's runtime was destroyed.
   std::function<void(const TestGroupReport& report)> onGroupFinished;
+  // The bundle's source map. JS reads it through `__nitroTestSourceMap()` to
+  // report failures at their TypeScript locations.
+  std::shared_ptr<const std::string> sourceMap;
 };
 
 // Runs groups of JS cases. A group's cases run in order in one Hermes runtime

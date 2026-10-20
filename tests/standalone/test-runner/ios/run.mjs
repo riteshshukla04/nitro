@@ -251,6 +251,10 @@ if (existsSync(groupReport)) {
     .sort((a, b) => b.ms - a.ms)
     .slice(0, 5)
   console.log(`  slowest: ${slowest.map((group) => `${group.name} ${seconds(group.ms)}`).join(', ')}`)
+  // xcodebuild only reports that a parameterized case failed, not which one.
+  for (const { name, failure } of groups.flatMap((group) => group.failedCases ?? [])) {
+    console.log(`  failed: ${name}\n    ${failure}`)
+  }
 }
 console.log(`Test results: ${results}`)
 if (sanitizerFailure) console.error('Sanitizer reported an error.')

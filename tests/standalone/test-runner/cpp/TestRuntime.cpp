@@ -17,6 +17,7 @@
 #include <limits>
 #include <list>
 #include <mutex>
+#include <optional>
 #include <pthread.h>
 #include <queue>
 #include <system_error>
@@ -175,9 +176,10 @@ namespace {
   class HermesSession {
   public:
     // Returns nullptr and sets `failure` if setup fails or times out.
-    static std::unique_ptr<HermesSession> create(const std::string& bundle, uint32_t timeoutMs, std::string& failure) {
+    static std::unique_ptr<HermesSession> create(const std::string& bundle, uint32_t timeoutMs,
+                                                 const std::shared_ptr<const std::string>& sourceMap, std::string& failure) {
       std::unique_ptr<HermesSession> session(new HermesSession());
-      failure = session->setup(bundle, timeoutMs);
+      failure = session->setup(bundle, timeoutMs, sourceMap);
       if (!failure.empty())
         return nullptr;
       return session;
@@ -277,7 +279,7 @@ namespace {
       runtime = facebook::hermes::makeHermesRuntime(config);
     }
 
-    std::string setup(const std::string& bundle, uint32_t timeoutMs) {
+    std::string setup(const std::string& bundle, uint32_t timeoutMs, const std::shared_ptr<const std::string>& sourceMap) {
       const char* phase = "preparing JS test bundle";
       // JSError owns JSI values. Convert it before its runtime can be destroyed.
       try {
@@ -301,6 +303,15 @@ namespace {
                                                     rt.instrumentation().collectGarbage("Nitro runtime test");
                                                     return jsi::Value::undefined();
                                                   }));
+        if (sourceMap) {
+          // Only failing cases call this, so the map is never copied otherwise.
+          runtime->global().setProperty(
+              *runtime, "__nitroTestSourceMap",
+              jsi::Function::createFromHostFunction(*runtime, jsi::PropNameID::forAscii(*runtime, "__nitroTestSourceMap"), 0,
+                                                    [sourceMap](jsi::Runtime& rt, const jsi::Value&, const jsi::Value*, size_t) {
+                                                      return jsi::String::createFromUtf8(rt, *sourceMap);
+                                                    }));
+        }
         phase = "loading JS test bundle";
         const auto timeoutMessage = "Timed out after " + std::to_string(timeoutMs) + "ms";
         const auto deadline = Clock::now() + std::chrono::milliseconds(timeoutMs);
@@ -374,7 +385,7 @@ namespace {
 std::string runTest(const std::string& bundle, const std::string& name, uint32_t timeoutMs, const std::function<void()>& onTestStarted) {
   try {
     std::string failure;
-    if (auto session = HermesSession::create(bundle, timeoutMs, failure))
+    if (auto session = HermesSession::create(bundle, timeoutMs, nullptr, failure))
       failure = session->run(name, timeoutMs, onTestStarted);
     return failure.empty() ? "" : name + ": " + failure;
   } catch (const std::exception& error) {
@@ -437,6 +448,10 @@ struct TestScheduler::State {
       session.reset();
       report.teardownMs += millisecondsSince(start);
     };
+    // The group's last result waits for its teardown and report. Otherwise the
+    // test process could finish, and exit, before Nitro released everything
+    // the group created, and a crash in that teardown would go unnoticed.
+    std::optional<std::pair<std::string, TestCaseResult>> lastResult;
     for (const auto& name : group.cases) {
       std::string failure;
       double durationMs = 0;
@@ -445,7 +460,7 @@ struct TestScheduler::State {
         // with that error instead of retrying setup for each of them.
         if (!session && setupFailure.empty()) {
           const auto start = Clock::now();
-          session = HermesSession::create(bundle, options.timeoutMs, setupFailure);
+          session = HermesSession::create(bundle, options.timeoutMs, options.sourceMap, setupFailure);
           report.setupMs += millisecondsSince(start);
           report.runtimes++;
         }
@@ -477,9 +492,15 @@ struct TestScheduler::State {
         failure = "unknown native exception";
         session.reset();
       }
-      if (!failure.empty())
+      if (!failure.empty()) {
         report.failures++;
-      publish(name, {failure.empty() ? "" : name + ": " + failure, durationMs});
+        report.failedCases.emplace_back(name, failure.substr(0, failure.find('\n')));
+      }
+      TestCaseResult result{failure.empty() ? "" : name + ": " + failure, durationMs};
+      if (&name == &group.cases.back())
+        lastResult.emplace(name, std::move(result));
+      else
+        publish(name, std::move(result));
     }
     // Destroying the runtime finalizes everything the group created.
     if (options.caseScope)
@@ -488,6 +509,8 @@ struct TestScheduler::State {
       destroySession();
     if (options.onGroupFinished)
       options.onGroupFinished(report);
+    if (lastResult)
+      publish(lastResult->first, std::move(lastResult->second));
   }
 
   void work() {

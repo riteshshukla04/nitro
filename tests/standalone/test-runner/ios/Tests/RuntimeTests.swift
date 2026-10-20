@@ -140,9 +140,14 @@ private let behaviorScheduler = Result {
   guard let url = testResources.url(forResource: "runtime-tests", withExtension: "js") else {
     throw JavaScriptFailure(description: "Missing runtime-tests.js. Run bun test:prepare.")
   }
+  // Optional: without it, failures report locations in the bundle.
+  let sourceMap = testResources.url(forResource: "runtime-tests.js", withExtension: "map").flatMap {
+    try? String(contentsOf: $0, encoding: .utf8)
+  }
   return try NitroTestScheduler(
     bundle: String(contentsOf: url, encoding: .utf8), groups: manifest.groups, workers: UInt(workerCount),
-    timeoutMs: defaultTimeoutMs, onCaseStarted: nil, onGroupFinished: { groupReports.append($0) })
+    timeoutMs: defaultTimeoutMs, sourceMap: sourceMap, onCaseStarted: nil,
+    onGroupFinished: { groupReports.append($0) })
 }
 
 @Suite
@@ -172,13 +177,14 @@ struct RuntimeTests {
 /// Runs handwritten JS through its own scheduler and returns the failure of
 /// every case that failed. These cases test the runner, not HybridObjects.
 private func runContract(
-  _ source: String, groups: [[String]], workers: Int = 1, timeoutMs: UInt32 = 1000,
+  _ source: String, groups: [[String]], workers: Int = 1, timeoutMs: UInt32 = 1000, sourceMap: String? = nil,
   onCaseStarted: (@Sendable (String) -> Void)? = nil
 ) async throws -> (failures: [String: String], peakConcurrency: Int) {
   let scheduler = try NitroTestScheduler(
     bundle: source,
     groups: groups.enumerated().map { index, cases in NitroTestGroup(name: "contract \(index)", cases: cases) },
-    workers: UInt(workers), timeoutMs: timeoutMs, onCaseStarted: onCaseStarted, onGroupFinished: nil)
+    workers: UInt(workers), timeoutMs: timeoutMs, sourceMap: sourceMap, onCaseStarted: onCaseStarted,
+    onGroupFinished: nil)
   let failures = await withTaskGroup(of: (String, String?).self) { tasks in
     for name in groups.joined() {
       tasks.addTask { (name, await scheduler.run(name)) }
@@ -286,6 +292,20 @@ struct RunnerContractTests {
     #expect(rendezvous.met, "Two initialized Hermes runtimes must meet before either case runs")
     #expect(result.peakConcurrency == 2, "The third group must wait for a worker")
     #expect(result.failures.isEmpty, "\(result.failures)")
+  }
+
+  @Test func sourceMapReachesJavaScriptOnlyWhenGiven() async throws {
+    let source = """
+      globalThis.runNitroTest = async (name) => {
+        const map = globalThis.__nitroTestSourceMap?.();
+        if (name === 'with-map' && map !== '{"version":3}') throw new Error(`unexpected map ${map}`);
+        if (name === 'without-map' && map !== undefined) throw new Error('map without one being given');
+      };
+      """
+    let withMap = try await runContract(source, groups: [["with-map"]], sourceMap: #"{"version":3}"#)
+    #expect(withMap.failures.isEmpty, "\(withMap.failures)")
+    let withoutMap = try await runContract(source, groups: [["without-map"]])
+    #expect(withoutMap.failures.isEmpty, "\(withoutMap.failures)")
   }
 
   @Test func changedBundleReplacesPreparedSource() async throws {

@@ -19,13 +19,15 @@ NS_SWIFT_SENDABLE
 NS_SWIFT_SENDABLE
 @interface NitroTestScheduler : NSObject
 
-/// Groups start in the given order. `onCaseStarted` runs on a worker thread
+/// Groups start in the given order. `sourceMap` is the bundle's source map, which
+/// lets failures report TypeScript locations. `onCaseStarted` runs on a worker thread
 /// after setup, right before each case. `onGroupFinished` receives a one-line
 /// JSON timing report after each group's runtime was destroyed.
 - (nullable instancetype)initWithBundle:(NSString*)bundle
                                  groups:(NSArray<NitroTestGroup*>*)groups
                                 workers:(NSUInteger)workers
                               timeoutMs:(uint32_t)timeoutMs
+                              sourceMap:(nullable NSString*)sourceMap
                           onCaseStarted:(void(NS_SWIFT_SENDABLE ^ _Nullable)(NSString* name))onCaseStarted
                         onGroupFinished:(void(NS_SWIFT_SENDABLE ^ _Nullable)(NSString* report))onGroupFinished
                                   error:(NSError**)error NS_DESIGNATED_INITIALIZER;

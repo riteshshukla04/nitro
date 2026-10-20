@@ -31,6 +31,7 @@ static NSString* toNSString(const std::string& string) {
                                  groups:(NSArray<NitroTestGroup*>*)groups
                                 workers:(NSUInteger)workers
                               timeoutMs:(uint32_t)timeoutMs
+                              sourceMap:(nullable NSString*)sourceMap
                           onCaseStarted:(void (^)(NSString*))onCaseStarted
                         onGroupFinished:(void (^)(NSString*))onGroupFinished
                                   error:(NSError**)error {
@@ -49,6 +50,8 @@ static NSString* toNSString(const std::string& string) {
     TestSchedulerOptions options;
     options.workers = workers;
     options.timeoutMs = timeoutMs;
+    if (sourceMap)
+      options.sourceMap = std::make_shared<const std::string>(sourceMap.UTF8String);
     if (onCaseStarted) {
       void (^block)(NSString*) = [onCaseStarted copy];
       options.onCaseStarted = [block](const std::string& name) { block(toNSString(name)); };
@@ -57,6 +60,9 @@ static NSString* toNSString(const std::string& string) {
       void (^block)(NSString*) = [onGroupFinished copy];
       options.onGroupFinished = [block, workers](const TestGroupReport& report) {
         @autoreleasepool {
+          NSMutableArray* failedCases = [NSMutableArray arrayWithCapacity:report.failedCases.size()];
+          for (const auto& [name, failure] : report.failedCases)
+            [failedCases addObject:@{@"name" : toNSString(name), @"failure" : toNSString(failure)}];
           NSDictionary* fields = @{
             @"name" : toNSString(report.name),
             @"cases" : @(report.cases),
@@ -66,6 +72,7 @@ static NSString* toNSString(const std::string& string) {
             @"casesMs" : @(std::round(report.casesMs)),
             @"teardownMs" : @(std::round(report.teardownMs)),
             @"workers" : @(workers),
+            @"failedCases" : failedCases,
           };
           NSData* json = [NSJSONSerialization dataWithJSONObject:fields options:NSJSONWritingSortedKeys error:nil];
           block([[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding]);
