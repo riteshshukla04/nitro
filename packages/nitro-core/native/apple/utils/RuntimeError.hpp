@@ -14,7 +14,12 @@
 namespace margelo::nitro {
 
 static inline std::exception_ptr makeException(const std::string& message) {
-  return std::make_exception_ptr(std::runtime_error(message));
+  // TODO: Switch to `std::make_exception_ptr(..)` instead of `try` + `catch` once we drop iOS 18 support or fix https://github.com/margelo/nitro/issues/1652 differently
+  try {
+    throw std::runtime_error(message);
+  } catch (...) {
+    return std::current_exception();
+  }
 }
 
 static inline std::string getExceptionMessage(const std::exception_ptr& exception) {
