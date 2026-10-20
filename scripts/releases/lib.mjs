@@ -8,7 +8,6 @@ import {
   writeFileSync,
 } from 'node:fs'
 import path from 'node:path'
-import { setTimeout } from 'node:timers/promises'
 import { releasePackages } from './packages.mjs'
 
 export function run(command, args, { cwd, capture = false, input, env } = {}) {
@@ -361,7 +360,7 @@ export function packPackage(packageDir, destination) {
 
 export async function registryPackage(name, version, execute = spawnSync) {
   const spec = `${name}@${version}`
-  // Revalidate cached metadata while npm processes a newly published version.
+  // Revalidate cached metadata before deciding whether to publish or resume.
   // npm handles registry configuration and retries transient read failures.
   const result = execute('npm', ['view', spec, '--json', '--prefer-online'], {
     encoding: 'utf8',
@@ -389,33 +388,10 @@ export async function registryPackage(name, version, execute = spawnSync) {
   return metadata
 }
 
-export async function assertPublishedPackages(
-  manifest,
-  { lookup = registryPackage, retries = 0, wait = setTimeout } = {}
-) {
-  for (const pkg of manifest.packages) {
-    let published
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      published = await lookup(pkg.name, pkg.version)
-      // Only a missing version can be delayed publication. Metadata with a
-      // different integrity must fail immediately.
-      if (published || attempt === retries) break
-      console.log(
-        `${pkg.name}@${pkg.version} is not visible on npm yet; retrying in 10s (${attempt + 1}/${retries})`
-      )
-      await wait(10_000)
-    }
-    if (published?.dist?.integrity !== pkg.integrity)
-      throw new Error(
-        `npm does not contain the recorded ${pkg.name}@${pkg.version} tarball`
-      )
-  }
-}
-
 export async function publishPackages(
   manifest,
   directory,
-  { lookup = registryPackage, execute = run, wait = setTimeout } = {}
+  { lookup = registryPackage, execute = run } = {}
 ) {
   verifyFiles(manifest, directory)
   // Preflight every package before publishing the first one.
@@ -462,12 +438,6 @@ export async function publishPackages(
       '--provenance',
       '--ignore-scripts',
     ])
-    // npm can accept the upload before the version is visible. Allow five
-    // minutes of visibility waits, without repeating the publish command.
-    await assertPublishedPackages(
-      { packages: [pkg] },
-      { lookup, retries: 30, wait }
-    )
   }
 }
 

@@ -14,7 +14,6 @@ import { gzipSync } from 'node:zlib'
 import { releasePackages } from './packages.mjs'
 import { corePackageFiles, verifyCorePackage } from './package-layout.mjs'
 import {
-  assertPublishedPackages,
   assertValidatedCommit,
   compareVersions,
   downloadRelease,
@@ -716,7 +715,6 @@ test('partial publication resumes with the same artifacts and only publishes the
     'nitrogen-0.37.2.tgz',
     'react-native-nitro-modules-0.37.2.tgz',
   ])
-  await assertPublishedPackages(manifest, { lookup: registry.lookup })
   await publishPackages(manifest, directory, {
     lookup: registry.lookup,
     execute,
@@ -772,7 +770,6 @@ test('a failed RN publish resumes only the adapter from the saved three-package 
   assert.deepEqual(registry.publishes, ['nitro-core', 'nitrogen'])
   await publishPackages(manifest, directory, registry)
   assert.deepEqual(registry.publishes, releasePackages)
-  await assertPublishedPackages(manifest, { lookup: registry.lookup })
 })
 
 test('corrupt saved tarballs fail before registry access or publication', async (t) => {
@@ -847,12 +844,12 @@ test('prereleases publish only to their selected channel', async (t) => {
   )
 })
 
-test('fresh and resumed publications wait for npm visibility without republishing', async (t) => {
+test('successful publishes finalize fresh and resumed releases without registry visibility', async (t) => {
   for (const resume of [false, true]) {
     const { manifest, directory } = releaseFixture(t)
     const registry = registryFixture(manifest)
-    const reads = new Map()
-    const delays = []
+    const github = githubFixture(manifest)
+    const release = saveDraft(manifest, directory, 'nitro-release.json', github)
     if (resume) {
       const core = manifest.packages[0]
       registry.versions.set(
@@ -861,173 +858,34 @@ test('fresh and resumed publications wait for npm visibility without republishin
       )
     }
     await publishPackages(manifest, directory, {
-      lookup: async (name, version) => {
-        if (version === manifest.version && registry.publishes.includes(name)) {
-          const count = (reads.get(name) ?? 0) + 1
-          reads.set(name, count)
-          if (count <= 2) return null
-        }
+      lookup: (name, version) => {
+        assert.equal(
+          registry.publishes.length,
+          0,
+          'successful uploads must not depend on further registry reads'
+        )
         return registry.lookup(name, version)
       },
       execute: (command, args) => {
-        for (const name of registry.publishes)
-          assert.equal(
-            reads.get(name),
-            3,
-            'verify before publishing the next package'
-          )
         registry.execute(command, args)
+        const name = registry.publishes.at(-1)
+        // npm accepted the upload, but its read API still returns E404.
+        registry.versions.delete(registry.key(name, manifest.version))
+        registry.tags.delete(registry.key(name, manifest.npmTag))
       },
-      wait: async (delay) => delays.push(delay),
     })
+    finishRelease(manifest, { release, request: github.request })
     const expected = resume ? releasePackages.slice(1) : releasePackages
     assert.deepEqual(registry.publishes, expected)
-    assert.deepEqual(delays, Array(expected.length * 2).fill(10_000))
+    assert.equal(github.releases[0].draft, false)
+    for (const name of expected)
+      assert.equal(await registry.lookup(name, manifest.version), null)
     for (const pkg of manifest.packages)
       assert.equal(
         fileIntegrity(path.join(directory, pkg.filename)),
         pkg.integrity
       )
-    await assertPublishedPackages(manifest, { lookup: registry.lookup })
   }
-})
-
-test('publication stops after five minutes of visibility waits and resumes the accepted upload', async (t) => {
-  const { manifest, directory } = releaseFixture(t)
-  const registry = registryFixture(manifest)
-  let hideCore = true
-  let verificationReads = 0
-  const delays = []
-  const lookup = async (name, version) => {
-    if (
-      hideCore &&
-      name === 'nitro-core' &&
-      version === manifest.version &&
-      registry.publishes.includes(name)
-    ) {
-      verificationReads++
-      return null
-    }
-    return registry.lookup(name, version)
-  }
-  const options = {
-    lookup,
-    execute: registry.execute,
-    wait: async (delay) => delays.push(delay),
-  }
-  await assert.rejects(
-    publishPackages(manifest, directory, options),
-    /npm does not contain the recorded nitro-core/
-  )
-  assert.deepEqual(registry.publishes, ['nitro-core'])
-  assert.equal(verificationReads, 31)
-  assert.deepEqual(delays, Array(30).fill(10_000))
-  hideCore = false
-  await publishPackages(manifest, directory, options)
-  assert.deepEqual(registry.publishes, releasePackages)
-  await assertPublishedPackages(manifest, { lookup: registry.lookup })
-})
-
-test('visibility retries stop as soon as npm returns a conflicting tarball', async (t) => {
-  const { manifest, directory } = releaseFixture(t)
-  const registry = registryFixture(manifest)
-  let verificationReads = 0
-  const delays = []
-  await assert.rejects(
-    publishPackages(manifest, directory, {
-      lookup: async (name, version) => {
-        if (version === manifest.version && registry.publishes.includes(name)) {
-          verificationReads++
-          if (verificationReads === 1) return null
-          return { version, dist: { integrity: 'sha512-other' } }
-        }
-        return registry.lookup(name, version)
-      },
-      execute: registry.execute,
-      wait: async (delay) => delays.push(delay),
-    }),
-    /npm does not contain the recorded nitro-core/
-  )
-  assert.equal(verificationReads, 2)
-  assert.deepEqual(delays, [10_000])
-  assert.deepEqual(registry.publishes, ['nitro-core'])
-})
-
-test('verification after publication stops before the next package if npm serves different bytes', async (t) => {
-  const { manifest, directory } = releaseFixture(t)
-  const registry = registryFixture(manifest)
-  await assert.rejects(
-    publishPackages(manifest, directory, {
-      lookup: registry.lookup,
-      execute: (command, args) => {
-        registry.execute(command, args)
-        registry.versions.set(registry.key('nitro-core', manifest.version), {
-          dist: { integrity: 'sha512-other' },
-        })
-      },
-      wait: () => assert.fail('a conflicting tarball must fail immediately'),
-    }),
-    /npm does not contain the recorded nitro-core/
-  )
-  assert.deepEqual(registry.publishes, ['nitro-core'])
-})
-
-test('a registry outage after a successful publish resumes without publishing that version again', async (t) => {
-  const { manifest, directory } = releaseFixture(t)
-  const registry = registryFixture(manifest)
-  let failVerification = true
-  const lookup = async (name, version) => {
-    if (
-      failVerification &&
-      name === 'nitro-core' &&
-      version === manifest.version &&
-      registry.publishes.length > 0
-    ) {
-      failVerification = false
-      throw new Error('verification connection reset')
-    }
-    return registry.lookup(name, version)
-  }
-  await assert.rejects(
-    publishPackages(manifest, directory, { lookup, execute: registry.execute }),
-    /connection reset/
-  )
-  assert.deepEqual(registry.publishes, ['nitro-core'])
-  await publishPackages(manifest, directory, {
-    lookup,
-    execute: registry.execute,
-  })
-  assert.deepEqual(registry.publishes, releasePackages)
-})
-
-test('verification requires every recorded package with matching integrity', async (t) => {
-  const { manifest } = releaseFixture(t)
-  const registry = registryFixture(manifest)
-  await assert.rejects(
-    assertPublishedPackages(manifest, { lookup: registry.lookup }),
-    /npm does not contain/
-  )
-  registry.versions.set(
-    registry.key('nitro-core', manifest.version),
-    registry.record(manifest.packages[0])
-  )
-  await assert.rejects(
-    assertPublishedPackages(manifest, { lookup: registry.lookup }),
-    /recorded nitrogen/
-  )
-  registry.versions.set(
-    registry.key('nitrogen', manifest.version),
-    registry.record(manifest.packages[1])
-  )
-  await assert.rejects(
-    assertPublishedPackages(manifest, { lookup: registry.lookup }),
-    /recorded react-native-nitro-modules/
-  )
-  registry.versions.set(
-    registry.key('react-native-nitro-modules', manifest.version),
-    registry.record(manifest.packages[2])
-  )
-  await assertPublishedPackages(manifest, { lookup: registry.lookup })
 })
 
 function githubFixture(manifest) {
