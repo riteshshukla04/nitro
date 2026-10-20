@@ -92,12 +92,19 @@ public:
   [[nodiscard]] BorrowingReference<T> lock() const;
 
   /**
-   * Get whether the value this weak reference points to has already been deleted, or whether this weak reference is empty.
+   * Get whether the value is no longer accessible, or whether this weak reference is empty.
    * If this returns `true` for a non-empty weak reference, `lock()` will never return a value again.
+   * Destruction may still be running; use `destroyAndWait()` if it must finish before continuing.
    */
   [[nodiscard]] bool isExpired() const noexcept {
     return _state == nullptr || _state->isDeleted;
   }
+
+  /**
+   * Destroy the value and wait for any existing destructor to finish before
+   * runtime teardown. Do not call this barrier from a managed value's destructor.
+   */
+  void destroyAndWait() const;
 
 public:
   friend class BorrowingReference<T>;

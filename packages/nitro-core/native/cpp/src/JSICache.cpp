@@ -17,11 +17,8 @@ static constexpr jsi::UUID RUNTIME_DATA_UUID{0x1ea094a6, 0xd2fa, 0x4a79, 0xa00f,
 template <typename T>
 inline void destroyReferences(const std::vector<WeakReference<T>>& references) {
   for (auto& func : references) {
-    BorrowingReference<T> reference = func.lock();
-    if (reference) {
-      // Destroy all functions that we might still have in cache, some callbacks and Promises may now become invalid.
-      reference.destroy();
-    }
+    // Wait even when the last strong reference is being destroyed elsewhere.
+    func.destroyAndWait();
   }
 }
 

@@ -37,8 +37,12 @@ class Callback;
  * Unlike `InlineCallback`, `Callback` is escapable, meaning it can be called
  * "later", e.g. stored as a class member and invoked at a later point in time.
  *
- * `Callback` can be invoked sync (which has to be called on the JS Runtime
- * context/Thread) or async (which returns a `Promise<T>` and uses the `Dispatcher`).
+ * JS callbacks require their runtime's dispatcher for synchronous invocation;
+ * asynchronous invocation schedules work there and returns a `Promise<T>`.
+ * Native callbacks execute immediately on the calling thread in either case.
+ * Their captures must support concurrent invocation and destruction when the
+ * callback is shared across threads. Arguments and results retain their own
+ * synchronization requirements.
  * Synchronous JS calls invoke the Dispatcher's JS entry hooks. The runtime host
  * controls microtask checkpoints through those hooks and its dispatched tasks.
  */
@@ -144,7 +148,9 @@ private:
         // The caller is on the JS Thread and can catch this.
         throw std::runtime_error(getDispatcherDestroyedMessage());
       }
+#ifdef NITRO_DEBUG
       assert(dispatcher->isOnDispatcher() && "callSync(...) must be called on the JS Runtime's context/Thread!");
+#endif
       assertFunctionNotNull(_function);
 
       return dispatcher->withJSEntry(_runtime, [&]() -> R {

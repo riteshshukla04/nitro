@@ -101,7 +101,15 @@ private:
   static void addToCache(std::vector<WeakReference<T>>& cache, const BorrowingReference<T>& reference) {
     if (cache.size() == cache.capacity()) [[unlikely]] {
       // before the cache grows, remove all references whose values have already been deleted
-      std::erase_if(cache, [](const WeakReference<T>& weak) { return weak.isExpired(); });
+      std::erase_if(cache, [](const WeakReference<T>& weak) {
+        if (weak.isExpired()) {
+          // An expired value's destructor may still be running on another thread.
+          // Wait before removing the entry that runtime teardown uses to find it.
+          weak.destroyAndWait();
+          return true;
+        }
+        return false;
+      });
       if (cache.size() > cache.capacity() / 2) {
         // most references are still alive - grow now so we don't scan the whole cache again on the next add
         cache.reserve(cache.capacity() * 2);

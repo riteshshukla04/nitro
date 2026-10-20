@@ -120,9 +120,11 @@ public:
   /**
    * Delete and destroy the value this BorrowingReference is pointing to.
    * This can even be called if there are still multiple strong references to the value.
+   * If destruction has already started, this is a no-op. Runtime owners that need
+   * a completion barrier can use WeakReference::destroyAndWait().
    */
   void destroy() {
-    if (_state == nullptr) {
+    if (_state == nullptr || _state->isDeleted) {
       return;
     }
 
@@ -187,12 +189,27 @@ public:
 
 private:
   void release() {
+    // Releasing a non-final reference does not need the destruction lock.
+    size_t strongRefCount = _state->strongRefCount.load();
+    while (strongRefCount > 1) {
+      if (_state->strongRefCount.compare_exchange_weak(strongRefCount, strongRefCount - 1)) {
+        _state = nullptr;
+        return;
+      }
+    }
+
+    // Runtime teardown must wait for the final value destructor to finish.
+    // Otherwise JSICache teardown could observe zero references and destroy the
+    // Runtime while another thread is still releasing its last JSI value.
+    std::unique_lock lock(_state->mutex);
     bool shouldDestroy = _state->decrementStrongRefCount();
     if (shouldDestroy) {
-      // we were the last strong reference - delete the value, then drop the weak reference all strong references share
       forceDestroyValue();
+    }
+    lock.unlock();
+    if (shouldDestroy) {
+      // Drop the weak reference all strong references share after unlocking.
       if (_state->decrementWeakRefCount()) {
-        // free the full memory if there are no more references at all
         delete _state;
       }
     }
@@ -204,9 +221,12 @@ private:
       // it has already been destroyed.
       return;
     }
-    delete _value;
-    _value = nullptr;
+    // Invalidate before calling user code so a reentrant destructor cannot
+    // lock a weak reference or destroy the same value again.
     _state->isDeleted = true;
+    T* value = _value;
+    _value = nullptr;
+    delete value;
   }
 
 public:
@@ -232,8 +252,6 @@ BorrowingReference<T> WeakReference<T>::lock() const {
     return BorrowingReference<T>();
   }
 
-  std::unique_lock lock(_state->mutex);
-
   if (_state->isDeleted) {
     // return nullptr
     return BorrowingReference<T>();
@@ -249,7 +267,27 @@ BorrowingReference<T> WeakReference<T>::lock() const {
     }
   } while (!_state->strongRefCount.compare_exchange_weak(strongRefCount, strongRefCount + 1));
 
-  return BorrowingReference(*this);
+  BorrowingReference<T> reference(*this);
+  if (_state->isDeleted) {
+    return BorrowingReference<T>();
+  }
+  return reference;
+}
+
+template <typename T>
+void WeakReference<T>::destroyAndWait() const {
+  if (_state == nullptr) {
+    return;
+  }
+
+  // Even an expired reference can still have a destructor running elsewhere.
+  std::unique_lock lock(_state->mutex);
+  BorrowingReference<T> reference = this->lock();
+  if (reference) {
+    reference.forceDestroyValue();
+  }
+  // The retained reference must be released after unlocking the state.
+  lock.unlock();
 }
 
 } // namespace margelo::nitro
