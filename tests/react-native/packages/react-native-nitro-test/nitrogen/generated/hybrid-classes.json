@@ -2,6 +2,13 @@
   "version": 1,
   "classes": {
     "BenchmarkObjectCpp": {
+      "android": {
+        "implementation": {
+          "className": "HybridBenchmarkObjectCpp",
+          "include": "\"HybridBenchmarkObjectCpp.hpp\""
+        },
+        "language": "c++"
+      },
       "ios": {
         "implementation": {
           "className": "HybridBenchmarkObjectCpp",
@@ -11,6 +18,12 @@
       }
     },
     "BenchmarkObjectSwiftKotlin": {
+      "android": {
+        "implementation": {
+          "className": "HybridBenchmarkObjectKotlin"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "implementation": {
           "className": "HybridBenchmarkObjectSwift"
@@ -19,6 +32,12 @@
       }
     },
     "RecyclableTestView": {
+      "android": {
+        "implementation": {
+          "className": "HybridRecyclableTestView"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "implementation": {
           "className": "HybridRecyclableTestView"
@@ -27,6 +46,12 @@
       }
     },
     "TestView": {
+      "android": {
+        "implementation": {
+          "className": "HybridTestView"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "implementation": {
           "className": "HybridTestView"

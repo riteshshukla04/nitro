@@ -1,7 +1,11 @@
-import { iOS, type HybridView } from 'react-native-nitro-modules'
+import { Android, iOS, type HybridView } from 'react-native-nitro-modules'
 
 @iOS({
   language: 'swift',
+  implementation: { className: 'HybridRecyclableTestView' },
+})
+@Android({
+  language: 'kotlin',
   implementation: { className: 'HybridRecyclableTestView' },
 })
 export declare class RecyclableTestView extends HybridView {

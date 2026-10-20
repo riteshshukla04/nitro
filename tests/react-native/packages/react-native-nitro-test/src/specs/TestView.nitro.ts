@@ -1,9 +1,13 @@
-import { iOS, type HybridView, type Int64 } from 'react-native-nitro-modules'
+import { Android, iOS, type HybridView, type Int64 } from 'react-native-nitro-modules'
 
 export type ColorScheme = 'light' | 'dark'
 
 @iOS({
   language: 'swift',
+  implementation: { className: 'HybridTestView' },
+})
+@Android({
+  language: 'kotlin',
   implementation: { className: 'HybridTestView' },
 })
 export declare class TestView extends HybridView {

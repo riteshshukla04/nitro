@@ -1,6 +1,8 @@
 package com.margelo.nitro.views
 
 import android.view.View
+import androidx.annotation.Keep
+import com.facebook.proguard.annotations.DoNotStrip
 import com.margelo.nitro.core.HybridObject
 
 /**
@@ -18,12 +20,16 @@ abstract class HybridView : HybridObject() {
    * Called right before updating props.
    * React props are updated in a single batch/transaction.
    */
+  @Keep
+  @DoNotStrip
   open fun beforeUpdate() { /* noop */ }
 
   /**
    * Called right after updating props.
    * React props are updated in a single batch/transaction.
    */
+  @Keep
+  @DoNotStrip
   open fun afterUpdate() { /* noop */ }
 
   /**

@@ -2,6 +2,12 @@
   "version": 1,
   "classes": {
     "TestView": {
+      "android": {
+        "implementation": {
+          "className": "HybridTestView"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "implementation": {
           "className": "HybridTestView"

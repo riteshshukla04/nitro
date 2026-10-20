@@ -11,6 +11,7 @@ import { getHybridObjectName } from '../../syntax/getHybridObjectName.js'
 import { indent } from '../../utils.js'
 import { getImportsCode, getImportCode } from '../../syntax/getImportCode.js'
 import { getKotlinImplementation } from '../../syntax/kotlin/KotlinMethodHelpers.js'
+import { createKotlinNativeConverters, getKotlinNativeConverter } from '../../syntax/kotlin/KotlinNativeConverter.js'
 
 export function createKotlinHybridViewManager(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {
   const cppFiles = createViewComponentShadowNodeFiles(spec)
@@ -23,12 +24,18 @@ export function createKotlinHybridViewManager(spec: HybridObjectSpec<'kotlin'>):
   const implementation = getKotlinImplementation(spec)
   const viewImplementation = implementation.className
   const implementationImport = getImportCode(implementation.kotlinImport)
+  const viewProperties = getHybridViewProperties(spec)
+  const propertyFiles = viewProperties.flatMap(({ property }) => property.type.getExtraFiles())
+  const propertyConverters = viewProperties.map(({ property, config }) => createKotlinNativeConverters(property.type, config))
+  const converterFiles = propertyConverters.flatMap((converter) => converter.files)
+  const converterImports = propertyConverters.flatMap((converter) => converter.imports)
   const componentName = getHybridViewComponentName(spec)
   const componentHeader = spec.config.getCxxHeader(`views/${component}.hpp`, 'private')
   const updaterHeader = spec.config.getCxxHeader(`views/J${stateUpdaterName}.hpp`, 'private')
   const updaterIncludes = getImportsCode([
     { language: 'c++', declaration: updaterHeader },
     { language: 'c++', declaration: componentHeader },
+    ...converterImports,
   ])
   const declarationIncludes = getImportsCode([
     {
@@ -61,7 +68,7 @@ public class ${manager}: SimpleViewManager<View>() {
    * Represents the View and its last state snapshot (mutable)
    */
   private class HybridViewHolder(
-    val hybridView: ${viewImplementation},
+    val hybridView: ${HybridTSpec},
     var lastState: StateWrapper? = null,
   )
 
@@ -77,7 +84,7 @@ public class ${manager}: SimpleViewManager<View>() {
   }
 
   override fun createViewInstance(reactContext: ThemedReactContext): View {
-    val hybridView = ${viewImplementation}(reactContext)
+    val hybridView = createView(reactContext)
     val view = hybridView.view
     view.setTag(associated_hybrid_view_tag, HybridViewHolder(hybridView))
     return view
@@ -91,9 +98,7 @@ public class ${manager}: SimpleViewManager<View>() {
     val newState = stateWrapper
 
     // 1. Update each prop individually
-    hybridView.beforeUpdate()
     ${stateUpdaterName}.updateViewProps(hybridView, newState, oldState)
-    hybridView.afterUpdate()
     holder.lastState = newState
 
     // 2. Continue in base View props
@@ -117,11 +122,9 @@ public class ${manager}: SimpleViewManager<View>() {
 
     @Suppress("USELESS_IS_CHECK")
     if (hybridView is RecyclableView) {
-      // Recycle in it's implementation
+      // Reset the implementation while retaining the associated view and holder.
       hybridView.prepareForRecycle()
-
-      // Maybe update the view if it changed
-      return hybridView.view
+      return preparedView
     } else {
       return null
     }
@@ -129,6 +132,13 @@ public class ${manager}: SimpleViewManager<View>() {
 
   private fun getHybridViewHolder(view: View): HybridViewHolder? {
     return view.getTag(associated_hybrid_view_tag) as? HybridViewHolder
+  }
+
+  companion object {
+    @JvmStatic
+    fun createView(reactContext: ThemedReactContext): ${HybridTSpec} {
+      return ${viewImplementation}(reactContext)
+    }
   }
 }
   `.trim()
@@ -174,8 +184,8 @@ ${declarationIncludes}
 
 namespace ${cxxNamespace} {
 
-using namespace margelo;
-using namespace facebook;
+namespace jni = facebook::jni;
+namespace react = facebook::react;
 
 class J${stateUpdaterName} final: public jni::JavaClass<J${stateUpdaterName}> {
 public:
@@ -207,14 +217,15 @@ public:
 } // namespace ${cxxNamespace}
   `.trim()
 
-  const propsUpdaterCalls = getHybridViewProperties(spec).map(({ property }) => {
+  const propsUpdaterCalls = viewProperties.map(({ property, config }) => {
     const name = escapeCppName(property.name)
     const setter = property.getSetterName('other')
+    const converter = getKotlinNativeConverter({ cppType: property.type, nativeConfig: config })
     return `
 if (oldProps == nullptr
       ? newProps->${name}.isProvided()
       : !newProps->${name}.hasSameValue(oldProps->${name})) {
-  hybridView->${setter}(newProps->${name}.get());
+  hybridView->${setter}(${converter}::toKotlin(newProps->${name}.get()));
 }
     `.trim()
   })
@@ -224,11 +235,12 @@ ${createFileMetadataString(`J${stateUpdaterName}.cpp`)}
 ${updaterIncludes}
 #include <NitroModules/NitroDefines.hpp>
 #include <react/fabric/StateWrapperImpl.h>
+#include <stdexcept>
 
 namespace ${cxxNamespace} {
 
-using namespace margelo;
-using namespace facebook;
+namespace jni = facebook::jni;
+namespace react = facebook::react;
 using ConcreteStateData = react::ConcreteState<${stateClassName}>;
 
 std::shared_ptr<const ${propsClassName}> J${stateUpdaterName}::getPropsFromStateWrapper(
@@ -268,18 +280,27 @@ void J${stateUpdaterName}::updateViewProps(jni::alias_ref<jni::JClass> /* class 
     throw std::runtime_error("Current StateWrapper doesn't contain any props!");
   }
 
-  // Update only props that differ from the previous State snapshot.
-  ${indent(propsUpdaterCalls.join('\n'), '  ')}
+  const bool hasTransactionPropChanges = oldProps == nullptr
+      ? newProps->hasAnyProvidedProps()
+      : !newProps->hasSameProps(*oldProps);
+  if (hasTransactionPropChanges) {
+    static const auto beforeUpdate = ${JHybridTSpec}::JavaPart::javaClassStatic()->getMethod<void()>("beforeUpdate");
+    static const auto afterUpdate = ${JHybridTSpec}::JavaPart::javaClassStatic()->getMethod<void()>("afterUpdate");
+    beforeUpdate(javaView);
 
-  // Update hybridRef if it changed
-  if (oldProps == nullptr
-        ? newProps->hybridRef.isProvided()
-        : !newProps->hybridRef.hasSameValue(oldProps->hybridRef)) {
-    // hybridRef changed - call it with new this
-    const auto& maybeFunc = newProps->hybridRef.get();
-    if (maybeFunc.has_value()) {
-      maybeFunc.value().callAsync(hybridView);
+    // Update only props that differ from the previous State snapshot.
+    ${indent(propsUpdaterCalls.join('\n'), '    ')}
+
+    if (oldProps == nullptr
+          ? newProps->hybridRef.isProvided()
+          : !newProps->hybridRef.hasSameValue(oldProps->hybridRef)) {
+      const auto& maybeFunc = newProps->hybridRef.get();
+      if (maybeFunc.has_value()) {
+        maybeFunc.value().callAndForget(hybridView);
+      }
     }
+
+    afterUpdate(javaView);
   }
 }
 
@@ -288,6 +309,8 @@ void J${stateUpdaterName}::updateViewProps(jni::alias_ref<jni::JClass> /* class 
 
   return [
     ...cppFiles,
+    ...propertyFiles,
+    ...converterFiles,
     {
       content: viewManagerCode,
       language: 'kotlin',
@@ -308,6 +331,7 @@ void J${stateUpdaterName}::updateViewProps(jni::alias_ref<jni::JClass> /* class 
       name: `views/J${stateUpdaterName}.hpp`,
       platform: 'android',
       subdirectory: [],
+      headerVisibility: 'private',
     },
     {
       content: updaterJniCppCode,

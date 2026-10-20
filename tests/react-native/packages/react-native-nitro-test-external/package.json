@@ -12,6 +12,7 @@
     "src",
     "lib",
     "ios",
+    "android",
     "nitrogen/generated",
     "react-native.config.js",
     "*.podspec",
