@@ -1,9 +1,10 @@
 import { expect } from 'chai'
-import { casesForTestObjects } from './utils/cases'
+import { casesForTestObjects, namedCases } from './utils/cases'
 
 import { NitroModules } from 'nitro-core'
-import { Base, Child, Grandchild, SizeUnit, TestObjectSwiftKotlin } from 'nitro-test'
+import { Base, Child, Grandchild, SizeUnit, TestObjectSwiftKotlin, type Size } from 'nitro-test'
 import { HybridChild } from './utils/testObjects'
+import { TEST_CAR } from './utils/fixtures'
 
 const CHILD_TO_STRING = 'HybridChild custom toString() :)'
 
@@ -30,6 +31,42 @@ function isSamePrototype(a: object | null, b: object | null): boolean {
 }
 
 export const cases = {
+  ...namedCases('Three-level Swift inheritance', {
+    'constructors and prototypes preserve every declared level': () => {
+      const grandchild = new Grandchild()
+      expect(Object.is(grandchild.constructor, Grandchild)).to.equal(true)
+      expect(Object.is(Object.getPrototypeOf(grandchild), Grandchild.prototype)).to.equal(true)
+      expect(Object.is(Object.getPrototypeOf(Grandchild.prototype), Child.prototype)).to.equal(true)
+      expect(Object.is(Object.getPrototypeOf(Child.prototype), Base.prototype)).to.equal(true)
+      expect(Object.is(Object.getPrototypeOf(Grandchild), Child)).to.equal(true)
+      expect(Object.is(Object.getPrototypeOf(Child), Base)).to.equal(true)
+    },
+
+    'borrowed ancestor getters dispatch to the Grandchild implementation': () => {
+      const grandchild = new Grandchild()
+      const getBaseValue = Object.getOwnPropertyDescriptor(Base.prototype, 'baseValue')?.get
+      const getChildValue = Object.getOwnPropertyDescriptor(Child.prototype, 'childValue')?.get
+      expect(getBaseValue).to.be.a('function')
+      expect(getChildValue).to.be.a('function')
+      expect(getBaseValue!.call(grandchild)).to.equal(20)
+      expect(getChildValue!.call(grandchild)).to.equal(30)
+    },
+
+    'borrowed ancestor methods accept Grandchild receivers': async () => {
+      const grandchild = new Grandchild()
+      const size: Size = { width: 20, height: 30, unit: SizeUnit.Points }
+      expect(Base.prototype.bounceSize.call(grandchild, size)).to.deep.equal(size)
+      expect(Child.prototype.bounceVariant.call(grandchild, TEST_CAR)).to.deep.equal(TEST_CAR)
+      let calls = 0
+      expect(
+        await Base.prototype.mapSize.call(grandchild, size, (value) => {
+          calls += 1
+          return value
+        })
+      ).to.deep.equal(size)
+      expect(calls).to.equal(1)
+    },
+  }),
   ...casesForTestObjects('Inheritance', {
     'createBase() returns a Base': (testObject) => {
       const base = testObject.createBase()

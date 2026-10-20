@@ -26,7 +26,7 @@ function getCxxPartName(type: HybridObjectType): string {
 
 /**
  * Returns all direct and indirect base types of the given {@linkcode type},
- * starting at the root. C++ constructs virtual bases in this order.
+ * starting at the root, including ancestors that declare Swift protocol conformances.
  */
 function getBaseTypesFromRoot(type: HybridObjectType): HybridObjectType[] {
   return type.baseTypes.flatMap((base) => [...getBaseTypesFromRoot(base), base])
@@ -61,10 +61,13 @@ export function createSwiftHybridObjectCxxBridge(spec: HybridObjectSpec<'swift'>
   }
   const cppBaseImports = getImportsCode(baseHybridObjects.map((base) => base.cppImport))
   let hybridClassBase: string
+  let hybridClassBaseConstructorCall: string
   if (baseHybridObject != null) {
     hybridClassBase = baseHybridObject.cppName
+    hybridClassBaseConstructorCall = `${hybridClassBase}(swiftPart)`
   } else {
     hybridClassBase = 'HybridObject'
+    hybridClassBaseConstructorCall = 'HybridObject()'
   }
   let swiftImplementationType: string
   let swiftImplementationAssignment: string
@@ -370,10 +373,6 @@ ${swiftClassDeclaration} ${hybridObjectNames.HybridTSpecCxx}${swiftSuperclass} {
   ${indent(swiftMethodImplementations.join('\n\n'), '  ')}
 }
 `.trim()
-  const cppBaseClasses = hasBase ? baseHybridObjects.map((base) => `public virtual ${base.cppName}`) : ['public virtual HybridObject']
-  // The most derived class initializes every virtual base, including indirect ones.
-  const cppVirtualBaseNames = getBaseTypesFromRoot(type).map(getCxxPartName)
-  const cppConstructorInitializers = [...cppVirtualBaseNames.map((name) => `${name}(swiftPart)`), '_swiftPart(swiftPart)']
   const cppClassDeclaration = `
 /**
  * The C++ part of ${hybridObjectNames.HybridTSpecCxx}.swift.
@@ -381,7 +380,7 @@ ${swiftClassDeclaration} ${hybridObjectNames.HybridTSpecCxx}${swiftSuperclass} {
  * ${hybridObjectNames.HybridTSpecSwift} accesses the concrete Swift wrapper and registers
  * its Swift signatures for JS. C++ callers use a separate adapter when needed.
  */
-class ${hybridObjectNames.HybridTSpecSwift}${cppFinality} : ${cppBaseClasses.join(', ')} {
+class ${hybridObjectNames.HybridTSpecSwift}${cppFinality} : public ${hybridClassBase} {
 public:
   struct Class {
     using Base = ${hybridClassBase}::Class;
@@ -392,7 +391,8 @@ public:
 public:
   // Constructor from a Swift instance
   explicit ${hybridObjectNames.HybridTSpecSwift}(const ::${swiftModuleName}::${hybridObjectNames.HybridTSpecCxx}& swiftPart):
-    ${indent(cppConstructorInitializers.join(',\n'), '    ')} { }
+    ${hybridClassBaseConstructorCall},
+    _swiftPart(swiftPart) { }
 
 public:
   // Get the Swift part

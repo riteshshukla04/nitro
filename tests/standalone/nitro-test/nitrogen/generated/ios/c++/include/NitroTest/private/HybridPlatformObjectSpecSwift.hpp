@@ -22,7 +22,7 @@ namespace margelo::nitro::test {
    * HybridPlatformObjectSpecSwift accesses the concrete Swift wrapper and registers
    * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridPlatformObjectSpecSwift final : public virtual HybridObject {
+  class HybridPlatformObjectSpecSwift final : public HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -33,6 +33,7 @@ namespace margelo::nitro::test {
   public:
     // Constructor from a Swift instance
     explicit HybridPlatformObjectSpecSwift(const ::NitroTest::HybridPlatformObjectSpec_cxx& swiftPart):
+      HybridObject(),
       _swiftPart(swiftPart) { }
 
   public:

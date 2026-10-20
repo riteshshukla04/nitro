@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { NitroModules } from 'nitro-core'
-import { Base, Child, CppBase, CppChild, CppGrandchild, SizeUnit, TestObjectCpp, type Size } from 'nitro-test'
+import { Base, Child, CppBase, CppChild, CppGrandchild, Grandchild, SizeUnit, TestObjectCpp, type Size } from 'nitro-test'
 import { SomeExternalObject } from 'nitro-test-external'
 import { namedCases } from './utils/cases'
 import { TEST_CAR } from './utils/fixtures'
@@ -25,6 +25,15 @@ export const cases = {
       expect(object.readBaseValue(new Base())).to.equal(10)
       expect(object.readBaseValue(new Child())).to.equal(20)
       expect(object.readChildBaseValue(new Child())).to.equal(20)
+    },
+
+    'ancestor adapters dispatch through three Swift inheritance levels': () => {
+      const object = new TestObjectCpp()
+      const grandchild = new Grandchild()
+      expect(object.readBaseValue(grandchild)).to.equal(20)
+      expect(object.readChildBaseValue(grandchild)).to.equal(20)
+      expect(object.bounceSizeThroughBase(grandchild, SIZE)).to.deep.equal(SIZE)
+      expect(object.bounceVariantThroughChild(grandchild, TEST_CAR)).to.deep.equal(TEST_CAR)
     },
 
     'multiple Swift implementations share the same class and prototype': () => {

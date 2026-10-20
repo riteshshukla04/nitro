@@ -22,7 +22,7 @@ namespace margelo::nitro::test {
    * HybridChildSpecSwift accesses the concrete Swift wrapper and registers
    * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridChildSpecSwift : public virtual HybridBaseSpecSwift {
+  class HybridChildSpecSwift : public HybridBaseSpecSwift {
   public:
     struct Class {
       using Base = HybridBaseSpecSwift::Class;

@@ -22,7 +22,7 @@ namespace margelo::nitro::test {
    * HybridRecyclableTestViewSpecSwift accesses the concrete Swift wrapper and registers
    * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridRecyclableTestViewSpecSwift final : public virtual HybridObject {
+  class HybridRecyclableTestViewSpecSwift final : public HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -33,6 +33,7 @@ namespace margelo::nitro::test {
   public:
     // Constructor from a Swift instance
     explicit HybridRecyclableTestViewSpecSwift(const ::NitroTest::HybridRecyclableTestViewSpec_cxx& swiftPart):
+      HybridObject(),
       _swiftPart(swiftPart) { }
 
   public:

@@ -22,7 +22,7 @@ namespace margelo::nitro::test {
    * HybridTestObjectSwiftKotlinSpecSwift accesses the concrete Swift wrapper and registers
    * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridTestObjectSwiftKotlinSpecSwift final : public virtual HybridObject {
+  class HybridTestObjectSwiftKotlinSpecSwift final : public HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -33,6 +33,7 @@ namespace margelo::nitro::test {
   public:
     // Constructor from a Swift instance
     explicit HybridTestObjectSwiftKotlinSpecSwift(const ::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx& swiftPart):
+      HybridObject(),
       _swiftPart(swiftPart) { }
 
   public:
