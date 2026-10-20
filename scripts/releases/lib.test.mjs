@@ -370,49 +370,54 @@ test('an older nightly publishes under a commit tag without moving nightly backw
   )
 })
 
-test('npm provenance overrides only source commit and ref, preserving workflow identity', async (t) => {
+test('fresh publications and checkpoint retries preserve GitHub provenance identity', async (t) => {
   const { manifest, directory } = releaseFixture(t)
-  const registry = registryFixture(manifest)
-  const environments = []
-  await publishPackages(manifest, directory, {
-    lookup: registry.lookup,
-    execute: (command, args, options) => {
-      environments.push(options.env)
-      registry.execute(command, args)
-    },
-  })
-  assert.deepEqual(
-    environments,
-    manifest.packages.map(() => ({
-      GITHUB_SHA: manifest.commit,
-      GITHUB_REF: `refs/tags/${manifest.tag}`,
-    }))
+  const keys = [
+    'GITHUB_SHA',
+    'GITHUB_REF',
+    'GITHUB_WORKFLOW_SHA',
+    'GITHUB_WORKFLOW_REF',
+  ]
+  const original = Object.fromEntries(
+    keys.map((key) => [key, process.env[key]])
   )
-  const original = process.env.GITHUB_WORKFLOW_REF
-  process.env.GITHUB_WORKFLOW_REF =
-    'margelo/nitro/.github/workflows/release.yml@refs/heads/main'
   try {
-    const environment = JSON.parse(
-      run(
-        process.execPath,
-        [
-          '-e',
-          'console.log(JSON.stringify({ sha: process.env.GITHUB_SHA, ref: process.env.GITHUB_REF, workflow: process.env.GITHUB_WORKFLOW_REF }))',
-        ],
-        {
-          capture: true,
-          env: environments[0],
-        }
-      )
-    )
-    assert.deepEqual(environment, {
-      sha: manifest.commit,
-      ref: `refs/tags/${manifest.tag}`,
-      workflow: process.env.GITHUB_WORKFLOW_REF,
-    })
+    // A fresh run starts at the source commit; recovery may run newer release
+    // tooling. Neither workflow's signed identity is the saved release tag.
+    for (const source of [manifest.sourceCommit, 'c'.repeat(40)]) {
+      const identity = {
+        GITHUB_SHA: source,
+        GITHUB_REF: 'refs/heads/main',
+        GITHUB_WORKFLOW_SHA: source,
+        GITHUB_WORKFLOW_REF:
+          'margelo/nitro/.github/workflows/release.yml@refs/heads/main',
+      }
+      Object.assign(process.env, identity)
+      const registry = registryFixture(manifest)
+      await publishPackages(manifest, directory, {
+        lookup: registry.lookup,
+        execute: (command, args, options) => {
+          const inherited = JSON.parse(
+            run(
+              process.execPath,
+              [
+                '-e',
+                `console.log(JSON.stringify(Object.fromEntries(${JSON.stringify(keys)}.map(key => [key, process.env[key]]))))`,
+              ],
+              { ...options, capture: true }
+            )
+          )
+          assert.deepEqual(inherited, identity)
+          registry.execute(command, args)
+        },
+      })
+      assert.deepEqual(registry.publishes, releasePackages)
+    }
   } finally {
-    if (original === undefined) delete process.env.GITHUB_WORKFLOW_REF
-    else process.env.GITHUB_WORKFLOW_REF = original
+    for (const [key, value] of Object.entries(original)) {
+      if (value === undefined) delete process.env[key]
+      else process.env[key] = value
+    }
   }
 })
 

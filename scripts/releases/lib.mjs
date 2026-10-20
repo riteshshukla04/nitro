@@ -438,27 +438,18 @@ export async function publishPackages(
       console.log(`Already published and verified: ${pkg.name}@${pkg.version}`)
       continue
     }
-    execute(
-      'npm',
-      [
-        'publish',
-        path.join(directory, pkg.filename),
-        '--tag',
-        existing[index].npmTag,
-        '--access',
-        'public',
-        '--provenance',
-        '--ignore-scripts',
-      ],
-      {
-        // npm uses these for provenance source material. Keep the workflow identity
-        // variables unchanged: the launcher ran on its original workflow revision.
-        env: {
-          GITHUB_SHA: manifest.commit,
-          GITHUB_REF: `refs/tags/${manifest.tag}`,
-        },
-      }
-    )
+    // npm's provenance must match GitHub's signed workflow identity. The saved
+    // release commit and tarball hashes are verified separately before publishing.
+    execute('npm', [
+      'publish',
+      path.join(directory, pkg.filename),
+      '--tag',
+      existing[index].npmTag,
+      '--access',
+      'public',
+      '--provenance',
+      '--ignore-scripts',
+    ])
     // A registry failure stops the release; a retry uses these same saved tarballs.
     await assertPublishedPackages({ packages: [pkg] }, { lookup })
   }
