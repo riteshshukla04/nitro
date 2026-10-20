@@ -67,9 +67,27 @@ export class HybridObjectType implements Type {
         return options.context === 'parameter' ? `const ${type}&` : type
       }
       case 'swift': {
+        const ios = this.platforms.ios
+        if (ios == null) {
+          throw new Error(`HybridObject "${this.hybridObjectName}" is not implemented on iOS and cannot be referenced from Swift.`)
+        }
+        if (ios.language !== 'swift') {
+          throw new Error(
+            `HybridObject "${this.hybridObjectName}" is implemented in ${ios.language} on iOS, but this reference requires Swift. Cross-language HybridObject references are currently supported only in C++ APIs.`
+          )
+        }
         return `(any ${name.HybridTSpec})`
       }
       case 'kotlin': {
+        const android = this.platforms.android
+        if (android == null) {
+          throw new Error(`HybridObject "${this.hybridObjectName}" is not implemented on Android and cannot be referenced from Kotlin.`)
+        }
+        if (android.language !== 'kotlin') {
+          throw new Error(
+            `HybridObject "${this.hybridObjectName}" is implemented in ${android.language} on Android, but this reference requires Kotlin. Cross-language HybridObject references are currently supported only in C++ APIs.`
+          )
+        }
         if (fullyQualified) {
           // full qualified name: "com.margelo.nitro.image.Image"
           return this.sourceConfig.getAndroidPackage('java/kotlin', name.HybridTSpec)

@@ -1,7 +1,8 @@
 import type { HybridObjectSpec } from './HybridObjectSpec.js'
+import { getReferencedTypes } from './getReferencedTypes.js'
 import type { Type } from './types/Type.js'
 
-// TODO: Structs or other HybridObjects may reference other types recursively - we need to add a `referencedTypes` prop to each `Type` to be able to resolve that.
+/** The types used directly by this spec's properties, methods and constructor. */
 export function getAllTypes(spec: HybridObjectSpec): Type[] {
   const types: Type[] = []
 
@@ -22,4 +23,9 @@ export function getAllTypes(spec: HybridObjectSpec): Type[] {
   }
 
   return types
+}
+
+/** This spec's API types and their nested value types. Base specs are handled separately. */
+export function getAllReferencedTypes(spec: HybridObjectSpec): Type[] {
+  return getAllTypes(spec).flatMap(getReferencedTypes)
 }

@@ -2,7 +2,6 @@ import type { Method } from '../Method.js'
 import type { StaticMethodOptions } from '../StaticMethod.js'
 import { Parameter } from '../Parameter.js'
 import type { SourceImport } from '../SourceFile.js'
-import { addKnownType } from '../createType.js'
 import { indent } from '../../utils.js'
 import { getSwiftConverter } from './SwiftConverter.js'
 import { getSwiftImports } from './getSwiftImports.js'
@@ -85,9 +84,6 @@ export function prepareSwiftMethod(nativeMethod: Method, isThrowing: boolean): S
     exportedReturnType = returnType
   }
   const resultType = getSwiftResultType(exportedReturnType)
-  if (isThrowing) {
-    addKnownType(`swift-result:${resultType.getCode('c++', { context: 'value' })}`, resultType, 'swift')
-  }
   return {
     nativeMethod: nativeMethod,
     returnType: returnType,

@@ -5,13 +5,13 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroTest/private/HybridBaseSpecSwift.hpp>
 
 #include <NitroTest/private/SizeUnit-Swift.hpp>
 #include <NitroTest/private/Size-Swift.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/SwiftResult.hpp>
-#include <NitroTest/private/HybridBaseSpecSwift.hpp>
 #include <NitroTest/private/HybridChildSpecSwift.hpp>
 #include <memory>
 #include <NitroTest/HybridChildSpec.hpp>
@@ -20,26 +20,36 @@
 #include <NitroTest/private/HybridGrandchildSpecSwift.hpp>
 #include <NitroTest/HybridGrandchildSpec.hpp>
 #include <NitroTest/private/HybridPlatformObjectSpecSwift.hpp>
+#include <NitroTest/private/HybridTestObjectSwiftKotlinSpecSwift.hpp>
 #include <NitroTest/private/Powertrain-Swift.hpp>
 #include <NitroModules/JSIConverter+SwiftArray.hpp>
 #include <NitroTest/private/SwiftContainer_swift__Array_NitroTest__Powertrain_-Swift.hpp>
+#include <NitroModules/JSIConverter+SwiftOptional.hpp>
 #include <NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/JSIConverter+SwiftString.hpp>
 #include <NitroTest/private/Person-Swift.hpp>
-#include <NitroModules/JSIConverter+SwiftOptional.hpp>
-#include <NitroTest/private/SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___-Swift.hpp>
 #include <NitroTest/private/Variant_Double_String-Swift.hpp>
 #include <NitroTest/private/Car-Swift.hpp>
+#include <NitroTestExternalAppleCxx/NitroTestExternalAppleCxx.h>
+#include <NitroTest/HybridTestObjectSwiftKotlinSpec.hpp>
+#include <NitroTest/private/HybridTestObjectSwiftKotlinSpec_cxx-Swift.hpp>
+#include <NitroTest/private/SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___-Swift.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <exception>
-#include <NitroTestExternalAppleCxx/NitroTestExternalAppleCxx.h>
 #include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
-#include <NitroTest/private/HybridTestObjectSwiftKotlinSpecSwift.hpp>
-#include <NitroTest/HybridTestObjectSwiftKotlinSpec.hpp>
-#include <NitroTest/private/HybridTestObjectSwiftKotlinSpec_cxx-Swift.hpp>
 
 namespace margelo::nitro::test::swift_bridge {
+  std__shared_ptr_HybridBaseSpec_ create_std__shared_ptr_HybridBaseSpec_(void* NON_NULL pointer) {
+    return std::make_shared<margelo::nitro::test::HybridBaseSpecSwift>(NitroTest::HybridBaseSpec_cxx::fromUnsafe(pointer));
+  }
+
+  void* NON_NULL get_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value) {
+    auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::HybridBaseSpecSwift>(value);
+    if (!wrapper) throw std::runtime_error("HybridBaseSpec is not implemented in Swift");
+    return wrapper->getSwiftPart().toUnsafe();
+  }
+
   Promise_NitroTest__Size create_Promise_NitroTest__Size() { return Promise_NitroTest__Size::pending(); }
 
   void reject_Promise_NitroTest__Size(const Promise_NitroTest__Size& promise, std::exception_ptr error) { promise.reject(std::move(error)); }
@@ -89,16 +99,6 @@ namespace margelo::nitro::test::swift_bridge {
     });
   }
 
-  std__shared_ptr_HybridBaseSpec_ create_std__shared_ptr_HybridBaseSpec_(void* NON_NULL pointer) {
-    return std::make_shared<margelo::nitro::test::HybridBaseSpecSwift>(NitroTest::HybridBaseSpec_cxx::fromUnsafe(pointer));
-  }
-
-  void* NON_NULL get_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value) {
-    auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::HybridBaseSpecSwift>(value);
-    if (!wrapper) throw std::runtime_error("HybridBaseSpec is not implemented in Swift");
-    return wrapper->getSwiftPart().toUnsafe();
-  }
-
   std__shared_ptr_HybridChildSpec_ create_std__shared_ptr_HybridChildSpec_(void* NON_NULL pointer) {
     return std::make_shared<margelo::nitro::test::HybridChildSpecSwift>(NitroTest::HybridChildSpec_cxx::fromUnsafe(pointer));
   }
@@ -133,6 +133,16 @@ namespace margelo::nitro::test::swift_bridge {
     return wrapper->getSwiftPart().toUnsafe();
   }
 
+  std__shared_ptr_HybridTestObjectSwiftKotlinSpec_ create_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(void* NON_NULL pointer) {
+    return std::make_shared<margelo::nitro::test::HybridTestObjectSwiftKotlinSpecSwift>(NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::fromUnsafe(pointer));
+  }
+
+  void* NON_NULL get_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(const std__shared_ptr_HybridTestObjectSwiftKotlinSpec_& value) {
+    auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::HybridTestObjectSwiftKotlinSpecSwift>(value);
+    if (!wrapper) throw std::runtime_error("HybridTestObjectSwiftKotlinSpec is not implemented in Swift");
+    return wrapper->getSwiftPart().toUnsafe();
+  }
+
   Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void_double(const Callback_void_double& callback, double param0) noexcept {
     try {
       callback.callSync(param0);
@@ -145,34 +155,6 @@ namespace margelo::nitro::test::swift_bridge {
   Callback_void_double create_Callback_void_double(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(double param0)> closure) {
     return Callback_void_double::make([closure = std::move(closure)](double param0) -> void {
       auto __result = closure(param0);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-    });
-  }
-
-  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0) noexcept {
-    try {
-      callback.callSync(NitroModules::copySwiftValue<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>(param0));
-      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withValue();
-    } catch (...) {
-      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
-    }
-  }
-
-  Promise<void> callAsync_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0) {
-    return callback.callAsync(NitroModules::copySwiftValue<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>(param0));
-  }
-
-  void callAndForget_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0) {
-    callback.callAndForget(NitroModules::copySwiftValue<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>(param0));
-  }
-
-  Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_ create_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0)> closure) {
-    return Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_::make([closure = std::move(closure)](const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_& param0) -> void {
-      auto __result = borrowSwiftValue(param0, [&](const void* param0) {
-        return closure(param0);
-      });
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }
@@ -225,6 +207,150 @@ namespace margelo::nitro::test::swift_bridge {
         std::rethrow_exception(__result.error());
       }
       return std::move(__result.value());
+    });
+  }
+
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void(const Callback_void& callback) noexcept {
+    try {
+      callback.callSync();
+      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withValue();
+    } catch (...) {
+      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
+    }
+  }
+
+  Callback_void create_Callback_void(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>()> closure) {
+    return Callback_void::make([closure = std::move(closure)]() -> void {
+      auto __result = closure();
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+    });
+  }
+
+  Promise_swift__Optional_double_ create_Promise_swift__Optional_double_() { return Promise_swift__Optional_double_::pending(); }
+
+  void reject_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, std::exception_ptr error) { promise.reject(std::move(error)); }
+
+  void listenRejected_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, std::function<void(const std::exception_ptr&)> listener) { promise.addOnRejectedListener(std::move(listener)); }
+
+  void resolve_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, const void* NON_NULL value) {
+    promise.resolve(NitroModules::copySwiftValue<swift::Optional<double>>(value));
+  }
+
+  void listen_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, std::function<void(const void* NON_NULL)> listener) {
+    promise.addOnResolvedListener([listener = std::move(listener)](const swift::Optional<double>& value) {
+      NitroModules::withSwiftValue(value, [&](const void* pointer) {
+        listener(pointer);
+      });
+    });
+  }
+
+  Promise_NitroTest__Car create_Promise_NitroTest__Car() { return Promise_NitroTest__Car::pending(); }
+
+  void reject_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::exception_ptr error) { promise.reject(std::move(error)); }
+
+  void listenRejected_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::function<void(const std::exception_ptr&)> listener) { promise.addOnRejectedListener(std::move(listener)); }
+
+  void resolve_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, const void* NON_NULL value) {
+    promise.resolve(NitroModules::copySwiftValue<NitroTest::Car>(value));
+  }
+
+  void listen_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::function<void(const void* NON_NULL)> listener) {
+    promise.addOnResolvedListener([listener = std::move(listener)](const NitroTest::Car& value) {
+      NitroModules::withSwiftValue(value, [&](const void* pointer) {
+        listener(pointer);
+      });
+    });
+  }
+
+  Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double(const Callback_double& callback) noexcept {
+    try {
+      return Result<double, margelo::nitro::test::swift_bridge::ResultTag>::withValue(callback.callSync());
+    } catch (...) {
+      return Result<double, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
+    }
+  }
+
+  Callback_double create_Callback_double(std::function<Result<double, margelo::nitro::test::swift_bridge::ResultTag>()> closure) {
+    return Callback_double::make([closure = std::move(closure)]() -> double {
+      auto __result = closure();
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      return std::move(__result.value());
+    });
+  }
+
+  Result<int64_t, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_int64_t_int64_t(const Callback_int64_t_int64_t& callback, int64_t param0) noexcept {
+    try {
+      return Result<int64_t, margelo::nitro::test::swift_bridge::ResultTag>::withValue(callback.callSync(param0));
+    } catch (...) {
+      return Result<int64_t, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
+    }
+  }
+
+  Callback_int64_t_int64_t create_Callback_int64_t_int64_t(std::function<Result<int64_t, margelo::nitro::test::swift_bridge::ResultTag>(int64_t param0)> closure) {
+    return Callback_int64_t_int64_t::make([closure = std::move(closure)](int64_t param0) -> int64_t {
+      auto __result = closure(param0);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      return std::move(__result.value());
+    });
+  }
+
+  std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ create_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(void* NON_NULL pointer) {
+    return margelo::nitro::test::external::swift_bridge::create_std__shared_ptr_HybridSomeExternalObjectSpec_(pointer);
+  }
+
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(const std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_& value) {
+    return margelo::nitro::test::external::swift_bridge::get_std__shared_ptr_HybridSomeExternalObjectSpec_(value);
+  }
+
+  Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx create_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx() { return Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx::pending(); }
+
+  void reject_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::exception_ptr error) { promise.reject(std::move(error)); }
+
+  void listenRejected_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::function<void(const std::exception_ptr&)> listener) { promise.addOnRejectedListener(std::move(listener)); }
+
+  void resolve_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, const void* NON_NULL value) {
+    promise.resolve(NitroModules::copySwiftValue<NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>(value));
+  }
+
+  void listen_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::function<void(const void* NON_NULL)> listener) {
+    promise.addOnResolvedListener([listener = std::move(listener)](const NitroTest::HybridTestObjectSwiftKotlinSpec_cxx& value) {
+      NitroModules::withSwiftValue(value, [&](const void* pointer) {
+        listener(pointer);
+      });
+    });
+  }
+
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0) noexcept {
+    try {
+      callback.callSync(NitroModules::copySwiftValue<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>(param0));
+      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withValue();
+    } catch (...) {
+      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
+    }
+  }
+
+  Promise<void> callAsync_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0) {
+    return callback.callAsync(NitroModules::copySwiftValue<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>(param0));
+  }
+
+  void callAndForget_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0) {
+    callback.callAndForget(NitroModules::copySwiftValue<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>(param0));
+  }
+
+  Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_ create_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0)> closure) {
+    return Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_::make([closure = std::move(closure)](const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_& param0) -> void {
+      auto __result = borrowSwiftValue(param0, [&](const void* param0) {
+        return closure(param0);
+      });
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
     });
   }
 
@@ -300,60 +426,6 @@ namespace margelo::nitro::test::swift_bridge {
         std::rethrow_exception(__result.error());
       }
       return std::move(__result.value());
-    });
-  }
-
-  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void(const Callback_void& callback) noexcept {
-    try {
-      callback.callSync();
-      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withValue();
-    } catch (...) {
-      return Result<void, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
-    }
-  }
-
-  Callback_void create_Callback_void(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>()> closure) {
-    return Callback_void::make([closure = std::move(closure)]() -> void {
-      auto __result = closure();
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-    });
-  }
-
-  Promise_swift__Optional_double_ create_Promise_swift__Optional_double_() { return Promise_swift__Optional_double_::pending(); }
-
-  void reject_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, std::exception_ptr error) { promise.reject(std::move(error)); }
-
-  void listenRejected_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, std::function<void(const std::exception_ptr&)> listener) { promise.addOnRejectedListener(std::move(listener)); }
-
-  void resolve_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, const void* NON_NULL value) {
-    promise.resolve(NitroModules::copySwiftValue<swift::Optional<double>>(value));
-  }
-
-  void listen_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, std::function<void(const void* NON_NULL)> listener) {
-    promise.addOnResolvedListener([listener = std::move(listener)](const swift::Optional<double>& value) {
-      NitroModules::withSwiftValue(value, [&](const void* pointer) {
-        listener(pointer);
-      });
-    });
-  }
-
-  Promise_NitroTest__Car create_Promise_NitroTest__Car() { return Promise_NitroTest__Car::pending(); }
-
-  void reject_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::exception_ptr error) { promise.reject(std::move(error)); }
-
-  void listenRejected_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::function<void(const std::exception_ptr&)> listener) { promise.addOnRejectedListener(std::move(listener)); }
-
-  void resolve_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, const void* NON_NULL value) {
-    promise.resolve(NitroModules::copySwiftValue<NitroTest::Car>(value));
-  }
-
-  void listen_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::function<void(const void* NON_NULL)> listener) {
-    promise.addOnResolvedListener([listener = std::move(listener)](const NitroTest::Car& value) {
-      NitroModules::withSwiftValue(value, [&](const void* pointer) {
-        listener(pointer);
-      });
     });
   }
 
@@ -443,24 +515,6 @@ namespace margelo::nitro::test::swift_bridge {
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }
-    });
-  }
-
-  Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double(const Callback_double& callback) noexcept {
-    try {
-      return Result<double, margelo::nitro::test::swift_bridge::ResultTag>::withValue(callback.callSync());
-    } catch (...) {
-      return Result<double, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
-    }
-  }
-
-  Callback_double create_Callback_double(std::function<Result<double, margelo::nitro::test::swift_bridge::ResultTag>()> closure) {
-    return Callback_double::make([closure = std::move(closure)]() -> double {
-      auto __result = closure();
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      return std::move(__result.value());
     });
   }
 
@@ -609,32 +663,6 @@ namespace margelo::nitro::test::swift_bridge {
     });
   }
 
-  Result<int64_t, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_int64_t_int64_t(const Callback_int64_t_int64_t& callback, int64_t param0) noexcept {
-    try {
-      return Result<int64_t, margelo::nitro::test::swift_bridge::ResultTag>::withValue(callback.callSync(param0));
-    } catch (...) {
-      return Result<int64_t, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
-    }
-  }
-
-  Callback_int64_t_int64_t create_Callback_int64_t_int64_t(std::function<Result<int64_t, margelo::nitro::test::swift_bridge::ResultTag>(int64_t param0)> closure) {
-    return Callback_int64_t_int64_t::make([closure = std::move(closure)](int64_t param0) -> int64_t {
-      auto __result = closure(param0);
-      if (__result.hasError()) [[unlikely]] {
-        std::rethrow_exception(__result.error());
-      }
-      return std::move(__result.value());
-    });
-  }
-
-  std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ create_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(void* NON_NULL pointer) {
-    return margelo::nitro::test::external::swift_bridge::create_std__shared_ptr_HybridSomeExternalObjectSpec_(pointer);
-  }
-
-  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(const std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_& value) {
-    return margelo::nitro::test::external::swift_bridge::get_std__shared_ptr_HybridSomeExternalObjectSpec_(value);
-  }
-
   Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx create_Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx() { return Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx::pending(); }
 
   void reject_Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx& promise, std::exception_ptr error) { promise.reject(std::move(error)); }
@@ -679,34 +707,6 @@ namespace margelo::nitro::test::swift_bridge {
         std::rethrow_exception(__result.error());
       }
       return std::move(__result.value());
-    });
-  }
-
-  std__shared_ptr_HybridTestObjectSwiftKotlinSpec_ create_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(void* NON_NULL pointer) {
-    return std::make_shared<margelo::nitro::test::HybridTestObjectSwiftKotlinSpecSwift>(NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::fromUnsafe(pointer));
-  }
-
-  void* NON_NULL get_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(const std__shared_ptr_HybridTestObjectSwiftKotlinSpec_& value) {
-    auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::HybridTestObjectSwiftKotlinSpecSwift>(value);
-    if (!wrapper) throw std::runtime_error("HybridTestObjectSwiftKotlinSpec is not implemented in Swift");
-    return wrapper->getSwiftPart().toUnsafe();
-  }
-
-  Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx create_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx() { return Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx::pending(); }
-
-  void reject_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::exception_ptr error) { promise.reject(std::move(error)); }
-
-  void listenRejected_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::function<void(const std::exception_ptr&)> listener) { promise.addOnRejectedListener(std::move(listener)); }
-
-  void resolve_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, const void* NON_NULL value) {
-    promise.resolve(NitroModules::copySwiftValue<NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>(value));
-  }
-
-  void listen_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::function<void(const void* NON_NULL)> listener) {
-    promise.addOnResolvedListener([listener = std::move(listener)](const NitroTest::HybridTestObjectSwiftKotlinSpec_cxx& value) {
-      NitroModules::withSwiftValue(value, [&](const void* pointer) {
-        listener(pointer);
-      });
     });
   }
 } // namespace margelo::nitro::test::swift_bridge

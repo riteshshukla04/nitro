@@ -5,16 +5,26 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 #include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
+#include <NitroTestExternal/private/HybridBaseSpecSwift.hpp>
 
 #include <NitroTestExternal/private/SizeUnit-Swift.hpp>
 #include <NitroTestExternal/private/Size-Swift.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/SwiftResult.hpp>
-#include <NitroTestExternal/private/HybridBaseSpecSwift.hpp>
 #include <NitroTestExternal/private/HybridSomeExternalObjectSpecSwift.hpp>
 
 namespace margelo::nitro::test::external::swift_bridge {
+  std__shared_ptr_HybridBaseSpec_ create_std__shared_ptr_HybridBaseSpec_(void* NON_NULL pointer) {
+    return std::make_shared<margelo::nitro::test::external::HybridBaseSpecSwift>(NitroTestExternal::HybridBaseSpec_cxx::fromUnsafe(pointer));
+  }
+
+  void* NON_NULL get_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value) {
+    auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::external::HybridBaseSpecSwift>(value);
+    if (!wrapper) throw std::runtime_error("HybridBaseSpec is not implemented in Swift");
+    return wrapper->getSwiftPart().toUnsafe();
+  }
+
   Promise_NitroTestExternal__Size create_Promise_NitroTestExternal__Size() { return Promise_NitroTestExternal__Size::pending(); }
 
   void reject_Promise_NitroTestExternal__Size(const Promise_NitroTestExternal__Size& promise, std::exception_ptr error) { promise.reject(std::move(error)); }
@@ -62,16 +72,6 @@ namespace margelo::nitro::test::external::swift_bridge {
       }
       return std::move(__result.value());
     });
-  }
-
-  std__shared_ptr_HybridBaseSpec_ create_std__shared_ptr_HybridBaseSpec_(void* NON_NULL pointer) {
-    return std::make_shared<margelo::nitro::test::external::HybridBaseSpecSwift>(NitroTestExternal::HybridBaseSpec_cxx::fromUnsafe(pointer));
-  }
-
-  void* NON_NULL get_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value) {
-    auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::external::HybridBaseSpecSwift>(value);
-    if (!wrapper) throw std::runtime_error("HybridBaseSpec is not implemented in Swift");
-    return wrapper->getSwiftPart().toUnsafe();
   }
 
   std__shared_ptr_HybridSomeExternalObjectSpec_ create_std__shared_ptr_HybridSomeExternalObjectSpec_(void* NON_NULL pointer) {

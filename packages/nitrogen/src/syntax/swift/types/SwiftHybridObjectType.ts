@@ -121,6 +121,16 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
   }
 
   override getCode(language: Language, options: GetCodeOptions): string {
+    const ios = this.platforms.ios
+    if (ios == null) {
+      throw new Error(`HybridObject "${this.hybridObjectName}" is not implemented on iOS and cannot be referenced from Swift.`)
+    }
+    if (ios.language !== 'swift') {
+      throw new Error(
+        `HybridObject "${this.hybridObjectName}" is implemented in ${ios.language} on iOS, but this reference requires Swift. Cross-language HybridObject references are currently supported only in C++ APIs.`
+      )
+    }
+
     switch (language) {
       case 'c++': {
         const type = `${this.moduleName}::${this.name}`

@@ -29,6 +29,16 @@ export class KotlinHybridObjectType extends HybridObjectType implements KotlinTy
   }
 
   override getCode(language: Language, options: GetCodeOptions): string {
+    const android = this.platforms.android
+    if (android == null) {
+      throw new Error(`HybridObject "${this.hybridObjectName}" is not implemented on Android and cannot be referenced from Kotlin.`)
+    }
+    if (android.language !== 'kotlin') {
+      throw new Error(
+        `HybridObject "${this.hybridObjectName}" is implemented in ${android.language} on Android, but this reference requires Kotlin. Cross-language HybridObject references are currently supported only in C++ APIs.`
+      )
+    }
+
     switch (language) {
       case 'c++':
         return getJniReferenceCode(`${this.jniName}::JavaPart`, options.context)

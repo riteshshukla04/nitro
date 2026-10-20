@@ -7,6 +7,8 @@
 
 #pragma once
 
+// Forward declaration of `HybridBenchmarkObjectSwiftKotlinSpec_cxx` to properly resolve imports.
+namespace NitroTest { class HybridBenchmarkObjectSwiftKotlinSpec_cxx; }
 namespace swift { class String; }
 #ifndef SWIFT_SWIFT_H
 namespace swift { template <class T> class Array; }
@@ -24,20 +26,18 @@ namespace NitroTest { class Variant_Double_String_cxx; }
 namespace NitroTest { class Car; }
 // Forward declaration of `Record_swift__String_double` to properly resolve imports.
 namespace NitroTest { class Record_swift__String_double; }
+#include <NitroModules/ArrayBuffer.hpp>
+#include <NitroModules/Promise.hpp>
 // Forward declaration of `Variant_Bool__Double___String__Double_String_cxx` to properly resolve imports.
 namespace NitroTest { class Variant_Bool__Double___String__Double_String_cxx; }
-#include <NitroModules/ArrayBuffer.hpp>
 #include <NitroModules/Callback.hpp>
-#include <NitroModules/Promise.hpp>
-// Forward declaration of `HybridBenchmarkObjectSwiftKotlinSpec_cxx` to properly resolve imports.
-namespace NitroTest { class HybridBenchmarkObjectSwiftKotlinSpec_cxx; }
 #include <NitroModules/Result.hpp>
 // Forward declaration of `HybridRecyclableTestViewSpec_cxx` to properly resolve imports.
 namespace NitroTest { class HybridRecyclableTestViewSpec_cxx; }
-// Forward declaration of `ColorScheme` to properly resolve imports.
-namespace NitroTest { class ColorScheme; }
 // Forward declaration of `HybridTestViewSpec_cxx` to properly resolve imports.
 namespace NitroTest { class HybridTestViewSpec_cxx; }
+// Forward declaration of `ColorScheme` to properly resolve imports.
+namespace NitroTest { class ColorScheme; }
 #include <memory>
 // Forward declaration of `HybridBenchmarkObjectSwiftKotlinSpec` to properly resolve imports.
 namespace margelo::nitro::test { class HybridBenchmarkObjectSwiftKotlinSpec; }
@@ -48,6 +48,11 @@ namespace margelo::nitro::test { class HybridRecyclableTestViewSpec; }
 namespace margelo::nitro::test { class HybridTestViewSpec; }
 
 namespace margelo::nitro::test::swift_bridge {
+  using std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_ = std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec>;
+  using std__weak_ptr_HybridBenchmarkObjectSwiftKotlinSpec_ = std::weak_ptr<HybridBenchmarkObjectSwiftKotlinSpec>;
+  inline std__weak_ptr_HybridBenchmarkObjectSwiftKotlinSpec_ weakify_std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_(const std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_& value) { return value; }
+  std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_ create_std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_(const std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_& value);
   using Promise_double = Promise<double>;
   // Distinct specializations prevent duplicate Swift metadata across module headers.
   struct ResultTag {};
@@ -55,11 +60,6 @@ namespace margelo::nitro::test::swift_bridge {
   using Callback_double = Callback<double()>;
   Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double(const Callback_double& callback) noexcept;
   Callback_double create_Callback_double(std::function<Result<double, margelo::nitro::test::swift_bridge::ResultTag>()> closure);
-  using std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_ = std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec>;
-  using std__weak_ptr_HybridBenchmarkObjectSwiftKotlinSpec_ = std::weak_ptr<HybridBenchmarkObjectSwiftKotlinSpec>;
-  inline std__weak_ptr_HybridBenchmarkObjectSwiftKotlinSpec_ weakify_std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_(const std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_& value) { return value; }
-  std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_ create_std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_(void* NON_NULL pointer);
-  void* NON_NULL get_std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_(const std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_& value);
   using Result_void = Result<void, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_ArrayBuffer = Result<ArrayBuffer, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_Promise_double_ = Result<Promise<double>, margelo::nitro::test::swift_bridge::ResultTag>;
@@ -69,14 +69,14 @@ namespace margelo::nitro::test::swift_bridge {
   inline std__weak_ptr_HybridRecyclableTestViewSpec_ weakify_std__shared_ptr_HybridRecyclableTestViewSpec_(const std__shared_ptr_HybridRecyclableTestViewSpec_& value) { return value; }
   std__shared_ptr_HybridRecyclableTestViewSpec_ create_std__shared_ptr_HybridRecyclableTestViewSpec_(void* NON_NULL pointer);
   void* NON_NULL get_std__shared_ptr_HybridRecyclableTestViewSpec_(const std__shared_ptr_HybridRecyclableTestViewSpec_& value);
-  using Promise_void = Promise<void>;
-  using Callback_void = Callback<void()>;
-  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void(const Callback_void& callback) noexcept;
-  Callback_void create_Callback_void(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>()> closure);
   using std__shared_ptr_HybridTestViewSpec_ = std::shared_ptr<HybridTestViewSpec>;
   using std__weak_ptr_HybridTestViewSpec_ = std::weak_ptr<HybridTestViewSpec>;
   inline std__weak_ptr_HybridTestViewSpec_ weakify_std__shared_ptr_HybridTestViewSpec_(const std__shared_ptr_HybridTestViewSpec_& value) { return value; }
   std__shared_ptr_HybridTestViewSpec_ create_std__shared_ptr_HybridTestViewSpec_(void* NON_NULL pointer);
   void* NON_NULL get_std__shared_ptr_HybridTestViewSpec_(const std__shared_ptr_HybridTestViewSpec_& value);
+  using Promise_void = Promise<void>;
+  using Callback_void = Callback<void()>;
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void(const Callback_void& callback) noexcept;
+  Callback_void create_Callback_void(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>()> closure);
   using Result_bool = Result<bool, margelo::nitro::test::swift_bridge::ResultTag>;
 } // namespace margelo::nitro::test::swift_bridge

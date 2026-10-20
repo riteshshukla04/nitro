@@ -1,4 +1,4 @@
-import { Node, ts, Type as TSMorphType, type Signature } from 'ts-morph'
+import { Node, ts, Type as TSMorphType, type Project, type Signature } from 'ts-morph'
 import type { Type } from './types/Type.js'
 import { BooleanType } from './types/BooleanType.js'
 import { NumberType } from './types/NumberType.js'
@@ -154,44 +154,35 @@ export function createVoidType(): Type {
   return new VoidType()
 }
 
-// Caches complex types (types that have a symbol)
-type TypeId = string
-const knownTypes: Record<Language, Map<TypeId, Type>> = {
-  'c++': new Map<TypeId, Type>(),
-  'swift': new Map<TypeId, Type>(),
-  'kotlin': new Map<TypeId, Type>(),
-}
+// Parsed types belong to the TypeScript project that resolved their declarations.
+// Releasing the project also releases its cache, without resetting global state.
+type TypeCache = Record<Language, Map<string, Type>>
+const projectTypeCaches = new WeakMap<Project, TypeCache>()
 
-/**
- * Get a list of all currently known complex types.
- */
-export function getAllKnownTypes(language?: Language): Type[] {
-  if (language != null) {
-    // Get types for the given language
-    return Array.from(knownTypes[language].values())
-  } else {
-    // Get types for all languages alltogether
-    const allMaps = Object.values(knownTypes)
-    return allMaps.flatMap((m) => Array.from(m.values()))
+function getTypeCache(type: TSMorphType, language: Language): Map<string, Type> | undefined {
+  const symbol = type.getSymbol() ?? type.getAliasSymbol()
+  const project = symbol?.getDeclarations()[0]?.getProject()
+  if (project == null) return undefined
+
+  let cache = projectTypeCaches.get(project)
+  if (cache == null) {
+    cache = {
+      'c++': new Map(),
+      'swift': new Map(),
+      'kotlin': new Map(),
+    }
+    projectTypeCaches.set(project, cache)
   }
+  return cache[language]
 }
 
 function getTypeId(type: TSMorphType, isOptional: boolean): string {
-  const symbol = type.getSymbol()
-  let key = type.getText()
-  if (symbol != null) {
-    key += '_' + symbol.getFullyQualifiedName()
-  }
+  const config = getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
+  const symbol = type.getSymbol() ?? type.getAliasSymbol()
+  let key = `${config.getCxxNamespace('c++')}:${type.getText()}`
+  if (symbol != null) key += '_' + symbol.getFullyQualifiedName()
   if (isOptional) key += '?'
   return key
-}
-
-export function addKnownType(key: string, type: Type, language: Language): void {
-  if (knownTypes[language].has(key)) {
-    // type is already known
-    return
-  }
-  knownTypes[language].set(key, type)
 }
 
 /**
@@ -209,9 +200,10 @@ export function createType(
     const typeName = type.getText(undefined, ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope)
     throw new Error(`Inline callbacks (${typeName}) can only be the type of a required method, static method or constructor parameter!`)
   }
+  const cache = getTypeCache(type, language)
   const key = getTypeId(type, isOptional)
-  if (key != null && knownTypes[language].has(key)) {
-    const known = knownTypes[language].get(key)!
+  const known = cache?.get(key)
+  if (known != null) {
     if (isOptional === known instanceof OptionalType) {
       return known
     }
@@ -404,8 +396,6 @@ export function createType(
   }
 
   const result = get()
-  if (key != null) {
-    knownTypes[language].set(key, result)
-  }
+  cache?.set(key, result)
   return result
 }
