@@ -145,8 +145,21 @@ func addFixtureTargets(
   let exposedFlags = exposedModules.flatMap {
     ["-Xfrontend", "-clang-header-expose-module", "-Xfrontend", "\($0)=\($0)-Swift.h"]
   }
-  let userHeaderFlags = userCxxSources.map {
-    "-I" + URL(fileURLWithPath: Context.packageDirectory).appendingPathComponent($0).path
+  func userHeaderSearchPaths(relativeTo targetPath: String) -> [CXXSetting] {
+    let packageDirectory = URL(fileURLWithPath: Context.packageDirectory)
+    let targetComponents = packageDirectory.appendingPathComponent(targetPath).standardizedFileURL.pathComponents
+    return userCxxSources.map { source in
+      let sourceURL = packageDirectory.appendingPathComponent(source)
+      var isDirectory: ObjCBool = false
+      FileManager.default.fileExists(atPath: sourceURL.path, isDirectory: &isDirectory)
+      let directory = isDirectory.boolValue ? sourceURL : sourceURL.deletingLastPathComponent()
+      let headerComponents = directory.standardizedFileURL.pathComponents
+      let commonCount = zip(targetComponents, headerComponents).prefix { $0.0 == $0.1 }.count
+      let relativeComponents =
+        Array(repeating: "..", count: targetComponents.count - commonCount)
+        + headerComponents.dropFirst(commonCount)
+      return .headerSearchPath(relativeComponents.isEmpty ? "." : relativeComponents.joined(separator: "/"))
+    }
   }
   let bridgeSources = [
     "c++", "\(name)-Swift-Cxx-Bridge.cpp", "\(name)Autolinking.cpp",
@@ -160,7 +173,7 @@ func addFixtureTargets(
       exclude: excludes(keeping: cxxSources),
       sources: cxxSources,
       publicHeadersPath: "\(generated)/shared/c++/include",
-      cxxSettings: cxxSettings + [.unsafeFlags(userHeaderFlags)]
+      cxxSettings: cxxSettings + userHeaderSearchPaths(relativeTo: ".")
     ),
     .target(
       name: "\(name)AppleCxx",
@@ -183,9 +196,7 @@ func addFixtureTargets(
       path: ios,
       sources: bridgeSources,
       publicHeadersPath: "c++/include",
-      cxxSettings: cxxSettings + bridgeSettings + [
-        .unsafeFlags(userHeaderFlags)
-      ]
+      cxxSettings: cxxSettings + bridgeSettings + userHeaderSearchPaths(relativeTo: ios)
     ),
   ]
 }

@@ -116,16 +116,28 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
     }
     let userSwiftSources = swiftSources.filter(exists)
     let userCxxSources = cxxSources.filter(exists)
+    func userHeaderSearchPaths(relativeTo targetPath: String) -> [CXXSetting] {
+        let targetComponents = packageDirectory.appendingPathComponent(targetPath).standardizedFileURL.pathComponents
+        return userCxxSources.map { source in
+            let sourceURL = packageDirectory.appendingPathComponent(source)
+            var isDirectory: ObjCBool = false
+            FileManager.default.fileExists(atPath: sourceURL.path, isDirectory: &isDirectory)
+            let directory = isDirectory.boolValue ? sourceURL : sourceURL.deletingLastPathComponent()
+            let headerComponents = directory.standardizedFileURL.pathComponents
+            let commonCount = zip(targetComponents, headerComponents).prefix { $0.0 == $0.1 }.count
+            let relativeComponents = Array(repeating: "..", count: targetComponents.count - commonCount)
+                + headerComponents.dropFirst(commonCount)
+            return .headerSearchPath(relativeComponents.isEmpty ? "." : relativeComponents.joined(separator: "/"))
+        }
+    }
 
     // React Native's prebuilt React.framework is either Debug or Release, keep the C++ ABI in sync.
     let releaseSettings: [CXXSetting] = [
         .define("DEBUG", .when(configuration: .debug)),
         .define("NDEBUG", .when(configuration: .release)),
     ]
-    let userHeaderSearchPaths = userCxxSources.map { "-I" + packageDirectory.appendingPathComponent($0).path }
     let commonCxxSettings: [CXXSetting] = releaseSettings + [
         .disableWarning("nullability-extension"),
-        .unsafeFlags(userHeaderSearchPaths),
     ]
     let reactNativeDependencies: [Target.Dependency] = [
         .product(name: "ReactNativeHeaders", package: "${reactNative}"),
@@ -141,14 +153,14 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
             + ["${generatedDirectory}/shared/c++/include"],
         sources: cxxSourcesInTarget,
         publicHeadersPath: "${generatedDirectory}/shared/c++/include",
-        cxxSettings: commonCxxSettings + cxxSettings
+        cxxSettings: commonCxxSettings + userHeaderSearchPaths(relativeTo: ".") + cxxSettings
     )
 
     let appleCxxTarget: Target = .target(
         name: "${appleCxxTargetName}",
         dependencies: ["${cxxTargetName}"] + nitroModuleDependencies,
         path: "${iosDirectory}/${appleCxxTargetName}",
-        cxxSettings: commonCxxSettings
+        cxxSettings: commonCxxSettings + userHeaderSearchPaths(relativeTo: "${iosDirectory}/${appleCxxTargetName}")
     )
 
     let swiftSourcesInTarget = userSwiftSources + [
@@ -201,7 +213,7 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
             + ["c++/include"],
         sources: swiftBridgeSources,
         publicHeadersPath: "c++/include",
-        cxxSettings: commonCxxSettings + swiftBridgeSettings + cxxSettings
+        cxxSettings: commonCxxSettings + userHeaderSearchPaths(relativeTo: "${iosDirectory}") + swiftBridgeSettings + cxxSettings
     )
 
     package.products.append(
