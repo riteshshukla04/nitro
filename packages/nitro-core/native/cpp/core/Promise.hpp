@@ -36,7 +36,8 @@ public:
   ~Promise() {
     if (isPending()) [[unlikely]] {
       auto message = std::string("Timeouted: Promise<") + TypeInfo::getFriendlyTypename<TResult>() + "> was destroyed!";
-      // TODO: Switch to `std::make_exception_ptr(..)` instead of `try` + `catch` once we drop iOS 18 support or fix https://github.com/margelo/nitro/issues/1652 differently
+      // TODO: Switch to `std::make_exception_ptr(..)` instead of `try` + `catch` once we drop iOS 18 support or fix
+      // https://github.com/margelo/nitro/issues/1652 differently
       try {
         throw std::runtime_error(message);
       } catch (...) {
