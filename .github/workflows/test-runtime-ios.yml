@@ -102,4 +102,5 @@ jobs:
             tests/standalone/test-runner/build/runtime-tests.js.map
             tests/standalone/test-runner/build/runtime-tests.json
             tests/standalone/test-runner/build/runtime-test-skips.json
+            tests/standalone/test-runner/build/runtime-test-groups.json
           if-no-files-found: ignore

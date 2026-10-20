@@ -56,19 +56,23 @@ bun tests/standalone/test-runner/ios/run.mjs --help
 New exported tests in `js/**/*.test.ts` need no Swift changes. Each case keeps its file-qualified name in the test results and can be rerun
 individually in Xcode. Missing, invalid, empty or duplicate manifest entries fail discovery.
 
-The Swift tests await an operation queue limited to two concurrent native tests. Each test creates a fresh Hermes runtime and executes
-JavaScript and callbacks on its owning worker. This keeps Swift's cooperative executor available for `Promise.async` completions. The shared
-Xcode scheme and command-line runner set `LIBDISPATCH_COOPERATIVE_POOL_STRICT=1` in the test process so the concurrent native Promise case
-runs with one cooperative worker.
+Each Swift case awaits its result from `NitroTestScheduler`. The scheduler runs at most two runtime groups at once, each in its own Hermes
+runtime on a dedicated worker thread that executes JavaScript and callbacks. This keeps Swift's cooperative executor available for
+`Promise.async` completions. The shared Xcode scheme and command-line runner set `LIBDISPATCH_COOPERATIVE_POOL_STRICT=1` in the test process
+so the concurrent native Promise case runs with one cooperative worker. Rerunning one case in Xcode runs its whole group, which takes about
+a second. Durations that Xcode reports for a case include the time it waited for its group.
 
-The `static-properties` cases run serially within their own parameterized group because they write shared native storage. They use the same
-operation queue and fresh runtime per case, and can overlap with tests outside that group.
+The `static-properties` cases write shared native storage, so they form a single group whose cases never overlap. Groups of other files can
+run at the same time.
+
+`run.mjs` passes `NITRO_TEST_REPORT` to the test process, which appends a JSON line with setup, case, and teardown times for every group to
+`runtime-groups.jsonl` in the result directory. The runner prints a summary of those times after the tests.
 
 The Objective-C++ bridge converts a failed assertion or native exception into a Swift error. Handwritten tests check error propagation,
-cached bytecode with fresh runtime state, per-case timeout overrides, independent setup and execution budgets, and timeouts for unresolved
-promises, synchronous loops, and endless microtask chains. A concurrency contract submits three tests and makes the first two initialized
-runtimes meet, checking overlap, the two-worker limit, isolated globals, and Swift Promise callbacks. The automatically discovered
-TypeScript cases check HybridObject behavior.
+cached bytecode, runtime sharing within a group and isolation between groups, a fresh runtime after a failed or timed out case, per-case
+timeout overrides, independent setup and execution budgets, and timeouts for unresolved promises, synchronous loops, and endless microtask
+chains. A concurrency contract submits three groups to two workers and makes the first two initialized runtimes meet, checking overlap, the
+worker limit, isolated globals, and Swift Promise callbacks. The automatically discovered TypeScript cases check HybridObject behavior.
 
 `--sanitizer` accepts `none` (the default), `address` (ASan), or `thread` (TSan). CI runs all three modes. Xcode instruments the C++,
 Objective-C++, and Swift sources compiled for Core, generated bindings, fixtures, and the test runner. The prebuilt Hermes XCFramework is

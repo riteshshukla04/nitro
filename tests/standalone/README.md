@@ -45,10 +45,11 @@ bun test:prepare
 ```
 
 `test:prepare` builds the workspace Nitrogen, typechecks the specs and tests, regenerates bindings, and bundles the JS into
-`test-runner/build/runtime-tests.js`. It also writes `test-runner/build/runtime-tests.json`, the case list used by both native runners, and
-`test-runner/build/runtime-test-skips.json`, the platform/build exclusions. The bundle and manifests are generated together. Commit
-generated binding changes with their spec. The **Check Nitrogen output** job regenerates bindings for both test environments and checks for
-drift. It does not bundle the JavaScript tests; each native test job runs `test:prepare` before building and executing its tests.
+`test-runner/build/runtime-tests.js`. It also writes `test-runner/build/runtime-tests.json`, the case list used by both native runners,
+`test-runner/build/runtime-test-skips.json`, the platform/build exclusions, and `test-runner/build/runtime-test-groups.json`, the cases that
+share a Hermes runtime. The bundle and manifests are generated together. Commit generated binding changes with their spec. The **Check
+Nitrogen output** job regenerates bindings for both test environments and checks for drift. It does not bundle the JavaScript tests; each
+native test job runs `test:prepare` before building and executing its tests.
 
 Run `bun test:ios` on macOS with Xcode, or `bun test:android` with the Android SDK, NDK, JDK and a running emulator. See each platform
 directory for its toolchain and direct CLI command. The two native CI workflows run those same tests and retain their reports on failure.
@@ -118,18 +119,42 @@ Suites with exclusions export a literal `skips` object with `as const`. Each key
 or `release` to the exclusion reason. JUnit reports these as assumptions; Swift Testing puts them in a separate disabled parameterized test.
 They are never counted as successful behavior checks. New regressions should fail normally.
 
+### Runtime sharing
+
+The bundler packs the suites of each file into groups of about 50 cases, never more than 100. On iOS, a group's cases run in order in one
+Hermes runtime, which is destroyed after the group's last case. Destroying it also checks that Nitro releases everything the suite created.
+A suite is never split unless it alone exceeds 100 cases, and files never share a runtime, so a failure stays attributable to one file. A
+case that fails or times out also destroys the runtime, and the rest of its group continues in a fresh one.
+
+A file can export `runtimeSharing` to change this:
+
+```ts
+import type { RuntimeSharing } from './utils/cases'
+
+// Heap and external-memory measurements must not see garbage from other cases.
+export const runtimeSharing = 'case' satisfies RuntimeSharing
+```
+
+`case` gives every case its own runtime; these groups start first because they hold the slowest cases. `file` keeps every case of the file
+in one runtime, in order, for cases that write process-wide native state and must never overlap. The default is `suite`. Cases in a shared
+runtime see each other's module-level state, so do not mutate shared fixtures.
+
 ## Execution and failures
 
-Each native case creates a fresh Hermes runtime, installs Nitro, loads the bundle, and calls `runNitroTest(name)`. The runner eagerly
-compiles the bundle once and caches its bytecode by source contents. Each runtime evaluates that bytecode with fresh globals and native
-objects. Compilation happens before the JS deadlines; Hermes' watchdog cannot interrupt the native compiler.
+On iOS, each group gets a fresh Hermes runtime with Nitro installed and the bundle loaded, then calls `runNitroTest(name)` for each of its
+cases. After a passing case, the runner also runs any native callbacks and microtasks the case already queued, so their errors are reported
+for that case instead of a later one. On Android, every case still creates its own runtime. The runner eagerly compiles the bundle once and
+caches its bytecode by source contents. Each runtime evaluates that bytecode with fresh globals and native objects. Compilation happens
+before the JS deadlines; Hermes' watchdog cannot interrupt the native compiler.
 
-The native thread owns the runtime and pumps its dispatcher. On iOS, an operation queue runs at most two native tests at once while Swift
-awaits continuations. This leaves Swift's cooperative executor free to run `Promise.async` tasks that the JavaScript case awaits. The iOS
-runner restricts the cooperative pool to one worker so the concurrent native Promise test checks this behavior. Native work runs on
-background threads; its callbacks are queued back to the runtime's owning thread. When the microtask queue is empty, the dispatcher sleeps
-until a native callback arrives or the deadline expires. Each runtime owns its JSI caches. The shared prepared-bundle cache is locked only
-while compiling or replacing bytecode; test execution can overlap.
+The thread that creates a runtime owns it and pumps its dispatcher. On iOS, `TestScheduler` runs at most two groups at once, each on its own
+worker thread with an 8 MiB stack, while every Swift case awaits its own result. Swift Testing requests cases in no particular order, so
+queued groups start in manifest order: isolated cases first, then larger groups. Awaiting never blocks Swift's cooperative executor, which
+stays free to run `Promise.async` tasks that the JavaScript case awaits. The iOS runner restricts the cooperative pool to one worker so the
+concurrent native Promise test checks this behavior. Native work runs on background threads; its callbacks are queued back to the runtime's
+owning thread. When the microtask queue is empty, the dispatcher sleeps until a native callback arrives or the deadline expires. Each
+runtime owns its JSI caches. The shared prepared-bundle cache is locked only while compiling or replacing bytecode; test execution can
+overlap.
 
 An async case keeps that same runtime alive across every `await`. Put repeated calls, concurrent Promises, or cache-growth checks in one
 case when they must share runtime state. The suite checks concurrent native completions and a long Promise chain with per-iteration captured

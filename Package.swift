@@ -120,6 +120,7 @@ package.targets += [
       .copy("build/runtime-tests.js"),
       .copy("build/runtime-tests.json"),
       .copy("build/runtime-test-skips.json"),
+      .copy("build/runtime-test-groups.json"),
     ],
     swiftSettings: [.swiftLanguageMode(.v6)]
   ),

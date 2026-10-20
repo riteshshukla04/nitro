@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { TestObjectCpp, TestObjectSwiftKotlin } from 'nitro-test'
-import { namedCases } from './utils/cases'
+import { namedCases, type RuntimeSharing } from './utils/cases'
 
 type TestObjectConstructor = typeof TestObjectCpp | typeof TestObjectSwiftKotlin
 
@@ -87,6 +87,10 @@ function staticPropertyCases(Constructor: TestObjectConstructor) {
     },
   }
 }
+
+// These cases write process-wide native storage, so they run in one runtime, in
+// order, and never overlap each other.
+export const runtimeSharing = 'file' satisfies RuntimeSharing
 
 export const cases = {
   ...namedCases('Static properties / TestObjectCpp', staticPropertyCases(TestObjectCpp)),

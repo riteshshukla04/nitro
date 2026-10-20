@@ -113,6 +113,9 @@ if (values['skip-hermes-build']) {
 const buildDirectory = path.join(root, 'tests/standalone/.build/ios', values.sanitizer)
 const results = path.join(buildDirectory, 'results', `RuntimeTests-${Date.now()}-${process.pid}`)
 mkdirSync(results, { recursive: true })
+// The tests append one JSON line per runtime group to this file.
+const groupReport = path.join(results, 'runtime-groups.jsonl')
+environment.TEST_RUNNER_NITRO_TEST_REPORT = groupReport
 if (values.sanitizer !== 'none') {
   const option = values.sanitizer === 'address' ? 'ASAN_OPTIONS' : 'TSAN_OPTIONS'
   // xcodebuild forwards TEST_RUNNER_ variables to every test process. Preserve
@@ -178,6 +181,25 @@ for (const name of readdirSync(results).filter((name) => name.startsWith('saniti
     process.stderr.write(report)
     sanitizerFailure = true
   }
+}
+if (existsSync(groupReport)) {
+  const groups = readFileSync(groupReport, 'utf8')
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => JSON.parse(line))
+  const total = (key) => groups.reduce((sum, group) => sum + group[key], 0)
+  const seconds = (ms) => `${(ms / 1000).toFixed(1)} s`
+  console.log(
+    `Runtime groups: ${groups.length} groups, ${total('runtimes')} Hermes runtimes, ${total('cases')} cases, ${total('failures')} failed`
+  )
+  console.log(
+    `  summed over workers: setup ${seconds(total('setupMs'))}, cases ${seconds(total('casesMs'))}, teardown ${seconds(total('teardownMs'))}`
+  )
+  const slowest = groups
+    .map((group) => ({ ...group, ms: group.setupMs + group.casesMs + group.teardownMs }))
+    .sort((a, b) => b.ms - a.ms)
+    .slice(0, 5)
+  console.log(`  slowest: ${slowest.map((group) => `${group.name} ${seconds(group.ms)}`).join(', ')}`)
 }
 console.log(`Test results: ${results}`)
 if (sanitizerFailure) console.error('Sanitizer reported an error.')

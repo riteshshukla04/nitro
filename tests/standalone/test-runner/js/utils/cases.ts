@@ -1,6 +1,14 @@
 import { NitroModules } from 'nitro-core'
 import { TestObjectCpp, TestObjectSwiftKotlin } from 'nitro-test'
 
+/**
+ * Export `runtimeSharing` from a test file to change how its cases share Hermes
+ * runtimes, e.g. `export const runtimeSharing = 'case' satisfies RuntimeSharing`.
+ * By default (`suite`), suites of a file share a runtime that is torn down after
+ * its last case, which also checks that Nitro releases everything cleanly.
+ */
+export type { RuntimeSharing } from '../../scripts/groups'
+
 type Timeout = { timeoutMs?: number }
 export type TestCase = (() => void | Promise<void>) & Timeout
 type TestObject = TestObjectCpp | TestObjectSwiftKotlin

@@ -1,5 +1,13 @@
 import { expect } from 'chai'
-import { casesForTestObjects, namedCases, recordCallback, waitFor, withTestTimeout, yieldToEventLoop } from './utils/cases'
+import {
+  casesForTestObjects,
+  namedCases,
+  recordCallback,
+  type RuntimeSharing,
+  waitFor,
+  withTestTimeout,
+  yieldToEventLoop,
+} from './utils/cases'
 
 import { NitroModules } from 'nitro-core'
 
@@ -34,6 +42,9 @@ function getHermesExternalMemorySize(): number {
 
   return hermesInternal.getInstrumentedStats().js_externalBytes
 }
+
+// Heap and external-memory measurements must not see garbage from other cases.
+export const runtimeSharing = 'case' satisfies RuntimeSharing
 
 export const cases = {
   ...casesForTestObjects('Memory', {

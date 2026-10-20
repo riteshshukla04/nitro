@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
+import { groupTests, RUNTIME_SHARING_MODES, type RuntimeSharing, type TestFile } from './groups'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
 const files = [...new Bun.Glob('**/*.test.ts').scanSync(`${root}js`)].sort()
@@ -17,6 +18,7 @@ const imports = ['import { registerTests } from "../js/index";']
 const entries: string[] = []
 const names: string[] = []
 const skips: Record<string, Record<string, string>> = {}
+const testFiles: TestFile[] = []
 
 function requireTest(type: ts.Type, label: string): void {
   if (!type.getCallSignatures().some((signature) => signature.parameters.length === 0)) {
@@ -39,6 +41,8 @@ for (const [index, file] of files.entries()) {
   const exports = checker.getExportsOfModule(module).sort((a, b) => a.name.localeCompare(b.name))
   let count = 0
   const prefix = file.replace(/\.test\.ts$/, '')
+  const testFile: TestFile = { prefix, sharing: 'suite', cases: [] }
+  testFiles.push(testFile)
   for (const symbol of exports) {
     const value = symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol
     if (!(value.flags & ts.SymbolFlags.Value)) continue
@@ -59,11 +63,19 @@ for (const [index, file] of files.entries()) {
       }
       continue
     }
+    if (symbol.name === 'runtimeSharing') {
+      if (!type.isStringLiteral() || !RUNTIME_SHARING_MODES.includes(type.value as RuntimeSharing)) {
+        throw new Error(`${file}: runtimeSharing must be one of ${RUNTIME_SHARING_MODES.join(', ')}`)
+      }
+      testFile.sharing = type.value as RuntimeSharing
+      continue
+    }
     if (symbol.name === 'cases') {
       for (const test of literalProperties(type, `${file}: cases`)) {
         requireTest(checker.getTypeOfSymbolAtLocation(test, source), `${file}: ${test.name}`)
         const name = `${prefix}.${test.name}`
         names.push(name)
+        testFile.cases.push(name)
         entries.push(`${JSON.stringify(name)}: suite${index}.cases[${JSON.stringify(test.name)}]`)
         count++
       }
@@ -73,6 +85,7 @@ for (const [index, file] of files.entries()) {
     requireTest(type, `${file}: export ${symbol.name}`)
     const name = `${prefix}.${symbol.name}`
     names.push(name)
+    testFile.cases.push(name)
     entries.push(`${JSON.stringify(name)}: suite${index}[${JSON.stringify(symbol.name)}]`)
     count++
   }
@@ -100,4 +113,7 @@ const result = await Bun.build({
 if (!result.success) throw new AggregateError(result.logs, 'Test bundle failed')
 await Bun.write(`${root}build/runtime-tests.json`, `${JSON.stringify(names, null, 2)}\n`)
 await Bun.write(`${root}build/runtime-test-skips.json`, `${JSON.stringify(skips, null, 2)}\n`)
-console.log(`Bundled ${names.length} shared runtime tests into build/runtime-tests.js`)
+// Native runners create one Hermes runtime per group instead of one per case.
+const groups = groupTests(testFiles)
+await Bun.write(`${root}build/runtime-test-groups.json`, `${JSON.stringify(groups, null, 2)}\n`)
+console.log(`Bundled ${names.length} shared runtime tests in ${groups.length} runtime groups into build/runtime-tests.js`)
