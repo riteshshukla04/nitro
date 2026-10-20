@@ -589,7 +589,12 @@ test('registry lookup reads versions and tags through npm with tarball integrity
       version,
       (command, args, options) => {
         assert.equal(command, 'npm')
-        assert.deepEqual(args, ['view', `@scope/core@${version}`, '--json'])
+        assert.deepEqual(args, [
+          'view',
+          `@scope/core@${version}`,
+          '--json',
+          '--prefer-online',
+        ])
         assert.equal(options.encoding, 'utf8')
         return { status: 0, stdout: JSON.stringify(pkg), stderr: '' }
       }
@@ -842,6 +847,112 @@ test('prereleases publish only to their selected channel', async (t) => {
   )
 })
 
+test('fresh and resumed publications wait for npm visibility without republishing', async (t) => {
+  for (const resume of [false, true]) {
+    const { manifest, directory } = releaseFixture(t)
+    const registry = registryFixture(manifest)
+    const reads = new Map()
+    const delays = []
+    if (resume) {
+      const core = manifest.packages[0]
+      registry.versions.set(
+        registry.key(core.name, core.version),
+        registry.record(core)
+      )
+    }
+    await publishPackages(manifest, directory, {
+      lookup: async (name, version) => {
+        if (version === manifest.version && registry.publishes.includes(name)) {
+          const count = (reads.get(name) ?? 0) + 1
+          reads.set(name, count)
+          if (count <= 2) return null
+        }
+        return registry.lookup(name, version)
+      },
+      execute: (command, args) => {
+        for (const name of registry.publishes)
+          assert.equal(
+            reads.get(name),
+            3,
+            'verify before publishing the next package'
+          )
+        registry.execute(command, args)
+      },
+      wait: async (delay) => delays.push(delay),
+    })
+    const expected = resume ? releasePackages.slice(1) : releasePackages
+    assert.deepEqual(registry.publishes, expected)
+    assert.deepEqual(delays, Array(expected.length * 2).fill(10_000))
+    for (const pkg of manifest.packages)
+      assert.equal(
+        fileIntegrity(path.join(directory, pkg.filename)),
+        pkg.integrity
+      )
+    await assertPublishedPackages(manifest, { lookup: registry.lookup })
+  }
+})
+
+test('publication stops after five minutes of visibility waits and resumes the accepted upload', async (t) => {
+  const { manifest, directory } = releaseFixture(t)
+  const registry = registryFixture(manifest)
+  let hideCore = true
+  let verificationReads = 0
+  const delays = []
+  const lookup = async (name, version) => {
+    if (
+      hideCore &&
+      name === 'nitro-core' &&
+      version === manifest.version &&
+      registry.publishes.includes(name)
+    ) {
+      verificationReads++
+      return null
+    }
+    return registry.lookup(name, version)
+  }
+  const options = {
+    lookup,
+    execute: registry.execute,
+    wait: async (delay) => delays.push(delay),
+  }
+  await assert.rejects(
+    publishPackages(manifest, directory, options),
+    /npm does not contain the recorded nitro-core/
+  )
+  assert.deepEqual(registry.publishes, ['nitro-core'])
+  assert.equal(verificationReads, 31)
+  assert.deepEqual(delays, Array(30).fill(10_000))
+  hideCore = false
+  await publishPackages(manifest, directory, options)
+  assert.deepEqual(registry.publishes, releasePackages)
+  await assertPublishedPackages(manifest, { lookup: registry.lookup })
+})
+
+test('visibility retries stop as soon as npm returns a conflicting tarball', async (t) => {
+  const { manifest, directory } = releaseFixture(t)
+  const registry = registryFixture(manifest)
+  let verificationReads = 0
+  const delays = []
+  await assert.rejects(
+    publishPackages(manifest, directory, {
+      lookup: async (name, version) => {
+        if (version === manifest.version && registry.publishes.includes(name)) {
+          verificationReads++
+          if (verificationReads === 1) return null
+          return { version, dist: { integrity: 'sha512-other' } }
+        }
+        return registry.lookup(name, version)
+      },
+      execute: registry.execute,
+      wait: async (delay) => delays.push(delay),
+    }),
+    /npm does not contain the recorded nitro-core/
+  )
+  assert.equal(verificationReads, 2)
+  assert.deepEqual(delays, [10_000])
+  assert.deepEqual(registry.publishes, ['nitro-core'])
+})
+
 test('verification after publication stops before the next package if npm serves different bytes', async (t) => {
   const { manifest, directory } = releaseFixture(t)
   const registry = registryFixture(manifest)
@@ -854,6 +965,7 @@ test('verification after publication stops before the next package if npm serves
           dist: { integrity: 'sha512-other' },
         })
       },
+      wait: () => assert.fail('a conflicting tarball must fail immediately'),
     }),
     /npm does not contain the recorded nitro-core/
   )
