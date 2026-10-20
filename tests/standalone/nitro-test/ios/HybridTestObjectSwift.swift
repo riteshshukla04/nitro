@@ -465,6 +465,10 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
   }
 
   func calculateFibonacciSync(value: Double) throws -> Int64 {
+    return Self.calculateFibonacci(value: value)
+  }
+
+  private static func calculateFibonacci(value: Double) -> Int64 {
     let n = Int64(value)
     if n <= 1 {
       return n
@@ -482,7 +486,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
 
   func calculateFibonacciAsync(value: Double) throws -> any Promise<Int64> {
     return .async {
-      return try self.calculateFibonacciSync(value: value)
+      return Self.calculateFibonacci(value: value)
     }
   }
 
@@ -646,11 +650,15 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
   }
 
   func createArrayBuffer() throws -> ArrayBuffer {
+    return Self.allocateArrayBuffer()
+  }
+
+  private static func allocateArrayBuffer() -> ArrayBuffer {
     return ArrayBuffer.allocate(1024 * 1024 * 10)  // 10 MB
   }
 
   func createArrayBufferAsync() throws -> any Promise<ArrayBuffer> {
-    return .async { try self.createArrayBuffer() }
+    return .async { Self.allocateArrayBuffer() }
   }
 
   func copyBuffer(buffer: ArrayBuffer) throws -> ArrayBuffer {

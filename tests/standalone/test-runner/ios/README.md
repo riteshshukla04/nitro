@@ -12,6 +12,9 @@ The V1 runtime requires Swift 6.4. Its Swift target links [SimdUTF](https://gith
 `UTF8`, `UTF16`, and `ASCII` traits. Public include directories expose the existing `<NitroModules/Header.hpp>` imports. The private bridge
 targets compile after Swift and include its generated headers.
 
+The core, fixture modules, test runner, and generated React Native packages use Swift 6 language mode. HybridObject entry points remain
+synchronous and nonisolated; implementations synchronize shared mutable state.
+
 Hermes is a local XCFramework built from the pinned upstream CMake sources. Its binary target lives in the root manifest so the framework
 and all canonical runtime sources stay inside the Swift package boundary. Run the existing Hermes build helper before opening the package in
 Xcode. The command-line test runner builds Hermes automatically unless `--skip-hermes-build` is passed.

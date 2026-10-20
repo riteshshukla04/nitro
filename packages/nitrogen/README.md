@@ -512,8 +512,9 @@ apply to `NitroImage`, and C++ settings apply to `NitroImageCxx` and `NitroImage
 in `swiftpmConfig.dependencies` for React Native to link them.
 
 Keep `--out` inside the package root. Leave the generated product and target names for the helper, and leave `cxxLanguageStandard` unset or
-set it to C++20 or newer. Swift targets use Swift 5 language mode by default because the generated APIs do not yet support Swift 6 strict
-concurrency.
+set it to C++20 or newer. Swift targets use Swift 6 language mode. HybridObject APIs remain nonisolated, and implementations must
+synchronize state shared across callers. Native Swift callbacks require `@Sendable` closures; Swift promise awaiting requires a `Sendable`
+result.
 
 Build with Swift 6.4's Swift Build backend or Xcode: the generated C++ bridge uses their `GENERATED_MODULEMAP_DIR`. The helper computes
 source exclusions when SwiftPM evaluates the manifest. After adding or removing files outside the listed source paths, reset Xcode's package

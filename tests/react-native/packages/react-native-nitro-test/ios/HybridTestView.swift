@@ -10,7 +10,7 @@ import UIKit
 
 class HybridTestView: HybridTestViewSpec {
   // UIView
-  var view: UIView = UIView()
+  var view: UIView = MainActor.assumeIsolated { UIView() }
   private let lifecycleLock = NSLock()
   private var onDropViewCount: Double = 0
   private var isBlueSetterCallCount: Double = 0
@@ -20,7 +20,9 @@ class HybridTestView: HybridTestViewSpec {
   var isBlue: Bool = false {
     didSet {
       isBlueSetterCallCount += 1
-      view.backgroundColor = isBlue ? .systemBlue : .systemRed
+      MainActor.assumeIsolated { [view, isBlue] in
+        view.backgroundColor = isBlue ? .systemBlue : .systemRed
+      }
     }
   }
   var hasBeenCalled: Bool = false

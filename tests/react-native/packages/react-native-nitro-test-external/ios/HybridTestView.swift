@@ -2,11 +2,13 @@ import NitroModules
 import UIKit
 
 class HybridTestView: HybridTestViewSpec {
-  var view: UIView = UIView()
+  var view: UIView = MainActor.assumeIsolated { UIView() }
 
   var isBlue: Bool = false {
     didSet {
-      view.backgroundColor = isBlue ? .systemBlue : .systemRed
+      MainActor.assumeIsolated { [view, isBlue] in
+        view.backgroundColor = isBlue ? .systemBlue : .systemRed
+      }
     }
   }
   var someCallback: any Callback<(), Void> = .native {}

@@ -168,10 +168,7 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
     ]
     let swiftDependencies: [Target.Dependency] = ["${appleCxxTargetName}"] + nitroModuleDependencies
     let generatedSwiftSettings: [SwiftSetting] = [
-        // Nitro's Swift APIs don't support Swift 6 strict concurrency yet, e.g. the generated
-        // \`Promise.async\` wrappers return non-Sendable HybridObjects from \`@isolated(any)\` closures.
-        // Pass \`.swiftLanguageMode(.v6)\` in \`swiftSettings\` to opt into Swift 6.
-        .swiftLanguageMode(.v5),
+        .swiftLanguageMode(.v6),
         .enableUpcomingFeature("InternalImportsByDefault"),
         .interoperabilityMode(.Cxx),
         .unsafeFlags(["-Xfrontend", "-clang-header-expose-decls=has-expose-attr-or-stdlib"]),

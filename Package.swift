@@ -10,11 +10,10 @@ let cxxSettings: [CXXSetting] = [
   .disableWarning("nullability-extension"),
 ]
 let swiftSettings: [SwiftSetting] = [
-  .swiftLanguageMode(.v5),
+  .swiftLanguageMode(.v6),
   .enableUpcomingFeature("InternalImportsByDefault"),
   .enableUpcomingFeature("MemberImportVisibility"),
   .interoperabilityMode(.Cxx),
-  .unsafeFlags(["-strict-concurrency=minimal"]),
   .unsafeFlags(["-Xfrontend", "-clang-header-expose-decls=has-expose-attr-or-stdlib"]),
 ]
 let bridgeSettings: [CXXSetting] = [
@@ -122,7 +121,7 @@ package.targets += [
       .copy("build/runtime-tests.json"),
       .copy("build/runtime-test-skips.json"),
     ],
-    swiftSettings: [.swiftLanguageMode(.v5)]
+    swiftSettings: [.swiftLanguageMode(.v6)]
   ),
 ]
 

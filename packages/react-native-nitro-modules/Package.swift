@@ -73,8 +73,7 @@ let package = Package(
       swiftSettings: [
         .enableUpcomingFeature("InternalImportsByDefault"),
         .enableUpcomingFeature("MemberImportVisibility"),
-        .swiftLanguageMode(.v5),
-        .unsafeFlags(["-strict-concurrency=minimal"]),
+        .swiftLanguageMode(.v6),
         .enableUpcomingFeature("ApproachableConcurrency"),
         .interoperabilityMode(.Cxx),
         .unsafeFlags(["-Xfrontend", "-clang-header-expose-decls=has-expose-attr-or-stdlib"]),

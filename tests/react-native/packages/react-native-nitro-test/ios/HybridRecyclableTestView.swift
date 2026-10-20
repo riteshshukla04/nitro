@@ -10,7 +10,7 @@ import UIKit
 
 class HybridRecyclableTestView: HybridRecyclableTestViewSpec, RecyclableView {
   // UIView
-  var view: UIView = UIView()
+  var view: UIView = MainActor.assumeIsolated { UIView() }
   private let lifecycleLock = NSLock()
   private var isRecycled = false
   private var invalidLifecycleOrderCount: Double = 0
@@ -23,7 +23,9 @@ class HybridRecyclableTestView: HybridRecyclableTestViewSpec, RecyclableView {
   var isBlue: Bool = false {
     didSet {
       if !isRecycled {
-        view.backgroundColor = isBlue ? .systemBlue : .systemRed
+        MainActor.assumeIsolated { [view, isBlue] in
+          view.backgroundColor = isBlue ? .systemBlue : .systemRed
+        }
       }
     }
   }
@@ -68,7 +70,9 @@ class HybridRecyclableTestView: HybridRecyclableTestViewSpec, RecyclableView {
   func prepareForRecycle() {
     nativeDefaultValueStorage = 42
     nativeDefaultValueSetterCallCount = 0
-    view.backgroundColor = .yellow
+    MainActor.assumeIsolated { [view] in
+      view.backgroundColor = .yellow
+    }
     isRecycled = true
 
     lifecycleLock.withLock {

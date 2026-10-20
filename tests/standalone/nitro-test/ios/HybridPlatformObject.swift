@@ -6,10 +6,12 @@
 //
 
 import NitroModules
-import UIKit
+import Foundation
 
 class HybridPlatformObject: HybridPlatformObjectSpec {
   func getOSVersion() -> String {
-    return UIDevice.current.systemVersion
+    let version = ProcessInfo.processInfo.operatingSystemVersion
+    let baseVersion = "\(version.majorVersion).\(version.minorVersion)"
+    return version.patchVersion == 0 ? baseVersion : "\(baseVersion).\(version.patchVersion)"
   }
 }
