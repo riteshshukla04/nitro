@@ -40,24 +40,22 @@ const JSClass& HybridClass::getOrCreateJSClass(jsi::Runtime& runtime) const {
   }
 
   // 4. Add all properties (getter + setter) to it using defineProperty
-  for (const auto& [name, getter] : getGetters()) {
-    const auto& setterIterator = getSetters().find(name);
-    if (setterIterator != getSetters().end()) {
+  for (const auto& [name, property] : getProperties()) {
+    if (property.setter.has_value()) {
       // get + set
-      const HybridFunction& setter = setterIterator->second;
       CommonGlobals::Object::defineProperty(runtime, prototypeObject, name.c_str(),
                                             ComputedPropertyDescriptor{// getter + setter
                                                                        .configurable = false,
                                                                        .enumerable = true,
-                                                                       .get = getter.toJSFunction(runtime),
-                                                                       .set = setter.toJSFunction(runtime)});
+                                                                       .get = property.getter.toJSFunction(runtime),
+                                                                       .set = property.setter->toJSFunction(runtime)});
     } else {
       // get
       CommonGlobals::Object::defineProperty(runtime, prototypeObject, name.c_str(),
                                             ComputedReadonlyPropertyDescriptor{// getter
                                                                                .configurable = false,
                                                                                .enumerable = true,
-                                                                               .get = getter.toJSFunction(runtime)});
+                                                                               .get = property.getter.toJSFunction(runtime)});
     }
   }
 

@@ -17,7 +17,7 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridChildSpec::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridGetter("childValue", &HybridChildSpec::getChildValue);
+      clazz.registerHybridProperty("childValue", &HybridChildSpec::getChildValue);
       clazz.registerHybridMethod("bounceVariant", &HybridChildSpec::bounceVariant);
     });
     return hybridClass;

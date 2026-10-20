@@ -15,10 +15,8 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridRecyclableTestViewSpec::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridGetter("isBlue", &HybridRecyclableTestViewSpec::getIsBlue);
-      clazz.registerHybridSetter("isBlue", &HybridRecyclableTestViewSpec::setIsBlue);
-      clazz.registerHybridGetter("nativeDefaultValue", &HybridRecyclableTestViewSpec::getNativeDefaultValue);
-      clazz.registerHybridSetter("nativeDefaultValue", &HybridRecyclableTestViewSpec::setNativeDefaultValue);
+      clazz.registerHybridProperty("isBlue", &HybridRecyclableTestViewSpec::getIsBlue, &HybridRecyclableTestViewSpec::setIsBlue);
+      clazz.registerHybridProperty("nativeDefaultValue", &HybridRecyclableTestViewSpec::getNativeDefaultValue, &HybridRecyclableTestViewSpec::setNativeDefaultValue);
       clazz.registerHybridMethod("getInvalidLifecycleOrderCount", &HybridRecyclableTestViewSpec::getInvalidLifecycleOrderCount);
       clazz.registerHybridMethod("getOnDropViewCount", &HybridRecyclableTestViewSpec::getOnDropViewCount);
       clazz.registerHybridMethod("getPrepareForRecycleCount", &HybridRecyclableTestViewSpec::getPrepareForRecycleCount);

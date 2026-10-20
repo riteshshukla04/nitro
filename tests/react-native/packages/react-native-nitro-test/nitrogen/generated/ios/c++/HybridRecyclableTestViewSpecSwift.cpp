@@ -108,10 +108,8 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridRecyclableTestViewSpecSwift::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridGetter("isBlue", &HybridRecyclableTestViewSpecSwift::getIsBlue_Swift);
-      clazz.registerHybridSetter("isBlue", &HybridRecyclableTestViewSpecSwift::setIsBlue_Swift);
-      clazz.registerHybridGetter("nativeDefaultValue", &HybridRecyclableTestViewSpecSwift::getNativeDefaultValue_Swift);
-      clazz.registerHybridSetter("nativeDefaultValue", &HybridRecyclableTestViewSpecSwift::setNativeDefaultValue_Swift);
+      clazz.registerHybridProperty("isBlue", &HybridRecyclableTestViewSpecSwift::getIsBlue_Swift, &HybridRecyclableTestViewSpecSwift::setIsBlue_Swift);
+      clazz.registerHybridProperty("nativeDefaultValue", &HybridRecyclableTestViewSpecSwift::getNativeDefaultValue_Swift, &HybridRecyclableTestViewSpecSwift::setNativeDefaultValue_Swift);
       clazz.registerHybridMethod("getInvalidLifecycleOrderCount", &HybridRecyclableTestViewSpecSwift::getInvalidLifecycleOrderCount_Swift);
       clazz.registerHybridMethod("getOnDropViewCount", &HybridRecyclableTestViewSpecSwift::getOnDropViewCount_Swift);
       clazz.registerHybridMethod("getPrepareForRecycleCount", &HybridRecyclableTestViewSpecSwift::getPrepareForRecycleCount_Swift);

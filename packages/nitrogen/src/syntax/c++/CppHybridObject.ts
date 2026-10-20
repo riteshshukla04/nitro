@@ -176,23 +176,16 @@ namespace ${cxxNamespace} {
 } // namespace ${cxxNamespace}
 `.trim()
 
-  // Each C++ method needs to be registered in the HybridObject - that's getters, setters and normal methods.
+  // Register properties together with their optional setters, then normal methods.
   const registrations: string[] = []
   for (const property of spec.properties) {
-    const getterMethod = property.getGetterName('other')
-    const setterMethod = property.getSetterName('other')
-    // getter
-    const getterRegistration = `
-clazz.registerHybridGetter("${property.name}", &${name.HybridTSpec}::${getterMethod});
-`.trim()
-    registrations.push(getterRegistration)
+    const accessors = [`&${name.HybridTSpec}::${property.getGetterName('other')}`]
     if (!property.isReadonly) {
-      // setter
-      const setterRegistration = `
-clazz.registerHybridSetter("${property.name}", &${name.HybridTSpec}::${setterMethod});
-`.trim()
-      registrations.push(setterRegistration)
+      accessors.push(`&${name.HybridTSpec}::${property.getSetterName('other')}`)
     }
+    registrations.push(
+      `clazz.registerHybridProperty("${property.name}", ${accessors.join(', ')});`
+    )
   }
   for (const method of spec.methods) {
     // method

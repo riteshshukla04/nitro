@@ -36,9 +36,8 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridBenchmarkObjectCppSpec::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridGetter("numberValue", &HybridBenchmarkObjectCppSpec::getNumberValue);
-      clazz.registerHybridSetter("numberValue", &HybridBenchmarkObjectCppSpec::setNumberValue);
-      clazz.registerHybridGetter("thisObject", &HybridBenchmarkObjectCppSpec::getThisObject);
+      clazz.registerHybridProperty("numberValue", &HybridBenchmarkObjectCppSpec::getNumberValue, &HybridBenchmarkObjectCppSpec::setNumberValue);
+      clazz.registerHybridProperty("thisObject", &HybridBenchmarkObjectCppSpec::getThisObject);
       clazz.registerHybridMethod("simpleFunc", &HybridBenchmarkObjectCppSpec::simpleFunc);
       clazz.registerHybridMethod("addNumbers", &HybridBenchmarkObjectCppSpec::addNumbers);
       clazz.registerHybridMethod("addStrings", &HybridBenchmarkObjectCppSpec::addStrings);

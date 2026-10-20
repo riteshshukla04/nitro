@@ -187,18 +187,12 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridTestViewSpecSwift::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridGetter("isBlue", &HybridTestViewSpecSwift::getIsBlue_Swift);
-      clazz.registerHybridSetter("isBlue", &HybridTestViewSpecSwift::setIsBlue_Swift);
-      clazz.registerHybridGetter("hasBeenCalled", &HybridTestViewSpecSwift::getHasBeenCalled_Swift);
-      clazz.registerHybridSetter("hasBeenCalled", &HybridTestViewSpecSwift::setHasBeenCalled_Swift);
-      clazz.registerHybridGetter("int64Value", &HybridTestViewSpecSwift::getInt64Value_Swift);
-      clazz.registerHybridSetter("int64Value", &HybridTestViewSpecSwift::setInt64Value_Swift);
-      clazz.registerHybridGetter("colorScheme", &HybridTestViewSpecSwift::getColorScheme_Swift);
-      clazz.registerHybridSetter("colorScheme", &HybridTestViewSpecSwift::setColorScheme_Swift);
-      clazz.registerHybridGetter("someCallback", &HybridTestViewSpecSwift::getSomeCallback_Swift);
-      clazz.registerHybridSetter("someCallback", &HybridTestViewSpecSwift::setSomeCallback_Swift);
-      clazz.registerHybridGetter("nativeDefaultValue", &HybridTestViewSpecSwift::getNativeDefaultValue_Swift);
-      clazz.registerHybridSetter("nativeDefaultValue", &HybridTestViewSpecSwift::setNativeDefaultValue_Swift);
+      clazz.registerHybridProperty("isBlue", &HybridTestViewSpecSwift::getIsBlue_Swift, &HybridTestViewSpecSwift::setIsBlue_Swift);
+      clazz.registerHybridProperty("hasBeenCalled", &HybridTestViewSpecSwift::getHasBeenCalled_Swift, &HybridTestViewSpecSwift::setHasBeenCalled_Swift);
+      clazz.registerHybridProperty("int64Value", &HybridTestViewSpecSwift::getInt64Value_Swift, &HybridTestViewSpecSwift::setInt64Value_Swift);
+      clazz.registerHybridProperty("colorScheme", &HybridTestViewSpecSwift::getColorScheme_Swift, &HybridTestViewSpecSwift::setColorScheme_Swift);
+      clazz.registerHybridProperty("someCallback", &HybridTestViewSpecSwift::getSomeCallback_Swift, &HybridTestViewSpecSwift::setSomeCallback_Swift);
+      clazz.registerHybridProperty("nativeDefaultValue", &HybridTestViewSpecSwift::getNativeDefaultValue_Swift, &HybridTestViewSpecSwift::setNativeDefaultValue_Swift);
       clazz.registerHybridMethod("getIsViewBlue", &HybridTestViewSpecSwift::getIsViewBlue_Swift);
       clazz.registerHybridMethod("getOnDropViewCount", &HybridTestViewSpecSwift::getOnDropViewCount_Swift);
       clazz.registerHybridMethod("getIsBlueSetterCallCount", &HybridTestViewSpecSwift::getIsBlueSetterCallCount_Swift);

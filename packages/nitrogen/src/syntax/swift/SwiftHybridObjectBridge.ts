@@ -101,20 +101,23 @@ self.__implementation = implementation
   const callableGroups: { name: string; bridges: SwiftMethodBridge[] }[] = []
   const properties: SwiftInstanceMethod[] = []
   for (const property of spec.properties) {
-    properties.push(
-      new SwiftInstanceMethod({
-        method: property.cppGetter,
-        accessor: { kind: 'getter', name: property.name },
-      })
-    )
+    const getter = new SwiftInstanceMethod({
+      method: property.cppGetter,
+      accessor: { kind: 'getter', name: property.name },
+    })
+    properties.push(getter)
+    const accessors = [`&${cppClassName}::${getter.name}`]
     if (property.cppSetter != null) {
-      properties.push(
-        new SwiftInstanceMethod({
-          method: property.cppSetter,
-          accessor: { kind: 'setter', name: property.name },
-        })
-      )
+      const setter = new SwiftInstanceMethod({
+        method: property.cppSetter,
+        accessor: { kind: 'setter', name: property.name },
+      })
+      properties.push(setter)
+      accessors.push(`&${cppClassName}::${setter.name}`)
     }
+    cppMethodRegistrations.push(
+      `clazz.registerHybridProperty("${property.name}", ${accessors.join(', ')});`
+    )
   }
   callableGroups.push({
     name: 'Properties',

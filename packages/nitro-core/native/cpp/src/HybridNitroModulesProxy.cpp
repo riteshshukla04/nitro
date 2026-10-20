@@ -25,8 +25,8 @@ const std::shared_ptr<const HybridClass>& HybridNitroModulesProxy::Class::get() 
     clazz.registerHybridMethod("createNativeArrayBuffer", &HybridNitroModulesProxy::createNativeArrayBuffer);
     clazz.registerRawHybridMethod("hasNativeState", 1, &HybridNitroModulesProxy::hasNativeState);
 
-    clazz.registerHybridGetter("buildType", &HybridNitroModulesProxy::getBuildType);
-    clazz.registerHybridGetter("version", &HybridNitroModulesProxy::getVersion);
+    clazz.registerHybridProperty("buildType", &HybridNitroModulesProxy::getBuildType);
+    clazz.registerHybridProperty("version", &HybridNitroModulesProxy::getVersion);
 
     clazz.registerHybridMethod("debug_getTotalAllocatedHybridObjects", &HybridNitroModulesProxy::debug_getTotalAllocatedHybridObjects);
   });

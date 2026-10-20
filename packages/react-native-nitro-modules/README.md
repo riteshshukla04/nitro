@@ -100,8 +100,7 @@ const std::shared_ptr<const HybridClass>& MyHybridObject::Class::get() {
     clazz.registerHybridConstructor(+[]() {
       return std::make_shared<MyHybridObject>();
     });
-    clazz.registerHybridGetter("number", &MyHybridObject::getNumber);
-    clazz.registerHybridSetter("number", &MyHybridObject::setNumber);
+    clazz.registerHybridProperty("number", &MyHybridObject::getNumber, &MyHybridObject::setNumber);
     clazz.registerHybridMethod("add", &MyHybridObject::add);
   });
   return clazz;

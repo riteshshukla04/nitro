@@ -25,6 +25,11 @@ using namespace facebook;
  */
 using HybridClassId = std::type_index;
 
+struct HybridProperty {
+  HybridFunction getter;
+  std::optional<HybridFunction> setter;
+};
+
 /**
  * Shared metadata for a HybridObject class: its name, base class,
  * constructor, static methods, and instance methods and properties.
@@ -40,8 +45,7 @@ private:
   // The base class's descriptor, or null for the root.
   std::shared_ptr<const HybridClass> _base;
   std::unordered_map<std::string, HybridFunction> _methods;
-  std::unordered_map<std::string, HybridFunction> _getters;
-  std::unordered_map<std::string, HybridFunction> _setters;
+  std::unordered_map<std::string, HybridProperty> _properties;
   std::optional<HybridFunction> _constructor;
   std::unordered_map<std::string, HybridFunction> _staticMethods;
 
@@ -102,11 +106,8 @@ public:
   inline const std::unordered_map<std::string, HybridFunction>& getMethods() const noexcept {
     return _methods;
   }
-  inline const std::unordered_map<std::string, HybridFunction>& getGetters() const noexcept {
-    return _getters;
-  }
-  inline const std::unordered_map<std::string, HybridFunction>& getSetters() const noexcept {
-    return _setters;
+  inline const std::unordered_map<std::string, HybridProperty>& getProperties() const noexcept {
+    return _properties;
   }
 
 public:
@@ -135,43 +136,36 @@ public:
   }
 
   /**
-   * Registers the given C++ method as a property getter that can be called from JS, through the object's prototype.
+   * Registers the given C++ getter as a read-only property on this type's JavaScript prototype.
    * Example:
    * ```cpp
-   * registerHybridGetter("foo", &MyObject::getFoo);
+   * registerHybridProperty("foo", &MyObject::getFoo);
    * ```
    */
   template <typename Derived, typename ReturnType>
     requires JSIEncodable<ReturnType>
-  inline void registerHybridGetter(std::string name, InstanceMethod<Derived, ReturnType> method) {
-    if (_getters.contains(name)) [[unlikely]] {
-      throw std::runtime_error("Cannot add Hybrid Property Getter \"" + name + "\" - a getter with that name already exists!");
-    }
-    if (_methods.contains(name)) [[unlikely]] {
-      throw std::runtime_error("Cannot add Hybrid Property Getter \"" + name + "\" - a method with that name already exists!");
-    }
-
-    _getters.emplace(name, HybridFunction::createHybridFunction(name, method, FunctionKind::GETTER));
+  inline void registerHybridProperty(std::string name, InstanceMethod<Derived, ReturnType> getter) {
+    registerHybridProperty(name, HybridProperty{
+                                     .getter = HybridFunction::createHybridFunction(name, getter, FunctionKind::GETTER),
+                                     .setter = std::nullopt,
+                                 });
   }
 
   /**
-   * Registers the given C++ method as a property setter that can be called from JS, through the object's prototype.
+   * Registers the given C++ getter and setter as a property on this type's JavaScript prototype.
    * Example:
    * ```cpp
-   * registerHybridSetter("foo", &MyObject::setFoo);
+   * registerHybridProperty("foo", &MyObject::getFoo, &MyObject::setFoo);
    * ```
    */
-  template <typename Derived, typename ValueType>
-    requires JSIDecodable<std::decay_t<ValueType>>
-  inline void registerHybridSetter(std::string name, InstanceMethod<Derived, void, ValueType> method) {
-    if (_setters.contains(name)) [[unlikely]] {
-      throw std::runtime_error("Cannot add Hybrid Property Setter \"" + name + "\" - a setter with that name already exists!");
-    }
-    if (_methods.contains(name)) [[unlikely]] {
-      throw std::runtime_error("Cannot add Hybrid Property Setter \"" + name + "\" - a method with that name already exists!");
-    }
-
-    _setters.emplace(name, HybridFunction::createHybridFunction(name, method, FunctionKind::SETTER));
+  template <typename GetterClass, typename ReturnType, typename SetterClass, typename ValueType>
+    requires(JSIEncodable<ReturnType> && JSIDecodable<std::decay_t<ValueType>>)
+  inline void registerHybridProperty(std::string name, InstanceMethod<GetterClass, ReturnType> getter,
+                                     InstanceMethod<SetterClass, void, ValueType> setter) {
+    registerHybridProperty(name, HybridProperty{
+                                     .getter = HybridFunction::createHybridFunction(name, getter, FunctionKind::GETTER),
+                                     .setter = HybridFunction::createHybridFunction(name, setter, FunctionKind::SETTER),
+                                 });
   }
 
   /**
@@ -184,7 +178,7 @@ public:
   template <typename Derived, typename ReturnType, typename... Args>
     requires((JSIDecodable<std::decay_t<Args>> && ...) && (std::is_void_v<ReturnType> || JSIEncodable<ReturnType>))
   inline void registerHybridMethod(std::string name, InstanceMethod<Derived, ReturnType, Args...> method) {
-    if (_getters.contains(name) || _setters.contains(name)) [[unlikely]] {
+    if (_properties.contains(name)) [[unlikely]] {
       throw std::runtime_error("Cannot add Hybrid Method \"" + name + "\" - a property with that name already exists!");
     }
     if (_methods.contains(name)) [[unlikely]] {
@@ -203,7 +197,7 @@ public:
    */
   template <typename Derived>
   inline void registerRawHybridMethod(std::string name, size_t expectedArgumentsCount, RawInstanceMethod<Derived> method) {
-    if (_getters.contains(name) || _setters.contains(name)) [[unlikely]] {
+    if (_properties.contains(name)) [[unlikely]] {
       throw std::runtime_error("Cannot add Hybrid Method \"" + name + "\" - a property with that name already exists!");
     }
     if (_methods.contains(name)) [[unlikely]] {
@@ -211,6 +205,17 @@ public:
     }
 
     _methods.emplace(name, HybridFunction::createRawHybridFunction(name, expectedArgumentsCount, method));
+  }
+
+private:
+  void registerHybridProperty(std::string name, HybridProperty property) {
+    if (_properties.contains(name)) [[unlikely]] {
+      throw std::runtime_error("Cannot add Hybrid Property \"" + name + "\" - a property with that name already exists!");
+    }
+    if (_methods.contains(name)) [[unlikely]] {
+      throw std::runtime_error("Cannot add Hybrid Property \"" + name + "\" - a method with that name already exists!");
+    }
+    _properties.emplace(std::move(name), std::move(property));
   }
 };
 

@@ -17,10 +17,8 @@ namespace margelo::nitro::test::external {
 
   const std::shared_ptr<const HybridClass>& HybridTestViewSpec::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridGetter("isBlue", &HybridTestViewSpec::getIsBlue);
-      clazz.registerHybridSetter("isBlue", &HybridTestViewSpec::setIsBlue);
-      clazz.registerHybridGetter("someCallback", &HybridTestViewSpec::getSomeCallback);
-      clazz.registerHybridSetter("someCallback", &HybridTestViewSpec::setSomeCallback);
+      clazz.registerHybridProperty("isBlue", &HybridTestViewSpec::getIsBlue, &HybridTestViewSpec::setIsBlue);
+      clazz.registerHybridProperty("someCallback", &HybridTestViewSpec::getSomeCallback, &HybridTestViewSpec::setSomeCallback);
       clazz.registerHybridMethod("someMethod", &HybridTestViewSpec::someMethod);
       clazz.registerHybridMethod("getModuleName", &HybridTestViewSpec::getModuleName);
     });

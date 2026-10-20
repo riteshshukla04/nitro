@@ -62,16 +62,12 @@ export class SwiftInstanceMethod extends InstanceMethod {
       endpoint.parameters,
       { access: 'public', final: true, throwing: false, generated: true }
     )
-    const registrationKind = this.accessor?.kind ?? 'method'
-    const registrationMethod = {
-      method: 'registerHybridMethod',
-      getter: 'registerHybridGetter',
-      setter: 'registerHybridSetter',
-    }[registrationKind]
-    const registrationName = this.accessor?.name ?? nativeMethod.name
-    const cppRegistration = `
-clazz.${registrationMethod}("${registrationName}", &${cppClassName}::${this.name});
-`.trim()
+    const cppRegistrations: string[] = []
+    if (this.accessor == null) {
+      cppRegistrations.push(
+        `clazz.registerHybridMethod("${nativeMethod.name}", &${cppClassName}::${this.name});`
+      )
+    }
     return {
       cppMethods: [
         { method: forwarder, body: cppForwarderBody },
@@ -79,7 +75,7 @@ clazz.${registrationMethod}("${registrationName}", &${cppClassName}::${this.name
       ],
       swiftMethod: { method: swiftMethod, body: endpoint.body },
       swiftImports: getSwiftMethodImports(this.callable),
-      cppRegistrations: [cppRegistration],
+      cppRegistrations: cppRegistrations,
     }
   }
 

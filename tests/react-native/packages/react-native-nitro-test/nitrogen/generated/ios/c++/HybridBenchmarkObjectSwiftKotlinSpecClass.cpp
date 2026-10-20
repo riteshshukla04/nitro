@@ -25,9 +25,8 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridBenchmarkObjectSwiftKotlinSpec::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridGetter("numberValue", &HybridBenchmarkObjectSwiftKotlinSpec::getNumberValue);
-      clazz.registerHybridSetter("numberValue", &HybridBenchmarkObjectSwiftKotlinSpec::setNumberValue);
-      clazz.registerHybridGetter("thisObject", &HybridBenchmarkObjectSwiftKotlinSpec::getThisObject);
+      clazz.registerHybridProperty("numberValue", &HybridBenchmarkObjectSwiftKotlinSpec::getNumberValue, &HybridBenchmarkObjectSwiftKotlinSpec::setNumberValue);
+      clazz.registerHybridProperty("thisObject", &HybridBenchmarkObjectSwiftKotlinSpec::getThisObject);
       clazz.registerHybridMethod("simpleFunc", &HybridBenchmarkObjectSwiftKotlinSpec::simpleFunc);
       clazz.registerHybridMethod("addNumbers", &HybridBenchmarkObjectSwiftKotlinSpec::addNumbers);
       clazz.registerHybridMethod("addStrings", &HybridBenchmarkObjectSwiftKotlinSpec::addStrings);

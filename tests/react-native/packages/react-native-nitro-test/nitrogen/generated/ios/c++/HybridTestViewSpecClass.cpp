@@ -19,18 +19,12 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridTestViewSpec::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridGetter("isBlue", &HybridTestViewSpec::getIsBlue);
-      clazz.registerHybridSetter("isBlue", &HybridTestViewSpec::setIsBlue);
-      clazz.registerHybridGetter("hasBeenCalled", &HybridTestViewSpec::getHasBeenCalled);
-      clazz.registerHybridSetter("hasBeenCalled", &HybridTestViewSpec::setHasBeenCalled);
-      clazz.registerHybridGetter("int64Value", &HybridTestViewSpec::getInt64Value);
-      clazz.registerHybridSetter("int64Value", &HybridTestViewSpec::setInt64Value);
-      clazz.registerHybridGetter("colorScheme", &HybridTestViewSpec::getColorScheme);
-      clazz.registerHybridSetter("colorScheme", &HybridTestViewSpec::setColorScheme);
-      clazz.registerHybridGetter("someCallback", &HybridTestViewSpec::getSomeCallback);
-      clazz.registerHybridSetter("someCallback", &HybridTestViewSpec::setSomeCallback);
-      clazz.registerHybridGetter("nativeDefaultValue", &HybridTestViewSpec::getNativeDefaultValue);
-      clazz.registerHybridSetter("nativeDefaultValue", &HybridTestViewSpec::setNativeDefaultValue);
+      clazz.registerHybridProperty("isBlue", &HybridTestViewSpec::getIsBlue, &HybridTestViewSpec::setIsBlue);
+      clazz.registerHybridProperty("hasBeenCalled", &HybridTestViewSpec::getHasBeenCalled, &HybridTestViewSpec::setHasBeenCalled);
+      clazz.registerHybridProperty("int64Value", &HybridTestViewSpec::getInt64Value, &HybridTestViewSpec::setInt64Value);
+      clazz.registerHybridProperty("colorScheme", &HybridTestViewSpec::getColorScheme, &HybridTestViewSpec::setColorScheme);
+      clazz.registerHybridProperty("someCallback", &HybridTestViewSpec::getSomeCallback, &HybridTestViewSpec::setSomeCallback);
+      clazz.registerHybridProperty("nativeDefaultValue", &HybridTestViewSpec::getNativeDefaultValue, &HybridTestViewSpec::setNativeDefaultValue);
       clazz.registerHybridMethod("getIsViewBlue", &HybridTestViewSpec::getIsViewBlue);
       clazz.registerHybridMethod("getOnDropViewCount", &HybridTestViewSpec::getOnDropViewCount);
       clazz.registerHybridMethod("getIsBlueSetterCallCount", &HybridTestViewSpec::getIsBlueSetterCallCount);
