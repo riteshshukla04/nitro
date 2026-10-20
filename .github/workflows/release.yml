@@ -33,6 +33,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       commit: ${{ steps.resolve.outputs.commit }}
+      branch:
+        ${{ github.event_name == 'release' && (startsWith(github.event.release.tag_name, 'v1.') && contains(github.event.release.tag_name,
+        '-alpha.') && 'v1' || 'main') || github.ref_name }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -120,6 +123,8 @@ jobs:
 
   test-runtime-android:
     needs: resolve
+    # v1 currently supports iOS only.
+    if: needs.resolve.outputs.branch != 'v1'
     uses: ./.github/workflows/test-runtime-android.yml
     with:
       ref: ${{ needs.resolve.outputs.commit }}
@@ -132,6 +137,7 @@ jobs:
 
   build-android:
     needs: resolve
+    if: needs.resolve.outputs.branch != 'v1'
     uses: ./.github/workflows/build-android.yml
     with:
       ref: ${{ needs.resolve.outputs.commit }}
@@ -144,6 +150,7 @@ jobs:
 
   harness-android:
     needs: resolve
+    if: needs.resolve.outputs.branch != 'v1'
     uses: ./.github/workflows/harness-android.yml
     with:
       ref: ${{ needs.resolve.outputs.commit }}
@@ -167,6 +174,20 @@ jobs:
       - build-android
       - harness-ios
       - harness-android
+    # Only v1's unsupported Android jobs may be skipped.
+    if: >-
+      !cancelled() && needs.resolve.result == 'success' && needs.build.result == 'success' && needs.build-docs.result == 'success' &&
+      needs.format-prettier.result == 'success' && needs.lint-cpp.result == 'success' && needs.lint-swift.result == 'success' &&
+      needs.lint-kotlin.result == 'success' && needs.lint-typescript.result == 'success' && needs.run-nitrogen.result == 'success' &&
+      needs.run-nitrogen-init.result == 'success' && needs.check-release.result == 'success' && needs.test-runtime-ios.result == 'success'
+      && needs.build-ios.result == 'success' && needs.harness-ios.result == 'success' && ((needs.resolve.outputs.branch == 'v1' &&
+        needs.test-runtime-android.result == 'skipped' &&
+        needs.build-android.result == 'skipped' &&
+        needs.harness-android.result == 'skipped') ||
+       (needs.resolve.outputs.branch == 'main' &&
+        needs.test-runtime-android.result == 'success' &&
+        needs.build-android.result == 'success' &&
+        needs.harness-android.result == 'success'))
     runs-on: ubuntu-latest
     timeout-minutes: 90
     concurrency:
@@ -194,9 +215,7 @@ jobs:
         id: release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_BRANCH:
-            ${{ github.event_name == 'release' && (startsWith(github.event.release.tag_name, 'v1.') &&
-            contains(github.event.release.tag_name, '-alpha.') && 'v1' || 'main') || github.ref_name }}
+          RELEASE_BRANCH: ${{ needs.resolve.outputs.branch }}
           RELEASE_MODE: ${{ github.event_name == 'push' && 'nightly' || 'manual' }}
           RELEASE_VERSION: ${{ inputs.version }}
           RELEASE_NPM_TAG: ${{ inputs.npm-tag }}
@@ -208,7 +227,8 @@ jobs:
   # Releases created with GITHUB_TOKEN do not trigger other release workflows.
   ios-artifacts:
     needs: release
-    if: needs.release.outputs.tag != '' && github.event_name != 'release'
+    if: >-
+      !cancelled() && needs.release.result == 'success' && needs.release.outputs.tag != '' && github.event_name != 'release'
     permissions:
       contents: write
     uses: ./.github/workflows/build-ios-release.yml
@@ -216,8 +236,10 @@ jobs:
       release-tag: ${{ needs.release.outputs.tag }}
 
   android-artifacts:
-    needs: release
-    if: needs.release.outputs.tag != '' && github.event_name != 'release'
+    needs: [resolve, release]
+    if: >-
+      !cancelled() && needs.resolve.result == 'success' && needs.release.result == 'success' && needs.resolve.outputs.branch == 'main' &&
+      needs.release.outputs.tag != '' && github.event_name != 'release'
     permissions:
       contents: write
     uses: ./.github/workflows/build-android-release.yml
