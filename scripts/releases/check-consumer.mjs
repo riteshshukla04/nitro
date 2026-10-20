@@ -67,7 +67,13 @@ export function checkConsumer(tarballs) {
   )
   writeFileSync(
     path.join(consumer, 'Math.nitro.ts'),
-    "import { iOS, type HybridObject } from 'nitro-core'\n@iOS({ language: 'swift', allowMultipleImplementations: true })\nexport declare class Math extends HybridObject { add(a: number, b: number): number }\n"
+    `import { iOS, type HybridObject } from 'nitro-core'
+@iOS({ language: 'swift', allowMultipleImplementations: true })
+export declare class Math extends HybridObject {
+  add(a: number, b: number): number
+  greet(name: string): string
+}
+`
   )
   writeFileSync(path.join(consumer, 'esm.mts'), "export type { HybridObject, NitroModulesProxy } from 'nitro-core'\n")
   writeJSON(path.join(consumer, 'tsconfig.json'), {
@@ -96,9 +102,29 @@ export function checkConsumer(tarballs) {
   run('node', [tsc, '--project', path.join(consumer, 'tsconfig.json')], {
     cwd: consumer,
   })
-  const header = path.join(consumer, 'nitrogen/generated/shared/c++/include/ReleaseCheck/HybridMathSpec.hpp')
-  if (!existsSync(header) || !readFileSync(header, 'utf8').includes('add('))
-    throw new Error('Packed Nitrogen did not generate the consumer spec')
+  const generated = path.join(consumer, 'nitrogen/generated')
+  const swiftSpec = readFileSync(path.join(generated, 'ios/swift/HybridMathSpec.swift'), 'utf8')
+  for (const signature of ['func add(a: Double, b: Double) throws -> Double', 'func greet(name: String) throws -> String']) {
+    if (!swiftSpec.includes(signature)) throw new Error(`Packed Nitrogen did not generate the Swift signature: ${signature}`)
+  }
+  const bridgeHeader = readFileSync(path.join(generated, 'ios/c++/include/ReleaseCheck/private/HybridMathSpecSwift.hpp'), 'utf8')
+  for (const signature of ['double add_Swift(double a, double b);', 'swift::String greet_Swift(const swift::String& name);']) {
+    if (!bridgeHeader.includes(signature)) throw new Error(`Packed Nitrogen did not generate the Swift C++ bridge signature: ${signature}`)
+  }
+  if (bridgeHeader.includes('std::string greet(')) throw new Error('Packed Nitrogen generated a native C++ method for the Swift-only spec')
+  const bridgeSource = readFileSync(path.join(generated, 'ios/c++/HybridMathSpecSwift.cpp'), 'utf8')
+  for (const method of ['add', 'greet']) {
+    if (!bridgeSource.includes(`clazz.registerHybridMethod("${method}", &HybridMathSpecSwift::${method}_Swift);`))
+      throw new Error(`Packed Nitrogen did not register the Swift ${method} method`)
+  }
+  for (const file of [
+    'shared/c++/include/ReleaseCheck/HybridMathSpec.hpp',
+    'shared/c++/HybridMathSpec.cpp',
+    'shared/c++/include/ReleaseCheck/HybridMathSpecCxx.hpp',
+    'ios/c++/HybridMathSpecCxx.ios.cpp',
+  ]) {
+    if (existsSync(path.join(generated, file))) throw new Error(`Packed Nitrogen generated an unused C++ spec or adapter: ${file}`)
+  }
   run(
     'node',
     ['-e', `${mockRuntime} if (typeof require('#nitro/Math').Math !== 'function') throw Error('Generated HybridObject class is missing')`],
