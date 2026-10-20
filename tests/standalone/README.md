@@ -147,8 +147,8 @@ for that case instead of a later one. On Android, every case still creates its o
 caches its bytecode by source contents. Each runtime evaluates that bytecode with fresh globals and native objects. Compilation happens
 before the JS deadlines; Hermes' watchdog cannot interrupt the native compiler.
 
-The thread that creates a runtime owns it and pumps its dispatcher. On iOS, `TestScheduler` runs at most two groups at once, each on its own
-worker thread with an 8 MiB stack, while every Swift case awaits its own result. Swift Testing requests cases in no particular order, so
+The thread that creates a runtime owns it and pumps its dispatcher. On iOS, `TestScheduler` runs one group per CPU core at once, each on its
+own worker thread with an 8 MiB stack, while every Swift case awaits its own result. Swift Testing requests cases in no particular order, so
 queued groups start in manifest order: isolated cases first, then larger groups. Awaiting never blocks Swift's cooperative executor, which
 stays free to run `Promise.async` tasks that the JavaScript case awaits. The iOS runner restricts the cooperative pool to one worker so the
 concurrent native Promise test checks this behavior. Native work runs on background threads; its callbacks are queued back to the runtime's
