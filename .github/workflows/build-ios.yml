@@ -48,7 +48,7 @@ jobs:
         run: bun specs
 
       - name: Install Ccache
-        uses: hendrikmuhs/ccache-action@v1.2
+        uses: hendrikmuhs/ccache-action@v1.2.24
         with:
           max-size: 1.5G
           key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-spm-ccache-example-ios
