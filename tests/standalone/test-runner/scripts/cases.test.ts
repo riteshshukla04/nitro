@@ -19,6 +19,12 @@ mock.module('nitro-test-external', () => ({
   SomeExternalObject: class SomeExternalObject {},
 }))
 const { casesForTestObjects, namedCases, withTestTimeout } = await import('../js/utils/cases')
+type TestCase = import('../js/utils/cases').TestCase
+
+/** Registers already loaded cases, the way the bundle registers module loaders. */
+function loaded(cases: Record<string, TestCase>): Record<string, () => TestCase> {
+  return Object.fromEntries(Object.entries(cases).map(([name, test]) => [name, () => test]))
+}
 
 const originalRun = globalThis.runNitroTest
 const originalTimeout = globalThis.getNitroTestTimeoutMs
@@ -30,11 +36,13 @@ afterEach(() => {
 
 test('unannotated cases leave the native default unchanged', async () => {
   let called = false
-  registerTests({
-    ordinary: () => {
-      called = true
-    },
-  })
+  registerTests(
+    loaded({
+      ordinary: () => {
+        called = true
+      },
+    })
+  )
   expect(globalThis.getNitroTestTimeoutMs('ordinary')).toBeUndefined()
   await globalThis.runNitroTest('ordinary')
   expect(called).toBe(true)
@@ -48,7 +56,7 @@ test('fixture binding preserves timeouts without allocating the fixture', async 
     }),
     ordinary: () => {},
   })
-  registerTests(cases)
+  registerTests(loaded(cases))
 
   for (const implementation of ['TestObjectCpp', 'TestObjectSwiftKotlin']) {
     const name = `Memory / ${implementation} / allocate`
@@ -63,12 +71,12 @@ test('fixture binding preserves timeouts without allocating the fixture', async 
 })
 
 test('named cases retain an explicit timeout', () => {
-  registerTests(namedCases('Stress', { allocate: withTestTimeout(500, () => {}) }))
+  registerTests(loaded(namedCases('Stress', { allocate: withTestTimeout(500, () => {}) })))
   expect(globalThis.getNitroTestTimeoutMs('Stress / allocate')).toBe(500)
 })
 
 test('timeout lookup rejects unknown and inherited case names', () => {
-  registerTests({ ordinary: () => {} })
+  registerTests(loaded({ ordinary: () => {} }))
   for (const name of ['missing', 'constructor']) {
     expect(() => globalThis.getNitroTestTimeoutMs(name)).toThrow(`Unknown Nitro test: ${name}`)
   }
@@ -76,7 +84,7 @@ test('timeout lookup rejects unknown and inherited case names', () => {
 
 test('only the four allocation stress cases receive a longer budget', async () => {
   const { cases } = await import('../js/memory.test')
-  registerTests(cases)
+  registerTests(loaded(cases))
   const overrides = Object.keys(cases).filter((name) => globalThis.getNitroTestTimeoutMs(name) !== undefined)
   expect(overrides.sort()).toEqual([
     'Memory / TestObjectCpp / newTestObject() objects are reclaimed by JS GC',
@@ -87,4 +95,23 @@ test('only the four allocation stress cases receive a longer budget', async () =
   for (const name of overrides) {
     expect(globalThis.getNitroTestTimeoutMs(name)).toBe(150_000)
   }
+})
+
+test('a test module is only loaded when one of its cases runs', async () => {
+  const loads: string[] = []
+  const module = (file: string, cases: Record<string, TestCase>) => () => {
+    loads.push(file)
+    return cases
+  }
+  const arrays = module('arrays', { first: () => {}, second: () => {} })
+  const maps = module('maps', { first: () => {} })
+  registerTests({
+    'arrays.first': () => arrays().first!,
+    'arrays.second': () => arrays().second!,
+    'maps.first': () => maps().first!,
+  })
+  expect(loads).toEqual([])
+  await globalThis.runNitroTest('arrays.second')
+  expect(loads).toEqual(['arrays'])
+  expect(() => globalThis.getNitroTestTimeoutMs('missing')).toThrow('Unknown Nitro test: missing')
 })

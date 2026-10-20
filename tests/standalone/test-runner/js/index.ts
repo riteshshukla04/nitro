@@ -9,9 +9,14 @@ declare global {
   var getNitroTestTimeoutMs: (name: string) => number | undefined
 }
 
-export function registerTests(cases: Record<string, TestCase>): void {
+/**
+ * Registers every case by name. Each entry loads its test module on first use,
+ * so a runtime only evaluates the files whose cases it actually runs.
+ */
+export function registerTests(cases: Record<string, () => TestCase>): void {
   const getTest = (name: string): TestCase => {
-    const test = Object.hasOwn(cases, name) ? cases[name] : undefined
+    const load = Object.hasOwn(cases, name) ? cases[name] : undefined
+    const test = typeof load === 'function' ? load() : undefined
     if (typeof test !== 'function') throw new Error(`Unknown Nitro test: ${name}`)
     return test
   }
