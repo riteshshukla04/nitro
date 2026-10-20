@@ -135,7 +135,7 @@ Since JS callbacks could theoretically be called from any native Thread, callbac
 class HybridMath: HybridMathSpec {
   func calculate(getValue: any Callback<(), Double>) {
     Task {
-      let result = try await getValue().await() // Double
+      let result = try await getValue() // Double
     }
   }
 }
@@ -153,8 +153,9 @@ func call(callback: any Callback<(), Void>) throws {
 }
 ```
 
-Additionally, the call operator overload either chooses `callAndForget()` when the callback returns `Void`, or `callAsync()` when it returns
-a value.
+In synchronous code, the call operator chooses `callAndForget()` when the callback returns `Void`, or returns a `Promise` when it returns a
+value. In async code, `try await callback(...)` waits for the result and propagates errors, just like `try await callback.callAsync(...)`.
+These Swift async overloads require a `Sendable` result. Use `callAndForget()` explicitly to fire and forget from an async function.
 
 ```swift
 func callVoid(callback: any Callback<(), Void>) {
@@ -162,6 +163,9 @@ func callVoid(callback: any Callback<(), Void>) {
 }
 func callResult(callback: any Callback<(), Double>) {
   callback()               // Promise<Double> (just like callAsync())
+}
+func callResultAsync(callback: any Callback<(), Double>) async throws {
+  let result = try await callback() // Double
 }
 ```
 

@@ -110,8 +110,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     -> any Promise<Void>
   {
     return .async {
-      let callPromise = callback()
-      let resultPromise = try await callPromise.await()
+      let resultPromise = try await callback()
       try await resultPromise.await()
     }
   }
@@ -132,7 +131,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     Double
   > {
     return .async {
-      let jsResult = try await getValue().await()
+      let jsResult = try await getValue()
       return jsResult
     }
   }
@@ -141,8 +140,8 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     callback: any Callback<(), String>, andThenCall: any Callback<String, Void>
   ) throws -> any Promise<Void> {
     return .async {
-      let jsResult = try await callback().await()
-      andThenCall(jsResult)
+      let jsResult = try await callback()
+      andThenCall.callAndForget(jsResult)
     }
   }
 
@@ -150,7 +149,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     var result = 0.0
     return .async {
       for _ in 0..<max(0, Int(n)) {
-        let current = try await callback().await()
+        let current = try await callback()
         result += current
       }
       return result
@@ -161,7 +160,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     Double
   > {
     return .async {
-      let promise = try await callback().await()
+      let promise = try await callback()
       let result = try await promise.await()
       return result
     }
@@ -254,7 +253,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     callback: any Callback<(), any Promise<[Powertrain]>>
   ) throws -> any Promise<[Powertrain]> {
     return .async {
-      let promise = try await callback().await()
+      let promise = try await callback()
       return try await promise.await()
     }
   }

@@ -77,6 +77,12 @@ extension Callback where Return: Sendable {
   public nonisolated(nonsending) func callAsync<each A>(_ args: repeat each A) async throws -> Return where Arguments == (repeat each A) {
     return try await callAsync((repeat each args)).await()
   }
+
+  /// Invokes this callback and awaits its result, throwing if the callback fails.
+  public nonisolated(nonsending) func callAsFunction<each A>(_ args: repeat each A) async throws -> Return
+  where Arguments == (repeat each A) {
+    return try await callAsync(repeat each args)
+  }
 }
 
 /// Extension to support callAsFunction() which returns a `Promise` if it has a return type
@@ -90,5 +96,9 @@ extension Callback {
 extension Callback where Return == Void {
   public func callAsFunction<each A>(_ args: repeat each A) where Arguments == (repeat each A) {
     callAndForget((repeat each args))
+  }
+
+  public nonisolated(nonsending) func callAsFunction<each A>(_ args: repeat each A) async throws where Arguments == (repeat each A) {
+    try await callAsync((repeat each args)).await()
   }
 }
