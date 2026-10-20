@@ -108,13 +108,13 @@ export declare class Math extends HybridObject {
     if (!swiftSpec.includes(signature)) throw new Error(`Packed Nitrogen did not generate the Swift signature: ${signature}`)
   }
   const bridgeHeader = readFileSync(path.join(generated, 'ios/c++/include/ReleaseCheck/private/HybridMathSpecSwift.hpp'), 'utf8')
-  for (const signature of ['double add_Swift(double a, double b);', 'swift::String greet_Swift(const swift::String& name);']) {
+  for (const signature of ['double add(double a, double b);', 'swift::String greet(const swift::String& name);']) {
     if (!bridgeHeader.includes(signature)) throw new Error(`Packed Nitrogen did not generate the Swift C++ bridge signature: ${signature}`)
   }
   if (bridgeHeader.includes('std::string greet(')) throw new Error('Packed Nitrogen generated a native C++ method for the Swift-only spec')
   const bridgeSource = readFileSync(path.join(generated, 'ios/c++/HybridMathSpecSwift.cpp'), 'utf8')
   for (const method of ['add', 'greet']) {
-    if (!bridgeSource.includes(`clazz.registerHybridMethod("${method}", &HybridMathSpecSwift::${method}_Swift);`))
+    if (!bridgeSource.includes(`clazz.registerHybridMethod("${method}", &HybridMathSpecSwift::${method});`))
       throw new Error(`Packed Nitrogen did not register the Swift ${method} method`)
   }
   for (const file of [
