@@ -28,18 +28,10 @@ export function createSwiftPromiseBridge(type: SwiftPromiseType): SourceFile[] {
   })
   const resolvedType = type.adapterResultingType
   const needsAdapter = resolvedType instanceof SwiftBorrowedPointerType
-  const pendingCall = needsAdapter
-    ? `${bridgeNamespace}.create_${swiftClassName}()`
-    : `${swiftClassName}.__pending()`
-  const rejectCall = needsAdapter
-    ? `bridge.reject_${swiftClassName}(self, error.toCpp())`
-    : 'reject(consuming: error.toCpp())'
-  const rejectedListenerCall = needsAdapter
-    ? `bridge.listenRejected_${swiftClassName}(self, `
-    : 'addOnRejectedListener('
-  const resolvedListenerCall = needsAdapter
-    ? `bridge.listen_${swiftClassName}(self, `
-    : 'addOnResolvedListener('
+  const pendingCall = needsAdapter ? `${bridgeNamespace}.create_${swiftClassName}()` : `${swiftClassName}.__pending()`
+  const rejectCall = needsAdapter ? `bridge.reject_${swiftClassName}(self, error.toCpp())` : 'reject(consuming: error.toCpp())'
+  const rejectedListenerCall = needsAdapter ? `bridge.listenRejected_${swiftClassName}(self, ` : 'addOnRejectedListener('
+  const resolvedListenerCall = needsAdapter ? `bridge.listen_${swiftClassName}(self, ` : 'addOnResolvedListener('
   let resolveBody: string
   let addOnResolvedListenerBody: string
   if (resolvedType.kind === 'void') {

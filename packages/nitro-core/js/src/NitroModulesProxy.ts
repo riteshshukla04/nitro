@@ -15,9 +15,7 @@ declare class NitroModulesProxy extends HybridObject {
    * Nitrogen's generated exports provide the class type automatically.
    * Classes without a public constructor can still be used with `instanceof`.
    */
-  getHybridClass<T extends { readonly prototype: HybridObject }>(
-    name: string
-  ): T
+  getHybridClass<T extends { readonly prototype: HybridObject }>(name: string): T
   /**
    * Returns whether a HybridObject class is registered under the given {@linkcode name}.
    */
@@ -113,8 +111,7 @@ declare class NitroModulesProxy extends HybridObject {
  * NitroModules.getHybridClass('core.Performance')
  * ```
  */
-const NativeNitroModulesProxy: typeof NitroModulesProxy =
-  NitroModules.getHybridClass('NitroModulesProxy')
+const NativeNitroModulesProxy: typeof NitroModulesProxy = NitroModules.getHybridClass('NitroModulesProxy')
 type NativeNitroModulesProxy = NitroModulesProxy
 
 export { NativeNitroModulesProxy as NitroModulesProxy }

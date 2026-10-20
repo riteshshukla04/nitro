@@ -29,11 +29,7 @@ export class KotlinInt64Type extends Int64Type implements KotlinType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniPrimitiveCode(
-          super.getCode(language, options),
-          options.context,
-          this.jniPrimitive
-        )
+        return getJniPrimitiveCode(super.getCode(language, options), options.context, this.jniPrimitive)
       default:
         return super.getCode(language, options)
     }

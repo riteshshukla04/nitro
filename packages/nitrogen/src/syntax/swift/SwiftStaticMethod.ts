@@ -28,9 +28,7 @@ export class SwiftStaticMethod extends StaticMethod {
   constructor({ spec, method }: SwiftStaticMethodOptions) {
     const implementation = spec.implementation
     if (implementation == null) {
-      throw new Error(
-        `${spec.name}: Cannot generate a static method without a Swift implementation.`
-      )
+      throw new Error(`${spec.name}: Cannot generate a static method without a Swift implementation.`)
     }
     const callable = prepareSwiftMethod(method, true)
     const parameters = callable.parameters.map((parameter) => parameter.swift)
@@ -45,25 +43,16 @@ export class SwiftStaticMethod extends StaticMethod {
     this.callable = callable
   }
 
-  createBridge(
-    cppClassName: string,
-    swiftOptions: SwiftClassMethodOptions = {}
-  ): SwiftMethodBridge {
+  createBridge(cppClassName: string, swiftOptions: SwiftClassMethodOptions = {}): SwiftMethodBridge {
     const nativeMethod = this.nativeMethod
-    const forwarder = new StaticMethod(
-      nativeMethod.name,
-      nativeMethod.returnType,
-      nativeMethod.parameters,
-      { generated: true }
-    )
+    const forwarder = new StaticMethod(nativeMethod.name, nativeMethod.returnType, nativeMethod.parameters, { generated: true })
     const cppForwarderBody = createCppForwarderBody({
       nativeMethod: nativeMethod,
       swiftMethod: this,
     })
     const cppBridgeBody = createCppBridgeBody({
       callable: this.callable,
-      getCppInvocation: (args) =>
-        `${this.cppInvocationTarget}::${nativeMethod.name}(${args.join(', ')})`,
+      getCppInvocation: (args) => `${this.cppInvocationTarget}::${nativeMethod.name}(${args.join(', ')})`,
     })
     const endpoint = createSwiftEndpoint({
       callable: this.callable,
@@ -72,17 +61,12 @@ export class SwiftStaticMethod extends StaticMethod {
         return `try ${this.implementationClassName}.${nativeMethod.name}(${argumentsList.join(', ')})`
       },
     })
-    const swiftMethod = new StaticMethod(
-      nativeMethod.name,
-      endpoint.returnType,
-      endpoint.parameters,
-      {
-        ...swiftOptions,
-        access: 'public',
-        throwing: false,
-        generated: true,
-      }
-    )
+    const swiftMethod = new StaticMethod(nativeMethod.name, endpoint.returnType, endpoint.parameters, {
+      ...swiftOptions,
+      access: 'public',
+      throwing: false,
+      generated: true,
+    })
     return {
       cppMethods: [
         { method: forwarder, body: cppForwarderBody },
@@ -90,9 +74,7 @@ export class SwiftStaticMethod extends StaticMethod {
       ],
       swiftMethod: { method: swiftMethod, body: endpoint.body },
       swiftImports: getSwiftMethodImports(this.callable),
-      cppRegistrations: [
-        `clazz.registerStaticHybridMethod("${nativeMethod.name}", &${cppClassName}::${this.name});`,
-      ],
+      cppRegistrations: [`clazz.registerStaticHybridMethod("${nativeMethod.name}", &${cppClassName}::${this.name});`],
     }
   }
 }

@@ -2,10 +2,7 @@ import type { HybridObjectPlatformOptions } from './HybridObjectPlatformOptions.
 
 // A full ClassDecoratorContext requires a public constructor. Specs can also
 // have protected or private constructors, so only constrain the decorator kind.
-type HybridObjectDecorator = (
-  target: unknown,
-  context?: Pick<ClassDecoratorContext, 'kind'>
-) => void
+type HybridObjectDecorator = (target: unknown, context?: Pick<ClassDecoratorContext, 'kind'>) => void
 
 function createDecoratorCallError(name: 'iOS' | 'Android'): Error {
   return new Error(
@@ -23,9 +20,7 @@ function createDecoratorCallError(name: 'iOS' | 'Android'): Error {
  * @throws Always. A call means the spec uses `class` instead of `declare class`,
  * or a transpiler emitted decorator calls for a declared class.
  */
-export function iOS(
-  _options: HybridObjectPlatformOptions<'c++' | 'swift'>
-): HybridObjectDecorator {
+export function iOS(_options: HybridObjectPlatformOptions<'c++' | 'swift'>): HybridObjectDecorator {
   throw createDecoratorCallError('iOS')
 }
 
@@ -36,8 +31,6 @@ export function iOS(
  * @throws Always. A call means the spec uses `class` instead of `declare class`,
  * or a transpiler emitted decorator calls for a declared class.
  */
-export function Android(
-  _options: HybridObjectPlatformOptions<'c++' | 'kotlin'>
-): HybridObjectDecorator {
+export function Android(_options: HybridObjectPlatformOptions<'c++' | 'kotlin'>): HybridObjectDecorator {
   throw createDecoratorCallError('Android')
 }

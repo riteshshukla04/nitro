@@ -5,12 +5,7 @@ import { parseArguments, requiredArgument } from './args'
 /** Raw measurements and provenance, retained separately from the rendered publication. */
 export interface PerformanceReport {
   schemaVersion: 2
-  eventName:
-    | 'issue_comment'
-    | 'pull_request'
-    | 'push'
-    | 'schedule'
-    | 'workflow_dispatch'
+  eventName: 'issue_comment' | 'pull_request' | 'push' | 'schedule' | 'workflow_dispatch'
   repository: string
   pullRequestNumber: number | null
   baseSha: string
@@ -32,13 +27,7 @@ export interface PlatformArtifacts {
 /** Stable publication envelope. It does not depend on the raw benchmark schema. */
 export interface ReportMetadata extends Pick<
   PerformanceReport,
-  | 'eventName'
-  | 'repository'
-  | 'pullRequestNumber'
-  | 'baseSha'
-  | 'headSha'
-  | 'workflowRunId'
-  | 'runAttempt'
+  'eventName' | 'repository' | 'pullRequestNumber' | 'baseSha' | 'headSha' | 'workflowRunId' | 'runAttempt'
 > {
   platforms: ('android' | 'ios')[]
 }
@@ -55,23 +44,18 @@ if (import.meta.main) {
   ) {
     throw new Error(`Unsupported event: ${eventName}`)
   }
-  const { baseSuiteHash, headSuiteHash } = JSON.parse(
-    await readFile(requiredArgument(args, 'suite'), 'utf8')
-  ) as Pick<PerformanceReport, 'baseSuiteHash' | 'headSuiteHash'>
+  const { baseSuiteHash, headSuiteHash } = JSON.parse(await readFile(requiredArgument(args, 'suite'), 'utf8')) as Pick<
+    PerformanceReport,
+    'baseSuiteHash' | 'headSuiteHash'
+  >
   const raw = requiredArgument(args, 'raw-directory')
-  async function artifacts(
-    platform: 'android' | 'ios'
-  ): Promise<PlatformArtifacts> {
+  async function artifacts(platform: 'android' | 'ios'): Promise<PlatformArtifacts> {
     const build = await Bun.file(path.join(raw, platform, 'build.json')).json()
-    const measurement = await Bun.file(
-      path.join(raw, platform, 'measurement.json')
-    ).json()
+    const measurement = await Bun.file(path.join(raw, platform, 'measurement.json')).json()
     return {
       buildId: measurement.buildArtifactId,
       buildAttempt: build.runAttempt,
-      measurementId: Number(
-        process.env[`${platform.toUpperCase()}_ARTIFACT_ID`]
-      ),
+      measurementId: Number(process.env[`${platform.toUpperCase()}_ARTIFACT_ID`]),
       measurementAttempt: measurement.runAttempt,
     }
   }
@@ -91,8 +75,5 @@ if (import.meta.main) {
     workflowRunId: Number(process.env.GITHUB_RUN_ID),
     runAttempt: Number(process.env.GITHUB_RUN_ATTEMPT),
   }
-  await Bun.write(
-    requiredArgument(args, 'output'),
-    `${JSON.stringify(report, null, 2)}\n`
-  )
+  await Bun.write(requiredArgument(args, 'output'), `${JSON.stringify(report, null, 2)}\n`)
 }

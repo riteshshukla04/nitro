@@ -10,20 +10,14 @@ export function getUmbrellaHeaderName(config = NitroConfig.current): string {
   return `${moduleName}-Swift-Cxx-Umbrella.hpp`
 }
 
-export function createSwiftUmbrellaHeader(
-  types: SwiftType[],
-  moduleDependencies: NitroConfig[]
-): SourceFile {
+export function createSwiftUmbrellaHeader(types: SwiftType[], moduleDependencies: NitroConfig[]): SourceFile {
   const moduleName = NitroConfig.current.getIosModuleName()
   const filename = getUmbrellaHeaderName()
 
   const dependencyIncludes = getImportsCode(
     moduleDependencies.map<SourceImport>((config) => ({
       language: 'c++',
-      declaration: config.getCxxHeader(
-        getUmbrellaHeaderName(config),
-        'private'
-      ),
+      declaration: config.getCxxHeader(getUmbrellaHeaderName(config), 'private'),
     })),
     'implementation'
   )

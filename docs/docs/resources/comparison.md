@@ -1,7 +1,9 @@
 ---
 title: Compare Nitro, Turbo Modules, Legacy Native Modules, and Expo Modules
 sidebar_label: Comparison
-description: Compare React Native Nitro Modules with Turbo Modules, Legacy Native Modules, and Expo Modules for performance, typing, and native implementation tradeoffs.
+description:
+  Compare React Native Nitro Modules with Turbo Modules, Legacy Native Modules, and Expo Modules for performance, typing, and native
+  implementation tradeoffs.
 ---
 
 # Comparison with other frameworks
@@ -15,7 +17,8 @@ Nitro is not the only one of its kind. There's multiple ways to build native mod
 
 ## Benchmarks
 
-[This benchmark](https://github.com/mrousavy/NitroBenchmarks) compares the total execution time when calling a single native method 100.000 times:
+[This benchmark](https://github.com/mrousavy/NitroBenchmarks) compares the total execution time when calling a single native method 100.000
+times:
 
 <table>
   <tr>
@@ -38,14 +41,17 @@ Nitro is not the only one of its kind. There's multiple ways to build native mod
   </tr>
 </table>
 
-Note: These benchmarks only compare native method throughput in extreme cases, and do not necessarily reflect real world use-cases. In a real-world app, results may vary. See [NitroBenchmarks](https://github.com/mrousavy/NitroBenchmarks) for full context.
+Note: These benchmarks only compare native method throughput in extreme cases, and do not necessarily reflect real world use-cases. In a
+real-world app, results may vary. See [NitroBenchmarks](https://github.com/mrousavy/NitroBenchmarks) for full context.
 
 It's not all about performance though - there are some key differences between Nitro-, Turbo- and Expo-Modules:
 
 ## Turbo Modules
 
-[Turbo Modules](https://github.com/reactwg/react-native-new-architecture/blob/main/docs/turbo-modules.md) are React Native's default framework for building native modules.
-They use a code-generator called "[codegen](https://github.com/reactwg/react-native-new-architecture/blob/main/docs/codegen.md)" to convert Flow (or TypeScript) specs to native interfaces, similar to Nitro's nitrogen.
+[Turbo Modules](https://github.com/reactwg/react-native-new-architecture/blob/main/docs/turbo-modules.md) are React Native's default
+framework for building native modules. They use a code-generator called
+"[codegen](https://github.com/reactwg/react-native-new-architecture/blob/main/docs/codegen.md)" to convert Flow (or TypeScript) specs to
+native interfaces, similar to Nitro's nitrogen.
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -79,13 +85,15 @@ Turbo Modules can be built with Objective-C for iOS and Java for Android, or C++
 
 ### Shipped with react-native core
 
-Unlike Nitro, Turbo Modules are actually part of react-native core. This means, users don't have to install a single dependency to build- or use a Turbo Module.
+Unlike Nitro, Turbo Modules are actually part of react-native core. This means, users don't have to install a single dependency to build- or
+use a Turbo Module.
 
 ### Implementation details
 
 #### No Swift
 
-There is no direct Swift support for Turbo Modules. You could bridge from Objective-C to Swift, but that would still always go through Objective-C, which is comparatively slower than bridging directly from C++ to Swift, like Nitro does.
+There is no direct Swift support for Turbo Modules. You could bridge from Objective-C to Swift, but that would still always go through
+Objective-C, which is comparatively slower than bridging directly from C++ to Swift, like Nitro does.
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -148,9 +156,12 @@ RCT_EXPORT_MODULE()
 
 #### Not object-oriented
 
-While a Turbo Module can represent many types from JavaScript, there is no equivalent to Nitro's **Hybrid Object** in Turbo Modules. Instead, every Turbo Module is a singleton, and every native method is similar to a static method.
+While a Turbo Module can represent many types from JavaScript, there is no equivalent to Nitro's **Hybrid Object** in Turbo Modules.
+Instead, every Turbo Module is a singleton, and every native method is similar to a static method.
 
-Native objects, like Image instances, can not be represented in Turbo Modules. Common workarounds include writing the image to a file, converting images to base64 strings, or using Blobs - which all introduce runtime overhead and performance hits _just to pass an image instance to JS_.
+Native objects, like Image instances, can not be represented in Turbo Modules. Common workarounds include writing the image to a file,
+converting images to base64 strings, or using Blobs - which all introduce runtime overhead and performance hits _just to pass an image
+instance to JS_.
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -192,7 +203,8 @@ class HybridImageEditor: HybridImageEditorSpec {
 </div>
 </div>
 
-Using native objects (like the `HybridImage`) directly is much more efficient and performant, as well as more convenient to use than to write everything to a file.
+Using native objects (like the `HybridImage`) directly is much more efficient and performant, as well as more convenient to use than to
+write everything to a file.
 
 #### No tuples
 
@@ -212,8 +224,9 @@ type SomeCallback = () => number
 
 #### Events
 
-Since functions are not first-class citizens in Turbo Modules, you cannot hold onto a JavaScript callback in native code and call it more often, like you could in Nitro.
-Instead, Turbo Modules has "Events". Events are essentially just native functions that notify JS and potentially also pass data to JS more often.
+Since functions are not first-class citizens in Turbo Modules, you cannot hold onto a JavaScript callback in native code and call it more
+often, like you could in Nitro. Instead, Turbo Modules has "Events". Events are essentially just native functions that notify JS and
+potentially also pass data to JS more often.
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -255,18 +268,23 @@ RCT_EXPORT_MODULE();
 </div>
 </div>
 
-Events are untyped and have to be natively defined via `supportedEvents`. In Nitro, this would be fully typesafe as functions are first class citizens. (see `addListener(..)`)
+Events are untyped and have to be natively defined via `supportedEvents`. In Nitro, this would be fully typesafe as functions are first
+class citizens. (see `addListener(..)`)
 
 #### HostObject vs NativeState
 
-As of today, Turbo Modules are implemented using `jsi::HostObject`, whereas Nitro Modules are built with `jsi::NativeState`.
-NativeState has been proven to be much more efficient and performant, as property- and method-access is much faster - it can be properly cached by the JS Runtime and does not involve any virtual/Proxy-like accessors.
+As of today, Turbo Modules are implemented using `jsi::HostObject`, whereas Nitro Modules are built with `jsi::NativeState`. NativeState has
+been proven to be much more efficient and performant, as property- and method-access is much faster - it can be properly cached by the JS
+Runtime and does not involve any virtual/Proxy-like accessors.
 
-Additionally, Nitro Modules properly set up memory pressure per object, so the JS garbage collector actually knows a native module's memory size and can properly delete them when no longer needed. This is not the case with Turbo Modules.
+Additionally, Nitro Modules properly set up memory pressure per object, so the JS garbage collector actually knows a native module's memory
+size and can properly delete them when no longer needed. This is not the case with Turbo Modules.
 
 ### Codegen
 
-Codegen is similar to Nitrogen as it also generates native interfaces from TypeScript specifications. This ensures type-safety on the JavaScript side, as specs have to be implemented on the native side in order for the app to build successfully. This prevents any wrong type errors and ensures undefined/null-safety.
+Codegen is similar to Nitrogen as it also generates native interfaces from TypeScript specifications. This ensures type-safety on the
+JavaScript side, as specs have to be implemented on the native side in order for the app to build successfully. This prevents any wrong type
+errors and ensures undefined/null-safety.
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -298,8 +316,8 @@ export const Math =
 
 #### Codegen runs on app build
 
-Nitrogen is executed explicitly by the library developer and all generated interfaces are part of the npm package to always ship a working solution.
-Codegen on the other hand runs on app build, which causes specs to always be re-generated for every app.
+Nitrogen is executed explicitly by the library developer and all generated interfaces are part of the npm package to always ship a working
+solution. Codegen on the other hand runs on app build, which causes specs to always be re-generated for every app.
 
 #### Codegen cannot resolve imports
 
@@ -311,8 +329,9 @@ Codegen also supports [Flow](https://flow.org), while Nitrogen doesn't.
 
 ## Legacy Native Modules
 
-Prior to [Turbo Modules](#turbo-modules), React Native provided a default approach for building native modules which was just called ["Native Modules"](https://reactnative.dev/docs/native-modules-intro).
-Instead of using JSI, Native Modules were built on top of a communication layer that sent events and commands using JSON messages, both asynchronous and batched.
+Prior to [Turbo Modules](#turbo-modules), React Native provided a default approach for building native modules which was just called
+["Native Modules"](https://reactnative.dev/docs/native-modules-intro). Instead of using JSI, Native Modules were built on top of a
+communication layer that sent events and commands using JSON messages, both asynchronous and batched.
 
 Because Turbo Modules are just an evolution of Native Modules, their API is almost identical:
 
@@ -350,10 +369,11 @@ They are now deprecated in favor of [Turbo Modules](#turbo-modules).
 
 [Expo Modules](https://docs.expo.dev/modules/overview/) is an easy to use API to build native modules by Expo.
 
-Unlike both Nitro- and Turbo-, Expo-Modules does not have a code-generator.
-All native modules are considered untyped, and TypeScript definitions can be written afterwards.
+Unlike both Nitro- and Turbo-, Expo-Modules does not have a code-generator. All native modules are considered untyped, and TypeScript
+definitions can be written afterwards.
 
-An Expo Module can be written using a declarative syntax (_DSL_) where each function and property is declared inside the `definition()` function:
+An Expo Module can be written using a declarative syntax (_DSL_) where each function and property is declared inside the `definition()`
+function:
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -391,7 +411,8 @@ public class MathModule: Module {
 
 Just like Nitro, Expo Modules are written in Swift, instead of Objective-C.
 
-Expo Modules however bridge through Objective-C, whereas Nitro bridges to Swift directly (using the new Swift &lt;&gt; C++ interop) which has proven to be much more efficient.
+Expo Modules however bridge through Objective-C, whereas Nitro bridges to Swift directly (using the new Swift &lt;&gt; C++ interop) which
+has proven to be much more efficient.
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -420,7 +441,8 @@ graph LR;
 
 #### Kotlin coroutines
 
-Asynchronous functions can be implemented using Kotlin coroutines, which is a convenient pattern for asynchronous code. This is similar to Nitro's `Promise.async` function.
+Asynchronous functions can be implemented using Kotlin coroutines, which is a convenient pattern for asynchronous code. This is similar to
+Nitro's `Promise.async` function.
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -505,8 +527,9 @@ public class MathModule: Module {
 
 #### HostObject vs NativeState
 
-As of today, Expo Modules are implemented using `jsi::HostObject`, whereas Nitro Modules are built with `jsi::NativeState`.
-NativeState has been proven to be much more efficient and performant, as property- and method-access is much faster - it can be properly cached by the JS Runtime and does not involve any virtual/Proxy-like accessors.
+As of today, Expo Modules are implemented using `jsi::HostObject`, whereas Nitro Modules are built with `jsi::NativeState`. NativeState has
+been proven to be much more efficient and performant, as property- and method-access is much faster - it can be properly cached by the JS
+Runtime and does not involve any virtual/Proxy-like accessors.
 
 Expo-Modules do however properly set memory pressure of native objects, just like in Nitro.
 
@@ -515,7 +538,9 @@ Expo-Modules do however properly set memory pressure of native objects, just lik
 Expo Modules has a concept of "shared objects", which is similar to Hybrid Objects in Nitro.
 
 :::note
+
 I could not find any documentation for Shared Objects, so I cannot really compare them here.
+
 :::
 
 #### No tuples
@@ -536,8 +561,9 @@ type SomeCallback = () => number
 
 ### No code-generator
 
-Since Expo Modules does not provide a code-generator, all native modules are untyped by default.
-While TypeScript definitions can be written afterwards, it is possible that the handwritten TypeScript definitions are out of sync with the actual native types due to a user-error, especially when it comes to null-safety.
+Since Expo Modules does not provide a code-generator, all native modules are untyped by default. While TypeScript definitions can be written
+afterwards, it is possible that the handwritten TypeScript definitions are out of sync with the actual native types due to a user-error,
+especially when it comes to null-safety.
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -574,7 +600,8 @@ public class MathModule: Module {
 </div>
 </div>
 
-Note: It is also possible for Nitro specs to go out of sync, but only if you forget to run Nitrogen. In both cases, it's a user-error - one more likely than the other.
+Note: It is also possible for Nitro specs to go out of sync, but only if you forget to run Nitrogen. In both cases, it's a user-error - one
+more likely than the other.
 
 ## Supported Types
 

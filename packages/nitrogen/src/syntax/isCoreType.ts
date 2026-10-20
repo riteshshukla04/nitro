@@ -41,10 +41,7 @@ export function isError(type: TSMorphType): boolean {
 }
 
 export function isCustomType(type: TSMorphType): boolean {
-  return (
-    type.getProperty('__customTypeName') != null &&
-    type.getProperty('__customTypeConfig') != null
-  )
+  return type.getProperty('__customTypeName') != null && type.getProperty('__customTypeConfig') != null
 }
 
 export function isInt64(type: TSMorphType): boolean {

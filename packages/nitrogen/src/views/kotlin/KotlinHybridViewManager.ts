@@ -6,44 +6,27 @@ import {
   getHybridViewComponentName,
   getHybridViewProperties,
 } from '../CppHybridViewComponent.js'
-import {
-  createFileMetadataString,
-  escapeCppName,
-} from '../../syntax/helpers.js'
+import { createFileMetadataString, escapeCppName } from '../../syntax/helpers.js'
 import { getHybridObjectName } from '../../syntax/getHybridObjectName.js'
 import { addJNINativeRegistration } from '../../syntax/kotlin/JNINativeRegistrations.js'
 import { indent } from '../../utils.js'
 import { getImportsCode, getImportCode } from '../../syntax/getImportCode.js'
 import { getKotlinImplementation } from '../../syntax/kotlin/KotlinMethodHelpers.js'
 
-export function createKotlinHybridViewManager(
-  spec: HybridObjectSpec<'kotlin'>
-): SourceFile[] {
+export function createKotlinHybridViewManager(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {
   const cppFiles = createViewComponentShadowNodeFiles(spec)
   const javaSubNamespace = spec.config.getAndroidPackage('java/kotlin', 'views')
   const javaNamespace = spec.config.getAndroidPackage('java/kotlin')
   const cxxNamespace = spec.config.getCxxNamespace('c++', 'views')
   const { JHybridTSpec, HybridTSpec } = getHybridObjectName(spec.name)
-  const {
-    manager,
-    stateClassName,
-    component,
-    propsClassName,
-    descriptorClassName,
-  } = getViewComponentNames(spec)
+  const { manager, stateClassName, component, propsClassName, descriptorClassName } = getViewComponentNames(spec)
   const stateUpdaterName = `${stateClassName}Updater`
   const implementation = getKotlinImplementation(spec)
   const viewImplementation = implementation.className
   const implementationImport = getImportCode(implementation.kotlinImport)
   const componentName = getHybridViewComponentName(spec)
-  const componentHeader = spec.config.getCxxHeader(
-    `views/${component}.hpp`,
-    'private'
-  )
-  const updaterHeader = spec.config.getCxxHeader(
-    `views/J${stateUpdaterName}.hpp`,
-    'private'
-  )
+  const componentHeader = spec.config.getCxxHeader(`views/${component}.hpp`, 'private')
+  const updaterHeader = spec.config.getCxxHeader(`views/J${stateUpdaterName}.hpp`, 'private')
   const updaterIncludes = getImportsCode([
     { language: 'c++', declaration: updaterHeader },
     { language: 'c++', declaration: componentHeader },
@@ -172,11 +155,7 @@ internal class ${stateUpdaterName} {
 }
   `.trim()
 
-  const updaterJniDescriptor = spec.config.getAndroidPackage(
-    'c++/jni',
-    'views',
-    stateUpdaterName
-  )
+  const updaterJniDescriptor = spec.config.getAndroidPackage('c++/jni', 'views', stateUpdaterName)
   const updaterJniHeaderCode = `
 ${createFileMetadataString(`J${stateUpdaterName}.hpp`)}
 

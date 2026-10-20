@@ -2,16 +2,9 @@ import type { Language } from '../../../getPlatformSpecs.js'
 import type { GetCodeOptions } from '../../types/Type.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { ArrayBufferType } from '../../types/ArrayBufferType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
-export class KotlinArrayBufferType
-  extends ArrayBufferType
-  implements KotlinType
-{
+export class KotlinArrayBufferType extends ArrayBufferType implements KotlinType {
   readonly jniValueKind = 'pointer'
   readonly needsKotlinConversion = false
 

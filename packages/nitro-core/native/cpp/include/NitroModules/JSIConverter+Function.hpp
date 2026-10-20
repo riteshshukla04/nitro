@@ -6,8 +6,8 @@
 
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroModules/detail/PromiseType.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/detail/PromiseType.hpp>
 #include <functional>
 #include <jsi/jsi.h>
 #include <string>

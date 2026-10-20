@@ -2,11 +2,7 @@ import type { Language } from '../../../getPlatformSpecs.js'
 import type { GetCodeOptions } from '../../types/Type.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { NullType } from '../../types/NullType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinNullType extends NullType implements KotlinType {
   readonly jniValueKind = 'wrapper'

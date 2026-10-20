@@ -1,9 +1,5 @@
 import { expect, test } from 'bun:test'
-import {
-  REPORTING_THRESHOLD_PERCENT,
-  type MetricComparison,
-  type PlatformComparison,
-} from './comparison'
+import { REPORTING_THRESHOLD_PERCENT, type MetricComparison, type PlatformComparison } from './comparison'
 import { renderPerformanceReportMarkdown } from './report-markdown'
 
 const options = {
@@ -14,11 +10,7 @@ const options = {
   artifactId: 987,
   runAttempt: 2,
 }
-function metric(
-  id: string,
-  delta: number,
-  pairs = [delta, delta]
-): MetricComparison {
+function metric(id: string, delta: number, pairs = [delta, delta]): MetricComparison {
   return {
     id,
     baseMedianNsPerOp: 100,
@@ -112,12 +104,7 @@ test('restores the original table, emphasis, colors, disclosure, and footer', ()
 
 test('large Promise changes remain visible without duplicate diagnostic tables', () => {
   const text = renderPerformanceReportMarkdown(
-    [
-      report([
-        metric('nitro-cpp/promise/immediate', 20, [-5, 45]),
-        metric('nitro-cpp/primitive/add-numbers', 2),
-      ]),
-    ],
+    [report([metric('nitro-cpp/promise/immediate', 20, [-5, 45]), metric('nitro-cpp/primitive/add-numbers', 2)])],
     options
   )
   const [main, collapsed] = text.split('<details>')
@@ -136,10 +123,7 @@ test.each([
   REPORTING_THRESHOLD_PERCENT - 0.01,
   -REPORTING_THRESHOLD_PERCENT + 0.01,
 ])('preserves the reporting threshold for a %s%% change', (delta) => {
-  const text = renderPerformanceReportMarkdown(
-    [report([metric('nitro-cpp/primitive/add-numbers', delta)])],
-    options
-  )
+  const text = renderPerformanceReportMarkdown([report([metric('nitro-cpp/primitive/add-numbers', delta)])], options)
   const [main, collapsed] = text.split('<details>')
   const visible = Math.abs(delta) >= REPORTING_THRESHOLD_PERCENT
   expect(main!.includes('addNumbers()')).toBe(visible)
@@ -149,17 +133,12 @@ test.each([
   if (visible) {
     expect(collapsed).toContain('All benchmarks are shown above.')
   } else {
-    expect(main).toContain(
-      `No observed change reached the ${REPORTING_THRESHOLD_PERCENT}% reporting threshold.`
-    )
+    expect(main).toContain(`No observed change reached the ${REPORTING_THRESHOLD_PERCENT}% reporting threshold.`)
   }
 })
 
 test('equal measurements show zero observed change without bolding either time', () => {
-  const text = renderPerformanceReportMarkdown(
-    [report([metric('nitro-cpp/primitive/add-numbers', 0, [-30, 30])])],
-    options
-  )
+  const text = renderPerformanceReportMarkdown([report([metric('nitro-cpp/primitive/add-numbers', 0, [-30, 30])])], options)
   expect(text).toContain('⚪ ~0% observed change')
   expect(text.match(/<td align="right">100.0 ns<\/td>/g)).toHaveLength(2)
   expect(text).not.toMatch(/unchanged|equal performance/)
@@ -179,18 +158,13 @@ test('keeps iOS before Android and preserves names, escaping, and time units', (
     },
     metric('nitro-platform/custom/a-<b>&"\'', 20),
   ])
-  const platforms: PlatformComparison[] = [
-    { ...comparison, platform: 'android' },
-    comparison,
-  ]
+  const platforms: PlatformComparison[] = [{ ...comparison, platform: 'android' }, comparison]
   const text = renderPerformanceReportMarkdown(platforms, options)
   expect(text.indexOf('### iOS')).toBeLessThan(text.indexOf('### Android'))
   expect(platforms[0]!.platform).toBe('android')
   expect(text).toContain('<strong>Swift</strong> <code>copy(1 MiB)</code>')
   expect(text).toContain('<strong>Kotlin</strong> <code>copy(1 MiB)</code>')
-  expect(text).toContain(
-    '<strong>TurboModule</strong> <code>addNumbers()</code>'
-  )
+  expect(text).toContain('<strong>TurboModule</strong> <code>addNumbers()</code>')
   expect(text).toContain('1.60 ms')
   expect(text).toContain('<strong>1.50 ms</strong>')
   expect(text).toContain('<strong>1.00 µs</strong>')

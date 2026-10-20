@@ -5,11 +5,7 @@ import type { GetCodeOptions, Type } from '../../types/Type.js'
 import { VariantType } from '../../types/VariantType.js'
 import { createKotlinVariant } from '../KotlinVariant.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export interface KotlinVariantCase {
   label: string
@@ -73,10 +69,7 @@ export class KotlinVariantType extends VariantType implements KotlinType {
   }
 
   override getExtraFiles(): SourceFile[] {
-    return [
-      ...this.variants.flatMap((v) => v.getExtraFiles()),
-      ...createKotlinVariant(this),
-    ]
+    return [...this.variants.flatMap((v) => v.getExtraFiles()), ...createKotlinVariant(this)]
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
@@ -85,16 +78,11 @@ export class KotlinVariantType extends VariantType implements KotlinType {
       case 'c++':
         imports.push({
           language: language,
-          declaration: NitroConfig.current.getCxxHeader(
-            `${this.jniName}.hpp`,
-            'private'
-          ),
+          declaration: NitroConfig.current.getCxxHeader(`${this.jniName}.hpp`, 'private'),
         })
         break
     }
-    imports.push(
-      ...this.variants.flatMap((v) => v.getRequiredImports(language))
-    )
+    imports.push(...this.variants.flatMap((v) => v.getRequiredImports(language)))
     return imports
   }
 }

@@ -6,11 +6,7 @@ import { validateBenchmarkRun } from './schema'
 const BASE_SHA = 'a'.repeat(40)
 const HEAD_SHA = 'b'.repeat(40)
 
-function run(
-  sha: string,
-  samples: number[],
-  suiteHash = 'c'.repeat(64)
-): BenchmarkRunResult {
+function run(sha: string, samples: number[], suiteHash = 'c'.repeat(64)): BenchmarkRunResult {
   return {
     schemaVersion: 2,
     suiteVersion: 1,
@@ -56,9 +52,7 @@ function run(
 describe('performance comparison', () => {
   test('requires explicit bounded chunk counts and Release Hermes', () => {
     const result = run(BASE_SHA, [100, 100])
-    expect(() => validateBenchmarkRun({ ...result, schemaVersion: 1 })).toThrow(
-      'Unsupported benchmark schema'
-    )
+    expect(() => validateBenchmarkRun({ ...result, schemaVersion: 1 })).toThrow('Unsupported benchmark schema')
     for (const chunk of [0, -1, 1.5, 10_001, undefined]) {
       expect(() =>
         validateBenchmarkRun({
@@ -72,10 +66,7 @@ describe('performance comparison', () => {
   })
 
   test('retains process disagreement even when pooled medians match', () => {
-    const result = compareRuns(
-      [run(BASE_SHA, [80, 80]), run(BASE_SHA, [120, 120])],
-      [run(HEAD_SHA, [120, 120]), run(HEAD_SHA, [80, 80])]
-    )
+    const result = compareRuns([run(BASE_SHA, [80, 80]), run(BASE_SHA, [120, 120])], [run(HEAD_SHA, [120, 120]), run(HEAD_SHA, [80, 80])])
     expect(result.comparisons[0]?.deltaPercent).toBe(0)
     expect(result.comparisons[0]?.baseProcessMedians).toEqual([80, 120])
     expect(result.comparisons[0]?.pairChangesPercent[0]).toBe(50)
@@ -83,10 +74,7 @@ describe('performance comparison', () => {
   })
 
   test('reports observed changes without inventing confidence bounds', () => {
-    const result = compareRuns(
-      [run(BASE_SHA, [99, 100, 101])],
-      [run(HEAD_SHA, [119, 120, 121])]
-    )
+    const result = compareRuns([run(BASE_SHA, [99, 100, 101])], [run(HEAD_SHA, [119, 120, 121])])
     expect(result.comparisons[0]?.deltaPercent).toBeCloseTo(20)
     expect(result.comparisons[0]?.baseMadPercent).toBe(1)
     expect(toBencherMetricFormat([run(HEAD_SHA, [119, 120, 121])])).toEqual({
@@ -113,13 +101,7 @@ describe('performance comparison', () => {
     head.metrics.unshift({ ...head.metrics[0]!, id: 'new' })
     base.benchmarkCount = head.benchmarkCount = 2
     const metrics = compareRuns([base], [head]).comparisons
-    expect(
-      metrics.map(({ id, baseMedianNsPerOp, headMedianNsPerOp }) => [
-        id,
-        baseMedianNsPerOp,
-        headMedianNsPerOp,
-      ])
-    ).toEqual([
+    expect(metrics.map(({ id, baseMedianNsPerOp, headMedianNsPerOp }) => [id, baseMedianNsPerOp, headMedianNsPerOp])).toEqual([
       ['new', null, 120],
       ['nitro-cpp/primitive/add-numbers', 100, 120],
       ['removed', 100, null],

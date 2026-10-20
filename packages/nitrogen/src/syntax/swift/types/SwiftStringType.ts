@@ -60,10 +60,7 @@ export class SwiftStringType extends StringType implements SwiftType {
     return []
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports: SourceImport[] = []
     switch (language) {
       case 'c++':

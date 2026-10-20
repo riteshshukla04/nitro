@@ -16,9 +16,7 @@ const RUNNER_OPTIONS: Omit<BenchmarkRunnerOptions, 'reverse'> = {
   sampleCount: 20,
 }
 
-function isRunConfiguration(
-  value: unknown
-): value is BenchmarkRunConfiguration {
+function isRunConfiguration(value: unknown): value is BenchmarkRunConfiguration {
   if (value == null || typeof value !== 'object') return false
   const candidate = value as Partial<BenchmarkRunConfiguration>
   return (
@@ -31,9 +29,7 @@ function isRunConfiguration(
     typeof candidate.osVersion === 'string' &&
     typeof candidate.architecture === 'string' &&
     typeof candidate.toolchain === 'string' &&
-    (candidate.benchmarkIndex === undefined ||
-      (Number.isInteger(candidate.benchmarkIndex) &&
-        candidate.benchmarkIndex >= 0))
+    (candidate.benchmarkIndex === undefined || (Number.isInteger(candidate.benchmarkIndex) && candidate.benchmarkIndex >= 0))
   )
 }
 
@@ -77,20 +73,10 @@ async function run(): Promise<BenchmarkRunResult> {
   const suite = createBenchmarkSuite()
   const ordered = configuration.reverse ? [...suite].reverse() : suite
   const selected =
-    configuration.benchmarkIndex === undefined
-      ? suite
-      : ordered.slice(
-          configuration.benchmarkIndex,
-          configuration.benchmarkIndex + 1
-        )
-  if (selected.length === 0)
-    throw new Error('Requested benchmark index is outside the suite.')
+    configuration.benchmarkIndex === undefined ? suite : ordered.slice(configuration.benchmarkIndex, configuration.benchmarkIndex + 1)
+  if (selected.length === 0) throw new Error('Requested benchmark index is outside the suite.')
   const runner = RUNNER_OPTIONS
-  const metrics = await runBenchmarkDefinitions(
-    selected,
-    { ...runner, reverse: configuration.reverse },
-    configuration.platform
-  )
+  const metrics = await runBenchmarkDefinitions(selected, { ...runner, reverse: configuration.reverse }, configuration.platform)
 
   return {
     schemaVersion: 2,

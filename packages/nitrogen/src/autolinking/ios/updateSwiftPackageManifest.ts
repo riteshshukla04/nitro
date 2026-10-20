@@ -51,23 +51,14 @@ export async function updateSwiftPackageManifest({
   const lines = manifest.split('\n')
   const beginIndexes = getLineIndexes(lines, SWIFT_PACKAGE_SECTION_BEGIN)
   const endIndexes = getLineIndexes(lines, SWIFT_PACKAGE_SECTION_END)
-  const callsFunction = lines.some(
-    (line) =>
-      !line.trim().startsWith('//') &&
-      line.includes(`${SWIFT_PACKAGE_FUNCTION_NAME}(`)
-  )
+  const callsFunction = lines.some((line) => !line.trim().startsWith('//') && line.includes(`${SWIFT_PACKAGE_FUNCTION_NAME}(`))
   if (beginIndexes.length === 0 && endIndexes.length === 0 && !callsFunction) {
-    Logger.debug(
-      `    ${chalk.dim('Package.swift')} does not call ${SWIFT_PACKAGE_FUNCTION_NAME}(...), skipping Swift package setup.`
-    )
+    Logger.debug(`    ${chalk.dim('Package.swift')} does not call ${SWIFT_PACKAGE_FUNCTION_NAME}(...), skipping Swift package setup.`)
     return
   }
   checkSwiftPMConfig(packageDirectory)
 
-  const generatedDirectory = await getGeneratedDirectory(
-    packageDirectory,
-    outputDirectory
-  )
+  const generatedDirectory = await getGeneratedDirectory(packageDirectory, outputDirectory)
   const section = createSwiftPackageTargets({
     generatedDirectory: generatedDirectory,
     moduleDependencies: moduleDependencies,
@@ -97,9 +88,7 @@ export async function updateSwiftPackageManifest({
   if (updatedManifest === manifest) {
     return
   }
-  Logger.info(
-    `    Updating Swift package targets in ${chalk.dim('Package.swift')}...`
-  )
+  Logger.info(`    Updating Swift package targets in ${chalk.dim('Package.swift')}...`)
   await writeFile(manifestPath, updatedManifest, 'utf8')
 }
 
@@ -113,19 +102,10 @@ function getLineIndexes(lines: string[], marker: string): number[] {
   return indexes
 }
 
-async function getGeneratedDirectory(
-  packageDirectory: string,
-  outputDirectory: string
-): Promise<string> {
+async function getGeneratedDirectory(packageDirectory: string, outputDirectory: string): Promise<string> {
   // Both directories exist at this point. Resolve symlinks, since process.cwd() is a real path.
-  const relativePath = path.relative(
-    await realpath(packageDirectory),
-    await realpath(outputDirectory)
-  )
-  const isOutsidePackage =
-    relativePath === '..' ||
-    relativePath.startsWith(`..${path.sep}`) ||
-    path.isAbsolute(relativePath)
+  const relativePath = path.relative(await realpath(packageDirectory), await realpath(outputDirectory))
+  const isOutsidePackage = relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)
   if (relativePath === '' || isOutsidePackage) {
     throw new Error(
       `Nitrogen's output directory (${prettifyDirectory(outputDirectory)}) must be a subdirectory of the Swift package (${prettifyDirectory(packageDirectory)}).`

@@ -1,11 +1,13 @@
 ---
 title: Nitro Typing System
-description: Understand Nitro's static, type-safe, and null-safe conversion system for JavaScript, C++, Swift, and Kotlin native module types.
+description:
+  Understand Nitro's static, type-safe, and null-safe conversion system for JavaScript, C++, Swift, and Kotlin native module types.
 ---
 
 # Nitro's Typing System
 
-Nitro uses an extensible typing system to efficiently convert between JS and C++ types - **statically defined** and fully **type-safe** and **null-safe at compile-time**.
+Nitro uses an extensible typing system to efficiently convert between JS and C++ types - **statically defined** and fully **type-safe** and
+**null-safe at compile-time**.
 
 For example, a JS `number` will always be a `double` on the native side:
 
@@ -34,15 +36,15 @@ public:
 </div>
 </div>
 
-Nitro strictly enforces **type-safety** and **null-safety** - both at compile-time and at runtime.
-This prevents accidentally passing a wrong type to `add(..)` (for example, a `string`) and performs null-checks to prevent passing and returning `null`/`undefined` values.
+Nitro strictly enforces **type-safety** and **null-safety** - both at compile-time and at runtime. This prevents accidentally passing a
+wrong type to `add(..)` (for example, a `string`) and performs null-checks to prevent passing and returning `null`/`undefined` values.
 
 On the JS side (TypeScript), type- and null-safety is enforced via TypeScript - so use it!
 
 ## Nitrogen
 
-[Nitrogen](../concepts/nitrogen) ensures that TypeScript definitions are always in sync with native type definitions.
-You can also use Nitro without nitrogen, in this case TypeScript definitions have to be written manually.
+[Nitrogen](../concepts/nitrogen) ensures that TypeScript definitions are always in sync with native type definitions. You can also use Nitro
+without nitrogen, in this case TypeScript definitions have to be written manually.
 
 ## Supported Types
 

@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <NitroModules/detail/IsSharedPtrTo.hpp>
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroTypeInfo.hpp>
+#include <NitroModules/detail/IsSharedPtrTo.hpp>
 #include <jsi/jsi.h>
 
 namespace margelo::nitro {

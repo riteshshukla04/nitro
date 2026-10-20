@@ -19,9 +19,7 @@ export class BooleanType implements Type {
       case 'kotlin':
         return 'Boolean'
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for BooleanType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for BooleanType!`)
     }
   }
   getExtraFiles(): SourceFile[] {

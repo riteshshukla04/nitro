@@ -7,11 +7,7 @@ import { readJsonFile } from './readJsonFile.js'
 
 // react-native-builder-bob reads its config from these files before the
 // package.json field.
-const BOB_CONFIG_FILE_NAMES = [
-  'bob.config.mjs',
-  'bob.config.cjs',
-  'bob.config.js',
-]
+const BOB_CONFIG_FILE_NAMES = ['bob.config.mjs', 'bob.config.cjs', 'bob.config.js']
 
 // The parts of a react-native-builder-bob config in package.json that decide
 // whether bob writes a package.json with a `type` field to its output.
@@ -19,15 +15,7 @@ const bobPackageJsonSchema = z.object({
   'react-native-builder-bob': z.object({
     output: z.string(),
     // A target is a name, or a name with options, e.g. ["module", { "esm": true }].
-    targets: z.array(
-      z.union([
-        z.string(),
-        z.tuple([
-          z.string(),
-          z.object({ esm: z.boolean().optional() }).optional(),
-        ]),
-      ])
-    ),
+    targets: z.array(z.union([z.string(), z.tuple([z.string(), z.object({ esm: z.boolean().optional() }).optional()])])),
   }),
 })
 
@@ -39,9 +27,7 @@ const listFormat = new Intl.ListFormat('en', { type: 'conjunction' })
  * to its output. That file scopes the built specs and has no "imports", so
  * they cannot resolve `#nitro/*`.
  */
-export function getBobPackageScopeWarnings(
-  realSpecPaths: readonly string[]
-): string[] {
+export function getBobPackageScopeWarnings(realSpecPaths: readonly string[]): string[] {
   const packageJsonPaths = new Set<string>()
   for (const specPath of realSpecPaths) {
     const packageJsonPath = findPackageJson(specPath)
@@ -53,18 +39,12 @@ export function getBobPackageScopeWarnings(
   })
 }
 
-type BobTarget = z.infer<
-  typeof bobPackageJsonSchema
->['react-native-builder-bob']['targets'][number]
+type BobTarget = z.infer<typeof bobPackageJsonSchema>['react-native-builder-bob']['targets'][number]
 
-function getBobPackageScopeWarning(
-  packageJsonPath: string
-): string | undefined {
+function getBobPackageScopeWarning(packageJsonPath: string): string | undefined {
   // Nitrogen never runs a bob.config file, so it can't tell what bob builds.
   const packageDirectory = path.dirname(packageJsonPath)
-  const hasBobConfigFile = BOB_CONFIG_FILE_NAMES.some((fileName) =>
-    fs.existsSync(path.join(packageDirectory, fileName))
-  )
+  const hasBobConfigFile = BOB_CONFIG_FILE_NAMES.some((fileName) => fs.existsSync(path.join(packageDirectory, fileName)))
   if (hasBobConfigFile) return undefined
 
   const packageJson = readJsonFile(packageJsonPath, z.unknown())
@@ -77,9 +57,7 @@ function getBobPackageScopeWarning(
   if (typedDirectories.length === 0) return undefined
 
   const packageJsonName = prettifyDirectory(packageJsonPath)
-  const typedPackageJsons = typedDirectories.map((directory) =>
-    path.posix.join(output, directory, 'package.json')
-  )
+  const typedPackageJsons = typedDirectories.map((directory) => path.posix.join(output, directory, 'package.json'))
   const typedPackageJsonsText = listFormat.format(typedPackageJsons)
   return (
     `${packageJsonName} configures react-native-builder-bob to write ${typedPackageJsonsText} with a "type" field. ` +
@@ -95,17 +73,10 @@ function getBobPackageScopeWarning(
  * would skip them in that case.
  */
 function getTypedOutputDirectories(targets: readonly BobTarget[]): string[] {
-  const names = targets.map((target) =>
-    typeof target === 'string' ? target : target[0]
-  )
+  const names = targets.map((target) => (typeof target === 'string' ? target : target[0]))
   const hasCommonjs = names.includes('commonjs')
   // The `typescript` target uses the `esm` option of the `module` target.
-  const esm = targets.some(
-    (target) =>
-      typeof target !== 'string' &&
-      target[0] === 'module' &&
-      target[1]?.esm === true
-  )
+  const esm = targets.some((target) => typeof target !== 'string' && target[0] === 'module' && target[1]?.esm === true)
   return names.flatMap((name) => {
     switch (name) {
       case 'commonjs':
@@ -116,9 +87,7 @@ function getTypedOutputDirectories(targets: readonly BobTarget[]): string[] {
         if (!esm) return []
         // With both JavaScript targets, bob splits the declarations into one
         // folder per target.
-        return hasCommonjs
-          ? ['typescript/commonjs', 'typescript/module']
-          : ['typescript']
+        return hasCommonjs ? ['typescript/commonjs', 'typescript/module'] : ['typescript']
       default:
         return []
     }

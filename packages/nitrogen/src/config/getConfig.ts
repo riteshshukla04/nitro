@@ -1,9 +1,6 @@
 import { ZodError } from 'zod'
 import fs from 'fs'
-import {
-  NitroUserConfigSchema,
-  type NitroUserConfig,
-} from './NitroUserConfig.js'
+import { NitroUserConfigSchema, type NitroUserConfig } from './NitroUserConfig.js'
 import chalk from 'chalk'
 
 function readFile(configPath: string): string {
@@ -49,12 +46,9 @@ function parseConfig(json: string): NitroUserConfig {
   try {
     object = JSON.parse(json)
   } catch (error) {
-    throw new Error(
-      `Failed to parse nitro.json config as JSON! Make sure it has a valid JSON syntax. JSON: ${json}`,
-      {
-        cause: error,
-      }
-    )
+    throw new Error(`Failed to parse nitro.json config as JSON! Make sure it has a valid JSON syntax. JSON: ${json}`, {
+      cause: error,
+    })
   }
 
   try {
@@ -74,9 +68,7 @@ function parseConfig(json: string): NitroUserConfig {
             return `\`${prop}\`: ${i.message} (${i.code})`
         }
       })
-      console.error(
-        `❌  Invalid nitro.json config file! ${issues.join(' - also, ')}`
-      )
+      console.error(`❌  Invalid nitro.json config file! ${issues.join(' - also, ')}`)
       process.exit(1)
     } else {
       throw error

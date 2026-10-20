@@ -27,8 +27,7 @@ public:
   explicit ViewPropsHolderState(std::shared_ptr<const TProps> props) : _props(std::move(props)) {}
 
 public:
-  [[nodiscard]]
-  const std::shared_ptr<const TProps>& getProps() const {
+  [[nodiscard]] const std::shared_ptr<const TProps>& getProps() const {
     return _props;
   }
 

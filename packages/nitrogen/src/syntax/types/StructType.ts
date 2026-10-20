@@ -1,11 +1,7 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
 import type { Language } from '../../getPlatformSpecs.js'
 import { createCppStruct } from '../c++/CppStruct.js'
-import {
-  type FileWithReferencedTypes,
-  type SourceFile,
-  type SourceImport,
-} from '../SourceFile.js'
+import { type FileWithReferencedTypes, type SourceFile, type SourceImport } from '../SourceFile.js'
 import type { GetCodeOptions, NamedType, Type, TypeKind } from './Type.js'
 
 export class StructType implements Type {
@@ -17,22 +13,15 @@ export class StructType implements Type {
   constructor(structName: string, properties: NamedType[]) {
     this.structName = structName
     this.properties = properties
-    const [declarationFile, implementationFile] = createCppStruct(
-      structName,
-      properties
-    )
+    const [declarationFile, implementationFile] = createCppStruct(structName, properties)
     this.declarationFile = declarationFile
     this.implementationFile = implementationFile
 
     if (this.structName.startsWith('__')) {
-      throw new Error(
-        `Struct name cannot start with two underscores (__) as this is reserved syntax for Nitrogen! (In ${this.structName})`
-      )
+      throw new Error(`Struct name cannot start with two underscores (__) as this is reserved syntax for Nitrogen! (In ${this.structName})`)
     }
     if (this.properties.length === 0) {
-      throw new Error(
-        `Empty structs are not supported in Nitrogen! Add at least one property to ${this.structName}.`
-      )
+      throw new Error(`Empty structs are not supported in Nitrogen! Add at least one property to ${this.structName}.`)
     }
   }
 
@@ -43,10 +32,7 @@ export class StructType implements Type {
     return this.properties.every((p) => p.isEquatable)
   }
 
-  getCode(
-    language: Language,
-    { fullyQualified, context }: GetCodeOptions
-  ): string {
+  getCode(language: Language, { fullyQualified, context }: GetCodeOptions): string {
     switch (language) {
       case 'c++': {
         let type = this.structName
@@ -60,15 +46,11 @@ export class StructType implements Type {
       case 'kotlin':
         return this.structName
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for StructType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for StructType!`)
     }
   }
   getExtraFiles(): SourceFile[] {
-    const referencedTypes = this.declarationFile.referencedTypes.flatMap((r) =>
-      r.getExtraFiles()
-    )
+    const referencedTypes = this.declarationFile.referencedTypes.flatMap((r) => r.getExtraFiles())
     return [this.declarationFile, this.implementationFile, ...referencedTypes]
   }
   getRequiredImports(language: Language): SourceImport[] {
@@ -77,9 +59,7 @@ export class StructType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: NitroConfig.current.getCxxHeader(
-            this.declarationFile.name
-          ),
+          declaration: NitroConfig.current.getCxxHeader(this.declarationFile.name),
         })
         break
     }

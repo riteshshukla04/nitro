@@ -12,41 +12,31 @@ import { getAllTypes } from '../getAllTypes.js'
 import { getProtocolConformanceImports } from './getSwiftImports.js'
 import { SwiftHybridObjectType } from './types/SwiftHybridObjectType.js'
 
-export function createSwiftHybridObject(
-  spec: HybridObjectSpec<'swift'>
-): SourceFile[] {
+export function createSwiftHybridObject(spec: HybridObjectSpec<'swift'>): SourceFile[] {
   const hybridObjectType = new HybridObjectType(spec)
   const swiftType = new SwiftHybridObjectType(hybridObjectType)
   const conformances = swiftType.getProtocolConformances()
   const name = getHybridObjectName(spec.name)
   const protocolName = name.HybridTSpec
   const properties = spec.properties.map((p) => p.getCode('swift')).join('\n')
-  const methods = spec.methods
-    .map((method) => method.getDeclaration('swift'))
-    .join('\n')
+  const methods = spec.methods.map((method) => method.getDeclaration('swift')).join('\n')
   const extraImports = [
     ...spec.properties.flatMap((p) => p.getRequiredImports('swift')),
     ...spec.staticProperties.flatMap((p) => p.getRequiredImports('swift')),
     ...spec.methods.flatMap((m) => m.getRequiredImports('swift')),
-    ...spec.staticMethods.flatMap((method) =>
-      method.getRequiredImports('swift')
-    ),
+    ...spec.staticMethods.flatMap((method) => method.getRequiredImports('swift')),
     ...(spec.constructor?.getRequiredImports('swift') ?? []),
     ...hybridObjectType.baseTypes.flatMap((b) => b.getRequiredImports('swift')),
   ]
 
-  const protocolBaseClasses = conformances.map(
-    (conformance) => conformance.name
-  )
+  const protocolBaseClasses = conformances.map((conformance) => conformance.name)
   if (spec.isHybridView) {
     protocolBaseClasses.push('HybridView')
   }
   const classBaseClasses: string[] = []
   if (spec.baseTypes.length > 0) {
     if (spec.baseTypes.length > 1) {
-      throw new Error(
-        `${name.T}: Inheriting from multiple HybridObject bases is not yet supported in Swift!`
-      )
+      throw new Error(`${name.T}: Inheriting from multiple HybridObject bases is not yet supported in Swift!`)
     }
     const base = spec.baseTypes[0]
     if (base == null) {
@@ -87,11 +77,7 @@ ${wrapperAccessorModifiers} func getCxxWrapper() -> ${name.HybridTSpecCxx} {
 `.trim()
   )
 
-  const imports = getImportsCode([
-    { language: 'swift', name: 'NitroModules', access: 'public' },
-    ...extraImports,
-    ...conformanceImports,
-  ])
+  const imports = getImportsCode([{ language: 'swift', name: 'NitroModules', access: 'public' }, ...extraImports, ...conformanceImports])
 
   const protocolCode = `
 ${createFileMetadataString(`${protocolName}.swift`)}

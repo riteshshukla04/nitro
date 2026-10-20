@@ -16,19 +16,13 @@ export function parseArguments(argv: readonly string[]): Map<string, string[]> {
   return values
 }
 
-export function requiredArgument(
-  argumentsMap: Map<string, string[]>,
-  name: string
-): string {
+export function requiredArgument(argumentsMap: Map<string, string[]>, name: string): string {
   const value = argumentsMap.get(name)?.[0]
   if (value == null) throw new Error(`Missing --${name}.`)
   return value
 }
 
-export function repeatedArgument(
-  argumentsMap: Map<string, string[]>,
-  name: string
-): string[] {
+export function repeatedArgument(argumentsMap: Map<string, string[]>, name: string): string[] {
   const values = argumentsMap.get(name) ?? []
   if (values.length === 0) throw new Error(`Missing --${name}.`)
   return values

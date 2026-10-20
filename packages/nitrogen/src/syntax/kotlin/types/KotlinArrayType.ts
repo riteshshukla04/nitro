@@ -4,11 +4,7 @@ import { indent } from '../../../utils.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { ArrayType } from '../../types/ArrayType.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinArrayType extends ArrayType implements KotlinType {
   override readonly itemType: KotlinType
@@ -164,9 +160,6 @@ export class KotlinArrayType extends ArrayType implements KotlinType {
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
-    return [
-      ...this.type.getRequiredImports(language),
-      ...this.itemType.getRequiredImports(language),
-    ]
+    return [...this.type.getRequiredImports(language), ...this.itemType.getRequiredImports(language)]
   }
 }

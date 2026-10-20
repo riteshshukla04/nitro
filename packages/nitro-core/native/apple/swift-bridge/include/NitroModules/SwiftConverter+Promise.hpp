@@ -24,9 +24,7 @@ private:
       return input;
     } else {
       auto result = Output::pending();
-      input.addOnResolvedListener([result, convertValue](const auto& value) {
-        result.resolve(convertValue(value));
-      });
+      input.addOnResolvedListener([result, convertValue](const auto& value) { result.resolve(convertValue(value)); });
       input.addOnRejectedListener([result](const std::exception_ptr& error) { result.reject(std::exception_ptr(error)); });
       return result;
     }

@@ -19,9 +19,7 @@ type ImportsTarget = string | ImportsConditions
 interface ImportsConditions {
   [condition: string]: ImportsTarget
 }
-const importsTargetSchema: z.ZodType<ImportsTarget> = z.lazy(() =>
-  z.union([z.string(), z.record(z.string(), importsTargetSchema)])
-)
+const importsTargetSchema: z.ZodType<ImportsTarget> = z.lazy(() => z.union([z.string(), z.record(z.string(), importsTargetSchema)]))
 
 const conditionsListFormat = new Intl.ListFormat('en', { type: 'conjunction' })
 
@@ -58,15 +56,10 @@ interface ImportsEntryOptions {
  * Returns an error for each package.json of a spec that does not map
  * `#nitro/*` to the generated runtime modules.
  */
-export function getRuntimeImportsErrors({
-  realSpecPaths,
-  outputDirectory,
-}: RuntimeImportsErrorsOptions): string[] {
+export function getRuntimeImportsErrors({ realSpecPaths, outputDirectory }: RuntimeImportsErrorsOptions): string[] {
   // Compare real paths, so a symlink in the base path or the output path
   // doesn't move the runtime directory outside the package.
-  const runtimeDirectory = getRealPath(
-    getHybridClassRuntimeDirectory(outputDirectory)
-  )
+  const runtimeDirectory = getRealPath(getHybridClassRuntimeDirectory(outputDirectory))
   const errors: string[] = []
   const packageJsonPaths = new Set<string>()
   for (const specPath of realSpecPaths) {
@@ -127,15 +120,9 @@ export function findPackageJson(filePath: string): string | undefined {
  * Returns the `#nitro/*` targets for a package, or `undefined` if the runtime
  * directory is outside the package, where package imports cannot point.
  */
-function getRuntimeImportsTargets(
-  packageDirectory: string,
-  runtimeDirectory: string
-): RuntimeImportsTargets | undefined {
+function getRuntimeImportsTargets(packageDirectory: string, runtimeDirectory: string): RuntimeImportsTargets | undefined {
   const relativePath = path.relative(packageDirectory, runtimeDirectory)
-  const isOutside =
-    relativePath === '..' ||
-    relativePath.startsWith(`..${path.sep}`) ||
-    path.isAbsolute(relativePath)
+  const isOutside = relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)
   if (isOutside) return undefined
   return {
     modules: `./${toUnixPath(path.join(relativePath, '*.cjs'))}`,
@@ -144,12 +131,7 @@ function getRuntimeImportsTargets(
 }
 
 /** Returns why the package.json does not map `#nitro/*` to the runtime modules. */
-function getImportsEntryProblem({
-  packageJsonPath,
-  imports,
-  targets,
-  runtimeDirectory,
-}: ImportsEntryOptions): string | undefined {
+function getImportsEntryProblem({ packageJsonPath, imports, targets, runtimeDirectory }: ImportsEntryOptions): string | undefined {
   const packageJsonName = prettifyDirectory(packageJsonPath)
   const target = targets.modules
   const entryCode = `"${RUNTIME_IMPORTS_KEY}": ${JSON.stringify(target)}`
@@ -159,17 +141,11 @@ function getImportsEntryProblem({
   ${entryCode}
 }
 `.trim()
-    return [
-      `${packageJsonName} does not map \`#nitro/*\` to Nitrogen's runtime modules. Add this to it:`,
-      importsCode,
-    ].join('\n')
+    return [`${packageJsonName} does not map \`#nitro/*\` to Nitrogen's runtime modules. Add this to it:`, importsCode].join('\n')
   }
   const entry = imports[RUNTIME_IMPORTS_KEY]
   if (entry === undefined) {
-    return [
-      `${packageJsonName} does not map \`#nitro/*\` to Nitrogen's runtime modules. Add this to its "imports":`,
-      entryCode,
-    ].join('\n')
+    return [`${packageJsonName} does not map \`#nitro/*\` to Nitrogen's runtime modules. Add this to its "imports":`, entryCode].join('\n')
   }
 
   const result = importsTargetSchema.safeParse(entry)
@@ -182,9 +158,7 @@ function getImportsEntryProblem({
       wrongConditions.push({ name: 'default', isTypes: false })
     }
     if (wrongConditions.length === 0) return undefined
-    const conditionsCode = conditionsListFormat.format(
-      wrongConditions.map((condition) => `\`${condition.name}\``)
-    )
+    const conditionsCode = conditionsListFormat.format(wrongConditions.map((condition) => `\`${condition.name}\``))
     const s = wrongConditions.length === 1 ? '' : 's'
     // If only `types` conditions are wrong, suggest the declarations like the README.
     const isOnlyTypes = wrongConditions.every((condition) => condition.isTypes)
@@ -200,10 +174,7 @@ function getImportsEntryProblem({
  * spec re-exports through `types`, so a `types` condition must point to the
  * runtime modules or their declarations.
  */
-function getWrongConditions(
-  conditions: ImportsConditions,
-  targets: RuntimeImportsTargets
-): WrongCondition[] {
+function getWrongConditions(conditions: ImportsConditions, targets: RuntimeImportsTargets): WrongCondition[] {
   return Object.entries(conditions).flatMap(([condition, conditionTarget]) => {
     if (typeof conditionTarget === 'string') {
       const isTypes = condition === 'types'

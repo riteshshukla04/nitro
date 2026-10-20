@@ -6,11 +6,7 @@ import { StructType } from '../../types/StructType.js'
 import { createKotlinStruct } from '../KotlinStruct.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
 import { KotlinNamedType } from './KotlinNamedType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinStructType extends StructType implements KotlinType {
   override readonly properties: KotlinNamedType[]
@@ -18,9 +14,7 @@ export class KotlinStructType extends StructType implements KotlinType {
   readonly needsKotlinConversion = false
 
   constructor(readonly type: StructType) {
-    const properties = type.properties.map(
-      (p) => new KotlinNamedType(p.name, wrapKotlinType(p))
-    )
+    const properties = type.properties.map((p) => new KotlinNamedType(p.name, wrapKotlinType(p)))
     super(type.structName, properties)
     this.properties = properties
   }
@@ -53,10 +47,7 @@ export class KotlinStructType extends StructType implements KotlinType {
   }
 
   override getExtraFiles(): SourceFile[] {
-    return [
-      ...this.properties.flatMap((p) => p.getExtraFiles()),
-      ...createKotlinStruct(this),
-    ]
+    return [...this.properties.flatMap((p) => p.getExtraFiles()), ...createKotlinStruct(this)]
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
@@ -65,16 +56,11 @@ export class KotlinStructType extends StructType implements KotlinType {
       case 'c++':
         imports.push({
           language: language,
-          declaration: NitroConfig.current.getCxxHeader(
-            `${this.jniName}.hpp`,
-            'private'
-          ),
+          declaration: NitroConfig.current.getCxxHeader(`${this.jniName}.hpp`, 'private'),
         })
         break
     }
-    imports.push(
-      ...this.properties.flatMap((p) => p.getRequiredImports(language))
-    )
+    imports.push(...this.properties.flatMap((p) => p.getRequiredImports(language)))
     return imports
   }
 }

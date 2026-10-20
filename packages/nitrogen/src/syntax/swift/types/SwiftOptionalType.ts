@@ -101,19 +101,11 @@ export class SwiftOptionalType extends OptionalType implements SwiftType {
     return this.wrappingType.requiredCppHelpers
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports = this.wrappingType.getRequiredImports(language, context)
     switch (language) {
       case 'c++':
-        imports.push(
-          getSwiftGenericImport(
-            'Optional',
-            'NitroModules/JSIConverter+SwiftOptional.hpp'
-          )
-        )
+        imports.push(getSwiftGenericImport('Optional', 'NitroModules/JSIConverter+SwiftOptional.hpp'))
         break
     }
     return imports

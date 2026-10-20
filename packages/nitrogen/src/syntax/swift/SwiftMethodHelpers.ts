@@ -62,10 +62,7 @@ export interface SwiftMethodInfo {
   resultType: SwiftResultType
 }
 
-export function prepareSwiftMethod(
-  nativeMethod: Method,
-  isThrowing: boolean
-): SwiftMethodInfo {
+export function prepareSwiftMethod(nativeMethod: Method, isThrowing: boolean): SwiftMethodInfo {
   const returnType = wrapSwiftType(nativeMethod.returnType)
   const parameters = nativeMethod.parameters.map((parameter) => {
     const swiftType = wrapSwiftType(parameter.type)
@@ -89,11 +86,7 @@ export function prepareSwiftMethod(
   }
   const resultType = getSwiftResultType(exportedReturnType)
   if (isThrowing) {
-    addKnownType(
-      `swift-result:${resultType.getCode('c++', { context: 'value' })}`,
-      resultType,
-      'swift'
-    )
+    addKnownType(`swift-result:${resultType.getCode('c++', { context: 'value' })}`, resultType, 'swift')
   }
   return {
     nativeMethod: nativeMethod,
@@ -114,10 +107,7 @@ export function getSwiftResultType(returnType: SwiftType): SwiftResultType {
 }
 
 /** The parameters of a Swift function exported to C++, including result storage. */
-export function getSwiftBridgeParameters(
-  parameters: SwiftBridgeParameter[],
-  returnType: SwiftType
-): SwiftBridgeParameter[] {
+export function getSwiftBridgeParameters(parameters: SwiftBridgeParameter[], returnType: SwiftType): SwiftBridgeParameter[] {
   if (returnType instanceof SwiftOutPointerType) {
     return [...parameters, { name: SWIFT_RESULT_STORAGE, type: returnType }]
   }
@@ -129,13 +119,9 @@ interface CppForwarderOptions {
   swiftMethod: Method
 }
 
-export function createCppForwarderBody({
-  nativeMethod,
-  swiftMethod,
-}: CppForwarderOptions): string {
+export function createCppForwarderBody({ nativeMethod, swiftMethod }: CppForwarderOptions): string {
   const cppConvertedArguments = nativeMethod.parameters.map(
-    (parameter) =>
-      `${getSwiftConverter(parameter.type, 'parameter-type')}::toSwift(${parameter.type.escapedName})`
+    (parameter) => `${getSwiftConverter(parameter.type, 'parameter-type')}::toSwift(${parameter.type.escapedName})`
   )
   const cppForwardCall = `${swiftMethod.name}(${cppConvertedArguments.join(', ')})`
   if (nativeMethod.returnType.kind === 'void') {
@@ -161,21 +147,13 @@ interface CppToSwiftCallOptions {
  * C++ code that calls a Swift function and returns its value or throws its error.
  * Pointer types pass the arguments and result storage around the call.
  */
-export function createCppToSwiftCall({
-  parameters,
-  returnType,
-  returnsVoid,
-  getCppInvocation,
-}: CppToSwiftCallOptions): string {
+export function createCppToSwiftCall({ parameters, returnType, returnsVoid, getCppInvocation }: CppToSwiftCallOptions): string {
   // Borrowed pointers shadow the values they point to.
   const cppArguments = parameters.map((parameter) => parameter.name)
   let cppSwiftInvocation: string
   if (returnType instanceof SwiftOutPointerType) {
     const cppStorageArguments = [...cppArguments, SWIFT_RESULT_STORAGE]
-    cppSwiftInvocation = returnType.tryAllocate(
-      SWIFT_RESULT_STORAGE,
-      getCppInvocation(cppStorageArguments)
-    )
+    cppSwiftInvocation = returnType.tryAllocate(SWIFT_RESULT_STORAGE, getCppInvocation(cppStorageArguments))
   } else {
     cppSwiftInvocation = getCppInvocation(cppArguments)
   }
@@ -204,10 +182,7 @@ interface CppBridgeBodyOptions {
   getCppInvocation: (args: string[]) => string
 }
 
-export function createCppBridgeBody({
-  callable,
-  getCppInvocation,
-}: CppBridgeBodyOptions): string {
+export function createCppBridgeBody({ callable, getCppInvocation }: CppBridgeBodyOptions): string {
   const parameters = callable.parameters.map((parameter) => parameter.exported)
   if (!callable.isThrowing) {
     const cppArguments = parameters.map((parameter) => parameter.name)
@@ -236,12 +211,7 @@ interface SwiftResultBodyOptions {
  * Swift statements that return the value of `invocation` to C++ as a Result,
  * initializing the storage pointer when the value is returned through storage.
  */
-export function createSwiftResultBody({
-  invocation,
-  returnType,
-  resultType,
-  returnsVoid,
-}: SwiftResultBodyOptions): string {
+export function createSwiftResultBody({ invocation, returnType, resultType, returnsVoid }: SwiftResultBodyOptions): string {
   if (returnsVoid) {
     return `
 ${invocation}
@@ -250,11 +220,7 @@ return ${resultType}.withValue()
   }
   const swiftValue = returnType.fromSwift('value')
   if (returnType instanceof SwiftOutPointerType) {
-    const initializeCode = returnType.initialize(
-      'swift',
-      SWIFT_RESULT_STORAGE,
-      swiftValue
-    )
+    const initializeCode = returnType.initialize('swift', SWIFT_RESULT_STORAGE, swiftValue)
     return `
 let value = ${invocation}
 ${initializeCode}
@@ -293,19 +259,14 @@ interface SwiftEndpoint {
 }
 
 /** The exported Swift ABI uses pointers and Result where Swift requires them. */
-export function createSwiftEndpoint({
-  callable,
-  getSwiftInvocation,
-}: SwiftEndpointOptions): SwiftEndpoint {
+export function createSwiftEndpoint({ callable, getSwiftInvocation }: SwiftEndpointOptions): SwiftEndpoint {
   const exportedReturnType = callable.exportedReturnType
   const returnsVoid = callable.nativeMethod.returnType.kind === 'void'
   const bridgeParameters = getSwiftBridgeParameters(
     callable.parameters.map((parameter) => parameter.exported),
     exportedReturnType
   )
-  const exportedParameters = bridgeParameters.map(
-    ({ name, type }) => new Parameter(name, type, { generated: true })
-  )
+  const exportedParameters = bridgeParameters.map(({ name, type }) => new Parameter(name, type, { generated: true }))
   const swiftArguments = callable.parameters.map(({ native, exported }) => ({
     name: native.name,
     code: exported.type.toSwift(exported.name),
@@ -335,34 +296,18 @@ return ${exportedReturnType.fromSwift('value')}
   const swiftMethodBody = createSwiftCatchBody(swiftResultBody, swiftResultType)
   return {
     parameters: exportedParameters,
-    returnType: new SwiftResultType(
-      callable.resultType.payload,
-      callable.resultType.sourceConfig,
-      'bridge'
-    ),
+    returnType: new SwiftResultType(callable.resultType.payload, callable.resultType.sourceConfig, 'bridge'),
     body: swiftMethodBody,
   }
 }
 
-export function getSwiftMethodImports(
-  callable: SwiftMethodInfo
-): SourceImport<'swift'>[] {
-  const publicSwiftTypes = callable.parameters.map(
-    (parameter) => parameter.exported.type
-  )
+export function getSwiftMethodImports(callable: SwiftMethodInfo): SourceImport<'swift'>[] {
+  const publicSwiftTypes = callable.parameters.map((parameter) => parameter.exported.type)
   if (callable.isThrowing) {
     publicSwiftTypes.push(callable.resultType)
   } else {
     publicSwiftTypes.push(callable.returnType)
   }
-  const swiftParameterTypes = callable.parameters.map(
-    (parameter) => parameter.type
-  )
-  return [
-    ...getSwiftImports(publicSwiftTypes, 'public'),
-    ...getSwiftImports(
-      [callable.returnType, ...swiftParameterTypes],
-      'internal'
-    ),
-  ]
+  const swiftParameterTypes = callable.parameters.map((parameter) => parameter.type)
+  return [...getSwiftImports(publicSwiftTypes, 'public'), ...getSwiftImports([callable.returnType, ...swiftParameterTypes], 'internal')]
 }

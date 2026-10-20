@@ -3,11 +3,7 @@ import type { SourceImport } from '../../SourceFile.js'
 import type { CppHelper } from '../../c++/CppHelper.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import { ErrorType } from '../../types/ErrorType.js'
-import {
-  getClangImporterReferenceName,
-  getQualifiedSwiftName,
-  type ImportedCxxRecord,
-} from '../ImportedCxxRecord.js'
+import { getClangImporterReferenceName, getQualifiedSwiftName, type ImportedCxxRecord } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
 

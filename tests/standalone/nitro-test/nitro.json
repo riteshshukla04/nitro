@@ -1,20 +1,13 @@
 {
   "$schema": "https://nitro.margelo.com/nitro.schema.json",
   "environment": "bare",
-  "cxxNamespace": [
-    "test"
-  ],
+  "cxxNamespace": ["test"],
   "ios": {
     "iosModuleName": "NitroTest"
   },
   "android": {
-    "androidNamespace": [
-      "test"
-    ],
+    "androidNamespace": ["test"],
     "androidCxxLibName": "NitroTest"
   },
-  "ignorePaths": [
-    "**/node_modules",
-    "**/build"
-  ]
+  "ignorePaths": ["**/node_modules", "**/build"]
 }

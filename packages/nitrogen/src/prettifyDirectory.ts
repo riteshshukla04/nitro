@@ -10,19 +10,14 @@ export function prettifyDirectory(directory: string): string {
 
   const home = os.homedir()
   const homeShorthand = os.platform() === 'win32' ? '$HOME' : '~'
-  const prettifiedHomeShorthand = directory.startsWith(home)
-    ? `${homeShorthand}${directory.slice(home.length)}`
-    : directory
+  const prettifiedHomeShorthand = directory.startsWith(home) ? `${homeShorthand}${directory.slice(home.length)}` : directory
 
   if (relativePath.length < 1) {
     // If relativePath is ".", we don't want to return it
     return prettifiedHomeShorthand
   }
 
-  if (
-    relativePath.length > 0 &&
-    relativePath.length < prettifiedHomeShorthand.length
-  ) {
+  if (relativePath.length > 0 && relativePath.length < prettifiedHomeShorthand.length) {
     // If relativePath is shroter than the ~/... home path, we use the relative one.
     return relativePath
   } else {

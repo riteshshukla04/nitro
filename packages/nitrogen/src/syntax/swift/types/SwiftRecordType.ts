@@ -40,11 +40,7 @@ export class SwiftRecordType extends RecordType implements SwiftType {
   }
 
   override getExtraFiles(): SourceFile[] {
-    return [
-      ...this.keyType.getExtraFiles(),
-      ...this.valueType.getExtraFiles(),
-      ...createSwiftRecordBridge(this),
-    ]
+    return [...this.keyType.getExtraFiles(), ...this.valueType.getExtraFiles(), ...createSwiftRecordBridge(this)]
   }
 
   get isHashable(): boolean {
@@ -94,41 +90,25 @@ export class SwiftRecordType extends RecordType implements SwiftType {
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   getClangImporterName(context: TypeContext): string {
-    return getClangImporterReferenceName(
-      `${this.moduleName}.${this.name}`,
-      context
-    )
+    return getClangImporterReferenceName(`${this.moduleName}.${this.name}`, context)
   }
 
   get requiredCppHelpers(): CppHelper[] {
-    return [
-      ...this.keyType.requiredCppHelpers,
-      ...this.valueType.requiredCppHelpers,
-    ]
+    return [...this.keyType.requiredCppHelpers, ...this.valueType.requiredCppHelpers]
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports: SourceImport[] = []
     switch (language) {
       case 'c++':
-        imports.push(
-          ...this.keyType.getRequiredImports(language, context),
-          ...this.valueType.getRequiredImports(language, context),
-          {
-            language,
-            declaration: { forwardDeclaration: this.forwardDeclaration },
-          }
-        )
+        imports.push(...this.keyType.getRequiredImports(language, context), ...this.valueType.getRequiredImports(language, context), {
+          language,
+          declaration: { forwardDeclaration: this.forwardDeclaration },
+        })
         if (context === 'implementation') {
           imports.push({
             language: language,
-            declaration: NitroConfig.current.getCxxHeader(
-              `${this.name}-Swift.hpp`,
-              'private'
-            ),
+            declaration: NitroConfig.current.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
           })
         }
         break

@@ -5,10 +5,7 @@ import type { CppHelper } from '../../c++/CppHelper.js'
 import type { SourceFile } from '../../SourceFile.js'
 import { getHybridObjectName } from '../../getHybridObjectName.js'
 import { HybridObjectType } from '../../types/HybridObjectType.js'
-import {
-  createSwiftHybridObjectConverter,
-  getHybridObjectBridgeNames,
-} from '../SwiftHybridObjectHelpers.js'
+import { createSwiftHybridObjectConverter, getHybridObjectBridgeNames } from '../SwiftHybridObjectHelpers.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import { getForwardDeclaration } from '../../c++/getForwardDeclaration.js'
 import type { SourceImport } from '../../SourceFile.js'
@@ -17,23 +14,12 @@ import type { SwiftType } from './SwiftType.js'
 import { SwiftRetainedPointerType } from './SwiftRetainedPointerType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
 
-export class SwiftHybridObjectType
-  extends HybridObjectType
-  implements SwiftType
-{
+export class SwiftHybridObjectType extends HybridObjectType implements SwiftType {
   override readonly baseTypes: SwiftHybridObjectType[]
 
   constructor(readonly type: HybridObjectType) {
-    const baseTypes = type.baseTypes.map(
-      (base) => new SwiftHybridObjectType(base)
-    )
-    super(
-      type.hybridObjectName,
-      type.implementationLanguage,
-      baseTypes,
-      type.sourceConfig,
-      type.swiftProtocolConformances
-    )
+    const baseTypes = type.baseTypes.map((base) => new SwiftHybridObjectType(base))
+    super(type.hybridObjectName, type.implementationLanguage, baseTypes, type.sourceConfig, type.swiftProtocolConformances)
     this.baseTypes = baseTypes
   }
 
@@ -145,23 +131,14 @@ export class SwiftHybridObjectType
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   getClangImporterName(context: TypeContext): string {
-    return getClangImporterReferenceName(
-      `${this.moduleName}.${this.name}`,
-      context
-    )
+    return getClangImporterReferenceName(`${this.moduleName}.${this.name}`, context)
   }
 
   get requiredCppHelpers(): CppHelper[] {
-    return [
-      ...this.baseTypes.flatMap((base) => base.requiredCppHelpers),
-      ...this.createCppHelpers(),
-    ]
+    return [...this.baseTypes.flatMap((base) => base.requiredCppHelpers), ...this.createCppHelpers()]
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports: SourceImport[] = []
     switch (language) {
       case 'c++':
@@ -174,10 +151,7 @@ export class SwiftHybridObjectType
           if (!this.sourceConfig.isExternalConfig) {
             imports.push({
               language: language,
-              declaration: this.sourceConfig.getCxxHeader(
-                `${this.name}-Swift.hpp`,
-                'private'
-              ),
+              declaration: this.sourceConfig.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
             })
           }
         }
@@ -216,12 +190,7 @@ export class SwiftHybridObjectType
     if (type.sourceConfig.isExternalConfig) {
       const namespace = type.sourceConfig.getSwiftBridgeNamespace('c++')
       const localNames = getHybridObjectBridgeNames(
-        new HybridObjectType(
-          type.hybridObjectName,
-          type.implementationLanguage,
-          [],
-          NitroConfig.current
-        )
+        new HybridObjectType(type.hybridObjectName, type.implementationLanguage, [], NitroConfig.current)
       )
       createBody = `return ${namespace}::${localNames.create}(pointer);`
       getBody = `return ${namespace}::${localNames.get}(value);`
@@ -232,19 +201,14 @@ export class SwiftHybridObjectType
         },
       ]
     } else {
-      const implementation = type.sourceConfig.getCxxNamespace(
-        'c++',
-        names.HybridTSpecSwift
-      )
+      const implementation = type.sourceConfig.getCxxNamespace('c++', names.HybridTSpecSwift)
       const swiftPart = pointer.take('c++', 'pointer')
       const swiftPartPointer = pointer.retain('c++', 'wrapper->getSwiftPart()')
       createBody = `return std::make_shared<${implementation}>(${swiftPart});`
       getBody = `auto wrapper = std::dynamic_pointer_cast<${implementation}>(value);
 if (!wrapper) throw std::runtime_error("${names.HybridTSpec} is not implemented in Swift");
 return ${swiftPartPointer};`
-      implementationImports = [
-        { language: 'c++', declaration: this.getCxxPartHeader() },
-      ]
+      implementationImports = [{ language: 'c++', declaration: this.getCxxPartHeader() }]
     }
     return [
       {

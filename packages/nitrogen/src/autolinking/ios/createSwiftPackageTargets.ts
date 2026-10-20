@@ -36,10 +36,7 @@ interface SwiftPackageTargetsOptions {
  * SwiftPM compiles `Package.swift` as a single file, so nitrogen maintains this
  * section inside the manifest instead of a separate file under `nitrogen/generated`.
  */
-export function createSwiftPackageTargets({
-  generatedDirectory,
-  moduleDependencies,
-}: SwiftPackageTargetsOptions): string {
+export function createSwiftPackageTargets({ generatedDirectory, moduleDependencies }: SwiftPackageTargetsOptions): string {
   const moduleName = NitroConfig.current.getIosModuleName()
   const cxxTargetName = `${moduleName}Cxx`
   const appleCxxTargetName = NitroConfig.current.getAppleCxxTargetName()
@@ -50,22 +47,15 @@ export function createSwiftPackageTargets({
   const autolinkingObjcSourceName = `${moduleName}Autolinking.mm`
   const nitroModules = NITRO_MODULES_PACKAGE_NAME
   const reactNative = REACT_NATIVE_PACKAGE_NAME
-  const dependencyModuleNames = moduleDependencies.map((config) =>
-    config.getIosModuleName()
-  )
+  const dependencyModuleNames = moduleDependencies.map((config) => config.getIosModuleName())
   const packageDependencies = [
     `.package(name: "${reactNative}", path: "../../../../xcframeworks"),`,
     `.package(name: "${nitroModules}", path: "../${nitroModules}"),`,
-    ...dependencyModuleNames.map(
-      (name) => `.package(name: "${name}", path: "../${name}"),`
-    ),
+    ...dependencyModuleNames.map((name) => `.package(name: "${name}", path: "../${name}"),`),
   ]
-  const productDependencies = [nitroModules, ...dependencyModuleNames].map(
-    (name) => `.product(name: "${name}", package: "${name}"),`
-  )
+  const productDependencies = [nitroModules, ...dependencyModuleNames].map((name) => `.product(name: "${name}", package: "${name}"),`)
   const exposedSwiftModules = [nitroModules, ...dependencyModuleNames].map(
-    (name) =>
-      `"-Xfrontend", "-clang-header-expose-module", "-Xfrontend", "${name}=${name}-Swift.h",`
+    (name) => `"-Xfrontend", "-clang-header-expose-module", "-Xfrontend", "${name}=${name}-Swift.h",`
   )
 
   return `

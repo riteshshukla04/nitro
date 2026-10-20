@@ -5,12 +5,7 @@ import type { SourceFile } from '../SourceFile.js'
 import type { SwiftCallbackType } from './types/SwiftCallbackType.js'
 import { getImportsCode } from '../getImportCode.js'
 import { getSwiftImports } from './getSwiftImports.js'
-import {
-  createSwiftCatchBody,
-  createSwiftResultBody,
-  getSwiftBridgeParameters,
-  type SwiftBridgeParameter,
-} from './SwiftMethodHelpers.js'
+import { createSwiftCatchBody, createSwiftResultBody, getSwiftBridgeParameters, type SwiftBridgeParameter } from './SwiftMethodHelpers.js'
 import { SwiftBorrowedPointerType } from './types/SwiftBorrowedPointerType.js'
 import { SwiftOutPointerType } from './types/SwiftOutPointerType.js'
 
@@ -19,9 +14,7 @@ interface SwiftCallbackArgument {
   argument: string
 }
 
-function getSwiftCallbackArguments(
-  type: SwiftCallbackType
-): SwiftCallbackArgument[] {
+function getSwiftCallbackArguments(type: SwiftCallbackType): SwiftCallbackArgument[] {
   const adapterParameters = type.adapterParameters
   return adapterParameters.map((parameter, index) => {
     let argument = `arguments.${index}`
@@ -33,12 +26,9 @@ function getSwiftCallbackArguments(
   })
 }
 
-function getSwiftCallArguments(
-  swiftArguments: SwiftCallbackArgument[]
-): string[] {
+function getSwiftCallArguments(swiftArguments: SwiftCallbackArgument[]): string[] {
   return swiftArguments.map(({ parameter, argument }) => {
-    if (parameter.type instanceof SwiftBorrowedPointerType)
-      return parameter.name
+    if (parameter.type instanceof SwiftBorrowedPointerType) return parameter.name
     return argument
   })
 }
@@ -51,12 +41,7 @@ interface BorrowSwiftArgumentsOptions {
 }
 
 /** Each pointer borrows its argument for this invocation only. */
-function borrowSwiftArguments({
-  swiftArguments,
-  code,
-  returnType,
-  isThrowing,
-}: BorrowSwiftArgumentsOptions): string {
+function borrowSwiftArguments({ swiftArguments, code, returnType, isThrowing }: BorrowSwiftArgumentsOptions): string {
   const tryKeyword = isThrowing ? 'try ' : ''
   let borrowedCode = code
   for (const { parameter, argument } of swiftArguments.toReversed()) {
@@ -78,10 +63,7 @@ interface SwiftSyncCallOptions {
 }
 
 /** Calls a C++ callback synchronously and rethrows its error in Swift. */
-function createSwiftSyncCallCode({
-  type,
-  bridgeFunction,
-}: SwiftSyncCallOptions): string {
+function createSwiftSyncCallCode({ type, bridgeFunction }: SwiftSyncCallOptions): string {
   const isVoid = type.returnType.kind === 'void'
   const adapterReturnType = type.adapterReturnType
   const swiftArguments = getSwiftCallbackArguments(type)
@@ -130,14 +112,10 @@ ${cppToSwiftReturnCode}
   })
 }
 
-export function createSwiftCallbackBridge(
-  type: SwiftCallbackType
-): SourceFile[] {
+export function createSwiftCallbackBridge(type: SwiftCallbackType): SourceFile[] {
   const swiftClassName = type.specializationName
   const bridgeNamespace = NitroConfig.current.getSwiftBridgeNamespace('swift')
-  const swiftParameterTypes = type.type.parameters.map((parameter) =>
-    parameter.getCode('swift', { context: 'type-argument' })
-  )
+  const swiftParameterTypes = type.type.parameters.map((parameter) => parameter.getCode('swift', { context: 'type-argument' }))
   const swiftReturnType = type.type.returnType.getCode('swift', {
     context: 'return',
   })
@@ -192,50 +170,33 @@ __callAndForget(${swiftCallArguments.join(', ')})
     isThrowing: false,
   })
 
-  const closureParameters = getSwiftBridgeParameters(
-    adapterParameters,
-    adapterReturnType
-  )
+  const closureParameters = getSwiftBridgeParameters(adapterParameters, adapterReturnType)
   const closureParameterDeclarations = closureParameters.map(
-    ({ name, type: parameterType }) =>
-      `${name}: ${parameterType.getCode('swift', { context: 'type-argument' })}`
+    ({ name, type: parameterType }) => `${name}: ${parameterType.getCode('swift', { context: 'type-argument' })}`
   )
-  const swiftClosureArguments = adapterParameters.map(
-    ({ name, type: parameterType }) => parameterType.toSwift(name)
-  )
+  const swiftClosureArguments = adapterParameters.map(({ name, type: parameterType }) => parameterType.toSwift(name))
   const cppToSwiftClosureCode = createSwiftResultBody({
     invocation: `try closure(${swiftClosureArguments.join(', ')})`,
     returnType: adapterReturnType,
     resultType: swiftResultType,
     returnsVoid: isVoid,
   })
-  const cppToSwiftClosureBody = createSwiftCatchBody(
-    cppToSwiftClosureCode,
-    swiftResultType
-  )
+  const cppToSwiftClosureBody = createSwiftCatchBody(cppToSwiftClosureCode, swiftResultType)
   const swiftToCppInitializerCode = `
 self = bridge.create_${swiftClassName}(.init { (${closureParameterDeclarations.join(', ')}) -> ${swiftResultType} in
   ${indent(cppToSwiftClosureBody, '  ')}
 })
 `.trim()
 
-  const swiftClosureParameterNames = type.parameters.map(
-    (parameter) => parameter.escapedName
-  )
-  const swiftClosureParameterDeclarations = type.type.parameters.map(
-    (parameter, index) => {
-      const swiftParameterType = parameter.getCode('swift', {
-        context: 'type-argument',
-      })
-      return `param${index}: ${swiftParameterType}`
-    }
-  )
+  const swiftClosureParameterNames = type.parameters.map((parameter) => parameter.escapedName)
+  const swiftClosureParameterDeclarations = type.type.parameters.map((parameter, index) => {
+    const swiftParameterType = parameter.getCode('swift', {
+      context: 'type-argument',
+    })
+    return `param${index}: ${swiftParameterType}`
+  })
   const publicSwiftTypes = [type.type, type, type.asyncResult]
-  const wrappedSwiftTypes = [
-    type.returnType,
-    ...type.parameters,
-    type.syncResult,
-  ]
+  const wrappedSwiftTypes = [type.returnType, ...type.parameters, type.syncResult]
   const swiftImports = getImportsCode([
     { language: 'swift', name: 'NitroModules', access: 'public' },
     { language: 'swift', name: 'CxxStdlib', access: 'internal' },
@@ -301,14 +262,10 @@ extension Callback<(${swiftParameterTypes.join(', ')}), ${swiftReturnType}> {
 }
 
 /** Conforms the borrowed bridge type of an `Inline<...>` parameter to `InlineCallback`. */
-export function createSwiftInlineCallbackBridge(
-  type: SwiftCallbackType
-): SourceFile[] {
+export function createSwiftInlineCallbackBridge(type: SwiftCallbackType): SourceFile[] {
   const swiftStructName = type.inlineSpecializationName
   const bridgeNamespace = NitroConfig.current.getSwiftBridgeNamespace('swift')
-  const swiftParameterTypes = type.type.parameters.map((parameter) =>
-    parameter.getCode('swift', { context: 'type-argument' })
-  )
+  const swiftParameterTypes = type.type.parameters.map((parameter) => parameter.getCode('swift', { context: 'type-argument' }))
   const swiftReturnType = type.type.returnType.getCode('swift', {
     context: 'return',
   })
@@ -317,11 +274,7 @@ export function createSwiftInlineCallbackBridge(
     bridgeFunction: `call_${swiftStructName}`,
   })
   const publicSwiftTypes = [type.type, type]
-  const wrappedSwiftTypes = [
-    type.returnType,
-    ...type.parameters,
-    type.syncResult,
-  ]
+  const wrappedSwiftTypes = [type.returnType, ...type.parameters, type.syncResult]
   const swiftImports = getImportsCode([
     { language: 'swift', name: 'NitroModules', access: 'public' },
     { language: 'swift', name: 'CxxStdlib', access: 'internal' },

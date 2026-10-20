@@ -1,10 +1,7 @@
 import { NamedWrappingType } from './NamedWrappingType.js'
 import type { Type } from './Type.js'
 
-export function getTypeAs<T>(
-  type: Type,
-  classReference: new (...args: any[]) => T
-): T {
+export function getTypeAs<T>(type: Type, classReference: new (...args: any[]) => T): T {
   if (type instanceof classReference) {
     return type
   } else if (type instanceof NamedWrappingType) {

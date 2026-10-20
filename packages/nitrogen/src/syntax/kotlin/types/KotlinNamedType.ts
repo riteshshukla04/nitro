@@ -1,14 +1,7 @@
 import { NamedWrappingType } from '../../types/NamedWrappingType.js'
-import type {
-  JniValueKind,
-  KotlinConversion,
-  KotlinType,
-} from './KotlinType.js'
+import type { JniValueKind, KotlinConversion, KotlinType } from './KotlinType.js'
 
-export class KotlinNamedType
-  extends NamedWrappingType<KotlinType>
-  implements KotlinType
-{
+export class KotlinNamedType extends NamedWrappingType<KotlinType> implements KotlinType {
   get jniValueKind(): JniValueKind {
     return this.type.jniValueKind
   }

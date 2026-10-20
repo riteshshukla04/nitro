@@ -6,9 +6,7 @@ import { indent } from '../../utils.js'
 import type { HybridObjectSpec } from '../../syntax/HybridObjectSpec.js'
 import { createHybridClassRegistration } from './createHybridClassRegistration.js'
 
-export function createHybridObjectInitializer(
-  specs: HybridObjectSpec[]
-): SourceFile[] {
+export function createHybridObjectInitializer(specs: HybridObjectSpec[]): SourceFile[] {
   const autolinkingClassName = `${NitroConfig.current.getIosModuleName()}Autolinking`
   const namespace = NitroConfig.current.getCxxNamespace('c++')
 
@@ -27,9 +25,7 @@ export function createHybridObjectInitializer(
   const includes = getImportsCode(cppImports, 'implementation')
   const autolinkingInclude = getImportCode({
     language: 'c++',
-    declaration: NitroConfig.current.getCxxHeader(
-      `${autolinkingClassName}.hpp`
-    ),
+    declaration: NitroConfig.current.getCxxHeader(`${autolinkingClassName}.hpp`),
   })
 
   const cppHeaderCode = `

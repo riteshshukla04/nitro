@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   update-lockfiles:
-    name: "Update lockfiles (SwiftPM)"
+    name: 'Update lockfiles (SwiftPM)'
     if: github.actor == 'dependabot[bot]'
     runs-on: xcode-27
     steps:

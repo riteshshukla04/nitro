@@ -39,11 +39,7 @@ function flatBaseTypes(type: HybridObjectSpec): HybridObjectSpec[] {
  * For example, `"toString"` would return `true` since it overrides from base HybridObject.
  * On Kotlin, `"hashCode"` would return `true` since it overrides from base `kotlin.Any`.
  */
-export function isMemberOverridingFromBase(
-  memberName: string,
-  hybridObject: HybridObjectSpec,
-  language: Language
-): boolean {
+export function isMemberOverridingFromBase(memberName: string, hybridObject: HybridObjectSpec, language: Language): boolean {
   // 1. Check if the HybridObject inherits from other HybridObjects,
   //    if yes, check if those have properties of that given name.
   const allBases = flatBaseTypes(hybridObject)

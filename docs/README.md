@@ -1,6 +1,7 @@
 # Nitro documentation
 
-The [Nitro documentation](https://nitro.margelo.com) uses [Docusaurus](https://docusaurus.io/). Its source lives in the `docs/` directory of `margelo/nitro`.
+The [Nitro documentation](https://nitro.margelo.com) uses [Docusaurus](https://docusaurus.io/). Its source lives in the `docs/` directory of
+`margelo/nitro`.
 
 ## Development
 
@@ -24,4 +25,6 @@ The build writes the site to `docs/build/`. Preview it with `bun docs serve`.
 
 ## Deployment
 
-Configure the Vercel project to use `margelo/nitro`, `main` as its production branch, and `docs` as its root directory, with access to the repository's root `bun.lock`. `vercel.json` installs the locked dependencies without running workspace build scripts, then runs `bun run build` from `docs/`.
+Configure the Vercel project to use `margelo/nitro`, `main` as its production branch, and `docs` as its root directory, with access to the
+repository's root `bun.lock`. `vercel.json` installs the locked dependencies without running workspace build scripts, then runs
+`bun run build` from `docs/`.

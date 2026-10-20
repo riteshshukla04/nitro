@@ -8,8 +8,8 @@
 #pragma once
 
 #include <NitroModules/BoxedHybridObject.hpp>
-#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <memory>
 #include <string>
 

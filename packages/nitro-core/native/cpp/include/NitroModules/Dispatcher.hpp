@@ -70,7 +70,9 @@ public:
     struct Entry {
       Dispatcher& dispatcher;
       jsi::Runtime& runtime;
-      ~Entry() { dispatcher.leaveJS(runtime); }
+      ~Entry() {
+        dispatcher.leaveJS(runtime);
+      }
     } entry{*this, runtime};
     return std::invoke(std::forward<Func>(function));
   }

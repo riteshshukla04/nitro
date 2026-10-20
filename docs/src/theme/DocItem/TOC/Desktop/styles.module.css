@@ -62,7 +62,9 @@
   font-weight: 700;
   font-size: 0.85rem;
   text-decoration: none;
-  transition: transform 150ms ease, background-color 150ms ease;
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease;
 }
 
 .ctaButton:hover,

@@ -4,10 +4,7 @@ import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { SwiftRecordType } from './types/SwiftRecordType.js'
 import { getImportsCode } from '../getImportCode.js'
-import {
-  getProtocolConformanceImports,
-  getSwiftImports,
-} from './getSwiftImports.js'
+import { getProtocolConformanceImports, getSwiftImports } from './getSwiftImports.js'
 
 export function createSwiftRecordBridge(type: SwiftRecordType): SourceFile[] {
   const swiftStructName = type.name

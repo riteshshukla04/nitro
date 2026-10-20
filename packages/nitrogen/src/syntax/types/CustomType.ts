@@ -22,14 +22,9 @@ export class CustomType implements Type {
   getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return options.context === 'parameter' &&
-          this.typeConfig.canBePassedByReference
-          ? `const ${this.typeName}&`
-          : this.typeName
+        return options.context === 'parameter' && this.typeConfig.canBePassedByReference ? `const ${this.typeName}&` : this.typeName
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for CustomType "${this.typeName}"!`
-        )
+        throw new Error(`Language ${language} is not yet supported for CustomType "${this.typeName}"!`)
     }
   }
   getExtraFiles(): SourceFile[] {

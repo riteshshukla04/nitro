@@ -7,20 +7,12 @@ import { InstanceMethod } from '../InstanceMethod.js'
 import { HybridObjectType } from '../types/HybridObjectType.js'
 import { getImportCode, getImportsCode } from '../getImportCode.js'
 import type { Platform } from '../../getPlatformSpecs.js'
-import {
-  createCppHybridClassBindings,
-  type HybridClassBindings,
-} from './CppHybridClassBindings.js'
+import { createCppHybridClassBindings, type HybridClassBindings } from './CppHybridClassBindings.js'
 import { createKotlinHybridClassBindings } from '../kotlin/KotlinHybridClassBindings.js'
 
-export function createCppHybridObject(
-  spec: HybridObjectSpec,
-  platform: Platform
-): SourceFile[] {
+export function createCppHybridObject(spec: HybridObjectSpec, platform: Platform): SourceFile[] {
   if (spec.baseTypes.length > 1) {
-    throw new Error(
-      `${spec.name} cannot extend multiple HybridObjects. Use a single base class.`
-    )
+    throw new Error(`${spec.name} cannot extend multiple HybridObjects. Use a single base class.`)
   }
   const baseSpec = spec.baseTypes[0]
   let hybridClassBase: string
@@ -34,16 +26,9 @@ export function createCppHybridObject(
   } else {
     hybridClassBase = 'HybridObject'
   }
-  const members = [
-    ...spec.properties,
-    ...spec.methods,
-    ...spec.staticMethods,
-    ...spec.staticProperties,
-  ]
+  const members = [...spec.properties, ...spec.methods, ...spec.staticMethods, ...spec.staticProperties]
   const extraFiles = members.flatMap((member) => member.getExtraFiles())
-  const memberImports = members.flatMap((member) =>
-    member.getRequiredImports('c++')
-  )
+  const memberImports = members.flatMap((member) => member.getRequiredImports('c++'))
   if (spec.constructor != null) {
     extraFiles.push(...spec.constructor.getExtraFiles())
     memberImports.push(...spec.constructor.getRequiredImports('c++'))
@@ -71,10 +56,7 @@ export function createCppHybridObject(
       })
     ),
   ]
-  const cppDeclarationIncludes = getImportsCode(
-    declarationImports,
-    'declaration'
-  )
+  const cppDeclarationIncludes = getImportsCode(declarationImports, 'declaration')
   const cxxNamespace = spec.config.getCxxNamespace('c++')
   const name = getHybridObjectName(spec.name)
   let bindings: HybridClassBindings | undefined
@@ -99,14 +81,9 @@ export function createCppHybridObject(
     declaration: new HybridObjectType(spec).getCppHeader(),
   }
   const cppSpecInclude = getImportCode(specImport)
-  const cppImplementationIncludes = getImportsCode(
-    [specImport, ...memberImports],
-    'implementation'
-  )
+  const cppImplementationIncludes = getImportsCode([specImport, ...memberImports], 'implementation')
 
-  const properties = spec.properties.map((p) =>
-    p.getCode('c++', { virtual: true })
-  )
+  const properties = spec.properties.map((p) => p.getCode('c++', { virtual: true }))
   const abstractMethods = spec.methods.map(
     (method) =>
       new InstanceMethod(method.name, method.returnType, method.parameters, {
@@ -118,9 +95,7 @@ export function createCppHybridObject(
   const bases = ['public virtual HybridObject']
   for (const base of spec.baseTypes) {
     const baseName = getHybridObjectName(base.name).HybridTSpec
-    const fullName = base.config.isExternalConfig
-      ? base.config.getCxxNamespace('c++', baseName)
-      : baseName
+    const fullName = base.config.isExternalConfig ? base.config.getCxxNamespace('c++', baseName) : baseName
     bases.push(`public virtual ${fullName}`)
   }
 
@@ -184,15 +159,11 @@ namespace ${cxxNamespace} {
   // Register properties together with their optional setters, then normal methods.
   const registrations: string[] = []
   for (const property of spec.properties) {
-    const accessors = [
-      `&${name.HybridTSpec}::${property.getGetterName('other')}`,
-    ]
+    const accessors = [`&${name.HybridTSpec}::${property.getGetterName('other')}`]
     if (!property.isReadonly) {
       accessors.push(`&${name.HybridTSpec}::${property.getSetterName('other')}`)
     }
-    registrations.push(
-      `clazz.registerHybridProperty("${property.name}", ${accessors.join(', ')});`
-    )
+    registrations.push(`clazz.registerHybridProperty("${property.name}", ${accessors.join(', ')});`)
   }
   for (const method of spec.methods) {
     // method

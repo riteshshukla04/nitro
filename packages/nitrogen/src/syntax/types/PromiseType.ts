@@ -39,17 +39,14 @@ export class PromiseType implements Type {
       case 'kotlin':
         return `Promise<${resultingCode}>`
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for PromiseType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for PromiseType!`)
     }
   }
   getExtraFiles(): SourceFile[] {
     return this.resultingType.getExtraFiles()
   }
   getRequiredImports(language: Language): SourceImport[] {
-    const imports: SourceImport[] =
-      this.resultingType.getRequiredImports(language)
+    const imports: SourceImport[] = this.resultingType.getRequiredImports(language)
     switch (language) {
       case 'c++':
         imports.push({

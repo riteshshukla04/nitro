@@ -38,10 +38,7 @@ export function errorToString(error: unknown): string {
     let message = `${error.name}: ${error.message}`
     if (error.cause != null) {
       // JSON.stringify() turns an Error into `{}`.
-      const cause =
-        error.cause instanceof Error
-          ? errorToString(error.cause)
-          : JSON.stringify(error.cause)
+      const cause = error.cause instanceof Error ? errorToString(error.cause) : JSON.stringify(error.cause)
       message += ` (cause: ${cause})`
     }
     return message
@@ -85,12 +82,7 @@ export function unsafeFastJoin(...segments: string[]): string {
 }
 
 function getFullPath(file: SourceFile): string {
-  return unsafeFastJoin(
-    file.platform,
-    file.language,
-    ...file.subdirectory,
-    file.name
-  )
+  return unsafeFastJoin(file.platform, file.language, ...file.subdirectory, file.name)
 }
 
 /**
@@ -116,9 +108,7 @@ export function toLowerCamelCase(string: string): string {
 
   const camelCaseString = parts[0]!.toLowerCase()
 
-  const camelCased = parts
-    .slice(1)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+  const camelCased = parts.slice(1).map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
 
   return camelCaseString + camelCased.join('')
 }
@@ -132,14 +122,11 @@ export function getDirectBaseTypes(type: Type): Type[] {
   return baseTypes.filter(isNotDuplicate)
 }
 
-export function getHybridObjectNitroModuleConfig(
-  type: Type
-): NitroConfig | undefined {
+export function getHybridObjectNitroModuleConfig(type: Type): NitroConfig | undefined {
   const symbol = type.getSymbol() ?? type.getAliasSymbol()
   if (!symbol) return undefined
 
-  const declarations =
-    symbol.getValueDeclaration() || symbol.getDeclarations()[0]
+  const declarations = symbol.getValueDeclaration() || symbol.getDeclarations()[0]
   if (!declarations) return undefined
 
   const sourceFile = declarations.getSourceFile()

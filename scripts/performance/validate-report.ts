@@ -3,16 +3,9 @@ import { appendFile, mkdir, readFile, lstat } from 'node:fs/promises'
 import path from 'node:path'
 import { parseArguments, requiredArgument } from './args'
 
-async function readBoundedFile(
-  file: string,
-  maxBytes: number
-): Promise<string> {
+async function readBoundedFile(file: string, maxBytes: number): Promise<string> {
   const information = await lstat(file)
-  if (
-    !information.isFile() ||
-    information.size === 0 ||
-    information.size > maxBytes
-  ) {
+  if (!information.isFile() || information.size === 0 || information.size > maxBytes) {
     throw new Error(`${file} has an invalid size.`)
   }
   return readFile(file, 'utf8')
@@ -23,13 +16,9 @@ const directory = requiredArgument(args, 'artifact-directory')
 const output = requiredArgument(args, 'output-directory')
 const repository = requiredArgument(args, 'expected-repository')
 // These inputs come from GitHub, not from the downloaded artifact.
-const event = JSON.parse(
-  await readFile(requiredArgument(args, 'trusted-workflow-event'), 'utf8')
-)
+const event = JSON.parse(await readFile(requiredArgument(args, 'trusted-workflow-event'), 'utf8'))
 const run = event.workflow_run
-const metadata: ReportMetadata = JSON.parse(
-  await readBoundedFile(path.join(directory, 'metadata.json'), 64 * 1024)
-)
+const metadata: ReportMetadata = JSON.parse(await readBoundedFile(path.join(directory, 'metadata.json'), 64 * 1024))
 if (
   metadata.repository !== repository ||
   event.repository.full_name !== repository ||
@@ -45,19 +34,13 @@ if (
   metadata.platforms.length === 0 ||
   metadata.platforms.length > 2 ||
   new Set(metadata.platforms).size !== metadata.platforms.length ||
-  metadata.platforms.some(
-    (platform) => platform !== 'android' && platform !== 'ios'
-  )
+  metadata.platforms.some((platform) => platform !== 'android' && platform !== 'ios')
 ) {
-  throw new Error(
-    'Publication metadata does not match the triggering workflow.'
-  )
+  throw new Error('Publication metadata does not match the triggering workflow.')
 }
 
 if (run.event === 'issue_comment' || run.event === 'pull_request') {
-  const pr = JSON.parse(
-    await readFile(requiredArgument(args, 'trusted-pull-request'), 'utf8')
-  )
+  const pr = JSON.parse(await readFile(requiredArgument(args, 'trusted-pull-request'), 'utf8'))
   if (
     metadata.pullRequestNumber === null ||
     !Number.isSafeInteger(metadata.pullRequestNumber) ||
@@ -65,24 +48,14 @@ if (run.event === 'issue_comment' || run.event === 'pull_request') {
     metadata.pullRequestNumber !== pr.number ||
     pr.base.repo.full_name !== repository ||
     (run.event === 'issue_comment'
-      ? run.head_repository.full_name !== repository ||
-        run.display_title !== `Nitro Performance for PR #${pr.number}`
+      ? run.head_repository.full_name !== repository || run.display_title !== `Nitro Performance for PR #${pr.number}`
       : pr.head.repo.full_name !== run.head_repository.full_name)
   ) {
-    throw new Error(
-      'Publication metadata does not match the trusted pull request.'
-    )
+    throw new Error('Publication metadata does not match the trusted pull request.')
   }
-  if (
-    pr.state !== 'open' ||
-    metadata.baseSha !== pr.base.sha ||
-    metadata.headSha !== pr.head.sha
-  ) {
-    console.info(
-      'Skipping stale performance results: the pull request advanced or closed.'
-    )
-    if (process.env.GITHUB_OUTPUT != null)
-      await appendFile(process.env.GITHUB_OUTPUT, 'stale=true\n')
+  if (pr.state !== 'open' || metadata.baseSha !== pr.base.sha || metadata.headSha !== pr.head.sha) {
+    console.info('Skipping stale performance results: the pull request advanced or closed.')
+    if (process.env.GITHUB_OUTPUT != null) await appendFile(process.env.GITHUB_OUTPUT, 'stale=true\n')
     process.exit(0)
   }
 } else if (
@@ -94,10 +67,7 @@ if (run.event === 'issue_comment' || run.event === 'pull_request') {
   throw new Error('Only main runs may publish main performance history.')
 }
 
-const markdown = await readBoundedFile(
-  path.join(directory, 'performance-summary.md'),
-  240_000
-)
+const markdown = await readBoundedFile(path.join(directory, 'performance-summary.md'), 240_000)
 if (markdown.length > 60_000 || markdown.trim().length === 0) {
   throw new Error('Performance comment is empty or exceeds GitHub limits.')
 }

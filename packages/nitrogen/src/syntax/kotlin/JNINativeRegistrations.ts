@@ -8,9 +8,7 @@ export interface JNINativeRegistration {
 
 const jniNativeRegistrations: JNINativeRegistration[] = []
 
-export function addJNINativeRegistration(
-  registerFunc: JNINativeRegistration
-): void {
+export function addJNINativeRegistration(registerFunc: JNINativeRegistration): void {
   jniNativeRegistrations.push(registerFunc)
 }
 

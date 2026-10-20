@@ -13,10 +13,7 @@ interface AppleCxxTargetOptions {
  * Creates the sources of the `<Module>AppleCxx` Swift package target.
  * Its public header declares the C++ bridge that Swift imports.
  */
-export function createAppleCxxTarget({
-  moduleDependencies,
-  bridgeDeclarations,
-}: AppleCxxTargetOptions): SourceFile[] {
+export function createAppleCxxTarget({ moduleDependencies, bridgeDeclarations }: AppleCxxTargetOptions): SourceFile[] {
   const targetName = NitroConfig.current.getAppleCxxTargetName()
   let dependencyIncludes: string
   if (moduleDependencies.length > 0) {
@@ -34,10 +31,7 @@ ${includes}
   } else {
     dependencyIncludes = ''
   }
-  const declarationIncludes = getImportsCode(
-    bridgeDeclarations.requiredImports,
-    'declaration'
-  )
+  const declarationIncludes = getImportsCode(bridgeDeclarations.requiredImports, 'declaration')
   const headerInclude = getImportCode({
     language: 'c++',
     declaration: NitroConfig.current.getAppleCxxHeader(),

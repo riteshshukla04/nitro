@@ -42,6 +42,7 @@ class ArrayBuffer;
  */
 class JSArrayBuffer final {
   friend JSIConverter<ArrayBuffer>;
+
 public:
   explicit JSArrayBuffer(jsi::Runtime& runtime, BorrowingReference<jsi::ArrayBuffer>&& jsReference);
   JSArrayBuffer(const JSArrayBuffer&) = default;
@@ -81,6 +82,7 @@ private:
  */
 class ArrayBuffer final {
   friend JSIConverter<ArrayBuffer>;
+
 public:
   ArrayBuffer() = delete;
   ArrayBuffer(const ArrayBuffer&) = default;

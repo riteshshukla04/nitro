@@ -17,9 +17,7 @@ export class SwiftStructType extends StructType implements SwiftType {
   override readonly properties: SwiftNamedType[]
 
   constructor(readonly type: StructType) {
-    const properties = type.properties.map(
-      (p) => new SwiftNamedType(p.name, wrapSwiftType(p))
-    )
+    const properties = type.properties.map((p) => new SwiftNamedType(p.name, wrapSwiftType(p)))
     super(type.structName, properties)
     this.properties = properties
   }
@@ -28,10 +26,7 @@ export class SwiftStructType extends StructType implements SwiftType {
     return this.type.structName
   }
   override getExtraFiles(): SourceFile[] {
-    return [
-      ...this.properties.flatMap((p) => p.getExtraFiles()),
-      ...createSwiftStructBridge(this),
-    ]
+    return [...this.properties.flatMap((p) => p.getExtraFiles()), ...createSwiftStructBridge(this)]
   }
 
   get isHashable(): boolean {
@@ -90,39 +85,25 @@ export class SwiftStructType extends StructType implements SwiftType {
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   getClangImporterName(context: TypeContext): string {
-    return getClangImporterReferenceName(
-      `${this.moduleName}.${this.name}`,
-      context
-    )
+    return getClangImporterReferenceName(`${this.moduleName}.${this.name}`, context)
   }
 
   get requiredCppHelpers(): CppHelper[] {
     return this.properties.flatMap((p) => p.requiredCppHelpers)
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports: SourceImport[] = []
     switch (language) {
       case 'c++':
-        imports.push(
-          ...this.properties.flatMap((p) =>
-            p.getRequiredImports(language, context)
-          ),
-          {
-            language,
-            declaration: { forwardDeclaration: this.forwardDeclaration },
-          }
-        )
+        imports.push(...this.properties.flatMap((p) => p.getRequiredImports(language, context)), {
+          language,
+          declaration: { forwardDeclaration: this.forwardDeclaration },
+        })
         if (context === 'implementation') {
           imports.push({
             language: language,
-            declaration: NitroConfig.current.getCxxHeader(
-              `${this.name}-Swift.hpp`,
-              'private'
-            ),
+            declaration: NitroConfig.current.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
           })
         }
         break

@@ -1,9 +1,10 @@
 ---
-description: Understand Nitro Modules, the React Native library structure for type-safe native modules backed by Hybrid Objects and statically compiled JSI bindings.
+description:
+  Understand Nitro Modules, the React Native library structure for type-safe native modules backed by Hybrid Objects and statically compiled
+  JSI bindings.
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Nitro Modules
 
@@ -27,23 +28,25 @@ npx nitrogen@alpha init react-native-math
 
 Once you set up the library, you can start implementing your Hybrid Objects!
 
-
 <Tabs groupId="nitrogen-or-not">
   <TabItem value="nitrogen" label="With Nitrogen ✨" default>
 
-  With [Nitrogen](nitrogen) you can ✨ automagically ✨ generate all native interfaces from your TypeScript definitions.
-  The generated iOS initialization code registers the classes with `HybridClassRegistry` when the library loads. Include it through the [SwiftPM setup](nitrogen#3-add-generated-sources-to-your-library).
+With [Nitrogen](nitrogen) you can ✨ automagically ✨ generate all native interfaces from your TypeScript definitions. The generated iOS
+initialization code registers the classes with `HybridClassRegistry` when the library loads. Include it through the
+[SwiftPM setup](nitrogen#3-add-generated-sources-to-your-library).
 
-  See [Hybrid Objects (Implementation)](hybrid-objects#implementation) for more information.
+See [Hybrid Objects (Implementation)](hybrid-objects#implementation) for more information.
 
   </TabItem>
   <TabItem value="manually" label="Manually">
 
-  If you don't want to use Nitrogen, simply create your native C++ classes that inherit from `HybridObject` and register a `HybridClass` - then register them using the `HybridClassRegistry`.
+If you don't want to use Nitrogen, simply create your native C++ classes that inherit from `HybridObject` and register a `HybridClass` -
+then register them using the `HybridClassRegistry`.
 
-  See [Hybrid Objects (Implementation)](hybrid-objects#implementation) for more information.
+See [Hybrid Objects (Implementation)](hybrid-objects#implementation) for more information.
 
   </TabItem>
+
 </Tabs>
 
 ### 3. Set up an example app
@@ -55,16 +58,23 @@ After creating a Nitro Module, it's time to set up an example app to test your l
   ```sh
   npx create-expo-app@latest
   ```
+
   </TabItem>
   <TabItem value="bare" label="Bare RN">
   ```sh
   npx @react-native-community/cli@latest init NitroMathExample
   ```
+
   </TabItem>
+
 </Tabs>
 
 :::tip
-The Hybrid Objects from your Nitro Module will be registered in the `HybridClassRegistry`. This registration process needs to be called from somewhere:
+
+The Hybrid Objects from your Nitro Module will be registered in the `HybridClassRegistry`. This registration process needs to be called from
+somewhere:
+
 - In React Native, this happens in the `*Package.kt` file which calls `.initializeNative()`.
 - If you are not using React Native, you need to manually call `.initializeNative()` in your library's entry point.
+
 :::

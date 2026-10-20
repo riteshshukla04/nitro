@@ -9,13 +9,8 @@ import { getImportCode, getImportsCode } from '../getImportCode.js'
 export function createKotlinVariant(variant: KotlinVariantType): SourceFile[] {
   const publicVariant = variant.type
   const jniName = variant.jniName
-  const jsName = publicVariant.variants
-    .map((v) => v.getCode('kotlin', { context: 'value' }))
-    .join(' | ')
-  const cxxName = publicVariant
-    .getCode('c++', { context: 'value' })
-    .replaceAll('/* ', '')
-    .replaceAll(' */', '')
+  const jsName = publicVariant.variants.map((v) => v.getCode('kotlin', { context: 'value' })).join(' | ')
+  const cxxName = publicVariant.getCode('c++', { context: 'value' }).replaceAll('/* ', '').replaceAll(' */', '')
   const kotlinName = variant.name
   const namespace = `${jniName}_impl`
 
@@ -140,10 +135,7 @@ sealed class ${kotlinName} {
   `.trim()
 
   const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
-  const jniClassDescriptor = NitroConfig.current.getAndroidPackage(
-    'c++/jni',
-    kotlinName
-  )
+  const jniClassDescriptor = NitroConfig.current.getAndroidPackage('c++/jni', kotlinName)
   const cppCreateDeclarations = variant.kotlinCases.map(({ type }, i) => {
     const jniType = type.getCode('c++', { context: 'parameter' })
     return `static jni::local_ref<${jniName}> create_${i}(${jniType} value);`
@@ -184,10 +176,7 @@ if (isInstanceOf(${namespace}::${innerName}::javaClassStatic())) {
   const cppInnerClasses = variant.kotlinCases.map(({ label, type }) => {
     const innerName = capitalizeName(label)
     const jniType = type.getCode('c++', { context: 'return' })
-    const descriptor = NitroConfig.current.getAndroidPackage(
-      'c++/jni',
-      `${kotlinName}$${innerName}`
-    )
+    const descriptor = NitroConfig.current.getAndroidPackage('c++/jni', `${kotlinName}$${innerName}`)
     return `
 class ${innerName} final : public jni::JavaClass<${innerName}, ${jniName}> {
 public:
@@ -210,21 +199,13 @@ ${jniType} ${namespace}::${innerName}::getValue() const {
     `.trim()
   })
 
-  const imports = [
-    ...publicVariant.getRequiredImports('c++'),
-    ...variant.variants.flatMap((v) => v.getRequiredImports('c++')),
-  ]
-  const declarationIncludes = imports
-    .map((i) => getImportCode(i, 'declaration'))
-    .filter(isNotDuplicate)
+  const imports = [...publicVariant.getRequiredImports('c++'), ...variant.variants.flatMap((v) => v.getRequiredImports('c++'))]
+  const declarationIncludes = imports.map((i) => getImportCode(i, 'declaration')).filter(isNotDuplicate)
   const implementationIncludes = getImportsCode(
     [
       {
         language: 'c++',
-        declaration: NitroConfig.current.getCxxHeader(
-          `${jniName}.hpp`,
-          'private'
-        ),
+        declaration: NitroConfig.current.getCxxHeader(`${jniName}.hpp`, 'private'),
       },
       ...imports,
     ],

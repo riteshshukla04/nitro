@@ -67,8 +67,7 @@ await yargs(hideBin(process.argv))
   // 🔥 nitrogen init <moduleName>
   .command(
     'init <moduleName>',
-    `Usage: ${chalk.bold(`${commandName} init <moduleName> [options]`)}\n` +
-      `Create a new Nitro Module.`,
+    `Usage: ${chalk.bold(`${commandName} init <moduleName> [options]`)}\n` + `Create a new Nitro Module.`,
     (y) =>
       y
         .positional('moduleName', {
@@ -97,30 +96,22 @@ await yargs(hideBin(process.argv))
   .version(NITROGEN_VERSION)
   .wrap(cliWidth).argv
 
-async function runNitrogenCommand(
-  baseDirectory: string,
-  outputDirectory: string
-): Promise<void> {
+async function runNitrogenCommand(baseDirectory: string, outputDirectory: string): Promise<void> {
   // 1. Prepare output folders
   const filesBefore = await getFiles(outputDirectory)
 
   const start = performance.now()
 
   // 2. Run Nitrogen
-  const { generatedFiles, generatedSpecsCount, targetSpecsCount } =
-    await runNitrogen({
-      baseDirectory: baseDirectory,
-      outputDirectory: outputDirectory,
-    })
+  const { generatedFiles, generatedSpecsCount, targetSpecsCount } = await runNitrogen({
+    baseDirectory: baseDirectory,
+    outputDirectory: outputDirectory,
+  })
 
   const end = performance.now()
   const timeS = ((end - start) / 1000).toFixed(1)
-  console.log(
-    `🎉  Generated ${generatedSpecsCount}/${targetSpecsCount} HybridObject${generatedSpecsCount === 1 ? '' : 's'} in ${timeS}s!`
-  )
-  console.log(
-    `💡  Your code is in ${chalk.underline(prettifyDirectory(outputDirectory))}`
-  )
+  console.log(`🎉  Generated ${generatedSpecsCount}/${targetSpecsCount} HybridObject${generatedSpecsCount === 1 ? '' : 's'} in ${timeS}s!`)
+  console.log(`💡  Your code is in ${chalk.underline(prettifyDirectory(outputDirectory))}`)
 
   // 3. Delete all old dangling files
   const currentFiles = await getFiles(outputDirectory)
@@ -128,12 +119,8 @@ async function runNitrogenCommand(
   // Only native output changes require refreshing the native build's file list.
   const runtimeDirectory = getHybridClassRuntimeDirectory(outputDirectory)
   const manifestPath = getHybridClassManifestPath(outputDirectory)
-  const nativeFiles = currentFiles.filter(
-    (f) => !f.startsWith(runtimeDirectory + path.sep) && f !== manifestPath
-  )
-  const addedFiles = nativeFiles.filter(
-    (f) => generatedFiles.includes(f) && !filesBefore.includes(f)
-  )
+  const nativeFiles = currentFiles.filter((f) => !f.startsWith(runtimeDirectory + path.sep) && f !== manifestPath)
+  const addedFiles = nativeFiles.filter((f) => generatedFiles.includes(f) && !filesBefore.includes(f))
   const removedFiles = nativeFiles.filter((f) => !generatedFiles.includes(f))
   if (addedFiles.length > 0 || removedFiles.length > 0) {
     let text = ''
@@ -147,9 +134,7 @@ async function runNitrogenCommand(
       text = `Added ${addedFiles.length} file${as} and removed ${removedFiles.length} file${rs}`
     }
 
-    console.log(
-      `‼️   ${text} - ${chalk.bold('refresh SwiftPM (`npx react-native spm` for React Native) or sync Gradle to update files!')}`
-    )
+    console.log(`‼️   ${text} - ${chalk.bold('refresh SwiftPM (`npx react-native spm` for React Native) or sync Gradle to update files!')}`)
   }
   const promises = danglingFiles.map(async (file) => {
     const stat = await fs.stat(file)

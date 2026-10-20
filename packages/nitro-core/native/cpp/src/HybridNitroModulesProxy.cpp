@@ -5,10 +5,10 @@
 //  Created by Marc Rousavy on 05.10.24
 //
 
-#include <NitroModules/detail/HybridNitroModulesProxy.hpp>
 #include <NitroModules/HybridClassRegistry.hpp>
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/NitroDefines.hpp>
+#include <NitroModules/detail/HybridNitroModulesProxy.hpp>
 
 namespace margelo::nitro::detail {
 

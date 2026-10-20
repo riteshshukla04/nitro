@@ -7,14 +7,14 @@
 
 #include <NitroModules/ArrayBuffer.hpp>
 #include <NitroModules/BorrowingReference.hpp>
-#include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/Dispatcher.hpp>
+#include <NitroModules/NitroDefines.hpp>
 #include <cassert>
 #include <cstring>
 #include <functional>
 #include <jsi/jsi.h>
-#include <thread>
 #include <span>
+#include <thread>
 #include <utility>
 
 namespace margelo::nitro {
@@ -41,14 +41,14 @@ public:
   OwningArrayBuffer(const OwningArrayBuffer&) = delete;
   OwningArrayBuffer(OwningArrayBuffer&&) = delete;
   ~OwningArrayBuffer() = default;
-  
+
   uint8_t* data() override {
     return _data.get();
   }
   size_t size() const override {
     return _size;
   }
-  
+
 private:
   std::unique_ptr<uint8_t[]> _data;
   size_t _size;
@@ -56,26 +56,26 @@ private:
 
 class VectorArrayBuffer final : public jsi::MutableBuffer {
 public:
-  VectorArrayBuffer(std::vector<uint8_t>&& data): _data(std::move(data)) { }
+  VectorArrayBuffer(std::vector<uint8_t>&& data) : _data(std::move(data)) {}
   VectorArrayBuffer(const VectorArrayBuffer&) = delete;
   VectorArrayBuffer(VectorArrayBuffer&&) = delete;
   ~VectorArrayBuffer() = default;
-  
+
   uint8_t* data() override {
     return _data.data();
   }
   size_t size() const override {
     return _data.size();
   }
-  
+
 private:
   std::vector<uint8_t> _data;
 };
 
 class WrappingArrayBuffer final : public jsi::MutableBuffer {
 public:
-  WrappingArrayBuffer(uint8_t* NON_NULL data, size_t size, DeleteFn&& deleteFn):
-    _data(data), _size(size), _deleteFn(std::move(deleteFn)) { }
+  WrappingArrayBuffer(uint8_t* NON_NULL data, size_t size, DeleteFn&& deleteFn)
+      : _data(data), _size(size), _deleteFn(std::move(deleteFn)) {}
   WrappingArrayBuffer(const WrappingArrayBuffer&) = delete;
   WrappingArrayBuffer(WrappingArrayBuffer&&) = delete;
   ~WrappingArrayBuffer() {
@@ -83,20 +83,19 @@ public:
       _deleteFn();
     }
   }
-  
+
   uint8_t* data() override {
     return _data;
   }
   size_t size() const override {
     return _size;
   }
-  
+
 private:
   uint8_t* _data;
   size_t _size;
   DeleteFn _deleteFn;
 };
-
 
 // 1. ArrayBuffer
 
@@ -187,9 +186,9 @@ ArrayBuffer ArrayBuffer::asOwning() const {
 JSArrayBuffer::JSArrayBuffer(jsi::Runtime& runtime, BorrowingReference<jsi::ArrayBuffer>&& jsReference)
     : _runtime(runtime), _jsReference(std::move(jsReference)) {
 #ifdef NITRO_DEBUG
-      _dispatcher = Dispatcher::getRuntimeGlobalDispatcher(runtime);
+  _dispatcher = Dispatcher::getRuntimeGlobalDispatcher(runtime);
 #endif
-    }
+}
 
 bool JSArrayBuffer::operator==(const JSArrayBuffer& other) const {
   return &_runtime.get() == &other._runtime.get() && _jsReference == other._jsReference;
@@ -203,7 +202,7 @@ uint8_t* NULLABLE JSArrayBuffer::data() const {
     return nullptr;
   }
   assert(dispatcher->isOnDispatcher() && "`data()` can only be accessed synchronously on the JS Thread! "
-         "If you want to access it elsewhere, copy it first.");
+                                         "If you want to access it elsewhere, copy it first.");
 #endif
 
   if (!_jsReference) [[unlikely]] {
@@ -222,7 +221,7 @@ size_t JSArrayBuffer::size() const {
     return 0;
   }
   assert(dispatcher->isOnDispatcher() && "`size()` can only be accessed synchronously on the JS Thread! "
-         "If you want to access it elsewhere, copy it first.");
+                                         "If you want to access it elsewhere, copy it first.");
 #endif
 
   if (!_jsReference) [[unlikely]] {
@@ -241,13 +240,13 @@ NativeArrayBuffer JSArrayBuffer::asOwning() const {
     throw std::runtime_error("Cannot escape JSArrayBuffer - the Dispatcher (and jsi::Runtime) have already been deleted!");
   }
   assert(dispatcher->isOnDispatcher() && "`asOwning()` can only be accessed synchronously on the JS Thread! "
-         "If you want to access it elsewhere, copy it first.");
+                                         "If you want to access it elsewhere, copy it first.");
 #endif
   if (!_jsReference) [[unlikely]] {
     // JS Part has been deleted - we cannot copy anything anymore.
     throw std::runtime_error("Cannot escape JSArrayBuffer - the jsi::Function has already been deleted!");
   }
-  
+
   if (auto mutableBuffer = _jsReference->tryGetMutableBuffer(_runtime)) {
     // We can simply downcast
     return mutableBuffer;

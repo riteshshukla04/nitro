@@ -41,15 +41,9 @@ export class KotlinUInt64Type extends UInt64Type implements KotlinType {
   convert(value: string, conversion: KotlinConversion): string {
     switch (conversion.in) {
       case 'kotlin':
-        return conversion.from === 'kotlin'
-          ? `${value}.toLong()`
-          : `${value}.toULong()`
+        return conversion.from === 'kotlin' ? `${value}.toLong()` : `${value}.toULong()`
       case 'c++': {
-        const jniValue = convertJniPrimitive(
-          value,
-          conversion,
-          this.jniPrimitive
-        )
+        const jniValue = convertJniPrimitive(value, conversion, this.jniPrimitive)
         switch (conversion.from) {
           case 'kotlin':
             // jlong is signed in Java.

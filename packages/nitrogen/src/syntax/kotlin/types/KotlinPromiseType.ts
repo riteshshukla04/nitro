@@ -4,11 +4,7 @@ import { indent } from '../../../utils.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { PromiseType } from '../../types/PromiseType.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinPromiseType extends PromiseType implements KotlinType {
   override readonly resultingType: KotlinType

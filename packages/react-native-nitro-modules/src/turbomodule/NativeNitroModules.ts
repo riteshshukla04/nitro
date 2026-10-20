@@ -16,9 +16,7 @@ if (globalThis.NitroModulesProxy == null) {
   }
 
   if (globalThis.NitroModulesProxy == null) {
-    const cause = new Error(
-      'The NitroModules TurboModule loaded, but its JSI bindings did not install `global.NitroModulesProxy`.'
-    )
+    const cause = new Error('The NitroModules TurboModule loaded, but its JSI bindings did not install `global.NitroModulesProxy`.')
     throw new ModuleNotFoundError(cause)
   }
 }

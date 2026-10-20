@@ -1,8 +1,7 @@
 ---
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Optionals (`T?`)
 
@@ -19,6 +18,7 @@ Optional or undefined values can be declared with the question mark operator (`?
       b: number | undefined
     }
     ```
+
   </TabItem>
   <TabItem value="swift" label="Swift">
     ```swift
@@ -27,6 +27,7 @@ Optional or undefined values can be declared with the question mark operator (`?
       var b: Double?
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin
@@ -35,6 +36,7 @@ Optional or undefined values can be declared with the question mark operator (`?
       override var b: Double? = null
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp
@@ -45,13 +47,17 @@ Optional or undefined values can be declared with the question mark operator (`?
       void setB(const std::optional<double>& value) override;
     };
     ```
+
   </TabItem>
+
 </Tabs>
 
 In Kotlin/Java, nullables have to be boxed in object types.
 
 ## Optionals vs `null`
 
-In the same way that JavaScript distinguishes between an optional type/`undefined` and `null`, Nitro also has two separate concepts for the two.
+In the same way that JavaScript distinguishes between an optional type/`undefined` and `null`, Nitro also has two separate concepts for the
+two.
 
-An optional type (or `undefined`) represents a non-declared value, whereas `null` represents an explicit absence of a value. See [Nulls](nulls) for more information.
+An optional type (or `undefined`) represents a non-declared value, whereas `null` represents an explicit absence of a value. See
+[Nulls](nulls) for more information.

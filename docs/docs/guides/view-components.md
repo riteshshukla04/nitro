@@ -1,32 +1,35 @@
 ---
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # View Components
 
 Nitro provides first-class support for creating React Native Views.
 
-Such views can be rendered within React Native apps using [Fabric](https://reactnative.dev/architecture/fabric-renderer), and are backed by a C++ ShadowNode.
-The key difference to a Fabric view is that it uses Nitro for prop parsing, which is more lightweight, performant and flexible.
+Such views can be rendered within React Native apps using [Fabric](https://reactnative.dev/architecture/fabric-renderer), and are backed by
+a C++ ShadowNode. The key difference to a Fabric view is that it uses Nitro for prop parsing, which is more lightweight, performant and
+flexible.
 
 :::note
+
 Nitro Views require React Native 0.88 or newer with the New Architecture.
+
 :::
 
 ## Create a Nitro View
 
 ### 1. Declaration
 
-Declare a class extending `HybridView` in a `*.nitro.ts` file. Its writable properties become React props, and its methods are available through the native ref:
+Declare a class extending `HybridView` in a `*.nitro.ts` file. Its writable properties become React props, and its methods are available
+through the native ref:
 
 ```ts title="CameraView.nitro.ts"
 import { iOS, type HybridView } from 'react-native-nitro-modules'
 
 @iOS({
   language: 'swift',
-  implementation: { className: 'HybridCameraView' }
+  implementation: { className: 'HybridCameraView' },
 })
 export declare class CameraView extends HybridView {
   enableFlash: boolean
@@ -45,29 +48,35 @@ Then, run [nitrogen](../concepts/nitrogen):
     ```sh
     npx nitrogen
     ```
+
   </TabItem>
   <TabItem value="yarn" label="yarn">
     ```sh
     yarn nitrogen
     ```
+
   </TabItem>
   <TabItem value="pnpm" label="pnpm">
     ```sh
     pnpm nitrogen
     ```
+
   </TabItem>
   <TabItem value="bun" label="bun">
     ```sh
     bun nitrogen
     ```
+
   </TabItem>
+
 </Tabs>
 
 Nitrogen generates the native view bindings and the `CameraViewComponent` export, including its React props and ref types.
 
 ### 3. Implementation
 
-Now it's time to implement the View - simply create a new Swift/Kotlin class/file, implement `HybridCameraViewSpec` and implement your `.enableFlash` property, as well as the common `.view` accessor:
+Now it's time to implement the View - simply create a new Swift/Kotlin class/file, implement `HybridCameraViewSpec` and implement your
+`.enableFlash` property, as well as the common `.view` accessor:
 
 <Tabs groupId="native-view-language">
   <TabItem value="swift" label="Swift" default>
@@ -80,6 +89,7 @@ Now it's time to implement the View - simply create a new Swift/Kotlin class/fil
       var view: UIView = UIView()
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin title="HybridCameraView.kt"
@@ -91,7 +101,9 @@ Now it's time to implement the View - simply create a new Swift/Kotlin class/fil
       override val view: View = View(context)
     }
     ```
+
   </TabItem>
+
 </Tabs>
 
 ### 4. Link the generated sources
@@ -130,7 +142,8 @@ function App() {
 
 ## Props
 
-Since every `HybridView` is also a `HybridObject`, you can use any type that Nitro supports as a property - including custom types (`interface`), `ArrayBuffer`, and even other `HybridObject`s!
+Since every `HybridView` is also a `HybridObject`, you can use any type that Nitro supports as a property - including custom types
+(`interface`), `ArrayBuffer`, and even other `HybridObject`s!
 
 For example, a custom `<ImageView>` component can be used to render custom `Image` types:
 
@@ -174,8 +187,10 @@ function App({ image }: { image: Image }) {
 ### Threading
 
 Since Nitro bridges props directly to JS, you are responsible for ensuring thread-safety.
+
 - If props are set normally via React, they will be set on the UI Thread.
-- If the user sets props on the view `hybridRef` (e.g. also if the `HybridView` is passed to a `HybridObject` in native), props _could_ be set on a different Thread, like the JS Thread.
+- If the user sets props on the view `hybridRef` (e.g. also if the `HybridView` is passed to a `HybridObject` in native), props _could_ be
+  set on a different Thread, like the JS Thread.
 
 ### Before/After update
 
@@ -192,6 +207,7 @@ To batch prop changes, you can override `beforeUpdate()` and `afterUpdate()` in 
       func afterUpdate() { }
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin title="HybridCameraView.kt"
@@ -203,7 +219,9 @@ To batch prop changes, you can override `beforeUpdate()` and `afterUpdate()` in 
       override fun afterUpdate() { }
     }
     ```
+
   </TabItem>
+
 </Tabs>
 
 ### Callbacks
@@ -225,8 +243,8 @@ function App() {
 
 ### Recycling
 
-For improved performance and lower memory footprint, Nitro Views can be _recycled_.
-To allow your view to be recycled, implement the `RecyclableView` interface/protocol from Nitro:
+For improved performance and lower memory footprint, Nitro Views can be _recycled_. To allow your view to be recycled, implement the
+`RecyclableView` interface/protocol from Nitro:
 
 <Tabs groupId="native-view-language">
   <TabItem value="swift" label="Swift" default>
@@ -238,6 +256,7 @@ To allow your view to be recycled, implement the `RecyclableView` interface/prot
       func prepareForRecycle() {}
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin title="HybridMyView.kt"
@@ -248,13 +267,16 @@ To allow your view to be recycled, implement the `RecyclableView` interface/prot
       override fun prepareForRecycle() {}
     }
     ```
+
   </TabItem>
+
 </Tabs>
 
-When Fabric decides to re-use a previously created view, the `prepareForRecycle()` method will be called.
-Inside that method you should reset any internal state to its default values.
+When Fabric decides to re-use a previously created view, the `prepareForRecycle()` method will be called. Inside that method you should
+reset any internal state to its default values.
 
-For example, an asynchronous Image component should reset its displayed image when it is being recycled, otherwise it would display an old image while the new one is still loading:
+For example, an asynchronous Image component should reset its displayed image when it is being recycled, otherwise it would display an old
+image while the new one is still loading:
 
 ```swift
 class HybridImageView: HybridImageViewSpec, RecyclableView {
@@ -270,8 +292,8 @@ class HybridImageView: HybridImageViewSpec, RecyclableView {
 
 ## Methods
 
-Since every `HybridView` is also a `HybridObject`, methods can be directly called on the object.
-Assuming our `<CameraViewComponent>` component has a `takePhoto()` function like so:
+Since every `HybridView` is also a `HybridObject`, methods can be directly called on the object. Assuming our `<CameraViewComponent>`
+component has a `takePhoto()` function like so:
 
 ```ts
 @iOS(...)

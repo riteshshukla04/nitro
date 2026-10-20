@@ -26,9 +26,7 @@ val ${p.escapedName}: ${type}
       return `${p.escapedName}: ${type}`
     })
     .join(', ')
-  const cxxCreateFunctionForward = structType.properties
-    .map((p) => p.escapedName)
-    .join(', ')
+  const cxxCreateFunctionForward = structType.properties.map((p) => p.escapedName).join(', ')
 
   const extraImports = publicType.properties
     .flatMap((t) => t.getRequiredImports('kotlin'))
@@ -37,12 +35,8 @@ val ${p.escapedName}: ${type}
 
   const secondaryConstructor = createKotlinConstructor(structType)
 
-  const equalityComparators = structType.properties.map(
-    (p) => `Objects.deepEquals(this.${p.escapedName}, other.${p.escapedName})`
-  )
-  const propertiesList = structType.properties
-    .map((p) => p.escapedName)
-    .join(',\n')
+  const equalityComparators = structType.properties.map((p) => `Objects.deepEquals(this.${p.escapedName}, other.${p.escapedName})`)
+  const propertiesList = structType.properties.map((p) => p.escapedName).join(',\n')
 
   const code = `
 ${createFileMetadataString(`${structType.structName}.kt`)}
@@ -92,34 +86,21 @@ data class ${structType.structName}(
   `.trim()
 
   const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
-  const jniClassDescriptor = NitroConfig.current.getAndroidPackage(
-    'c++/jni',
-    structType.structName
-  )
+  const jniClassDescriptor = NitroConfig.current.getAndroidPackage('c++/jni', structType.structName)
   const jniStructInitializerBody = createJNIStructInitializer(structType)
-  const cppStructInitializerBody = createCppStructInitializer(
-    'value',
-    structType
-  )
-  const imports = structType.properties.flatMap((p) =>
-    p.getRequiredImports('c++')
-  )
+  const cppStructInitializerBody = createCppStructInitializer('value', structType)
+  const imports = structType.properties.flatMap((p) => p.getRequiredImports('c++'))
   const implementationIncludes = imports
     .map((i) => getImportCode(i, 'implementation'))
     .filter(isNotDuplicate)
     .sort()
   const publicTypeInclude = getImportCode({
     language: 'c++',
-    declaration: NitroConfig.current.getCxxHeader(
-      publicType.declarationFile.name
-    ),
+    declaration: NitroConfig.current.getCxxHeader(publicType.declarationFile.name),
   })
   const jniTypeInclude = getImportCode({
     language: 'c++',
-    declaration: NitroConfig.current.getCxxHeader(
-      `${structType.jniName}.hpp`,
-      'private'
-    ),
+    declaration: NitroConfig.current.getCxxHeader(`${structType.jniName}.hpp`, 'private'),
   })
 
   const fbjniCode = `
@@ -206,17 +187,13 @@ namespace ${cxxNamespace} {
 }
 
 function createKotlinConstructor(structType: KotlinStructType): string {
-  const needsKotlinConversion = structType.properties.some(
-    (p) => p.needsKotlinConversion
-  )
+  const needsKotlinConversion = structType.properties.some((p) => p.needsKotlinConversion)
   if (needsKotlinConversion) {
     const kotlinParams = structType.type.properties.map((p) => {
       const type = p.getCode('kotlin', { context: 'parameter' })
       return `${p.escapedName}: ${type}`
     })
-    const paramsForward = structType.properties.map((p) =>
-      p.convert(p.escapedName, { from: 'kotlin', to: 'c++', in: 'kotlin' })
-    )
+    const paramsForward = structType.properties.map((p) => p.convert(p.escapedName, { from: 'kotlin', to: 'c++', in: 'kotlin' }))
     return `
 /**
  * Create a new instance of ${structType.structName} from Kotlin
@@ -235,30 +212,19 @@ function createJNIStructInitializer(structType: KotlinStructType): string {
     const fieldName = `field${capitalizeName(prop.escapedName)}`
     const signatureType = prop.getCode('c++', { context: 'property' })
     const valueType = prop.getCode('c++', { context: 'value' })
-    lines.push(
-      `static const auto ${fieldName} = clazz->getField<${signatureType}>("${prop.escapedName}");`
-    )
-    lines.push(
-      `${valueType} ${prop.escapedName} = this->getFieldValue(${fieldName});`
-    )
+    lines.push(`static const auto ${fieldName} = clazz->getField<${signatureType}>("${prop.escapedName}");`)
+    lines.push(`${valueType} ${prop.escapedName} = this->getFieldValue(${fieldName});`)
   }
 
-  const propsForward = structType.properties.map((p) =>
-    p.convert(p.escapedName, { from: 'kotlin', to: 'c++', in: 'c++' })
-  )
+  const propsForward = structType.properties.map((p) => p.convert(p.escapedName, { from: 'kotlin', to: 'c++', in: 'c++' }))
   lines.push(`return ${structType.structName}(`)
   lines.push(`  ${indent(propsForward.join(',\n'), '  ')}`)
   lines.push(`);`)
   return lines.join('\n')
 }
 
-function createCppStructInitializer(
-  cppValueName: string,
-  structType: KotlinStructType
-): string {
-  const jniTypes = structType.properties
-    .map((p) => p.getCode('c++', { context: 'parameter' }))
-    .join(', ')
+function createCppStructInitializer(cppValueName: string, structType: KotlinStructType): string {
+  const jniTypes = structType.properties.map((p) => p.getCode('c++', { context: 'parameter' })).join(', ')
   const params = structType.properties
     .map((p) =>
       p.convert(`${cppValueName}.${p.escapedName}`, {

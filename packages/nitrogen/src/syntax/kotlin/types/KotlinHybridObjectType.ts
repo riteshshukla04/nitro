@@ -3,27 +3,14 @@ import type { GetCodeOptions } from '../../types/Type.js'
 import { getHybridObjectName } from '../../getHybridObjectName.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { HybridObjectType } from '../../types/HybridObjectType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
-export class KotlinHybridObjectType
-  extends HybridObjectType
-  implements KotlinType
-{
+export class KotlinHybridObjectType extends HybridObjectType implements KotlinType {
   readonly jniValueKind = 'wrapper'
   readonly needsKotlinConversion = false
 
   constructor(type: HybridObjectType) {
-    super(
-      type.hybridObjectName,
-      type.implementationLanguage,
-      type.baseTypes,
-      type.sourceConfig,
-      type.swiftProtocolConformances
-    )
+    super(type.hybridObjectName, type.implementationLanguage, type.baseTypes, type.sourceConfig, type.swiftProtocolConformances)
   }
 
   /** The C++ class holding the Kotlin instance, e.g. `JHybridImageSpec`. */
@@ -73,10 +60,7 @@ export class KotlinHybridObjectType
         const name = getHybridObjectName(this.hybridObjectName)
         imports.push({
           language: language,
-          declaration: this.sourceConfig.getCxxHeader(
-            `${name.JHybridTSpec}.hpp`,
-            'private'
-          ),
+          declaration: this.sourceConfig.getCxxHeader(`${name.JHybridTSpec}.hpp`, 'private'),
         })
         break
       }

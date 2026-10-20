@@ -29,8 +29,5 @@ await Promise.all([
       headSha: comparison.headSha,
     })
   ),
-  Bun.write(
-    bencherOutput,
-    `${JSON.stringify(toBencherMetricFormat(headRuns), null, 2)}\n`
-  ),
+  Bun.write(bencherOutput, `${JSON.stringify(toBencherMetricFormat(headRuns), null, 2)}\n`),
 ])

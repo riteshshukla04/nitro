@@ -146,8 +146,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     }
   }
 
-  func callSumUpNTimes(callback: any Callback<(), Double>, n: Double) throws -> any Promise<Double>
-  {
+  func callSumUpNTimes(callback: any Callback<(), Double>, n: Double) throws -> any Promise<Double> {
     var result = 0.0
     return .async {
       for _ in 0..<max(0, Int(n)) {
@@ -257,8 +256,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     }
   }
 
-  func awaitEnumArrayPromise(promise: any Promise<[Powertrain]>) throws -> any Promise<[Powertrain]>
-  {
+  func awaitEnumArrayPromise(promise: any Promise<[Powertrain]>) throws -> any Promise<[Powertrain]> {
     return .async {
       return try await promise.await()
     }
@@ -298,8 +296,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     return strings
   }
 
-  func bounceOptionalNulls(strings: [Variant_NullType_String?]) throws -> [Variant_NullType_String?]
-  {
+  func bounceOptionalNulls(strings: [Variant_NullType_String?]) throws -> [Variant_NullType_String?] {
     return strings
   }
 

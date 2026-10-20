@@ -1,9 +1,9 @@
-import { NitroModules } from "nitro-core";
+import { NitroModules } from 'nitro-core'
 
 export interface Deferred<T> {
-  promise: Promise<T>;
-  resolve: (value: T) => void;
-  reject: (error: Error) => void;
+  promise: Promise<T>
+  resolve: (value: T) => void
+  reject: (error: Error) => void
 }
 
 /**
@@ -11,13 +11,13 @@ export interface Deferred<T> {
  * hand a JS Promise to native and settle it later.
  */
 export function deferred<T>(): Deferred<T> {
-  let resolve!: (value: T) => void;
-  let reject!: (error: Error) => void;
+  let resolve!: (value: T) => void
+  let reject!: (error: Error) => void
   const promise = new Promise<T>((promiseResolve, promiseReject) => {
-    resolve = promiseResolve;
-    reject = promiseReject;
-  });
-  return { promise, resolve, reject };
+    resolve = promiseResolve
+    reject = promiseReject
+  })
+  return { promise, resolve, reject }
 }
 
 /**
@@ -25,5 +25,5 @@ export function deferred<T>(): Deferred<T> {
  * C++ type names in error messages are only included in debug builds.
  */
 export function debugOnly(string: string): string {
-  return NitroModules.buildType === "debug" ? string : "";
+  return NitroModules.buildType === 'debug' ? string : ''
 }

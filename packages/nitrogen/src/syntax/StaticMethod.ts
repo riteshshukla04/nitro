@@ -1,9 +1,5 @@
 import type { Language } from '../getPlatformSpecs.js'
-import {
-  Method,
-  type MethodOptions,
-  type MethodSignatureOptions,
-} from './Method.js'
+import { Method, type MethodOptions, type MethodSignatureOptions } from './Method.js'
 
 export interface StaticMethodOptions extends MethodOptions {
   /** Swift only: overrides the superclass's `class func` with the same signature. */
@@ -16,13 +12,8 @@ export interface StaticMethodOptions extends MethodOptions {
 export class StaticMethod extends Method<StaticMethodOptions> {
   readonly kind = 'static'
 
-  protected getSignature(
-    language: Language,
-    { className }: MethodSignatureOptions
-  ): string {
-    const parameters = this.parameters.map((parameter) =>
-      parameter.getCode(language)
-    )
+  protected getSignature(language: Language, { className }: MethodSignatureOptions): string {
+    const parameters = this.parameters.map((parameter) => parameter.getCode(language))
     const returnType = this.returnType.getCode(language, { context: 'return' })
     const options = this.options
     switch (language) {
@@ -62,9 +53,7 @@ ${signature}
         return [...annotations, signature].join('\n')
       }
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for methods!`
-        )
+        throw new Error(`Language ${language} is not yet supported for methods!`)
     }
   }
 }

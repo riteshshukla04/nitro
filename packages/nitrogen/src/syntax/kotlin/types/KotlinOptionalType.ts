@@ -3,11 +3,7 @@ import type { GetCodeOptions } from '../../types/Type.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { OptionalType } from '../../types/OptionalType.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
-import type {
-  JniValueKind,
-  KotlinConversion,
-  KotlinType,
-} from './KotlinType.js'
+import type { JniValueKind, KotlinConversion, KotlinType } from './KotlinType.js'
 
 /** JNI represents an optional as a nullable reference to its boxed value. */
 export class KotlinOptionalType extends OptionalType implements KotlinType {
@@ -40,10 +36,7 @@ export class KotlinOptionalType extends OptionalType implements KotlinType {
       case 'c++': {
         switch (conversion.from) {
           case 'c++': {
-            const jniValue = this.wrappingType.convert(
-              `${value}.value()`,
-              conversion
-            )
+            const jniValue = this.wrappingType.convert(`${value}.value()`, conversion)
             return `${value}.has_value() ? ${jniValue} : nullptr`
           }
           case 'kotlin': {
@@ -65,9 +58,6 @@ export class KotlinOptionalType extends OptionalType implements KotlinType {
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
-    return [
-      ...this.type.getRequiredImports(language),
-      ...this.wrappingType.getRequiredImports(language),
-    ]
+    return [...this.type.getRequiredImports(language), ...this.wrappingType.getRequiredImports(language)]
   }
 }

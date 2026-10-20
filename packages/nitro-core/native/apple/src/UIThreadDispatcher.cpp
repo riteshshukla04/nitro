@@ -1,5 +1,5 @@
-#include <NitroModules/detail/UIThreadDispatcher.hpp>
 #include <NitroModules/ThreadUtils.hpp>
+#include <NitroModules/detail/UIThreadDispatcher.hpp>
 
 namespace margelo::nitro::detail {
 

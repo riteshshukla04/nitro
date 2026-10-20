@@ -105,10 +105,7 @@ describe('benchmark runner', () => {
     )
 
     expect(metric?.iterations).toBe(iterations)
-    expect(metric?.samplesNsPerOp).toEqual([
-      1_000_000 / iterations,
-      1_000_000 / iterations,
-    ])
+    expect(metric?.samplesNsPerOp).toEqual([1_000_000 / iterations, 1_000_000 / iterations])
     expect(metric?.checksum).toBe(6 * iterations)
   })
 
@@ -248,8 +245,7 @@ describe('benchmark runner', () => {
         )
         expect(measuredCalls).toEqual(Array(25 * 4).fill(count / 4))
         expect(result[0]?.samplesNsPerOp).toHaveLength(20)
-        for (const sample of result[0]!.samplesNsPerOp)
-          expect(sample).toBeCloseTo(speed * 1e6, 8)
+        for (const sample of result[0]!.samplesNsPerOp) expect(sample).toBeCloseTo(speed * 1e6, 8)
       }
     }
   })
@@ -287,9 +283,6 @@ describe('benchmark runner', () => {
       'ios',
       runtime
     )
-    expect(metric?.samplesNsPerOp).toEqual([
-      10_000_000 / iterations,
-      1_000_000 / iterations,
-    ])
+    expect(metric?.samplesNsPerOp).toEqual([10_000_000 / iterations, 1_000_000 / iterations])
   })
 })

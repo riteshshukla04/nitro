@@ -31,7 +31,7 @@ export function ViewScreen() {
               style={styles.view}
               isBlue={i % 2 === 0}
               someCallback={() => console.log(`Callback called!`)}
-              colorScheme="dark"
+              colorScheme='dark'
               hasBeenCalled={false}
               int64Value={0n}
               onTouchEnd={() => {
@@ -57,10 +57,7 @@ export function ViewScreen() {
 
   React.useEffect(() => {
     if (!isUpdating) return
-    const i = setInterval(
-      () => setCounter((c) => (c >= VIEWS_X * VIEWS_Y ? 0 : c + 1)),
-      10
-    )
+    const i = setInterval(() => setCounter((c) => (c >= VIEWS_X * VIEWS_Y ? 0 : c + 1)), 10)
     return () => clearInterval(i)
   }, [isUpdating])
 
@@ -78,9 +75,7 @@ export function ViewScreen() {
       <Text style={[styles.header, { color: colors.text }]}>Nitro Views</Text>
       <View style={styles.topControls}>
         <View style={styles.flex} />
-        <Text style={[styles.buildTypeText, { color: colors.text }]}>
-          {NitroModules.buildType}
-        </Text>
+        <Text style={[styles.buildTypeText, { color: colors.text }]}>{NitroModules.buildType}</Text>
       </View>
 
       <View style={styles.resultContainer}>
@@ -92,17 +87,11 @@ export function ViewScreen() {
       </View>
 
       <View style={[styles.bottomView, { backgroundColor: colors.background }]}>
-        <Text
-          style={[styles.resultText, { color: colors.text }]}
-          numberOfLines={2}
-        >
+        <Text style={[styles.resultText, { color: colors.text }]} numberOfLines={2}>
           {counter} views {isUpdating ? '(updating)' : '(paused)'}
         </Text>
         <View style={styles.flex} />
-        <Button
-          title={isUpdating ? 'Stop Updating' : 'Start Updating'}
-          onPress={() => setIsUpdating((i) => !i)}
-        />
+        <Button title={isUpdating ? 'Stop Updating' : 'Start Updating'} onPress={() => setIsUpdating((i) => !i)} />
       </View>
     </View>
   )

@@ -18,8 +18,7 @@ export function getSwiftConverter(
     context,
   })
   // Inline parameters keep their borrowed representation on both sides.
-  const swiftContext =
-    context === 'parameter-type' ? 'parameter-type' : 'type-argument'
+  const swiftContext = context === 'parameter-type' ? 'parameter-type' : 'type-argument'
   const swiftType = swiftRepresentation.getCode('c++', {
     context: swiftContext,
   })
@@ -87,17 +86,11 @@ export function createSwiftConverter({
   const implementationImports: SourceImport[] = [
     {
       language: 'c++',
-      declaration: NitroConfig.current.getCxxHeader(
-        `${converterName}.hpp`,
-        'private'
-      ),
+      declaration: NitroConfig.current.getCxxHeader(`${converterName}.hpp`, 'private'),
     },
     {
       language: 'c++',
-      declaration: NitroConfig.current.getCxxHeader(
-        getUmbrellaHeaderName(),
-        'private'
-      ),
+      declaration: NitroConfig.current.getCxxHeader(getUmbrellaHeaderName(), 'private'),
     },
     {
       language: 'c++',
@@ -109,10 +102,7 @@ export function createSwiftConverter({
     ...cppImports,
     ...imports,
   ]
-  const implementationIncludes = getImportsCode(
-    implementationImports,
-    'implementation'
-  )
+  const implementationIncludes = getImportsCode(implementationImports, 'implementation')
 
   const cppHeaderCode = `
 ${createFileMetadataString(`${converterName}.hpp`)}

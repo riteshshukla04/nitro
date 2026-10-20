@@ -24,10 +24,7 @@ export function getQualifiedSwiftName(record: ImportedCxxRecord): string {
  * How Swift names a C++ type that generated code passes as a `const T&` parameter,
  * when it appears in imported class template specializations.
  */
-export function getClangImporterReferenceName(
-  name: string,
-  context: TypeContext
-): string {
+export function getClangImporterReferenceName(name: string, context: TypeContext): string {
   return context === 'parameter' ? `__cxxLRef<__cxxConst<${name}>>` : name
 }
 
@@ -36,12 +33,8 @@ export function getClangImporterReferenceName(
  * e.g. `$sSo7margeloO5nitroO11ArrayBufferVMa` for `margelo::nitro::ArrayBuffer`.
  * Swift mangles namespaces as enums (`O`) and records as structs (`V`) in the clang module (`So`).
  */
-export function getSwiftMetadataAccessorName(
-  record: ImportedCxxRecord
-): string {
-  const context = record.namespaces
-    .map((namespace) => `${mangleIdentifier(namespace)}O`)
-    .join('')
+export function getSwiftMetadataAccessorName(record: ImportedCxxRecord): string {
+  const context = record.namespaces.map((namespace) => `${mangleIdentifier(namespace)}O`).join('')
   return `$sSo${context}${mangleIdentifier(record.swiftName)}VMa`
 }
 
@@ -51,9 +44,7 @@ export function getSwiftMetadataAccessorName(
  * that Nitro imports never repeat one.
  */
 function mangleIdentifier(identifier: string): string {
-  const needsPunycode = Array.from(identifier).some(
-    (character) => !isSymbolCharacter(character)
-  )
+  const needsPunycode = Array.from(identifier).some((character) => !isSymbolCharacter(character))
   if (!needsPunycode) return `${identifier.length}${identifier}`
   const encoded = encodePunycode(identifier)
   const separator = /^[0-9_]/.test(encoded) ? '_' : ''
@@ -104,11 +95,7 @@ function encodePunycode(identifier: string): string {
         q = Math.floor((q - t) / (PUNYCODE_BASE - t))
       }
       output += getPunycodeDigit(q)
-      bias = adaptPunycodeBias(
-        delta,
-        handled + 1,
-        handled === basicCodePoints.length
-      )
+      bias = adaptPunycodeBias(delta, handled + 1, handled === basicCodePoints.length)
       delta = 0
       handled++
     }
@@ -123,26 +110,15 @@ function getPunycodeDigit(digit: number): string {
   return String.fromCharCode(digit < 26 ? 0x61 + digit : 0x41 - 26 + digit)
 }
 
-function adaptPunycodeBias(
-  delta: number,
-  pointCount: number,
-  isFirstTime: boolean
-): number {
+function adaptPunycodeBias(delta: number, pointCount: number, isFirstTime: boolean): number {
   let adapted = Math.floor(delta / (isFirstTime ? 700 : 2))
   adapted += Math.floor(adapted / pointCount)
   let k = 0
-  const threshold = Math.floor(
-    ((PUNYCODE_BASE - PUNYCODE_T_MIN) * PUNYCODE_T_MAX) / 2
-  )
+  const threshold = Math.floor(((PUNYCODE_BASE - PUNYCODE_T_MIN) * PUNYCODE_T_MAX) / 2)
   while (adapted > threshold) {
     adapted = Math.floor(adapted / (PUNYCODE_BASE - PUNYCODE_T_MIN))
     k += PUNYCODE_BASE
   }
   const skew = 38
-  return (
-    k +
-    Math.floor(
-      ((PUNYCODE_BASE - PUNYCODE_T_MIN + 1) * adapted) / (adapted + skew)
-    )
-  )
+  return k + Math.floor(((PUNYCODE_BASE - PUNYCODE_T_MIN + 1) * adapted) / (adapted + skew))
 }

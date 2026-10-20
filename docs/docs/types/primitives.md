@@ -1,13 +1,12 @@
 ---
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Primitives (`number`, `boolean`, `bigint`)
 
-Primitive datatypes like `number`, `boolean` or `bigint` can use platform-native datatypes directly.
-For example, a JS `number` is always a 64-bit `double` in C++, a `Double` in Swift, and a `Double` in Kotlin.
+Primitive datatypes like `number`, `boolean` or `bigint` can use platform-native datatypes directly. For example, a JS `number` is always a
+64-bit `double` in C++, a `Double` in Swift, and a `Double` in Kotlin.
 
 <Tabs>
   <TabItem value="ts" label="TypeScript" default>
@@ -19,6 +18,7 @@ For example, a JS `number` is always a 64-bit `double` in C++, a `Double` in Swi
       add(a: number, b: number): number
     }
     ```
+
   </TabItem>
   <TabItem value="swift" label="Swift">
     ```swift
@@ -26,6 +26,7 @@ For example, a JS `number` is always a 64-bit `double` in C++, a `Double` in Swi
       func add(a: Double, b: Double) throws -> Double
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin
@@ -33,6 +34,7 @@ For example, a JS `number` is always a 64-bit `double` in C++, a `Double` in Swi
       override fun add(a: Double, b: Double): Double
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp
@@ -40,7 +42,9 @@ For example, a JS `number` is always a 64-bit `double` in C++, a `Double` in Swi
       double add(double a, double b) override;
     };
     ```
+
   </TabItem>
+
 </Tabs>
 
 Primitives are very efficient and can be passed with little to no overhead, especially between C++ and Swift, and C++ and Kotlin.
@@ -49,7 +53,8 @@ Primitives are very efficient and can be passed with little to no overhead, espe
 
 While a `bigint` is technically a primitive in JS, it is not fully representable by any standard library type in C++, Kotlin or Swift.
 
-In Nitro, you can use `bigint` as either a signed, or unsigned 64-bit integer, which makes it a primitive, but limits its range to those within 64-bit signed/unsigned values.
+In Nitro, you can use `bigint` as either a signed, or unsigned 64-bit integer, which makes it a primitive, but limits its range to those
+within 64-bit signed/unsigned values.
 
 ### `Int64`
 
@@ -65,6 +70,7 @@ A 64-bit signed integer that ranges from -2^63 to 2^63-1.
       add(a: Int64, b: Int64): Int64
     }
     ```
+
   </TabItem>
   <TabItem value="swift" label="Swift">
     ```swift
@@ -72,6 +78,7 @@ A 64-bit signed integer that ranges from -2^63 to 2^63-1.
       func add(a: Int64, b: Int64) throws -> Int64
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin
@@ -79,6 +86,7 @@ A 64-bit signed integer that ranges from -2^63 to 2^63-1.
       override fun add(a: Long, b: Long): Long
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp
@@ -86,7 +94,9 @@ A 64-bit signed integer that ranges from -2^63 to 2^63-1.
       int64_t add(int64_t a, int64_t b) override;
     };
     ```
+
   </TabItem>
+
 </Tabs>
 
 ### `UInt64`
@@ -103,6 +113,7 @@ A 64-bit unsigned integer that ranges from 0 to 2^64-1. On 64-bit systems, this 
       add(a: UInt64, b: UInt64): UInt64
     }
     ```
+
   </TabItem>
   <TabItem value="swift" label="Swift">
     ```swift
@@ -110,6 +121,7 @@ A 64-bit unsigned integer that ranges from 0 to 2^64-1. On 64-bit systems, this 
       func add(a: UInt64, b: UInt64) throws -> UInt64
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin
@@ -117,6 +129,7 @@ A 64-bit unsigned integer that ranges from 0 to 2^64-1. On 64-bit systems, this 
       override fun add(a: ULong, b: ULong): ULong
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp
@@ -124,15 +137,22 @@ A 64-bit unsigned integer that ranges from 0 to 2^64-1. On 64-bit systems, this 
       uint64_t add(uint64_t a, uint64_t b) override;
     };
     ```
+
   </TabItem>
+
 </Tabs>
 
 :::warning
+
 `Int64` and `UInt64` map to JavaScript `bigint`, which cannot be stored in [AnyJSON](any-json).
+
 :::
 
 ### Anything larger
 
-If you want to represent any `bigint` larger than `UInt64`/`Int64`'s maximum value, or smaller than `UInt64`/`Int64`'s minimum value, you must implement your own big integer type.
+If you want to represent any `bigint` larger than `UInt64`/`Int64`'s maximum value, or smaller than `UInt64`/`Int64`'s minimum value, you
+must implement your own big integer type.
 
-You can achieve this either by just passing the `bigint` as a [`string`](strings) and deserializing it again on the native side, or by rolling your own type via [Custom Types](custom-types) - in this case the `JSIConverter` can convert your custom big integer type from- and to a `bigint`.
+You can achieve this either by just passing the `bigint` as a [`string`](strings) and deserializing it again on the native side, or by
+rolling your own type via [Custom Types](custom-types) - in this case the `JSIConverter` can convert your custom big integer type from- and
+to a `bigint`.

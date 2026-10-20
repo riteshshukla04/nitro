@@ -1,14 +1,10 @@
 {
   "extends": "../../config/tsconfig.json",
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "isolatedModules": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",

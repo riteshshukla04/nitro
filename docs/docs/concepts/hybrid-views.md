@@ -1,11 +1,13 @@
 ---
-description: Learn how Nitro Hybrid Views render native view components in React Native while keeping Hybrid Object state and type-safe native bindings.
+description:
+  Learn how Nitro Hybrid Views render native view components in React Native while keeping Hybrid Object state and type-safe native
+  bindings.
 ---
 
 # Hybrid Views
 
-A **Hybrid View** is just a [**Hybrid Object**](hybrid-objects) that can also be rendered in react-native.
-It has one additional class-member, `view`:
+A **Hybrid View** is just a [**Hybrid Object**](hybrid-objects) that can also be rendered in react-native. It has one additional
+class-member, `view`:
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -38,7 +40,8 @@ class HybridCameraView : HybridCameraViewSpec {
 
 ## Rendering Hybrid Views
 
-Nitrogen generates a React Native Fabric component for each Hybrid View. Fabric creates its native instance; the spec does not expose a public JavaScript constructor:
+Nitrogen generates a React Native Fabric component for each Hybrid View. Fabric creates its native instance; the spec does not expose a
+public JavaScript constructor:
 
 ```tsx
 import { CameraViewComponent } from './CameraView.nitro'
@@ -48,7 +51,8 @@ function App() {
 }
 ```
 
-Internally, the `<CameraViewComponent />` view will create the `HybridCameraView` hybrid object and mount its `.view` - one hybrid object per view.
+Internally, the `<CameraViewComponent />` view will create the `HybridCameraView` hybrid object and mount its `.view` - one hybrid object
+per view.
 
 ## Accessing the underlying Hybrid Object
 

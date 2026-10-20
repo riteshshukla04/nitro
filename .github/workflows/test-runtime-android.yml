@@ -10,17 +10,17 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - ".github/workflows/test-runtime-android.yml"
-      - "packages/nitro-core/**"
-      - "packages/nitrogen/**"
-      - "tests/standalone/**"
-      - "package.json"
-      - "bun.lock"
-      - "bunfig.toml"
-      - "scripts/releases/**"
-      - "config/**"
-      - "scripts/set-version.mjs"
-      - ".gitmodules"
+      - '.github/workflows/test-runtime-android.yml'
+      - 'packages/nitro-core/**'
+      - 'packages/nitrogen/**'
+      - 'tests/standalone/**'
+      - 'package.json'
+      - 'bun.lock'
+      - 'bunfig.toml'
+      - 'scripts/releases/**'
+      - 'config/**'
+      - 'scripts/set-version.mjs'
+      - '.gitmodules'
 
 permissions:
   contents: read
@@ -39,7 +39,7 @@ jobs:
       matrix:
         sanitizer:
           - name: Default
-            flag: ""
+            flag: ''
             api-level: 36
           - name: ASan
             flag: address
@@ -57,7 +57,7 @@ jobs:
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: '17'
       - uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
@@ -79,7 +79,9 @@ jobs:
       - uses: actions/cache@v6
         with:
           path: tests/standalone/.build/hermes/host
-          key: hermes-host-${{ runner.os }}-${{ runner.arch }}-${{ steps.hermes.outputs.revision }}-${{ hashFiles('tests/standalone/hermes/build.mjs', 'tests/standalone/hermes/options.cmake') }}
+          key:
+            hermes-host-${{ runner.os }}-${{ runner.arch }}-${{ steps.hermes.outputs.revision }}-${{
+            hashFiles('tests/standalone/hermes/build.mjs', 'tests/standalone/hermes/options.cmake') }}
       - run: bun install --frozen-lockfile --ignore-scripts
       - run: bun test:prepare
       - name: Build test APK
@@ -92,7 +94,9 @@ jobs:
           arch: x86_64
           target: google_apis
           disable-animations: true
-          script: cd tests/standalone/test-runner/android && ./gradlew :connectedDebugAndroidTest -PnitroTestAbi=x86_64 -PnitroSanitizer=${{ matrix.sanitizer.flag }} --no-daemon
+          script:
+            cd tests/standalone/test-runner/android && ./gradlew :connectedDebugAndroidTest -PnitroTestAbi=x86_64 -PnitroSanitizer=${{
+            matrix.sanitizer.flag }} --no-daemon
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7

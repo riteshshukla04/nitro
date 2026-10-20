@@ -37,36 +37,31 @@ export class SwiftInstanceMethod extends InstanceMethod {
   createBridge(cppClassName: string): SwiftMethodBridge {
     const nativeMethod = this.nativeMethod
     // Non-throwing accessors can still require throwing C++ conversions.
-    const forwarder = new InstanceMethod(
-      nativeMethod.name,
-      nativeMethod.returnType,
-      nativeMethod.parameters,
-      { override: true, generated: true }
-    )
+    const forwarder = new InstanceMethod(nativeMethod.name, nativeMethod.returnType, nativeMethod.parameters, {
+      override: true,
+      generated: true,
+    })
     const cppForwarderBody = createCppForwarderBody({
       nativeMethod: nativeMethod,
       swiftMethod: this,
     })
     const cppBridgeBody = createCppBridgeBody({
       callable: this.callable,
-      getCppInvocation: (args) =>
-        `_swiftPart.${nativeMethod.name}(${args.join(', ')})`,
+      getCppInvocation: (args) => `_swiftPart.${nativeMethod.name}(${args.join(', ')})`,
     })
     const endpoint = createSwiftEndpoint({
       callable: this.callable,
       getSwiftInvocation: (args) => this.getSwiftInvocation(args),
     })
-    const swiftMethod = new InstanceMethod(
-      nativeMethod.name,
-      endpoint.returnType,
-      endpoint.parameters,
-      { access: 'public', final: true, throwing: false, generated: true }
-    )
+    const swiftMethod = new InstanceMethod(nativeMethod.name, endpoint.returnType, endpoint.parameters, {
+      access: 'public',
+      final: true,
+      throwing: false,
+      generated: true,
+    })
     const cppRegistrations: string[] = []
     if (this.accessor == null) {
-      cppRegistrations.push(
-        `clazz.registerHybridMethod("${nativeMethod.name}", &${cppClassName}::${this.name});`
-      )
+      cppRegistrations.push(`clazz.registerHybridMethod("${nativeMethod.name}", &${cppClassName}::${this.name});`)
     }
     return {
       cppMethods: [

@@ -1,11 +1,7 @@
 import { appendFile, writeFile } from 'node:fs/promises'
 
 /** A failed or unavailable diagnostic command is itself useful evidence. */
-export async function commandOutput(
-  executable: string,
-  argumentsList: string[],
-  timeoutMs = 15_000
-) {
+export async function commandOutput(executable: string, argumentsList: string[], timeoutMs = 15_000) {
   const startedAt = new Date().toISOString()
   let timedOut = false
   let truncated = false
@@ -41,11 +37,7 @@ export async function commandOutput(
       Promise.allSettled([stdoutReader.cancel(), stderrReader.cancel()])
     }, timeoutMs)
     try {
-      const [exitCode, stdout, stderr] = await Promise.all([
-        child.exited,
-        readOutput(stdoutReader),
-        readOutput(stderrReader),
-      ])
+      const [exitCode, stdout, stderr] = await Promise.all([child.exited, readOutput(stdoutReader), readOutput(stderrReader)])
       return {
         command: [executable, ...argumentsList],
         startedAt,
@@ -78,19 +70,11 @@ export async function commandOutput(
   }
 }
 
-export async function saveAndroidFailure(
-  deviceId: string,
-  appId: string,
-  output: string,
-  error: unknown
-): Promise<void> {
+export async function saveAndroidFailure(deviceId: string, appId: string, output: string, error: unknown): Promise<void> {
   const failureLog = output.replace(/\.json$/, '.failure.log')
   try {
     // Write the original failure first, even if ADB has disappeared or hangs.
-    await writeFile(
-      failureLog,
-      `Benchmark failure: ${error instanceof Error ? error.stack : String(error)}\n`
-    )
+    await writeFile(failureLog, `Benchmark failure: ${error instanceof Error ? error.stack : String(error)}\n`)
     for (const argumentsList of [
       ['devices', '-l'],
       ['-s', deviceId, 'logcat', '-d', '-t', '1000'],

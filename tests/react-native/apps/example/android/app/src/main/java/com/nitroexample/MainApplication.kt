@@ -30,15 +30,15 @@ private val stableFlagsWithNitroViewRecycling: ReactNativeFeatureFlagsProvider =
     override fun enableViewRecyclingForView(): Boolean = false
   }
 
-class MainApplication : Application(), ReactApplication {
-
+class MainApplication :
+  Application(),
+  ReactApplication {
   override val reactHost: ReactHost by lazy {
     getDefaultReactHost(
       context = applicationContext,
       packageList = PackageList(this).packages,
     )
   }
-
 
   override fun onCreate() {
     super.onCreate()

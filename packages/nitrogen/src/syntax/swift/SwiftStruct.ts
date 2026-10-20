@@ -4,39 +4,22 @@ import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { SwiftStructType } from './types/SwiftStructType.js'
 import { getImportsCode } from '../getImportCode.js'
-import {
-  getProtocolConformanceImports,
-  getSwiftImports,
-} from './getSwiftImports.js'
+import { getProtocolConformanceImports, getSwiftImports } from './getSwiftImports.js'
 
-export function createSwiftStructBridge(
-  swiftType: SwiftStructType
-): SourceFile[] {
+export function createSwiftStructBridge(swiftType: SwiftStructType): SourceFile[] {
   const structType = swiftType.type
   const conformances = swiftType.getProtocolConformances()
   const protocolNames = conformances.map((conformance) => conformance.name)
   const conformancePrefix = protocolNames.length > 0 ? ': ' : ''
-  const swiftProperties = structType.properties.map(
-    (p) =>
-      `public let ${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`
-  )
+  const swiftProperties = structType.properties.map((p) => `public let ${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`)
   const swiftInitializerParameters = structType.properties
-    .map(
-      (p) => `${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`
-    )
+    .map((p) => `${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`)
     .join(', ')
-  const swiftPropertyInitializers = structType.properties.map(
-    (p) => `self.${p.escapedName} = ${p.escapedName}`
-  )
+  const swiftPropertyInitializers = structType.properties.map((p) => `self.${p.escapedName} = ${p.escapedName}`)
   const swiftBridgeInitializerParameters = swiftType.properties
-    .map(
-      (p) =>
-        `_ ${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`
-    )
+    .map((p) => `_ ${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`)
     .join(', ')
-  const swiftBridgeInitializerArguments = swiftType.properties
-    .map((p) => `${p.escapedName}: ${p.toSwift(p.escapedName)}`)
-    .join(', ')
+  const swiftBridgeInitializerArguments = swiftType.properties.map((p) => `${p.escapedName}: ${p.toSwift(p.escapedName)}`).join(', ')
   const swiftBridgeGetters = swiftType.properties.map((p) => {
     const swiftGetterBody = `return ${p.fromSwift(`self.${p.escapedName}`)}`
     return `
@@ -48,10 +31,7 @@ public borrowing func get${capitalizeName(p.escapedName)}_cxx() -> ${p.getCode('
   })
   const swiftImports = getImportsCode([
     ...getProtocolConformanceImports(conformances),
-    ...getSwiftImports(
-      [...structType.properties, ...swiftType.properties],
-      'public'
-    ),
+    ...getSwiftImports([...structType.properties, ...swiftType.properties], 'public'),
     { language: 'swift', name: 'NitroModules', access: 'internal' },
     { language: 'swift', name: 'CxxStdlib', access: 'internal' },
   ])
@@ -116,12 +96,10 @@ return ${cppPropertyChecks.join(' && ')};
     fullyQualified: true,
   })
   const cppInitializerValues = structType.properties.map(
-    (property) =>
-      `${getSwiftConverter(property)}::fromSwift(value.get${capitalizeName(property.escapedName)}_cxx())`
+    (property) => `${getSwiftConverter(property)}::fromSwift(value.get${capitalizeName(property.escapedName)}_cxx())`
   )
   const swiftInitializerValues = structType.properties.map(
-    (property) =>
-      `${getSwiftConverter(property)}::toSwift(value.${property.escapedName})`
+    (property) => `${getSwiftConverter(property)}::toSwift(value.${property.escapedName})`
   )
   const swiftToCppConverterCode = `return ${cppNativeStructType}(${cppInitializerValues.join(', ')});`
   const cppToSwiftConverterCode = `return SwiftType::init_cxx(${swiftInitializerValues.join(', ')});`

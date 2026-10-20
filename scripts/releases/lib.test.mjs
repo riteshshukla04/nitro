@@ -1,12 +1,5 @@
 import assert from 'node:assert/strict'
-import {
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { test } from 'node:test'
@@ -37,16 +30,8 @@ test('publication requires CI for the resolved release commit', () => {
   const releaseCommit = 'a'.repeat(40)
   const newerMainCommit = 'b'.repeat(40)
   assert.doesNotThrow(() => assertValidatedCommit(releaseCommit, releaseCommit))
-  for (const validated of [
-    undefined,
-    '',
-    releaseCommit.slice(0, 12),
-    newerMainCommit,
-  ]) {
-    assert.throws(
-      () => assertValidatedCommit(releaseCommit, validated),
-      /Required CI has not validated release commit/
-    )
+  for (const validated of [undefined, '', releaseCommit.slice(0, 12), newerMainCommit]) {
+    assert.throws(() => assertValidatedCommit(releaseCommit, validated), /Required CI has not validated release commit/)
   }
 })
 
@@ -84,18 +69,9 @@ function installedCoreFixture(t) {
     mkdirSync(path.dirname(file), { recursive: true })
     writeFileSync(file, 'fixture\n')
   }
-  writeFileSync(
-    path.join(directory, 'package.json'),
-    JSON.stringify({ name: 'nitro-core', version: '0.37.2-beta.1' })
-  )
-  writeFileSync(
-    path.join(directory, 'native/cpp/include/NitroModules/NitroDefines.hpp'),
-    '#define NITRO_VERSION "0.37.2-beta.1"\n'
-  )
-  writeFileSync(
-    path.join(directory, 'js/src/version.ts'),
-    "export const version = '0.37.2-beta.1'\n"
-  )
+  writeFileSync(path.join(directory, 'package.json'), JSON.stringify({ name: 'nitro-core', version: '0.37.2-beta.1' }))
+  writeFileSync(path.join(directory, 'native/cpp/include/NitroModules/NitroDefines.hpp'), '#define NITRO_VERSION "0.37.2-beta.1"\n')
+  writeFileSync(path.join(directory, 'js/src/version.ts'), "export const version = '0.37.2-beta.1'\n")
   return directory
 }
 
@@ -111,19 +87,13 @@ test('packed core rejects missing native sources', (t) => {
 
 test('packed core rejects a JS/native version mismatch', (t) => {
   const directory = installedCoreFixture(t)
-  writeFileSync(
-    path.join(directory, 'native/cpp/include/NitroModules/NitroDefines.hpp'),
-    '#define NITRO_VERSION "0.37.1"\n'
-  )
+  writeFileSync(path.join(directory, 'native/cpp/include/NitroModules/NitroDefines.hpp'), '#define NITRO_VERSION "0.37.1"\n')
   assert.throws(() => verifyCorePackage(directory), /Native version/)
 })
 
 test('packed core rejects linked implementation sources and build caches', (t) => {
   const directory = installedCoreFixture(t)
-  symlinkSync(
-    path.join(directory, 'js/src/index.ts'),
-    path.join(directory, 'js/src/linked.ts')
-  )
+  symlinkSync(path.join(directory, 'js/src/index.ts'), path.join(directory, 'js/src/linked.ts'))
   assert.throws(() => verifyCorePackage(directory), /symlink/)
   rmSync(path.join(directory, 'js/src/linked.ts'))
   mkdirSync(path.join(directory, 'native/android/.gradle'))
@@ -144,10 +114,7 @@ function releaseFixture(t, { version = '0.37.2', npmTag = 'latest' } = {}) {
     packages: releasePackages.map((name) => {
       const filename = `${name}-${version}.tgz`
       // The release helpers hash these bytes; package inspection is tested by CI.
-      writeFileSync(
-        path.join(directory, filename),
-        gzipSync(JSON.stringify({ name, version }))
-      )
+      writeFileSync(path.join(directory, filename), gzipSync(JSON.stringify({ name, version })))
       return {
         name,
         version,
@@ -169,30 +136,18 @@ function registryFixture(manifest) {
     version: pkg.version,
     dist: { integrity: pkg.integrity },
   })
-  const lookup = async (name, version) =>
-    versions.get(key(name, version)) ?? tags.get(key(name, version)) ?? null
+  const lookup = async (name, version) => versions.get(key(name, version)) ?? tags.get(key(name, version)) ?? null
   const execute = (command, args) => {
     assert.equal(command, 'npm')
     assert.equal(args[0], 'publish')
-    const pkg = manifest.packages.find(
-      (entry) => entry.filename === path.basename(args[1])
-    )
+    const pkg = manifest.packages.find((entry) => entry.filename === path.basename(args[1]))
     assert.ok(pkg, 'only a recorded tarball may be published')
     const npmTag = args[3]
     assert.ok(
-      npmTag === manifest.npmTag ||
-        (isNightly(manifest.version) &&
-          npmTag === `nightly-${manifest.commit.slice(0, 12)}`),
+      npmTag === manifest.npmTag || (isNightly(manifest.version) && npmTag === `nightly-${manifest.commit.slice(0, 12)}`),
       'publish must use the selected channel or the older nightly fallback'
     )
-    assert.deepEqual(args.slice(2), [
-      '--tag',
-      npmTag,
-      '--access',
-      'public',
-      '--provenance',
-      '--ignore-scripts',
-    ])
+    assert.deepEqual(args.slice(2), ['--tag', npmTag, '--access', 'public', '--provenance', '--ignore-scripts'])
     publishes.push(pkg.name)
     publicationTags.push({ name: pkg.name, npmTag })
     versions.set(key(pkg.name, pkg.version), record(pkg))
@@ -215,22 +170,10 @@ test('nightly versions are deterministic for a source commit and workflow run', 
   const version = nightlyVersion('0.37.1', 42, source)
   assert.equal(version, '0.37.2-nightly.42.gabcdef012345')
   assert.equal(nightlyVersion('0.37.1', '42', source), version)
-  assert.equal(
-    nightlyVersion('0.38.0-beta.1', 42, source),
-    '0.38.0-nightly.42.gabcdef012345'
-  )
-  assert.equal(
-    nightlyVersion('1.0.0-rc.2', 42, source),
-    '1.0.0-nightly.42.gabcdef012345'
-  )
-  assert.equal(
-    nightlyVersion('0.37.1', 42, '001234567890' + 'a'.repeat(28)),
-    '0.37.2-nightly.42.g001234567890'
-  )
-  assert.equal(
-    compareVersions(nightlyVersion('0.37.1', 43, source), version),
-    1
-  )
+  assert.equal(nightlyVersion('0.38.0-beta.1', 42, source), '0.38.0-nightly.42.gabcdef012345')
+  assert.equal(nightlyVersion('1.0.0-rc.2', 42, source), '1.0.0-nightly.42.gabcdef012345')
+  assert.equal(nightlyVersion('0.37.1', 42, '001234567890' + 'a'.repeat(28)), '0.37.2-nightly.42.g001234567890')
+  assert.equal(compareVersions(nightlyVersion('0.37.1', 43, source), version), 1)
   assert.equal(compareVersions(version, '0.37.2'), -1)
   assert.ok(isNightly(version))
   assert.equal(isNightly('0.37.2'), false)
@@ -240,47 +183,14 @@ test('nightly versions are deterministic for a source commit and workflow run', 
 
 test('nightly versions require a positive run number and full source SHA', () => {
   const source = 'b'.repeat(40)
-  for (const runNumber of [
-    0,
-    -1,
-    1.2,
-    NaN,
-    Infinity,
-    Number.MAX_SAFE_INTEGER + 1,
-    '',
-    '01',
-    '1.2',
-    '1e2',
-    undefined,
-    null,
-    true,
-  ]) {
-    assert.throws(
-      () => nightlyVersion('0.37.1', runNumber, source),
-      /positive integer/
-    )
+  for (const runNumber of [0, -1, 1.2, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1, '', '01', '1.2', '1e2', undefined, null, true]) {
+    assert.throws(() => nightlyVersion('0.37.1', runNumber, source), /positive integer/)
   }
-  for (const commit of [
-    '',
-    'main',
-    'b'.repeat(12),
-    'g'.repeat(40),
-    `../${source}`,
-    undefined,
-  ]) {
-    assert.throws(
-      () => nightlyVersion('0.37.1', 1, commit),
-      /source commit SHA/
-    )
+  for (const commit of ['', 'main', 'b'.repeat(12), 'g'.repeat(40), `../${source}`, undefined]) {
+    assert.throws(() => nightlyVersion('0.37.1', 1, commit), /source commit SHA/)
   }
-  assert.throws(
-    () => nightlyVersion('0.37', 1, source),
-    /Invalid release version/
-  )
-  assert.throws(
-    () => nightlyVersion(`0.0.${Number.MAX_SAFE_INTEGER}`, 1, source),
-    /Invalid release version/
-  )
+  assert.throws(() => nightlyVersion('0.37', 1, source), /Invalid release version/)
+  assert.throws(() => nightlyVersion(`0.0.${Number.MAX_SAFE_INTEGER}`, 1, source), /Invalid release version/)
 })
 
 test('nightly manifests bind the nightly channel and full source commit', (t) => {
@@ -292,23 +202,11 @@ test('nightly manifests bind the nightly channel and full source commit', (t) =>
     packages: releasePackages,
   }
   assert.equal(validateManifest(manifest, options), manifest)
-  for (const override of [
-    { sourceCommit: undefined },
-    { sourceCommit: 'main' },
-    { npmTag: 'beta' },
-    { npmTag: 'latest' },
-  ]) {
+  for (const override of [{ sourceCommit: undefined }, { sourceCommit: 'main' }, { npmTag: 'beta' }, { npmTag: 'latest' }]) {
     assert.throws(() => validateManifest({ ...manifest, ...override }, options))
   }
   const stable = releaseFixture(t).manifest
-  assert.throws(
-    () =>
-      validateManifest(
-        { ...stable, npmTag: 'nightly' },
-        { ...options, tag: stable.tag }
-      ),
-    /reserved for nightly versions/
-  )
+  assert.throws(() => validateManifest({ ...stable, npmTag: 'nightly' }, { ...options, tag: stable.tag }), /reserved for nightly versions/)
 })
 
 test('new nightlies update nightly without changing stable latest', async (t) => {
@@ -356,30 +254,16 @@ test('an older nightly publishes under a commit tag without moving nightly backw
   for (const pkg of manifest.packages) {
     assert.equal((await registry.lookup(pkg.name, 'latest')).version, '0.37.1')
     assert.equal((await registry.lookup(pkg.name, 'nightly')).version, newer)
-    assert.equal(
-      (await registry.lookup(pkg.name, fallbackTag)).version,
-      version
-    )
+    assert.equal((await registry.lookup(pkg.name, fallbackTag)).version, version)
   }
   await publishPackages(manifest, directory, registry)
-  assert.equal(
-    registry.publishes.length,
-    3,
-    'retry must not republish or retag the older nightly'
-  )
+  assert.equal(registry.publishes.length, 3, 'retry must not republish or retag the older nightly')
 })
 
 test('fresh publications and checkpoint retries preserve GitHub provenance identity', async (t) => {
   const { manifest, directory } = releaseFixture(t)
-  const keys = [
-    'GITHUB_SHA',
-    'GITHUB_REF',
-    'GITHUB_WORKFLOW_SHA',
-    'GITHUB_WORKFLOW_REF',
-  ]
-  const original = Object.fromEntries(
-    keys.map((key) => [key, process.env[key]])
-  )
+  const keys = ['GITHUB_SHA', 'GITHUB_REF', 'GITHUB_WORKFLOW_SHA', 'GITHUB_WORKFLOW_REF']
+  const original = Object.fromEntries(keys.map((key) => [key, process.env[key]]))
   try {
     // A fresh run starts at the source commit; recovery may run newer release
     // tooling. Neither workflow's signed identity is the saved release tag.
@@ -388,8 +272,7 @@ test('fresh publications and checkpoint retries preserve GitHub provenance ident
         GITHUB_SHA: source,
         GITHUB_REF: 'refs/heads/main',
         GITHUB_WORKFLOW_SHA: source,
-        GITHUB_WORKFLOW_REF:
-          'margelo/nitro/.github/workflows/release.yml@refs/heads/main',
+        GITHUB_WORKFLOW_REF: 'margelo/nitro/.github/workflows/release.yml@refs/heads/main',
       }
       Object.assign(process.env, identity)
       const registry = registryFixture(manifest)
@@ -399,10 +282,7 @@ test('fresh publications and checkpoint retries preserve GitHub provenance ident
           const inherited = JSON.parse(
             run(
               process.execPath,
-              [
-                '-e',
-                `console.log(JSON.stringify(Object.fromEntries(${JSON.stringify(keys)}.map(key => [key, process.env[key]]))))`,
-              ],
+              ['-e', `console.log(JSON.stringify(Object.fromEntries(${JSON.stringify(keys)}.map(key => [key, process.env[key]]))))`],
               { ...options, capture: true }
             )
           )
@@ -454,24 +334,12 @@ test('versions require exact SemVer without build metadata or unsafe input', () 
 test('GitHub release tags select an exact version without accepting branch or path input', () => {
   assert.equal(versionFromTag('v0.38.0'), '0.38.0')
   assert.equal(versionFromTag('v0.38.0-beta.1'), '0.38.0-beta.1')
-  for (const tag of [
-    undefined,
-    'main',
-    '0.38.0',
-    'v^0.38.0',
-    'v0.38.0+build',
-    'v0.38.0\n',
-    '../v0.38.0',
-  ])
+  for (const tag of [undefined, 'main', '0.38.0', 'v^0.38.0', 'v0.38.0+build', 'v0.38.0\n', '../v0.38.0'])
     assert.throws(() => versionFromTag(tag))
 })
 
 test('release packages include the RN adapter after its dependencies', () => {
-  assert.deepEqual(releasePackages, [
-    'nitro-core',
-    'nitrogen',
-    'react-native-nitro-modules',
-  ])
+  assert.deepEqual(releasePackages, ['nitro-core', 'nitrogen', 'react-native-nitro-modules'])
 })
 
 test('version order follows SemVer prerelease precedence, including large identifiers', () => {
@@ -495,10 +363,7 @@ test('version order follows SemVer prerelease precedence, including large identi
       assert.equal(compareVersions(ordered[i], ordered[i - 1]), 1)
     }
   }
-  assert.equal(
-    compareVersions('1.0.0-9007199254740992', '1.0.0-9007199254740993'),
-    -1
-  )
+  assert.equal(compareVersions('1.0.0-9007199254740992', '1.0.0-9007199254740993'), -1)
   assert.equal(compareVersions('1.0.0-9', '1.0.0-a'), -1)
 })
 
@@ -509,20 +374,8 @@ test('npm tag defaults preserve stable and prerelease channels', () => {
   assert.equal(npmTagFor('0.38.0-1'), 'next')
   assert.equal(npmTagFor('0.38.0-beta.1', 'next'), 'next')
   assert.equal(npmTagFor('0.38.0', 'next'), 'next')
-  assert.throws(
-    () => npmTagFor('0.38.0-beta.1', 'latest'),
-    /prereleases cannot use latest/
-  )
-  for (const tag of [
-    '../latest',
-    '--provenance',
-    'latest\n',
-    'beta;echo',
-    'BETA',
-    '1.2.3',
-    'v1',
-    'x',
-  ]) {
+  assert.throws(() => npmTagFor('0.38.0-beta.1', 'latest'), /prereleases cannot use latest/)
+  for (const tag of ['../latest', '--provenance', 'latest\n', 'beta;echo', 'BETA', '1.2.3', 'v1', 'x']) {
     assert.throws(() => npmTagFor('0.38.0', tag), undefined, tag)
   }
 })
@@ -583,21 +436,12 @@ test('registry lookup reads versions and tags through npm with tarball integrity
     dist: { integrity: 'sha512-recorded' },
   }
   for (const version of [pkg.version, 'beta']) {
-    const published = await registryPackage(
-      '@scope/core',
-      version,
-      (command, args, options) => {
-        assert.equal(command, 'npm')
-        assert.deepEqual(args, [
-          'view',
-          `@scope/core@${version}`,
-          '--json',
-          '--prefer-online',
-        ])
-        assert.equal(options.encoding, 'utf8')
-        return { status: 0, stdout: JSON.stringify(pkg), stderr: '' }
-      }
-    )
+    const published = await registryPackage('@scope/core', version, (command, args, options) => {
+      assert.equal(command, 'npm')
+      assert.deepEqual(args, ['view', `@scope/core@${version}`, '--json', '--prefer-online'])
+      assert.equal(options.encoding, 'utf8')
+      return { status: 0, stdout: JSON.stringify(pkg), stderr: '' }
+    })
     assert.deepEqual(published, pkg)
   }
 })
@@ -622,15 +466,7 @@ test('registry lookup recognizes npm E404 and a missing latest tag', async () =>
 })
 
 test('registry auth, rate limit, server and exhausted network failures propagate', async () => {
-  for (const code of [
-    'E401',
-    'E403',
-    'E429',
-    'E500',
-    'E503',
-    'EPIPE',
-    'ECONNRESET',
-  ]) {
+  for (const code of ['E401', 'E403', 'E429', 'E500', 'E503', 'EPIPE', 'ECONNRESET']) {
     await assert.rejects(
       registryPackage('nitro-core', '0.37.2', () => ({
         status: 1,
@@ -660,13 +496,7 @@ test('registry lookup rejects malformed metadata and unexpected empty output', a
       )
     }
   }
-  for (const metadata of [
-    null,
-    {},
-    [],
-    '0.37.2',
-    { error: { code: 'E404' } },
-  ]) {
+  for (const metadata of [null, {}, [], '0.37.2', { error: { code: 'E404' } }]) {
     await assert.rejects(
       registryPackage('nitro-core', '0.37.2', () => ({
         status: 0,
@@ -699,10 +529,7 @@ test('partial publication resumes with the same artifacts and only publishes the
     }
     registry.execute(command, args)
   }
-  await assert.rejects(
-    publishPackages(manifest, directory, { lookup: registry.lookup, execute }),
-    /temporarily unavailable/
-  )
+  await assert.rejects(publishPackages(manifest, directory, { lookup: registry.lookup, execute }), /temporarily unavailable/)
   assert.deepEqual(registry.publishes, ['nitro-core'])
   await publishPackages(manifest, directory, {
     lookup: registry.lookup,
@@ -730,26 +557,17 @@ test('a conflict in the second package prevents publishing either package', asyn
     version: nitrogen.version,
     dist: { integrity: 'sha512-other' },
   })
-  await assert.rejects(
-    publishPackages(manifest, directory, registry),
-    /different tarball/
-  )
+  await assert.rejects(publishPackages(manifest, directory, registry), /different tarball/)
   assert.deepEqual(registry.publishes, [])
 })
 
 test('a conflicting RN tarball prevents publishing core or Nitrogen', async (t) => {
   const { manifest, directory } = releaseFixture(t)
   const registry = registryFixture(manifest)
-  registry.versions.set(
-    registry.key('react-native-nitro-modules', manifest.version),
-    {
-      dist: { integrity: 'sha512-other' },
-    }
-  )
-  await assert.rejects(
-    publishPackages(manifest, directory, registry),
-    /different tarball/
-  )
+  registry.versions.set(registry.key('react-native-nitro-modules', manifest.version), {
+    dist: { integrity: 'sha512-other' },
+  })
+  await assert.rejects(publishPackages(manifest, directory, registry), /different tarball/)
   assert.deepEqual(registry.publishes, [])
 })
 
@@ -760,8 +578,7 @@ test('a failed RN publish resumes only the adapter from the saved three-package 
     publishPackages(manifest, directory, {
       lookup: registry.lookup,
       execute: (command, args) => {
-        if (path.basename(args[1]).startsWith('react-native-nitro-modules-'))
-          throw new Error('RN publish interrupted')
+        if (path.basename(args[1]).startsWith('react-native-nitro-modules-')) throw new Error('RN publish interrupted')
         registry.execute(command, args)
       },
     }),
@@ -804,10 +621,7 @@ test('an unpublished older release cannot move latest backwards', async (t) => {
   const { manifest, directory } = releaseFixture(t)
   const registry = registryFixture(manifest)
   registry.tags.set(registry.key('nitrogen', 'latest'), { version: '0.38.0' })
-  await assert.rejects(
-    publishPackages(manifest, directory, registry),
-    /tag backwards from 0.38.0/
-  )
+  await assert.rejects(publishPackages(manifest, directory, registry), /tag backwards from 0.38.0/)
   assert.deepEqual(registry.publishes, [])
 })
 
@@ -815,18 +629,12 @@ test('an already published older release resumes without changing the newer late
   const { manifest, directory } = releaseFixture(t)
   const registry = registryFixture(manifest)
   for (const pkg of manifest.packages) {
-    registry.versions.set(
-      registry.key(pkg.name, pkg.version),
-      registry.record(pkg)
-    )
+    registry.versions.set(registry.key(pkg.name, pkg.version), registry.record(pkg))
     registry.tags.set(registry.key(pkg.name, 'latest'), { version: '0.38.0' })
   }
   await publishPackages(manifest, directory, registry)
   assert.deepEqual(registry.publishes, [])
-  assert.equal(
-    (await registry.lookup('nitro-core', 'latest')).version,
-    '0.38.0'
-  )
+  assert.equal((await registry.lookup('nitro-core', 'latest')).version, '0.38.0')
 })
 
 test('prereleases publish only to their selected channel', async (t) => {
@@ -838,10 +646,7 @@ test('prereleases publish only to their selected channel', async (t) => {
   registry.tags.set(registry.key('nitro-core', 'latest'), { version: '1.0.0' })
   await publishPackages(manifest, directory, registry)
   assert.equal((await registry.lookup('nitro-core', 'latest')).version, '1.0.0')
-  assert.equal(
-    (await registry.lookup('nitro-core', 'beta')).version,
-    manifest.version
-  )
+  assert.equal((await registry.lookup('nitro-core', 'beta')).version, manifest.version)
 })
 
 test('successful publishes finalize fresh and resumed releases without registry visibility', async (t) => {
@@ -852,18 +657,11 @@ test('successful publishes finalize fresh and resumed releases without registry 
     const release = saveDraft(manifest, directory, 'nitro-release.json', github)
     if (resume) {
       const core = manifest.packages[0]
-      registry.versions.set(
-        registry.key(core.name, core.version),
-        registry.record(core)
-      )
+      registry.versions.set(registry.key(core.name, core.version), registry.record(core))
     }
     await publishPackages(manifest, directory, {
       lookup: (name, version) => {
-        assert.equal(
-          registry.publishes.length,
-          0,
-          'successful uploads must not depend on further registry reads'
-        )
+        assert.equal(registry.publishes.length, 0, 'successful uploads must not depend on further registry reads')
         return registry.lookup(name, version)
       },
       execute: (command, args) => {
@@ -878,13 +676,8 @@ test('successful publishes finalize fresh and resumed releases without registry 
     const expected = resume ? releasePackages.slice(1) : releasePackages
     assert.deepEqual(registry.publishes, expected)
     assert.equal(github.releases[0].draft, false)
-    for (const name of expected)
-      assert.equal(await registry.lookup(name, manifest.version), null)
-    for (const pkg of manifest.packages)
-      assert.equal(
-        fileIntegrity(path.join(directory, pkg.filename)),
-        pkg.integrity
-      )
+    for (const name of expected) assert.equal(await registry.lookup(name, manifest.version), null)
+    for (const pkg of manifest.packages) assert.equal(fileIntegrity(path.join(directory, pkg.filename)), pkg.integrity)
   }
 })
 
@@ -908,9 +701,7 @@ function githubFixture(manifest) {
   const request = (endpoint, options = {}) => {
     calls.push({ endpoint, ...options })
     if (endpoint.startsWith(`${repo}/releases?`)) {
-      const page = Number(
-        new URLSearchParams(endpoint.split('?')[1]).get('page')
-      )
+      const page = Number(new URLSearchParams(endpoint.split('?')[1]).get('page'))
       return structuredClone(releases.slice((page - 1) * 100, page * 100))
     }
     if (endpoint === `${repo}/git/ref/tags/${manifest.tag}`) return {}
@@ -921,14 +712,11 @@ function githubFixture(manifest) {
     if (options.method === 'DELETE') {
       const id = Number(endpoint.split('/').at(-1))
       assert.ok(bytes.delete(id), 'only an existing asset can be deleted')
-      for (const release of releases)
-        release.assets = release.assets.filter((asset) => asset.id !== id)
+      for (const release of releases) release.assets = release.assets.filter((asset) => asset.id !== id)
       return null
     }
     if (options.method === 'PATCH') {
-      const release = releases.find(
-        (entry) => endpoint === `${repo}/releases/${entry.id}`
-      )
+      const release = releases.find((entry) => endpoint === `${repo}/releases/${entry.id}`)
       assert.ok(release, 'finalization must address the selected release ID')
       Object.assign(release, options.body)
       return structuredClone(release)
@@ -940,10 +728,7 @@ function githubFixture(manifest) {
     const release = releases.find((entry) => entry.id === selected.id)
     assert.ok(release)
     const name = path.basename(filename)
-    assert.ok(
-      !release.assets.some((asset) => asset.name === name),
-      'duplicate asset upload'
-    )
+    assert.ok(!release.assets.some((asset) => asset.name === name), 'duplicate asset upload')
     const asset = { id: nextID++, name }
     calls.push({ upload: name, releaseID: release.id })
     release.assets.push(asset)
@@ -973,18 +758,14 @@ test('draft lookup scans all pages and selects the exact tag checkpoint past an 
   const { manifest } = releaseFixture(t)
   const github = githubFixture(manifest)
   github.addRelease()
-  for (let i = 0; i < 99; i++)
-    github.addRelease({ tag_name: `${manifest.tag}-${i}` })
+  for (let i = 0; i < 99; i++) github.addRelease({ tag_name: `${manifest.tag}-${i}` })
   const original = github.addRelease({
     assets: [{ id: 500, name: 'nitro-release.json' }],
   })
   assert.deepEqual(github.lookup(manifest.repository, manifest.tag), original)
   assert.deepEqual(
     github.calls.map((call) => call.endpoint),
-    [
-      'repos/margelo/nitro/releases?per_page=100&page=1',
-      'repos/margelo/nitro/releases?per_page=100&page=2',
-    ]
+    ['repos/margelo/nitro/releases?per_page=100&page=1', 'repos/margelo/nitro/releases?per_page=100&page=2']
   )
 })
 
@@ -992,13 +773,9 @@ test('draft lookup detects conflicting checkpoints even after the first matching
   const { manifest } = releaseFixture(t)
   const github = githubFixture(manifest)
   github.addRelease({ assets: [{ id: 500, name: 'nitro-release.json' }] })
-  for (let i = 0; i < 99; i++)
-    github.addRelease({ tag_name: `${manifest.tag}-${i}` })
+  for (let i = 0; i < 99; i++) github.addRelease({ tag_name: `${manifest.tag}-${i}` })
   github.addRelease({ assets: [{ id: 501, name: 'nitro-release.json' }] })
-  assert.throws(
-    () => github.lookup(manifest.repository, manifest.tag),
-    /Ambiguous releases/
-  )
+  assert.throws(() => github.lookup(manifest.repository, manifest.tag), /Ambiguous releases/)
 })
 
 test('lookup distinguishes missing, incomplete, published and ambiguous releases', (t) => {
@@ -1010,10 +787,7 @@ test('lookup distinguishes missing, incomplete, published and ambiguous releases
   release.draft = false
   assert.deepEqual(github.lookup(manifest.repository, manifest.tag), release)
   github.addRelease()
-  assert.throws(
-    () => github.lookup(manifest.repository, manifest.tag),
-    /Ambiguous releases/
-  )
+  assert.throws(() => github.lookup(manifest.repository, manifest.tag), /Ambiguous releases/)
 })
 
 test('lookup errors cannot be mistaken for an absent draft', () => {
@@ -1082,10 +856,7 @@ test('completed releases are unchanged and missing checkpoints cannot be complet
   }
   const request = () => assert.fail('must not query or change GitHub')
   finishRelease(manifest, { release, request })
-  assert.throws(
-    () => finishRelease(manifest, { release: null, request }),
-    /checkpoint is missing/
-  )
+  assert.throws(() => finishRelease(manifest, { release: null, request }), /checkpoint is missing/)
   assert.throws(
     () =>
       finishRelease(manifest, {
@@ -1128,10 +899,7 @@ test('a draft checkpoint verifies its tag and uploads every tarball before the m
   })
   const github = githubFixture(manifest)
   const release = saveDraft(manifest, directory, 'nitro-release.json', github)
-  assert.equal(
-    github.calls[1].endpoint,
-    `repos/${manifest.repository}/git/ref/tags/${manifest.tag}`
-  )
+  assert.equal(github.calls[1].endpoint, `repos/${manifest.repository}/git/ref/tags/${manifest.tag}`)
   assert.deepEqual(github.calls[2], {
     endpoint: `repos/${manifest.repository}/releases`,
     method: 'POST',
@@ -1146,16 +914,9 @@ test('a draft checkpoint verifies its tag and uploads every tarball before the m
   })
   assert.deepEqual(
     github.calls.filter((call) => call.upload),
-    [...manifest.packages.map((pkg) => pkg.filename), 'nitro-release.json'].map(
-      (upload) => ({ upload, releaseID: release.id })
-    )
+    [...manifest.packages.map((pkg) => pkg.filename), 'nitro-release.json'].map((upload) => ({ upload, releaseID: release.id }))
   )
-  assert.deepEqual(
-    JSON.parse(
-      readFileSync(path.join(directory, 'nitro-release.json'), 'utf8')
-    ),
-    manifest
-  )
+  assert.deepEqual(JSON.parse(readFileSync(path.join(directory, 'nitro-release.json'), 'utf8')), manifest)
 })
 
 test('a missing remote tag prevents creating a draft', (t) => {
@@ -1198,10 +959,7 @@ test('an interrupted tarball upload resumes the same draft and writes the manife
   const github = githubFixture(manifest)
   let failSecondUpload = true
   const upload = (...args) => {
-    if (
-      path.basename(args[2]) === manifest.packages[1].filename &&
-      failSecondUpload
-    ) {
+    if (path.basename(args[2]) === manifest.packages[1].filename && failSecondUpload) {
       failSecondUpload = false
       throw new Error('upload connection reset')
     }
@@ -1234,11 +992,7 @@ test('a published release can save its first checkpoint without replacing public
   const github = githubFixture(manifest)
   const release = github.addRelease({ draft: false })
   const first = manifest.packages[0]
-  github.upload(
-    manifest.repository,
-    release,
-    path.join(directory, first.filename)
-  )
+  github.upload(manifest.repository, release, path.join(directory, first.filename))
   github.calls.length = 0
   saveDraft(manifest, directory, 'nitro-release.json', {
     ...github,
@@ -1246,10 +1000,7 @@ test('a published release can save its first checkpoint without replacing public
   })
   assert.deepEqual(
     github.calls.filter((call) => call.upload).map((call) => call.upload),
-    [
-      ...manifest.packages.slice(1).map((pkg) => pkg.filename),
-      'nitro-release.json',
-    ]
+    [...manifest.packages.slice(1).map((pkg) => pkg.filename), 'nitro-release.json']
   )
   assert.ok(!github.calls.some((call) => call.method === 'DELETE'))
 })
@@ -1258,11 +1009,7 @@ test('a published-release retry stops on corrupt public tarballs before uploadin
   const { manifest, directory } = releaseFixture(t)
   const github = githubFixture(manifest)
   const release = github.addRelease({ draft: false })
-  const asset = github.upload(
-    manifest.repository,
-    release,
-    path.join(directory, manifest.packages[0].filename)
-  )
+  const asset = github.upload(manifest.repository, release, path.join(directory, manifest.packages[0].filename))
   github.bytes.set(asset.id, Buffer.from('different bytes'))
   github.calls.length = 0
   assert.throws(
@@ -1303,42 +1050,25 @@ test('a duplicate empty draft cannot redirect checkpoint downloads or finalizati
   const duplicate = github.addRelease()
   github.releases.reverse() // GitHub lists the newer empty draft first.
   const registry = registryFixture(manifest)
-  registry.versions.set(
-    registry.key(manifest.packages[0].name, manifest.version),
-    registry.record(manifest.packages[0])
-  )
+  registry.versions.set(registry.key(manifest.packages[0].name, manifest.version), registry.record(manifest.packages[0]))
   const savedBytes = new Map(github.bytes)
   github.calls.length = 0
   const release = github.lookup(manifest.repository, manifest.tag)
   const recovered = path.join(directory, 'recovered')
-  const checkpoint = downloadRelease(
-    manifest.repository,
-    release,
-    'nitro-release.json',
-    recovered,
-    github
-  )
+  const checkpoint = downloadRelease(manifest.repository, release, 'nitro-release.json', recovered, github)
   assert.deepEqual(checkpoint, manifest)
   await publishPackages(checkpoint, recovered, registry)
   finishRelease(checkpoint, { release, request: github.request })
   assert.deepEqual(registry.publishes, releasePackages.slice(1))
   assert.deepEqual(
     github.calls.filter((call) => call.download).map((call) => call.download),
-    [
-      original.assets.at(-1).id,
-      ...original.assets.slice(0, -1).map((asset) => asset.id),
-    ]
+    [original.assets.at(-1).id, ...original.assets.slice(0, -1).map((asset) => asset.id)]
   )
   assert.deepEqual(github.bytes, savedBytes)
-  assert.equal(
-    github.releases.find((entry) => entry.id === original.id).draft,
-    false
-  )
+  assert.equal(github.releases.find((entry) => entry.id === original.id).draft, false)
   assert.equal(duplicate.draft, true)
   assert.deepEqual(duplicate.assets, [])
-  assert.ok(
-    !github.calls.some((call) => call.upload || call.method === 'DELETE')
-  )
+  assert.ok(!github.calls.some((call) => call.upload || call.method === 'DELETE'))
 })
 
 test('a lost manifest upload response resumes the completed checkpoint without replacing it', (t) => {
@@ -1350,8 +1080,7 @@ test('a lost manifest upload response resumes the completed checkpoint without r
         ...github,
         upload: (...args) => {
           const asset = github.upload(...args)
-          if (asset.name === 'nitro-release.json')
-            throw new Error('upload response lost')
+          if (asset.name === 'nitro-release.json') throw new Error('upload response lost')
           return asset
         },
       }),
@@ -1359,20 +1088,8 @@ test('a lost manifest upload response resumes the completed checkpoint without r
   )
   github.calls.length = 0
   const release = github.lookup(manifest.repository, manifest.tag)
-  assert.throws(
-    () => saveDraft(manifest, directory, 'nitro-release.json', github),
-    /checkpoint already exists/
-  )
-  assert.deepEqual(
-    downloadRelease(
-      manifest.repository,
-      release,
-      'nitro-release.json',
-      path.join(directory, 'recovered'),
-      github
-    ),
-    manifest
-  )
+  assert.throws(() => saveDraft(manifest, directory, 'nitro-release.json', github), /checkpoint already exists/)
+  assert.deepEqual(downloadRelease(manifest.repository, release, 'nitro-release.json', path.join(directory, 'recovered'), github), manifest)
   assert.ok(!github.calls.some((call) => call.upload || call.method))
 })
 
@@ -1382,19 +1099,10 @@ test('checkpoint recovery refuses missing, ambiguous and corrupt tarballs', (t) 
     const github = githubFixture(manifest)
     const release = saveDraft(manifest, directory, 'nitro-release.json', github)
     if (defect === 'missing') release.assets.shift()
-    if (defect === 'duplicate')
-      release.assets.push({ ...release.assets[0], id: 999 })
-    if (defect === 'corrupt')
-      github.bytes.set(release.assets[0].id, Buffer.from('different bytes'))
+    if (defect === 'duplicate') release.assets.push({ ...release.assets[0], id: 999 })
+    if (defect === 'corrupt') github.bytes.set(release.assets[0].id, Buffer.from('different bytes'))
     assert.throws(
-      () =>
-        downloadRelease(
-          manifest.repository,
-          release,
-          'nitro-release.json',
-          path.join(directory, 'recovered'),
-          github
-        ),
+      () => downloadRelease(manifest.repository, release, 'nitro-release.json', path.join(directory, 'recovered'), github),
       /Missing or ambiguous release asset|Tarball integrity mismatch/
     )
   }

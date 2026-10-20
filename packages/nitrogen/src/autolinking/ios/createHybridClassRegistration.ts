@@ -9,9 +9,7 @@ interface HybridClassRegistration {
   registration: string
 }
 
-export function createHybridClassRegistration(
-  spec: HybridObjectSpec
-): HybridClassRegistration {
+export function createHybridClassRegistration(spec: HybridObjectSpec): HybridClassRegistration {
   const names = getHybridObjectName(spec.name)
   const registryName = spec.config.getHybridClassRegistryName(spec.name)
   let className: string
@@ -19,9 +17,7 @@ export function createHybridClassRegistration(
   switch (spec.language) {
     case 'swift':
       className = names.HybridTSpecSwift
-      header = new SwiftHybridObjectType(
-        new HybridObjectType(spec)
-      ).getCxxPartHeader()
+      header = new SwiftHybridObjectType(new HybridObjectType(spec)).getCxxPartHeader()
       break
     case 'c++':
       className = names.HybridTSpec

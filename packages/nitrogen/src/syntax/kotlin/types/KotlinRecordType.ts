@@ -4,11 +4,7 @@ import { indent } from '../../../utils.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { RecordType } from '../../types/RecordType.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 /** JNI represents a record as a `java.util.Map` of boxed keys and values. */
 export class KotlinRecordType extends RecordType implements KotlinType {
@@ -25,9 +21,7 @@ export class KotlinRecordType extends RecordType implements KotlinType {
   }
 
   get needsKotlinConversion(): boolean {
-    return (
-      this.keyType.needsKotlinConversion || this.valueType.needsKotlinConversion
-    )
+    return this.keyType.needsKotlinConversion || this.valueType.needsKotlinConversion
   }
   private get jniKeyType(): string {
     return this.keyType.getCode('c++', { context: 'type-argument' })

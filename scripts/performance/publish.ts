@@ -26,11 +26,7 @@ export function bencherArguments(
     '--project',
     project,
     '--branch',
-    isBase
-      ? baselineBranch
-      : metadata.pullRequestNumber == null
-        ? 'main'
-        : `pr-${metadata.pullRequestNumber}`,
+    isBase ? baselineBranch : metadata.pullRequestNumber == null ? 'main' : `pr-${metadata.pullRequestNumber}`,
     '--hash',
     isBase ? metadata.baseSha : metadata.headSha,
     '--testbed',
@@ -41,38 +37,20 @@ export function bencherArguments(
     path.join(directory, `bencher-${isBase ? 'base-' : ''}${platform}.json`),
   ]
   if (!isBase && metadata.pullRequestNumber != null) {
-    command.push(
-      '--start-point',
-      baselineBranch,
-      '--start-point-hash',
-      metadata.baseSha
-    )
+    command.push('--start-point', baselineBranch, '--start-point-hash', metadata.baseSha)
   }
   return command
 }
 
-export function bencherPublications(
-  metadata: ReportMetadata,
-  directory: string,
-  project: string
-) {
-  const revisions =
-    metadata.pullRequestNumber == null
-      ? (['head'] as const)
-      : (['base', 'head'] as const)
+export function bencherPublications(metadata: ReportMetadata, directory: string, project: string) {
+  const revisions = metadata.pullRequestNumber == null ? (['head'] as const) : (['base', 'head'] as const)
   // Seed every testbed before creating the PR branch. Never reset that branch
   // per platform: doing so would discard reports published for earlier testbeds.
   return revisions.flatMap((revision) =>
     metadata.platforms.map((platform) => ({
       platform,
       revision,
-      command: bencherArguments(
-        metadata,
-        platform,
-        revision,
-        directory,
-        project
-      ),
+      command: bencherArguments(metadata, platform, revision, directory, project),
     }))
   )
 }
@@ -85,25 +63,15 @@ if (import.meta.main) {
   if (!project?.trim() || !apiKey?.trim()) {
     throw new Error('BENCHER_PROJECT and BENCHER_API_KEY are required.')
   }
-  const metadata: ReportMetadata = JSON.parse(
-    await readFile(path.join(directory, 'metadata.json'), 'utf8')
-  )
+  const metadata: ReportMetadata = JSON.parse(await readFile(path.join(directory, 'metadata.json'), 'utf8'))
   const dataDirectory = requiredArgument(argumentsMap, 'data-directory')
-  for (const { platform, revision, command } of bencherPublications(
-    metadata,
-    directory,
-    project
-  )) {
+  for (const { platform, revision, command } of bencherPublications(metadata, directory, project)) {
     // Read only fixed data filenames. The JSON adapter validates Bencher's format;
     // this uploader has no dependency on the app's raw measurement schema.
     const filename = `bencher-${revision === 'base' ? 'base-' : ''}${platform}.json`
     const source = path.join(dataDirectory, filename)
     const information = await lstat(source)
-    if (
-      !information.isFile() ||
-      information.size === 0 ||
-      information.size > 5 * 1024 * 1024
-    ) {
+    if (!information.isFile() || information.size === 0 || information.size > 5 * 1024 * 1024) {
       throw new Error(`Invalid Bencher data size for ${platform} ${revision}.`)
     }
     await Bun.write(path.join(directory, filename), await readFile(source))
@@ -114,9 +82,6 @@ if (import.meta.main) {
       stderr: 'inherit',
     })
     const exitCode = await child.exited
-    if (exitCode !== 0)
-      throw new Error(
-        `Bencher failed for ${platform} ${revision} with exit code ${exitCode}.`
-      )
+    if (exitCode !== 0) throw new Error(`Bencher failed for ${platform} ${revision} with exit code ${exitCode}.`)
   }
 }

@@ -36,8 +36,7 @@ private:
     BorrowingReference<jsi::Value> jsiValue;
 
     Entry() = default;
-    Entry(T&& value, BorrowingReference<jsi::Value>&& jsiValue)
-        : value(std::in_place, std::move(value)), jsiValue(std::move(jsiValue)) {}
+    Entry(T&& value, BorrowingReference<jsi::Value>&& jsiValue) : value(std::in_place, std::move(value)), jsiValue(std::move(jsiValue)) {}
   };
 
   std::shared_ptr<const Entry> _entry;
@@ -56,13 +55,11 @@ public:
   ~ReactProp() = default;
 
 public:
-  [[nodiscard]]
-  const T& get() const {
+  [[nodiscard]] const T& get() const {
     return _entry->value.value();
   }
 
-  [[nodiscard]]
-  bool hasSameValue(const ReactProp<T>& other) const noexcept {
+  [[nodiscard]] bool hasSameValue(const ReactProp<T>& other) const noexcept {
     return _entry == other._entry;
   }
 
@@ -71,8 +68,7 @@ public:
    * Props snapshot. Omitted props inherit this immutable state from the
    * previous snapshot.
    */
-  [[nodiscard]]
-  bool isProvided() const noexcept {
+  [[nodiscard]] bool isProvided() const noexcept {
     return _entry->value.has_value();
   }
 

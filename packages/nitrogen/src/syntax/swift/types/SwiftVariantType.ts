@@ -25,10 +25,7 @@ export class SwiftVariantType extends VariantType implements SwiftType {
     return this.type.getAliasName('swift')
   }
   override getExtraFiles(): SourceFile[] {
-    return [
-      ...this.variants.flatMap((v) => v.getExtraFiles()),
-      ...createSwiftVariant(this),
-    ]
+    return [...this.variants.flatMap((v) => v.getExtraFiles()), ...createSwiftVariant(this)]
   }
 
   get isHashable(): boolean {
@@ -87,39 +84,25 @@ export class SwiftVariantType extends VariantType implements SwiftType {
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   getClangImporterName(context: TypeContext): string {
-    return getClangImporterReferenceName(
-      `${this.moduleName}.${this.name}_cxx`,
-      context
-    )
+    return getClangImporterReferenceName(`${this.moduleName}.${this.name}_cxx`, context)
   }
 
   get requiredCppHelpers(): CppHelper[] {
     return this.variants.flatMap((v) => v.requiredCppHelpers)
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports: SourceImport[] = []
     switch (language) {
       case 'c++':
-        imports.push(
-          ...this.variants.flatMap((v) =>
-            v.getRequiredImports(language, context)
-          ),
-          {
-            language,
-            declaration: { forwardDeclaration: this.forwardDeclaration },
-          }
-        )
+        imports.push(...this.variants.flatMap((v) => v.getRequiredImports(language, context)), {
+          language,
+          declaration: { forwardDeclaration: this.forwardDeclaration },
+        })
         if (context === 'implementation') {
           imports.push({
             language: language,
-            declaration: NitroConfig.current.getCxxHeader(
-              `${this.name}-Swift.hpp`,
-              'private'
-            ),
+            declaration: NitroConfig.current.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
           })
         }
         break

@@ -12,17 +12,17 @@
 namespace margelo::nitro {
 
 namespace detail {
-template <typename T>
-inline constexpr bool isSwiftResultStatus = false;
+  template <typename T>
+  inline constexpr bool isSwiftResultStatus = false;
 
-template <typename OwnerTag>
-inline constexpr bool isSwiftResultStatus<Result<void, OwnerTag>> = true;
+  template <typename OwnerTag>
+  inline constexpr bool isSwiftResultStatus<Result<void, OwnerTag>> = true;
 
-template <typename T>
-inline constexpr bool isResult = false;
+  template <typename T>
+  inline constexpr bool isResult = false;
 
-template <typename T, typename OwnerTag>
-inline constexpr bool isResult<Result<T, OwnerTag>> = true;
+  template <typename T, typename OwnerTag>
+  inline constexpr bool isResult<Result<T, OwnerTag>> = true;
 } // namespace detail
 
 /**

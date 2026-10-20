@@ -49,9 +49,7 @@ export type SourceImport<L extends Language = Language> = L extends 'c++'
   ? {
       language: L
       /** Code required wherever this type is declared. */
-      declaration:
-        | { forwardDeclaration: string }
-        | { name: string; space: 'user' | 'system' }
+      declaration: { forwardDeclaration: string } | { name: string; space: 'user' | 'system' }
       /**
        * A definition needed by implementations using this type.
        * Defaults to the declaration if it is an include.

@@ -1,9 +1,5 @@
 import { describe, expect, test, spyOn } from 'bun:test'
-import {
-  postPerformanceComment,
-  upsertPerformanceComment,
-  createGitHubRequest,
-} from './github-report'
+import { postPerformanceComment, upsertPerformanceComment, createGitHubRequest } from './github-report'
 
 const report = {
   repository: 'margelo/nitro',
@@ -23,17 +19,14 @@ const marker = '<!-- nitro-performance-paired-comparison:456 -->'
 describe('paired performance PR comment', () => {
   test('creates a comment without modifying user comments', async () => {
     const writes: unknown[] = []
-    const status = await postPerformanceComment(
-      report,
-      async (endpoint, method = 'GET', body) => {
-        if (method !== 'GET') {
-          writes.push({ endpoint, method, body })
-          return {}
-        }
-        if (endpoint.includes('/pulls/')) return pullRequest
-        return [{ id: 1, body: marker, user: { login: 'user', type: 'User' } }]
+    const status = await postPerformanceComment(report, async (endpoint, method = 'GET', body) => {
+      if (method !== 'GET') {
+        writes.push({ endpoint, method, body })
+        return {}
       }
-    )
+      if (endpoint.includes('/pulls/')) return pullRequest
+      return [{ id: 1, body: marker, user: { login: 'user', type: 'User' } }]
+    })
     expect(status).toBe('created')
     expect(writes).toEqual([
       {
@@ -44,43 +37,40 @@ describe('paired performance PR comment', () => {
     ])
   })
 
-  test.each(['github-actions[bot]', 'nitro-modules-bot[bot]'])(
-    'updates only the existing paired comparison from %s',
-    async (botLogin) => {
-      const writes: unknown[] = []
-      const status = await postPerformanceComment(
-        report,
-        async (endpoint, method = 'GET', body) => {
-          if (method !== 'GET') {
-            writes.push({ endpoint, method, body })
-            return {}
-          }
-          if (endpoint.includes('/pulls/')) return pullRequest
-          return [
-            {
-              id: 1,
-              body: `${marker}\nother bot's report`,
-              user: { login: 'another-app[bot]', type: 'Bot' },
-            },
-            {
-              id: 2,
-              body: `${marker}\nold report`,
-              user: { login: botLogin, type: 'Bot' },
-            },
-          ]
-        },
-        botLogin
-      )
-      expect(status).toBe('updated')
-      expect(writes).toEqual([
-        {
-          endpoint: '/repos/margelo/nitro/issues/comments/2',
-          method: 'PATCH',
-          body: { body: `${marker}\n${report.markdown}` },
-        },
-      ])
-    }
-  )
+  test.each(['github-actions[bot]', 'nitro-modules-bot[bot]'])('updates only the existing paired comparison from %s', async (botLogin) => {
+    const writes: unknown[] = []
+    const status = await postPerformanceComment(
+      report,
+      async (endpoint, method = 'GET', body) => {
+        if (method !== 'GET') {
+          writes.push({ endpoint, method, body })
+          return {}
+        }
+        if (endpoint.includes('/pulls/')) return pullRequest
+        return [
+          {
+            id: 1,
+            body: `${marker}\nother bot's report`,
+            user: { login: 'another-app[bot]', type: 'Bot' },
+          },
+          {
+            id: 2,
+            body: `${marker}\nold report`,
+            user: { login: botLogin, type: 'Bot' },
+          },
+        ]
+      },
+      botLogin
+    )
+    expect(status).toBe('updated')
+    expect(writes).toEqual([
+      {
+        endpoint: '/repos/margelo/nitro/issues/comments/2',
+        method: 'PATCH',
+        body: { body: `${marker}\n${report.markdown}` },
+      },
+    ])
+  })
 
   test('new requests on the same commits create reports and reruns update only their own report', async () => {
     const comments = [
@@ -91,11 +81,7 @@ describe('paired performance PR comment', () => {
         user: { login: 'github-actions[bot]', type: 'Bot' },
       },
     ]
-    const request = async (
-      endpoint: string,
-      method = 'GET',
-      body?: Record<string, unknown>
-    ) => {
+    const request = async (endpoint: string, method = 'GET', body?: Record<string, unknown>) => {
       if (endpoint === '/graphql') return {}
       if (endpoint.includes('/pulls/')) return pullRequest
       if (method === 'POST') {
@@ -108,8 +94,7 @@ describe('paired performance PR comment', () => {
         return {}
       }
       if (method === 'PATCH') {
-        comments.find((comment) => endpoint.endsWith(`/${comment.id}`))!.body =
-          String(body!.body)
+        comments.find((comment) => endpoint.endsWith(`/${comment.id}`))!.body = String(body!.body)
         return {}
       }
       return comments
@@ -121,56 +106,41 @@ describe('paired performance PR comment', () => {
       markdown: 'Second request',
     }
     expect(await postPerformanceComment(nextRun, request)).toBe('created')
-    expect(
-      await postPerformanceComment(
-        { ...report, markdown: 'First run, attempt 2' },
-        request
-      )
-    ).toBe('updated')
+    expect(await postPerformanceComment({ ...report, markdown: 'First run, attempt 2' }, request)).toBe('updated')
     expect(comments.map((comment) => comment.body)).toEqual([
       '<!-- nitro-performance-paired-comparison -->\nlegacy report',
       `${marker}\nFirst run, attempt 2`,
       '<!-- nitro-performance-paired-comparison:789 -->\nSecond request',
     ])
-    expect(
-      await postPerformanceComment(
-        { ...nextRun, markdown: 'Second run, attempt 2' },
-        request
-      )
-    ).toBe('updated')
+    expect(await postPerformanceComment({ ...nextRun, markdown: 'Second run, attempt 2' }, request)).toBe('updated')
     expect(comments).toHaveLength(3)
     expect(comments[1]!.body).toBe(`${marker}\nFirst run, attempt 2`)
-    expect(comments[2]!.body).toBe(
-      '<!-- nitro-performance-paired-comparison:789 -->\nSecond run, attempt 2'
-    )
+    expect(comments[2]!.body).toBe('<!-- nitro-performance-paired-comparison:789 -->\nSecond run, attempt 2')
   })
 
   test('finds the same run on a later page before creating a comment', async () => {
     const writes: unknown[] = []
-    const status = await postPerformanceComment(
-      report,
-      async (endpoint, method = 'GET', body) => {
-        if (method !== 'GET') {
-          writes.push({ endpoint, method, body })
-          return {}
-        }
-        if (endpoint.includes('/pulls/')) return pullRequest
-        if (endpoint.endsWith('page=1')) {
-          return Array.from({ length: 100 }, (_, id) => ({
-            id,
-            body: 'Unrelated comment',
-            user: { login: 'github-actions[bot]', type: 'Bot' },
-          }))
-        }
-        return [
-          {
-            id: 101,
-            body: marker,
-            user: { login: 'github-actions[bot]', type: 'Bot' },
-          },
-        ]
+    const status = await postPerformanceComment(report, async (endpoint, method = 'GET', body) => {
+      if (method !== 'GET') {
+        writes.push({ endpoint, method, body })
+        return {}
       }
-    )
+      if (endpoint.includes('/pulls/')) return pullRequest
+      if (endpoint.endsWith('page=1')) {
+        return Array.from({ length: 100 }, (_, id) => ({
+          id,
+          body: 'Unrelated comment',
+          user: { login: 'github-actions[bot]', type: 'Bot' },
+        }))
+      }
+      return [
+        {
+          id: 101,
+          body: marker,
+          user: { login: 'github-actions[bot]', type: 'Bot' },
+        },
+      ]
+    })
     expect(status).toBe('updated')
     expect(writes).toEqual([
       {
@@ -181,19 +151,16 @@ describe('paired performance PR comment', () => {
     ])
   })
 
-  test.each([0, -1, NaN, 1.5, Number.MAX_SAFE_INTEGER + 1])(
-    'rejects invalid run ID %s before making requests',
-    async (workflowRunId) => {
-      let requests = 0
-      await expect(
-        postPerformanceComment({ ...report, workflowRunId }, async () => {
-          requests++
-          return {}
-        })
-      ).rejects.toThrow('Invalid validated PR report metadata or size.')
-      expect(requests).toBe(0)
-    }
-  )
+  test.each([0, -1, NaN, 1.5, Number.MAX_SAFE_INTEGER + 1])('rejects invalid run ID %s before making requests', async (workflowRunId) => {
+    let requests = 0
+    await expect(
+      postPerformanceComment({ ...report, workflowRunId }, async () => {
+        requests++
+        return {}
+      })
+    ).rejects.toThrow('Invalid validated PR report metadata or size.')
+    expect(requests).toBe(0)
+  })
 
   test('creates a new custom bot comment when migrating from GitHub Actions', async () => {
     const writes: unknown[] = []
@@ -295,11 +262,7 @@ describe('outdated performance comments', () => {
       method: string
       body?: Record<string, unknown>
     }[] = []
-    const request = async (
-      endpoint: string,
-      method = 'GET',
-      body?: Record<string, unknown>
-    ) => {
+    const request = async (endpoint: string, method = 'GET', body?: Record<string, unknown>) => {
       if (endpoint.includes('/pulls/')) return pullRequest
       if (method === 'GET') return comments
       writes.push({ endpoint, method, body })
@@ -310,18 +273,13 @@ describe('outdated performance comments', () => {
 
   test('posts first, then hides only earlier reports by the same bot as OUTDATED', async () => {
     const f = fixture()
-    expect(
-      await postPerformanceComment(report, f.request, 'nitro-modules-bot[bot]')
-    ).toBe('created')
+    expect(await postPerformanceComment(report, f.request, 'nitro-modules-bot[bot]')).toBe('created')
     expect(f.writes[0]).toEqual({
       endpoint: '/repos/margelo/nitro/issues/123/comments',
       method: 'POST',
       body: { body: `${marker}\n${report.markdown}` },
     })
-    expect(f.writes.slice(1).map((write) => write.body?.variables)).toEqual([
-      { id: 'legacy' },
-      { id: 'prior-run' },
-    ])
+    expect(f.writes.slice(1).map((write) => write.body?.variables)).toEqual([{ id: 'legacy' }, { id: 'prior-run' }])
     for (const write of f.writes.slice(1)) {
       expect(write.endpoint).toBe('/graphql')
       expect(write.body?.query).toContain('classifier: OUTDATED')
@@ -336,17 +294,9 @@ describe('outdated performance comments', () => {
       body: marker,
       user: { login: 'nitro-modules-bot[bot]', type: 'Bot' },
     })
-    expect(
-      await postPerformanceComment(
-        { ...report, workflowRunId: 100 },
-        f.request,
-        'nitro-modules-bot[bot]'
-      )
-    ).toBe('updated')
+    expect(await postPerformanceComment({ ...report, workflowRunId: 100 }, f.request, 'nitro-modules-bot[bot]')).toBe('updated')
     expect(f.writes[0]?.endpoint).toBe('/repos/margelo/nitro/issues/comments/2')
-    expect(f.writes.slice(1).map((write) => write.body?.variables)).toEqual([
-      { id: 'legacy' },
-    ])
+    expect(f.writes.slice(1).map((write) => write.body?.variables)).toEqual([{ id: 'legacy' }])
   })
 
   test('failed publication does not hide any previous comments', async () => {
@@ -355,8 +305,7 @@ describe('outdated performance comments', () => {
       postPerformanceComment(
         report,
         async (endpoint, method, body) => {
-          if (method === 'POST' && endpoint !== '/graphql')
-            throw new Error('Posting failed')
+          if (method === 'POST' && endpoint !== '/graphql') throw new Error('Posting failed')
           return f.request(endpoint, method, body)
         },
         'nitro-modules-bot[bot]'
@@ -367,11 +316,7 @@ describe('outdated performance comments', () => {
 
   test('failure notifications leave the previous successful reports visible', async () => {
     const f = fixture()
-    await upsertPerformanceComment(
-      { ...report, markdown: 'Performance tests failed' },
-      f.request,
-      'nitro-modules-bot[bot]'
-    )
+    await upsertPerformanceComment({ ...report, markdown: 'Performance tests failed' }, f.request, 'nitro-modules-bot[bot]')
     expect(f.writes).toHaveLength(1)
     expect(f.writes[0]?.method).toBe('POST')
   })
@@ -384,18 +329,13 @@ describe('outdated performance comments', () => {
       body: `${marker}\nPerformance tests failed`,
       user: { login: 'nitro-modules-bot[bot]', type: 'Bot' },
     })
-    expect(
-      await postPerformanceComment(report, f.request, 'nitro-modules-bot[bot]')
-    ).toBe('updated')
+    expect(await postPerformanceComment(report, f.request, 'nitro-modules-bot[bot]')).toBe('updated')
     expect(f.writes[0]).toEqual({
       endpoint: '/repos/margelo/nitro/issues/comments/6',
       method: 'PATCH',
       body: { body: `${marker}\n${report.markdown}` },
     })
-    expect(f.writes.slice(1).map((write) => write.body?.variables)).toEqual([
-      { id: 'legacy' },
-      { id: 'prior-run' },
-    ])
+    expect(f.writes.slice(1).map((write) => write.body?.variables)).toEqual([{ id: 'legacy' }, { id: 'prior-run' }])
   })
 
   test('surfaces GraphQL errors returned with HTTP 200', async () => {

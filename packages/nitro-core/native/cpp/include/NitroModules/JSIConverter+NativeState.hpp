@@ -10,9 +10,9 @@ namespace margelo::nitro {
 class HybridObject;
 } // namespace margelo::nitro
 
-#include <NitroModules/detail/IsSharedPtrTo.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroTypeInfo.hpp>
+#include <NitroModules/detail/IsSharedPtrTo.hpp>
 #include <jsi/jsi.h>
 #include <type_traits>
 

@@ -7,10 +7,7 @@ import type { ImportedCxxRecord } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
 
-export class SwiftNamedType
-  extends NamedWrappingType<SwiftType>
-  implements SwiftType
-{
+export class SwiftNamedType extends NamedWrappingType<SwiftType> implements SwiftType {
   get isHashable(): boolean {
     return this.type.isHashable
   }
@@ -60,10 +57,7 @@ export class SwiftNamedType
     return this.type.getClangImporterName(context)
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     return this.type.getRequiredImports(language, context)
   }
 }

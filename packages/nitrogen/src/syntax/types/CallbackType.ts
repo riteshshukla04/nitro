@@ -22,18 +22,12 @@ export class CallbackType implements Type {
   get specializationName(): string {
     return (
       'Callback_' +
-      [this.returnType, ...this.parameters]
-        .map((p) =>
-          escapeCppName(p.getCode('c++', { context: 'type-argument' }))
-        )
-        .join('_')
+      [this.returnType, ...this.parameters].map((p) => escapeCppName(p.getCode('c++', { context: 'type-argument' }))).join('_')
     )
   }
 
   get jsName(): string {
-    const paramsJs = this.parameters
-      .map((p) => `${p.name}: ${p.kind}`)
-      .join(', ')
+    const paramsJs = this.parameters.map((p) => `${p.name}: ${p.kind}`).join(', ')
     const returnType = this.returnType.getCode('c++', { context: 'return' })
     return `(${paramsJs}) => ${returnType}`
   }
@@ -51,9 +45,7 @@ export class CallbackType implements Type {
    */
   protected isBorrowed(options: GetCodeOptions): boolean {
     if (!this.isInline) return false
-    return (
-      options.context === 'parameter' || options.context === 'parameter-type'
-    )
+    return options.context === 'parameter' || options.context === 'parameter-type'
   }
 
   getCode(language: Language, options: GetCallbackCodeOptions): string {
@@ -118,16 +110,11 @@ export class CallbackType implements Type {
         return `(${params}) -> ${returnType}`
       }
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for CallbackType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for CallbackType!`)
     }
   }
   getExtraFiles(): SourceFile[] {
-    return [
-      ...this.returnType.getExtraFiles(),
-      ...this.parameters.flatMap((p) => p.getExtraFiles()),
-    ]
+    return [...this.returnType.getExtraFiles(), ...this.parameters.flatMap((p) => p.getExtraFiles())]
   }
   getRequiredImports(language: Language): SourceImport[] {
     const imports: SourceImport[] = [

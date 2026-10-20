@@ -21,9 +21,7 @@ export class ArrayBufferType implements Type {
       case 'kotlin':
         return 'ArrayBuffer'
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for ArrayBufferType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for ArrayBufferType!`)
     }
   }
   getExtraFiles(): SourceFile[] {

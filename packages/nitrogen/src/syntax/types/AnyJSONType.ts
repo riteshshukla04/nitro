@@ -19,9 +19,7 @@ export class AnyJSONType implements Type {
       case 'swift':
         return 'AnyJSON'
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for AnyJSONType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for AnyJSONType!`)
     }
   }
   getExtraFiles(): SourceFile[] {

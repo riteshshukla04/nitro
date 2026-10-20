@@ -8,14 +8,8 @@ import chalk from 'chalk'
 import { execSync } from 'child_process'
 import { randomUUID } from 'crypto'
 
-export async function initNewNitroModule(
-  baseDirectory: string,
-  moduleName: string,
-  ref: string = 'v1'
-): Promise<void> {
-  Logger.info(
-    `⚙️  Creating new Nitro Module "${chalk.bold(moduleName)}" in ${chalk.underline(prettifyDirectory(baseDirectory))}...`
-  )
+export async function initNewNitroModule(baseDirectory: string, moduleName: string, ref: string = 'v1'): Promise<void> {
+  Logger.info(`⚙️  Creating new Nitro Module "${chalk.bold(moduleName)}" in ${chalk.underline(prettifyDirectory(baseDirectory))}...`)
 
   const directory = path.join(baseDirectory, moduleName)
   if (existsSync(directory)) {
@@ -27,13 +21,7 @@ export async function initNewNitroModule(
 
   await fs.mkdir(directory)
 
-  const modulePath = await downloadGitHubFolder(
-    'margelo',
-    'nitro',
-    ref,
-    'packages/template',
-    directory
-  )
+  const modulePath = await downloadGitHubFolder('margelo', 'nitro', ref, 'packages/template', directory)
   Logger.info(`🏗️  Constructing template...`)
 
   const cleanLibraryName = moduleName.replace('react-native-', '')
@@ -54,12 +42,8 @@ export async function initNewNitroModule(
   await replaceTemplate(modulePath, `packageDescription`, moduleName)
   await replaceTemplate(modulePath, `nitroVersion`, NITROGEN_VERSION)
 
-  Logger.info(
-    `🎉 Created Nitro Module "${chalk.bold(moduleName)}" in ${chalk.underline(prettifyDirectory(directory))}!`
-  )
-  Logger.info(
-    `👉 To install dependencies, use your package manager of choice (e.g. ${chalk.bold('npm install')})`
-  )
+  Logger.info(`🎉 Created Nitro Module "${chalk.bold(moduleName)}" in ${chalk.underline(prettifyDirectory(directory))}!`)
+  Logger.info(`👉 To install dependencies, use your package manager of choice (e.g. ${chalk.bold('npm install')})`)
   Logger.info(
     `👉 To create your first Hybrid Object, add a ${chalk.underline(`*.nitro.ts`)} file with ${chalk.bold('export declare class')} extending ${chalk.bold('HybridObject')} with platform decorators. Map ${chalk.bold('#nitro/*')} to ${chalk.underline('./nitrogen/generated/shared/javascript/*.cjs')} in your package.json ${chalk.bold('imports')} and run ${chalk.bold('npx nitrogen')}, which adds ${chalk.bold(`export * from '#nitro/YourClass'`)} to the spec. Then import from ${chalk.bold('./YourClass.nitro')}. Include ${chalk.underline('nitrogen/generated')} when publishing.`
   )
@@ -80,13 +64,7 @@ async function isGitInstalled(): Promise<boolean> {
   }
 }
 
-async function downloadGitHubFolder(
-  owner: string,
-  repo: string,
-  branch: string,
-  folder: string,
-  outputPath: string
-): Promise<string> {
+async function downloadGitHubFolder(owner: string, repo: string, branch: string, folder: string, outputPath: string): Promise<string> {
   if (!isGitInstalled()) {
     console.error(
       `❌ ${chalk.bold('git')} is not installed or available in the current path! Make sure to install ${chalk.bold('git')} and try again.`
@@ -98,9 +76,7 @@ async function downloadGitHubFolder(
   Logger.info(`⏳ Cloning ${chalk.underline(repoUrl)}...`)
   const tempPath = randomUUID()
   const tempDir = path.join(outputPath, tempPath)
-  execSync(
-    `git clone --depth 1 --filter=blob:none -b ${branch} --quiet --sparse ${repoUrl} "${tempDir}"`
-  )
+  execSync(`git clone --depth 1 --filter=blob:none -b ${branch} --quiet --sparse ${repoUrl} "${tempDir}"`)
   const prettyOutputPath = prettifyDirectory(outputPath)
 
   const initialDir = process.cwd()
@@ -110,9 +86,7 @@ async function downloadGitHubFolder(
     Logger.debug(`⏳ Checking out ${chalk.underline(folder)}...`)
     execSync(`git sparse-checkout set ${folder}`)
 
-    Logger.debug(
-      `📁 Copying files from ${chalk.underline(`${prettyOutputPath}/${tempPath}`)} to ${chalk.underline(prettyOutputPath)}...`
-    )
+    Logger.debug(`📁 Copying files from ${chalk.underline(`${prettyOutputPath}/${tempPath}`)} to ${chalk.underline(prettyOutputPath)}...`)
     const sourcePath = path.join(tempDir, folder)
     await fs.mkdir(outputPath, { recursive: true })
     await copyFolder(sourcePath, outputPath)
@@ -122,9 +96,7 @@ async function downloadGitHubFolder(
     // change dir back to original
     process.chdir(initialDir)
 
-    Logger.debug(
-      `🗑️  Removing temporary folder ${chalk.underline(prettifyDirectory(tempDir))}...`
-    )
+    Logger.debug(`🗑️  Removing temporary folder ${chalk.underline(prettifyDirectory(tempDir))}...`)
     await fs.rm(tempDir, { recursive: true, force: true })
   }
 }
@@ -143,17 +115,10 @@ async function copyFolder(src: string, dest: string) {
   }
 }
 
-async function replaceTemplate(
-  dir: string,
-  templateName: string,
-  replacementValue: string
-): Promise<void> {
+async function replaceTemplate(dir: string, templateName: string, replacementValue: string): Promise<void> {
   const replaceInFile = async (filePath: string) => {
     const content = await fs.readFile(filePath, 'utf8')
-    const updatedContent = content.replaceAll(
-      `$$${templateName}$$`,
-      replacementValue
-    )
+    const updatedContent = content.replaceAll(`$$${templateName}$$`, replacementValue)
     if (content !== updatedContent) {
       await fs.writeFile(filePath, updatedContent, 'utf8')
     }

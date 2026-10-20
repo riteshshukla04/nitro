@@ -5,20 +5,13 @@ import path from 'node:path'
 import { commandOutput, saveAndroidFailure } from './diagnostics'
 
 test('diagnostic commands retain stderr, exit status, and timeout evidence', async () => {
-  const failure = await commandOutput(process.execPath, [
-    '-e',
-    'console.error("adb: device emulator-5554 not found"); process.exit(1)',
-  ])
+  const failure = await commandOutput(process.execPath, ['-e', 'console.error("adb: device emulator-5554 not found"); process.exit(1)'])
   expect(failure.exitCode).toBe(1)
   expect(failure.stdout).toBe('')
   expect(failure.stderr).toContain('device emulator-5554 not found')
   expect(failure.timedOut).toBe(false)
 
-  const hung = await commandOutput(
-    process.execPath,
-    ['-e', 'console.error("partial diagnostics"); await Bun.sleep(60000)'],
-    500
-  )
+  const hung = await commandOutput(process.execPath, ['-e', 'console.error("partial diagnostics"); await Bun.sleep(60000)'], 500)
   expect(hung.timedOut).toBe(true)
   expect(hung.signal).toBe('SIGKILL')
   expect(hung.stderr).toContain('partial diagnostics')
@@ -38,12 +31,7 @@ test('unwritable diagnostics never replace the original benchmark failure', asyn
       try {
         throw original
       } catch (error) {
-        await saveAndroidFailure(
-          'emulator-5554',
-          'app',
-          path.join(output, 'case.json'),
-          error
-        )
+        await saveAndroidFailure('emulator-5554', 'app', path.join(output, 'case.json'), error)
         throw error
       }
     }
@@ -54,10 +42,7 @@ test('unwritable diagnostics never replace the original benchmark failure', asyn
 })
 
 test('capture bounds output and pipe lifetime even after the command exits', async () => {
-  const verbose = await commandOutput(process.execPath, [
-    '-e',
-    'process.stdout.write("x".repeat(3 * 1024 * 1024)); await Bun.sleep(60000)',
-  ])
+  const verbose = await commandOutput(process.execPath, ['-e', 'process.stdout.write("x".repeat(3 * 1024 * 1024)); await Bun.sleep(60000)'])
   expect(verbose.truncated).toBe(true)
   expect(verbose.stdout.length).toBe(2 * 1024 * 1024)
   expect(verbose.signal).toBe('SIGKILL')
@@ -101,24 +86,11 @@ echo "fixture $*"
 `
     )
     await chmod(tool, 0o755)
-    for (const name of [
-      'cat',
-      'ps',
-      'df',
-      'sudo',
-      'journalctl',
-      'adb',
-      'uname',
-    ]) {
+    for (const name of ['cat', 'ps', 'df', 'sudo', 'journalctl', 'adb', 'uname']) {
       await symlink(tool, path.join(bin, name))
     }
     const child = Bun.spawn(
-      [
-        process.execPath,
-        path.join(import.meta.dir, 'collect-android-diagnostics.ts'),
-        '--output-directory',
-        output,
-      ],
+      [process.execPath, path.join(import.meta.dir, 'collect-android-diagnostics.ts'), '--output-directory', output],
       {
         env: { ...process.env, PATH: bin, TMPDIR: root },
         stdout: 'pipe',
@@ -135,21 +107,13 @@ echo "fixture $*"
       stdout: '',
       stderr: '',
     })
-    expect(await readFile(path.join(output, dump), 'utf8')).toBe(
-      'emulator minidump'
-    )
-    expect(
-      await readFile(path.join(output, 'emulator-crashes.log'), 'utf8')
-    ).toContain('Saved emu-crash-37.2.12.db')
+    expect(await readFile(path.join(output, dump), 'utf8')).toBe('emulator minidump')
+    expect(await readFile(path.join(output, 'emulator-crashes.log'), 'utf8')).toContain('Saved emu-crash-37.2.12.db')
     const adb = await Bun.file(path.join(output, 'adb.json')).json()
     expect(adb.exitCode).toBe(1)
     expect(adb.stderr).toContain('device emulator-5554 not found')
-    expect(
-      (await Bun.file(path.join(output, 'core-dumps.json')).json()).exitCode
-    ).toBeNull()
-    expect(
-      (await Bun.file(path.join(output, 'memory.json')).json()).stdout
-    ).toContain('/proc/meminfo')
+    expect((await Bun.file(path.join(output, 'core-dumps.json')).json()).exitCode).toBeNull()
+    expect((await Bun.file(path.join(output, 'memory.json')).json()).stdout).toContain('/proc/meminfo')
   } finally {
     await rm(root, { recursive: true, force: true })
   }

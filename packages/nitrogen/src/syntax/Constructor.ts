@@ -1,9 +1,5 @@
 import type { Language } from '../getPlatformSpecs.js'
-import {
-  Method,
-  type MethodOptions,
-  type MethodSignatureOptions,
-} from './Method.js'
+import { Method, type MethodOptions, type MethodSignatureOptions } from './Method.js'
 import type { Parameter } from './Parameter.js'
 import type { SourceFile, SourceImport } from './SourceFile.js'
 import { StaticMethod, type StaticMethodOptions } from './StaticMethod.js'
@@ -21,41 +17,26 @@ export interface ConstructorOptions extends MethodOptions {
 export class Constructor extends Method<ConstructorOptions> {
   readonly kind = 'constructor'
 
-  constructor(
-    name: string,
-    constructedType: Type,
-    parameters: Parameter[],
-    options: ConstructorOptions = {}
-  ) {
+  constructor(name: string, constructedType: Type, parameters: Parameter[], options: ConstructorOptions = {}) {
     super(name, constructedType, parameters, options)
   }
 
-  toStaticMethod(
-    returnType: Type = this.returnType,
-    name: string = 'constructor',
-    options: StaticMethodOptions = {}
-  ): StaticMethod {
+  toStaticMethod(returnType: Type = this.returnType, name: string = 'constructor', options: StaticMethodOptions = {}): StaticMethod {
     return new StaticMethod(name, returnType, this.parameters, {
       ...options,
       generated: true,
     })
   }
 
-  protected getSignature(
-    language: Language,
-    { className }: MethodSignatureOptions
-  ): string {
-    const parameters = this.parameters.map((parameter) =>
-      parameter.getCode(language)
-    )
+  protected getSignature(language: Language, { className }: MethodSignatureOptions): string {
+    const parameters = this.parameters.map((parameter) => parameter.getCode(language))
     const options = this.options
     switch (language) {
       case 'c++': {
         let name = this.name
         if (className != null) name = `${className}::${name}`
         let signature = `${name}(${parameters.join(', ')})`
-        if (options.explicit && className == null)
-          signature = `explicit ${signature}`
+        if (options.explicit && className == null) signature = `explicit ${signature}`
         if (options.inline) signature = `inline ${signature}`
         if (options.noexcept) signature = `${signature} noexcept`
         return signature
@@ -79,9 +60,7 @@ ${signature}
         return [...annotations, signature].join('\n')
       }
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for constructors!`
-        )
+        throw new Error(`Language ${language} is not yet supported for constructors!`)
     }
   }
 
@@ -90,8 +69,6 @@ ${signature}
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
-    return this.parameters.flatMap((parameter) =>
-      parameter.getRequiredImports(language)
-    )
+    return this.parameters.flatMap((parameter) => parameter.getRequiredImports(language))
   }
 }

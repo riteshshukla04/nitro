@@ -9,19 +9,19 @@ on:
         type: string
   pull_request:
     paths:
-      - ".github/workflows/test-runtime-ios.yml"
-      - "Package.swift"
-      - "Package.resolved"
-      - "packages/nitro-core/**"
-      - "packages/nitrogen/**"
-      - "tests/standalone/**"
-      - "package.json"
-      - "bun.lock"
-      - "bunfig.toml"
-      - "scripts/releases/**"
-      - "config/**"
-      - "scripts/set-version.mjs"
-      - ".gitmodules"
+      - '.github/workflows/test-runtime-ios.yml'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'packages/nitro-core/**'
+      - 'packages/nitrogen/**'
+      - 'tests/standalone/**'
+      - 'package.json'
+      - 'bun.lock'
+      - 'bunfig.toml'
+      - 'scripts/releases/**'
+      - 'config/**'
+      - 'scripts/set-version.mjs'
+      - '.gitmodules'
   workflow_dispatch:
 
 permissions:
@@ -73,7 +73,10 @@ jobs:
         uses: actions/cache@v6
         with:
           path: tests/standalone/.build/hermes/NitroTestHermes.xcframework
-          key: hermes-ios-${{ runner.os }}-${{ runner.arch }}-${{ steps.hermes.outputs.revision }}-${{ steps.hermes.outputs.toolchain }}-${{ hashFiles('tests/standalone/hermes/build.mjs', 'tests/standalone/hermes/options.cmake', 'tests/standalone/test-runner/ios/config.json') }}
+          key:
+            hermes-ios-${{ runner.os }}-${{ runner.arch }}-${{ steps.hermes.outputs.revision }}-${{ steps.hermes.outputs.toolchain }}-${{
+            hashFiles('tests/standalone/hermes/build.mjs', 'tests/standalone/hermes/options.cmake',
+            'tests/standalone/test-runner/ios/config.json') }}
       - name: Install workspace
         run: bun install --frozen-lockfile --ignore-scripts
       - name: Prepare runtime test fixtures

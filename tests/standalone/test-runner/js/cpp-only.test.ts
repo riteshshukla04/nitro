@@ -1,575 +1,484 @@
-import { expect } from "chai";
-import { namedCases } from "./utils/cases";
+import { expect } from 'chai'
+import { namedCases } from './utils/cases'
 
-import { NitroModules } from "nitro-core";
-import { Base } from "nitro-test";
-import { Child } from "nitro-test";
-import {
-  type Powertrain,
-  TestObjectCpp,
-  TestObjectSwiftKotlin,
-} from "nitro-test";
-import { HybridSomeExternalObject } from "./utils/testObjects";
+import { NitroModules } from 'nitro-core'
+import { Base } from 'nitro-test'
+import { Child } from 'nitro-test'
+import { type Powertrain, TestObjectCpp, TestObjectSwiftKotlin } from 'nitro-test'
+import { HybridSomeExternalObject } from './utils/testObjects'
 
-import { TEST_CUSTOM_TYPE, TEST_PERSON } from "./utils/fixtures";
-import { debugOnly } from "./utils/helpers";
+import { TEST_CUSTOM_TYPE, TEST_PERSON } from './utils/fixtures'
+import { debugOnly } from './utils/helpers'
 
 // `rawJsiFunc` is registered as a raw JSI method in `HybridTestObjectCpp.hpp`,
 // so it is not part of the `TestObjectCpp` spec.
 interface WithRawJsiFunc {
-  rawJsiFunc(...args: unknown[]): unknown;
+  rawJsiFunc(...args: unknown[]): unknown
 }
 
-const POWERTRAINS: Powertrain[] = ["electric", "gas", "hybrid"];
+const POWERTRAINS: Powertrain[] = ['electric', 'gas', 'hybrid']
 
 export const cases = {
-  ...namedCases("C++ only / TestObjectCpp", {
-    "getVariantTuple(...) converts Float2": () => {
-      const testObject = new TestObjectCpp();
+  ...namedCases('C++ only / TestObjectCpp', {
+    'getVariantTuple(...) converts Float2': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(testObject.getVariantTuple([10, 20])).to.deep.equal([10, 20]);
+      expect(testObject.getVariantTuple([10, 20])).to.deep.equal([10, 20])
     },
 
-    "getVariantTuple(...) converts Float3": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantTuple(...) converts Float3': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(testObject.getVariantTuple([10, 20, 30])).to.deep.equal([
-        10, 20, 30,
-      ]);
+      expect(testObject.getVariantTuple([10, 20, 30])).to.deep.equal([10, 20, 30])
     },
 
-    "getVariantTuple(...) throws at wrong size (5 items)": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantTuple(...) throws at wrong size (5 items)': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.getVariantTuple([10, 20, 30, 40, 50]),
-      ).to.throw(
-        `${testObject.constructor.name}.getVariantTuple(...): Cannot convert`,
-      );
+        testObject.getVariantTuple([10, 20, 30, 40, 50])
+      ).to.throw(`${testObject.constructor.name}.getVariantTuple(...): Cannot convert`)
     },
 
-    "getVariantTuple(...) throws at wrong type (string)": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantTuple(...) throws at wrong type (string)': () => {
+      const testObject = new TestObjectCpp()
 
       // @ts-expect-error
-      expect(() => testObject.getVariantTuple("hello")).to.throw(
-        `${testObject.constructor.name}.getVariantTuple(...): Cannot convert`,
-      );
+      expect(() => testObject.getVariantTuple('hello')).to.throw(`${testObject.constructor.name}.getVariantTuple(...): Cannot convert`)
     },
 
-    "getVariantTuple(...) throws at wrong type (string[])": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantTuple(...) throws at wrong type (string[])': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.getVariantTuple(["hello", "world"]),
-      ).to.throw(
-        `${testObject.constructor.name}.getVariantTuple(...): Cannot convert`,
-      );
+        testObject.getVariantTuple(['hello', 'world'])
+      ).to.throw(`${testObject.constructor.name}.getVariantTuple(...): Cannot convert`)
     },
 
     "someTuple roundtrips [55, 'hello']": () => {
-      const testObject = new TestObjectCpp();
+      const testObject = new TestObjectCpp()
 
-      testObject.someTuple = [55, "hello"];
-      expect(testObject.someTuple).to.deep.equal([55, "hello"]);
+      testObject.someTuple = [55, 'hello']
+      expect(testObject.someTuple).to.deep.equal([55, 'hello'])
     },
 
-    "flip([10, 20, 30]) reverses the tuple": () => {
-      const testObject = new TestObjectCpp();
+    'flip([10, 20, 30]) reverses the tuple': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(testObject.flip([10, 20, 30])).to.deep.equal([30, 20, 10]);
+      expect(testObject.flip([10, 20, 30])).to.deep.equal([30, 20, 10])
     },
 
-    "flip([10, 20]) throws at wrong size": () => {
-      const testObject = new TestObjectCpp();
+    'flip([10, 20]) throws at wrong size': () => {
+      const testObject = new TestObjectCpp()
 
       const flipTwoItems = () =>
         testObject.flip(
           // @ts-expect-error
-          [10, 20],
-        );
+          [10, 20]
+        )
       expect(flipTwoItems).to.throw(
-        `${testObject.constructor.name}.flip(...): The given JS Array has 2 items, but ${debugOnly("std::tuple<double, double, double>")}`,
-      );
-      expect(flipTwoItems).to.throw("expects 3 items");
+        `${testObject.constructor.name}.flip(...): The given JS Array has 2 items, but ${debugOnly('std::tuple<double, double, double>')}`
+      )
+      expect(flipTwoItems).to.throw('expects 3 items')
     },
 
-    "passTuple(...) returns the same tuple": () => {
-      const testObject = new TestObjectCpp();
+    'passTuple(...) returns the same tuple': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(testObject.passTuple([13, "hello", true])).to.deep.equal([
-        13,
-        "hello",
-        true,
-      ]);
+      expect(testObject.passTuple([13, 'hello', true])).to.deep.equal([13, 'hello', true])
     },
 
-    "bounceCustomType(...) returns the same value": () => {
-      const testObject = new TestObjectCpp();
+    'bounceCustomType(...) returns the same value': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(
-        Object.is(
-          testObject.bounceCustomType(TEST_CUSTOM_TYPE),
-          TEST_CUSTOM_TYPE,
-        ),
-      ).to.equal(true);
+      expect(Object.is(testObject.bounceCustomType(TEST_CUSTOM_TYPE), TEST_CUSTOM_TYPE)).to.equal(true)
     },
 
-    "bounceAnyHybrid(...) returns the same object": () => {
-      const testObject = new TestObjectCpp();
+    'bounceAnyHybrid(...) returns the same object': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(
-        Object.is(
-          testObject.bounceAnyHybrid(HybridSomeExternalObject),
-          HybridSomeExternalObject,
-        ),
-      ).to.equal(true);
+      expect(Object.is(testObject.bounceAnyHybrid(HybridSomeExternalObject), HybridSomeExternalObject)).to.equal(true)
     },
 
-    "bounceAnyHybrid(...) result does not equal a different object": () => {
-      const testObject = new TestObjectCpp();
+    'bounceAnyHybrid(...) result does not equal a different object': () => {
+      const testObject = new TestObjectCpp()
 
-      const external = testObject.bounceAnyHybrid(HybridSomeExternalObject);
-      expect(Object.is(external.equals(testObject), false)).to.equal(true);
+      const external = testObject.bounceAnyHybrid(HybridSomeExternalObject)
+      expect(Object.is(external.equals(testObject), false)).to.equal(true)
     },
 
-    "rawJsiFunc(...) returns its arguments as an array": () => {
-      const testObject = new TestObjectCpp();
+    'rawJsiFunc(...) returns its arguments as an array': () => {
+      const testObject = new TestObjectCpp()
 
-      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc;
+      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc
 
-      const result = rawObject.rawJsiFunc(55, false, "hello", { obj: true });
-      expect(result).to.deep.equal([55, false, "hello", { obj: true }]);
+      const result = rawObject.rawJsiFunc(55, false, 'hello', { obj: true })
+      expect(result).to.deep.equal([55, false, 'hello', { obj: true }])
     },
 
-    "getVariantHybridEnum(...) bounces a HybridObject": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantHybridEnum(...) bounces a HybridObject': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(
-        Object.is(testObject.getVariantHybridEnum(testObject), testObject),
-      ).to.equal(true);
+      expect(Object.is(testObject.getVariantHybridEnum(testObject), testObject)).to.equal(true)
     },
 
-    "getVariantHybridEnum(...) bounces every Powertrain": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantHybridEnum(...) bounces every Powertrain': () => {
+      const testObject = new TestObjectCpp()
 
       for (const powertrain of POWERTRAINS) {
-        expect(
-          Object.is(testObject.getVariantHybridEnum(powertrain), powertrain),
-          powertrain,
-        ).to.equal(true);
+        expect(Object.is(testObject.getVariantHybridEnum(powertrain), powertrain), powertrain).to.equal(true)
       }
     },
 
-    "getVariantHybridEnum(...) throws for an unknown string": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantHybridEnum(...) throws for an unknown string': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.getVariantHybridEnum("diesel"),
+        testObject.getVariantHybridEnum('diesel')
       ).to.throw(
-        `${testObject.constructor.name}.getVariantHybridEnum(...): Cannot convert "diesel" to any type in ${debugOnly("variant<std::shared_ptr<margelo::nitro::test::HybridTestObjectCppSpec>, margelo::nitro::test::Powertrain>!")}`,
-      );
+        `${testObject.constructor.name}.getVariantHybridEnum(...): Cannot convert "diesel" to any type in ${debugOnly('variant<std::shared_ptr<margelo::nitro::test::HybridTestObjectCppSpec>, margelo::nitro::test::Powertrain>!')}`
+      )
     },
 
-    "getVariantHybridEnum(...) throws for a TestObjectSwiftKotlin": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantHybridEnum(...) throws for a TestObjectSwiftKotlin': () => {
+      const testObject = new TestObjectCpp()
 
-      const swiftKotlinObject = new TestObjectSwiftKotlin();
+      const swiftKotlinObject = new TestObjectSwiftKotlin()
 
       expect(() =>
         // @ts-expect-error
-        testObject.getVariantHybridEnum(swiftKotlinObject),
-      ).to.throw(
-        `${testObject.constructor.name}.getVariantHybridEnum(...): Cannot convert "${String(swiftKotlinObject)}" to any type in `,
-      );
+        testObject.getVariantHybridEnum(swiftKotlinObject)
+      ).to.throw(`${testObject.constructor.name}.getVariantHybridEnum(...): Cannot convert "${String(swiftKotlinObject)}" to any type in `)
     },
 
-    "getVariantHybridEnum(...) throws for a Person": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantHybridEnum(...) throws for a Person': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.getVariantHybridEnum(TEST_PERSON),
-      ).to.throw(
-        `${testObject.constructor.name}.getVariantHybridEnum(...): Cannot convert "[object Object]" to any type in `,
-      );
+        testObject.getVariantHybridEnum(TEST_PERSON)
+      ).to.throw(`${testObject.constructor.name}.getVariantHybridEnum(...): Cannot convert "[object Object]" to any type in `)
     },
 
-    "getVariantTuple(...) checks every item, not just the first": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantTuple(...) checks every item, not just the first': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         testObject.getVariantTuple(
           // @ts-expect-error
-          [10, "twenty"],
-        ),
-      ).to.throw(
-        `${testObject.constructor.name}.getVariantTuple(...): Cannot convert "10,twenty" to any type in `,
-      );
+          [10, 'twenty']
+        )
+      ).to.throw(`${testObject.constructor.name}.getVariantTuple(...): Cannot convert "10,twenty" to any type in `)
     },
 
-    "getVariantTuple(...) throws for an empty array": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantTuple(...) throws for an empty array': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.getVariantTuple([]),
-      ).to.throw(
-        `${testObject.constructor.name}.getVariantTuple(...): Cannot convert "" to any type in `,
-      );
+        testObject.getVariantTuple([])
+      ).to.throw(`${testObject.constructor.name}.getVariantTuple(...): Cannot convert "" to any type in `)
     },
 
-    "getVariantTuple(...) keeps NaN and Infinity": () => {
-      const testObject = new TestObjectCpp();
+    'getVariantTuple(...) keeps NaN and Infinity': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(testObject.getVariantTuple([NaN, Infinity])).to.deep.equal([
-        NaN,
-        Infinity,
-      ]);
+      expect(testObject.getVariantTuple([NaN, Infinity])).to.deep.equal([NaN, Infinity])
     },
 
-    "someTuple roundtrips NaN and an empty string": () => {
-      const testObject = new TestObjectCpp();
+    'someTuple roundtrips NaN and an empty string': () => {
+      const testObject = new TestObjectCpp()
 
-      testObject.someTuple = [NaN, ""];
-      expect(testObject.someTuple).to.deep.equal([NaN, ""]);
+      testObject.someTuple = [NaN, '']
+      expect(testObject.someTuple).to.deep.equal([NaN, ''])
     },
 
-    "someTuple throws for 1 item": () => {
-      const testObject = new TestObjectCpp();
+    'someTuple throws for 1 item': () => {
+      const testObject = new TestObjectCpp()
 
       const setOneItem = () => {
         // @ts-expect-error
-        testObject.someTuple = [55];
-      };
+        testObject.someTuple = [55]
+      }
       expect(setOneItem).to.throw(
-        `${testObject.constructor.name}.someTuple: The given JS Array has 1 items, but ${debugOnly("std::tuple<double, std::string>")}`,
-      );
-      expect(setOneItem).to.throw("expects 2 items");
+        `${testObject.constructor.name}.someTuple: The given JS Array has 1 items, but ${debugOnly('std::tuple<double, std::string>')}`
+      )
+      expect(setOneItem).to.throw('expects 2 items')
     },
 
-    "someTuple throws for a number in place of the string": () => {
-      const testObject = new TestObjectCpp();
+    'someTuple throws for a number in place of the string': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() => {
         // @ts-expect-error
-        testObject.someTuple = [55, 66];
-      }).to.throw(
-        `${testObject.constructor.name}.someTuple: Value is a number, expected a String`,
-      );
+        testObject.someTuple = [55, 66]
+      }).to.throw(`${testObject.constructor.name}.someTuple: Value is a number, expected a String`)
     },
 
-    "someTuple keeps its value after a failed set": () => {
-      const testObject = new TestObjectCpp();
+    'someTuple keeps its value after a failed set': () => {
+      const testObject = new TestObjectCpp()
 
-      testObject.someTuple = [13, "before"];
+      testObject.someTuple = [13, 'before']
       expect(() => {
         // @ts-expect-error
-        testObject.someTuple = [55, 66];
-      }).to.throw(`${testObject.constructor.name}.someTuple: `);
-      expect(testObject.someTuple).to.deep.equal([13, "before"]);
+        testObject.someTuple = [55, 66]
+      }).to.throw(`${testObject.constructor.name}.someTuple: `)
+      expect(testObject.someTuple).to.deep.equal([13, 'before'])
     },
 
-    "flip(...) keeps NaN, Infinity and -0": () => {
-      const testObject = new TestObjectCpp();
+    'flip(...) keeps NaN, Infinity and -0': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(testObject.flip([NaN, Infinity, -0])).to.deep.equal([
-        -0,
-        Infinity,
-        NaN,
-      ]);
+      expect(testObject.flip([NaN, Infinity, -0])).to.deep.equal([-0, Infinity, NaN])
     },
 
-    "flip(...) throws for 4 items": () => {
-      const testObject = new TestObjectCpp();
+    'flip(...) throws for 4 items': () => {
+      const testObject = new TestObjectCpp()
 
       const flipFourItems = () =>
         testObject.flip(
           // @ts-expect-error
-          [1, 2, 3, 4],
-        );
+          [1, 2, 3, 4]
+        )
       expect(flipFourItems).to.throw(
-        `${testObject.constructor.name}.flip(...): The given JS Array has 4 items, but ${debugOnly("std::tuple<double, double, double>")}`,
-      );
-      expect(flipFourItems).to.throw("expects 3 items");
+        `${testObject.constructor.name}.flip(...): The given JS Array has 4 items, but ${debugOnly('std::tuple<double, double, double>')}`
+      )
+      expect(flipFourItems).to.throw('expects 3 items')
     },
 
-    "flip(...) throws for an empty array": () => {
-      const testObject = new TestObjectCpp();
+    'flip(...) throws for an empty array': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.flip([]),
-      ).to.throw(
-        `${testObject.constructor.name}.flip(...): The given JS Array has 0 items`,
-      );
+        testObject.flip([])
+      ).to.throw(`${testObject.constructor.name}.flip(...): The given JS Array has 0 items`)
     },
 
-    "flip(...) throws for a string item": () => {
-      const testObject = new TestObjectCpp();
+    'flip(...) throws for a string item': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         testObject.flip(
           // @ts-expect-error
-          [1, "two", 3],
-        ),
-      ).to.throw(
-        `${testObject.constructor.name}.flip(...): Value is a string, expected a number`,
-      );
+          [1, 'two', 3]
+        )
+      ).to.throw(`${testObject.constructor.name}.flip(...): Value is a string, expected a number`)
     },
 
-    "flip(...) throws for a non-array object": () => {
-      const testObject = new TestObjectCpp();
+    'flip(...) throws for a non-array object': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.flip({ 0: 1, 1: 2, 2: 3, length: 3 }),
-      ).to.throw(
-        `${testObject.constructor.name}.flip(...): Object is an object, expected an array`,
-      );
+        testObject.flip({ 0: 1, 1: 2, 2: 3, length: 3 })
+      ).to.throw(`${testObject.constructor.name}.flip(...): Object is an object, expected an array`)
     },
 
-    "flip(...) throws for a string": () => {
-      const testObject = new TestObjectCpp();
+    'flip(...) throws for a string': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.flip("abc"),
-      ).to.throw(
-        `${testObject.constructor.name}.flip(...): Value is a string, expected an Object`,
-      );
+        testObject.flip('abc')
+      ).to.throw(`${testObject.constructor.name}.flip(...): Value is a string, expected an Object`)
     },
 
-    "passTuple(...) bounces falsy values": () => {
-      const testObject = new TestObjectCpp();
+    'passTuple(...) bounces falsy values': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(testObject.passTuple([0, "", false])).to.deep.equal([
-        0,
-        "",
-        false,
-      ]);
+      expect(testObject.passTuple([0, '', false])).to.deep.equal([0, '', false])
     },
 
-    "passTuple(...) throws for a string in place of the boolean": () => {
-      const testObject = new TestObjectCpp();
+    'passTuple(...) throws for a string in place of the boolean': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         testObject.passTuple(
           // @ts-expect-error
-          [13, "hello", "true"],
-        ),
-      ).to.throw(
-        `${testObject.constructor.name}.passTuple(...): Value is a string, expected a boolean`,
-      );
+          [13, 'hello', 'true']
+        )
+      ).to.throw(`${testObject.constructor.name}.passTuple(...): Value is a string, expected a boolean`)
     },
 
-    "passTuple(...) throws for a number in place of the string": () => {
-      const testObject = new TestObjectCpp();
+    'passTuple(...) throws for a number in place of the string': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         testObject.passTuple(
           // @ts-expect-error
-          [13, 42, true],
-        ),
-      ).to.throw(
-        `${testObject.constructor.name}.passTuple(...): Value is a number, expected a String`,
-      );
+          [13, 42, true]
+        )
+      ).to.throw(`${testObject.constructor.name}.passTuple(...): Value is a number, expected a String`)
     },
 
-    "passTuple(...) throws for 4 items": () => {
-      const testObject = new TestObjectCpp();
+    'passTuple(...) throws for 4 items': () => {
+      const testObject = new TestObjectCpp()
 
       const passFourItems = () =>
         testObject.passTuple(
           // @ts-expect-error
-          [13, "hello", true, "extra"],
-        );
+          [13, 'hello', true, 'extra']
+        )
       expect(passFourItems).to.throw(
-        `${testObject.constructor.name}.passTuple(...): The given JS Array has 4 items, but ${debugOnly("std::tuple<double, std::string, bool>")}`,
-      );
-      expect(passFourItems).to.throw("expects 3 items");
+        `${testObject.constructor.name}.passTuple(...): The given JS Array has 4 items, but ${debugOnly('std::tuple<double, std::string, bool>')}`
+      )
+      expect(passFourItems).to.throw('expects 3 items')
     },
 
-    "bounceCustomType(...) bounces an empty string": () => {
-      const testObject = new TestObjectCpp();
+    'bounceCustomType(...) bounces an empty string': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(Object.is(testObject.bounceCustomType(""), "")).to.equal(true);
+      expect(Object.is(testObject.bounceCustomType(''), '')).to.equal(true)
     },
 
-    "bounceCustomType(...) bounces a unicode string": () => {
-      const testObject = new TestObjectCpp();
+    'bounceCustomType(...) bounces a unicode string': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(
-        Object.is(
-          testObject.bounceCustomType("héllo 👋 世界"),
-          "héllo 👋 世界",
-        ),
-      ).to.equal(true);
+      expect(Object.is(testObject.bounceCustomType('héllo 👋 世界'), 'héllo 👋 世界')).to.equal(true)
     },
 
-    "bounceCustomType(...) keeps an embedded NUL character": () => {
-      const testObject = new TestObjectCpp();
+    'bounceCustomType(...) keeps an embedded NUL character': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(Object.is(testObject.bounceCustomType("a\0b"), "a\0b")).to.equal(
-        true,
-      );
+      expect(Object.is(testObject.bounceCustomType('a\0b'), 'a\0b')).to.equal(true)
     },
 
-    "bounceCustomType(...) throws for a number": () => {
-      const testObject = new TestObjectCpp();
+    'bounceCustomType(...) throws for a number': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.bounceCustomType(55),
-      ).to.throw(
-        `${testObject.constructor.name}.bounceCustomType(...): Value is a number, expected a String`,
-      );
+        testObject.bounceCustomType(55)
+      ).to.throw(`${testObject.constructor.name}.bounceCustomType(...): Value is a number, expected a String`)
     },
 
-    "bounceAnyHybrid(...) bounces itself": () => {
-      const testObject = new TestObjectCpp();
+    'bounceAnyHybrid(...) bounces itself': () => {
+      const testObject = new TestObjectCpp()
 
-      expect(
-        Object.is(testObject.bounceAnyHybrid(testObject), testObject),
-      ).to.equal(true);
+      expect(Object.is(testObject.bounceAnyHybrid(testObject), testObject)).to.equal(true)
     },
 
-    "bounceAnyHybrid(...) bounces a TestObjectSwiftKotlin": () => {
-      const testObject = new TestObjectCpp();
+    'bounceAnyHybrid(...) bounces a TestObjectSwiftKotlin': () => {
+      const testObject = new TestObjectCpp()
 
-      const swiftKotlinObject = new TestObjectSwiftKotlin();
+      const swiftKotlinObject = new TestObjectSwiftKotlin()
 
-      expect(
-        Object.is(
-          testObject.bounceAnyHybrid(swiftKotlinObject),
-          swiftKotlinObject,
-        ),
-      ).to.equal(true);
+      expect(Object.is(testObject.bounceAnyHybrid(swiftKotlinObject), swiftKotlinObject)).to.equal(true)
     },
 
-    "bounceAnyHybrid(...) bounces a C++ Child": () => {
-      const testObject = new TestObjectCpp();
+    'bounceAnyHybrid(...) bounces a C++ Child': () => {
+      const testObject = new TestObjectCpp()
 
-      const child = testObject.createChild();
-      expect(Object.is(testObject.bounceAnyHybrid(child), child)).to.equal(
-        true,
-      );
+      const child = testObject.createChild()
+      expect(Object.is(testObject.bounceAnyHybrid(child), child)).to.equal(true)
     },
 
-    "bounceAnyHybrid(...) bounces a Swift/Kotlin Child": () => {
-      const testObject = new TestObjectCpp();
+    'bounceAnyHybrid(...) bounces a Swift/Kotlin Child': () => {
+      const testObject = new TestObjectCpp()
 
-      const child = new Child();
-      expect(Object.is(testObject.bounceAnyHybrid(child), child)).to.equal(
-        true,
-      );
+      const child = new Child()
+      expect(Object.is(testObject.bounceAnyHybrid(child), child)).to.equal(true)
     },
 
-    "bounceAnyHybrid(...) bounces a Swift/Kotlin Base": () => {
-      const testObject = new TestObjectCpp();
+    'bounceAnyHybrid(...) bounces a Swift/Kotlin Base': () => {
+      const testObject = new TestObjectCpp()
 
-      const base = new Base();
-      expect(Object.is(testObject.bounceAnyHybrid(base), base)).to.equal(true);
+      const base = new Base()
+      expect(Object.is(testObject.bounceAnyHybrid(base), base)).to.equal(true)
     },
 
-    "bounceAnyHybrid(...) throws for a plain object": () => {
-      const testObject = new TestObjectCpp();
+    'bounceAnyHybrid(...) throws for a plain object': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.bounceAnyHybrid({}),
+        testObject.bounceAnyHybrid({})
       ).to.throw(
-        `${testObject.constructor.name}.bounceAnyHybrid(...): Cannot convert "[object Object]" to NativeState<${debugOnly("margelo::nitro::HybridObject>! It does not have a NativeState!")}`,
-      );
+        `${testObject.constructor.name}.bounceAnyHybrid(...): Cannot convert "[object Object]" to NativeState<${debugOnly('margelo::nitro::HybridObject>! It does not have a NativeState!')}`
+      )
     },
 
-    "bounceAnyHybrid(...) throws for undefined": () => {
-      const testObject = new TestObjectCpp();
+    'bounceAnyHybrid(...) throws for undefined': () => {
+      const testObject = new TestObjectCpp()
 
       expect(() =>
         // @ts-expect-error
-        testObject.bounceAnyHybrid(undefined),
+        testObject.bounceAnyHybrid(undefined)
       ).to.throw(
-        `${testObject.constructor.name}.bounceAnyHybrid(...): Cannot convert "undefined" to NativeState<margelo::nitro::HybridObject>! It is undefined!`,
-      );
+        `${testObject.constructor.name}.bounceAnyHybrid(...): Cannot convert "undefined" to NativeState<margelo::nitro::HybridObject>! It is undefined!`
+      )
     },
 
-    "rawJsiFunc() returns an empty array without arguments": () => {
-      const testObject = new TestObjectCpp();
+    'rawJsiFunc() returns an empty array without arguments': () => {
+      const testObject = new TestObjectCpp()
 
-      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc;
+      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc
 
-      expect(rawObject.rawJsiFunc()).to.deep.equal([]);
+      expect(rawObject.rawJsiFunc()).to.deep.equal([])
     },
 
-    "rawJsiFunc(...) keeps undefined and null arguments": () => {
-      const testObject = new TestObjectCpp();
+    'rawJsiFunc(...) keeps undefined and null arguments': () => {
+      const testObject = new TestObjectCpp()
 
-      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc;
+      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc
 
-      expect(rawObject.rawJsiFunc(undefined, null)).to.deep.equal([
-        undefined,
-        null,
-      ]);
+      expect(rawObject.rawJsiFunc(undefined, null)).to.deep.equal([undefined, null])
     },
 
-    "rawJsiFunc(...) passes objects by reference": () => {
-      const testObject = new TestObjectCpp();
+    'rawJsiFunc(...) passes objects by reference': () => {
+      const testObject = new TestObjectCpp()
 
-      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc;
+      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc
 
-      const object = { some: "object" };
-      const [result] = rawObject.rawJsiFunc(object) as unknown[];
-      expect(Object.is(result, object)).to.equal(true);
+      const object = { some: 'object' }
+      const [result] = rawObject.rawJsiFunc(object) as unknown[]
+      expect(Object.is(result, object)).to.equal(true)
     },
 
-    "rawJsiFunc(...) passes functions by reference": () => {
-      const testObject = new TestObjectCpp();
+    'rawJsiFunc(...) passes functions by reference': () => {
+      const testObject = new TestObjectCpp()
 
-      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc;
+      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc
 
-      const func = () => {};
-      const [result] = rawObject.rawJsiFunc(func) as unknown[];
-      expect(Object.is(result, func)).to.equal(true);
+      const func = () => {}
+      const [result] = rawObject.rawJsiFunc(func) as unknown[]
+      expect(Object.is(result, func)).to.equal(true)
     },
 
-    "rawJsiFunc(...) throws for a `this` without NativeState": () => {
-      const testObject = new TestObjectCpp();
+    'rawJsiFunc(...) throws for a `this` without NativeState': () => {
+      const testObject = new TestObjectCpp()
 
-      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc;
+      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc
 
       expect(() => rawObject.rawJsiFunc.call({})).to.throw(
-        "Cannot call hybrid function `HybridTestObjectCpp.rawJsiFunc(...)` - `this` does not have a NativeState!",
-      );
+        'Cannot call hybrid function `HybridTestObjectCpp.rawJsiFunc(...)` - `this` does not have a NativeState!'
+      )
     },
 
-    "rawJsiFunc(...) throws for a different HybridObject as `this`": () => {
-      const testObject = new TestObjectCpp();
+    'rawJsiFunc(...) throws for a different HybridObject as `this`': () => {
+      const testObject = new TestObjectCpp()
 
-      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc;
+      const rawObject = testObject as TestObjectCpp & WithRawJsiFunc
 
-      expect(() =>
-        rawObject.rawJsiFunc.call(HybridSomeExternalObject),
-      ).to.throw(
-        "Cannot call hybrid function `HybridTestObjectCpp.rawJsiFunc(...)` - `this` has a NativeState, but it's the wrong type!",
-      );
+      expect(() => rawObject.rawJsiFunc.call(HybridSomeExternalObject)).to.throw(
+        "Cannot call hybrid function `HybridTestObjectCpp.rawJsiFunc(...)` - `this` has a NativeState, but it's the wrong type!"
+      )
     },
   }),
-};
+}
 
 export const skips = {
-  "C++ only / TestObjectCpp / bounceAnyHybrid(...) throws for undefined": {
-    release: "Existing main exclusion: IS_DEBUG",
+  'C++ only / TestObjectCpp / bounceAnyHybrid(...) throws for undefined': {
+    release: 'Existing main exclusion: IS_DEBUG',
   },
-  "C++ only / TestObjectCpp / rawJsiFunc(...) throws for a `this` without NativeState":
-    {
-      release: "Existing main exclusion: IS_DEBUG",
-    },
-  "C++ only / TestObjectCpp / rawJsiFunc(...) throws for a different HybridObject as `this`":
-    {
-      release: "Existing main exclusion: IS_DEBUG",
-    },
-} as const;
+  'C++ only / TestObjectCpp / rawJsiFunc(...) throws for a `this` without NativeState': {
+    release: 'Existing main exclusion: IS_DEBUG',
+  },
+  'C++ only / TestObjectCpp / rawJsiFunc(...) throws for a different HybridObject as `this`': {
+    release: 'Existing main exclusion: IS_DEBUG',
+  },
+} as const

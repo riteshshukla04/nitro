@@ -37,9 +37,7 @@ export class SwiftStaticProperty extends StaticProperty {
     super(property.name, property.type, property.isReadonly)
     const implementation = spec.implementation
     if (implementation == null) {
-      throw new Error(
-        `${spec.name}: Cannot generate a static property without a Swift implementation.`
-      )
+      throw new Error(`${spec.name}: Cannot generate a static property without a Swift implementation.`)
     }
     this.implementationClassName = implementation.className
     const moduleName = spec.config.getIosModuleName()
@@ -53,17 +51,9 @@ export class SwiftStaticProperty extends StaticProperty {
     this.setter = setter == null ? undefined : this.createAccessor(setter)
   }
 
-  createBridges(
-    inheritedClassMethods: ReadonlySet<string> = new Set()
-  ): SwiftMethodBridge[] {
+  createBridges(inheritedClassMethods: ReadonlySet<string> = new Set()): SwiftMethodBridge[] {
     const property = `${this.implementationClassName}.${this.name}`
-    const bridges = [
-      this.createAccessorBridge(
-        this.getter,
-        () => property,
-        inheritedClassMethods
-      ),
-    ]
+    const bridges = [this.createAccessorBridge(this.getter, () => property, inheritedClassMethods)]
     if (this.setter != null) {
       bridges.push(
         this.createAccessorBridge(
@@ -71,9 +61,7 @@ export class SwiftStaticProperty extends StaticProperty {
           (args) => {
             const argument = args[0]
             if (argument == null) {
-              throw new Error(
-                'A Swift static property setter requires a value parameter.'
-              )
+              throw new Error('A Swift static property setter requires a value parameter.')
             }
             return `${property} = ${argument.code}`
           },
@@ -85,10 +73,9 @@ export class SwiftStaticProperty extends StaticProperty {
   }
 
   getCppRegistration(cppClassName: string): string {
-    const references = [
-      this.getter,
-      ...(this.setter == null ? [] : [this.setter]),
-    ].map((accessor) => `&${cppClassName}::${accessor.swiftMethod.name}`)
+    const references = [this.getter, ...(this.setter == null ? [] : [this.setter])].map(
+      (accessor) => `&${cppClassName}::${accessor.swiftMethod.name}`
+    )
     return `clazz.registerStaticHybridProperty("${this.name}", ${references.join(', ')});`
   }
 
@@ -120,8 +107,7 @@ export class SwiftStaticProperty extends StaticProperty {
     })
     const cppBridgeBody = createCppBridgeBody({
       callable: callable,
-      getCppInvocation: (args) =>
-        `${this.cppInvocationTarget}::${endpointName}(${args.join(', ')})`,
+      getCppInvocation: (args) => `${this.cppInvocationTarget}::${endpointName}(${args.join(', ')})`,
     })
     const endpoint = createSwiftEndpoint({
       callable: callable,
@@ -132,21 +118,11 @@ export class SwiftStaticProperty extends StaticProperty {
       throwing: false,
       generated: true,
     } as const
-    const declaration = new StaticMethod(
-      endpointName,
-      endpoint.returnType,
-      endpoint.parameters,
-      endpointOptions
-    ).getDeclaration('swift')
-    const exportedMethod = new StaticMethod(
-      endpointName,
-      endpoint.returnType,
-      endpoint.parameters,
-      {
-        ...endpointOptions,
-        override: inheritedClassMethods.has(declaration),
-      }
-    )
+    const declaration = new StaticMethod(endpointName, endpoint.returnType, endpoint.parameters, endpointOptions).getDeclaration('swift')
+    const exportedMethod = new StaticMethod(endpointName, endpoint.returnType, endpoint.parameters, {
+      ...endpointOptions,
+      override: inheritedClassMethods.has(declaration),
+    })
     return {
       cppMethods: [
         { method: nativeMethod, body: cppForwarderBody },

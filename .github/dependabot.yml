@@ -1,78 +1,78 @@
 version: 2
 
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "daily"
+      interval: 'daily'
     labels:
-      - "dependencies"
+      - 'dependencies'
 
-  - package-ecosystem: "bun"
-    directory: "/"
+  - package-ecosystem: 'bun'
+    directory: '/'
     schedule:
-      interval: "daily"
+      interval: 'daily'
     labels:
-      - "dependencies"
+      - 'dependencies'
     groups:
       react-native:
         patterns:
-          - "@react-native/*"
-          - "react-native"
+          - '@react-native/*'
+          - 'react-native'
       react:
         patterns:
-          - "react"
-          - "react-dom"
-          - "@types/react"
-          - "@types/react-dom"
+          - 'react'
+          - 'react-dom'
+          - '@types/react'
+          - '@types/react-dom'
       react-native-cli:
         patterns:
-          - "@react-native-community/cli*"
+          - '@react-native-community/cli*'
       react-native-harness:
         patterns:
-          - "react-native-harness"
-          - "@react-native-harness/*"
+          - 'react-native-harness'
+          - '@react-native-harness/*'
       babel:
         patterns:
-          - "@babel/*"
+          - '@babel/*'
       eslint:
         patterns:
-          - "eslint"
-          - "@eslint/js"
+          - 'eslint'
+          - '@eslint/js'
       jest:
         patterns:
-          - "jest"
-          - "jest-*"
-          - "@jest/*"
-          - "@types/jest"
-          - "babel-jest"
+          - 'jest'
+          - 'jest-*'
+          - '@jest/*'
+          - '@types/jest'
+          - 'babel-jest'
       docusaurus:
         patterns:
-          - "@docusaurus/*"
+          - '@docusaurus/*'
 
-  - package-ecosystem: "gradle"
+  - package-ecosystem: 'gradle'
     directories:
-      - "/packages/react-native-nitro-modules/android/"
-      - "/packages/template/android/"
-      - "/tests/react-native/packages/react-native-nitro-test/android/"
-      - "/tests/react-native/apps/example/android/"
-      - "/tests/react-native/apps/benchmark/android/"
-      - "/tests/standalone/test-runner/android/"
+      - '/packages/react-native-nitro-modules/android/'
+      - '/packages/template/android/'
+      - '/tests/react-native/packages/react-native-nitro-test/android/'
+      - '/tests/react-native/apps/example/android/'
+      - '/tests/react-native/apps/benchmark/android/'
+      - '/tests/standalone/test-runner/android/'
     schedule:
-      interval: "daily"
+      interval: 'daily'
     labels:
-      - "dependencies"
-      - "kotlin"
+      - 'dependencies'
+      - 'kotlin'
     groups:
       android-toolchain:
         patterns:
-          - "gradle-wrapper"
-          - "com.android.tools.build:gradle"
-          - "com.android.application"
-          - "com.android.library"
-          - "org.jetbrains.kotlin:kotlin-gradle-plugin"
-          - "org.jetbrains.kotlin.android"
+          - 'gradle-wrapper'
+          - 'com.android.tools.build:gradle'
+          - 'com.android.application'
+          - 'com.android.library'
+          - 'org.jetbrains.kotlin:kotlin-gradle-plugin'
+          - 'org.jetbrains.kotlin.android'
       dependencies:
         group-by: dependency-name
         patterns:
-          - "*"
+          - '*'

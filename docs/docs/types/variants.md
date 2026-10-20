@@ -15,8 +15,10 @@ export declare class Math extends HybridObject {
 ```
 
 :::tip
-While variants are still very efficient, they need runtime-checks for type conversions,
-which comes with a tiny overhead compared to all other statically defined types. If possible, **avoid variants**.
+
+While variants are still very efficient, they need runtime-checks for type conversions, which comes with a tiny overhead compared to all
+other statically defined types. If possible, **avoid variants**.
+
 :::
 
 ## No literal values
@@ -34,7 +36,6 @@ export declare class Person extends HybridObject {
 ```
 
 If you need variants of literal values, you probably want to use [an enum (_union_)](custom-enums#typescript-union) instead.
-
 
 ## Custom Alias Names
 

@@ -10,36 +10,21 @@ interface HybridViewExportErrorsOptions {
 }
 
 /** View component, props and ref exports must reach callers through the spec. */
-export function getHybridViewExportErrors({
-  sourceFiles,
-  outputDirectory,
-}: HybridViewExportErrorsOptions): Error[] {
+export function getHybridViewExportErrors({ sourceFiles, outputDirectory }: HybridViewExportErrorsOptions): Error[] {
   const runtimeDirectory = getHybridClassRuntimeDirectory(outputDirectory)
   const errors: Error[] = []
   for (const sourceFile of sourceFiles) {
-    const views = sourceFile
-      .getClasses()
-      .filter((declaration) => isHybridView(declaration.getType()))
+    const views = sourceFile.getClasses().filter((declaration) => isHybridView(declaration.getType()))
     const exportedSymbols = sourceFile.getExportSymbols()
     const starExports = sourceFile
       .getExportDeclarations()
-      .filter(
-        (declaration) =>
-          !declaration.hasNamedExports() &&
-          declaration.getNamespaceExport() == null
-      )
+      .filter((declaration) => !declaration.hasNamedExports() && declaration.getNamespaceExport() == null)
     const sourcePath = sourceFile.getFilePath()
     for (const view of views) {
       const viewName = view.getName()
       if (viewName == null) continue
-      const generatedNames = new Set([
-        `${viewName}Component`,
-        `${viewName}Props`,
-        `${viewName}Ref`,
-      ])
-      const declarationPath = getRealPath(
-        path.join(runtimeDirectory, `${viewName}.d.cts`)
-      )
+      const generatedNames = new Set([`${viewName}Component`, `${viewName}Props`, `${viewName}Ref`])
+      const declarationPath = getRealPath(path.join(runtimeDirectory, `${viewName}.d.cts`))
       const reportedNames = new Set<string>()
       const report = (symbol: Symbol, location: Node): void => {
         const name = symbol.getName()
@@ -57,9 +42,7 @@ export function getHybridViewExportErrors({
       // Direct declarations and named/namespace exports have a declaration in
       // this source. Plain imports are absent from the exported-symbol list.
       for (const symbol of exportedSymbols) {
-        const declaration = symbol
-          .getDeclarations()
-          .find((node) => node.getSourceFile().getFilePath() === sourcePath)
+        const declaration = symbol.getDeclarations().find((node) => node.getSourceFile().getFilePath() === sourcePath)
         if (declaration != null) report(symbol, declaration)
       }
       // Inspect every export-star separately. TypeScript's combined export
@@ -77,19 +60,12 @@ export function getHybridViewExportErrors({
 }
 
 /** Re-exporting the expected generated symbol again does not shadow it. */
-function isGeneratedViewExport(
-  symbol: Symbol,
-  declarationPath: string
-): boolean {
+function isGeneratedViewExport(symbol: Symbol, declarationPath: string): boolean {
   const resolvedSymbol = symbol.getAliasedSymbol() ?? symbol
   if (resolvedSymbol.getName() !== symbol.getName()) return false
   const declarations = resolvedSymbol.getDeclarations()
   return (
     declarations.length > 0 &&
-    declarations.every(
-      (declaration) =>
-        getRealPath(declaration.getSourceFile().getFilePath()) ===
-        declarationPath
-    )
+    declarations.every((declaration) => getRealPath(declaration.getSourceFile().getFilePath()) === declarationPath)
   )
 }

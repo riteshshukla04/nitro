@@ -1,8 +1,4 @@
-export type BenchmarkImplementation =
-  | 'javascript'
-  | 'turbo-module'
-  | 'nitro-cpp'
-  | 'nitro-platform'
+export type BenchmarkImplementation = 'javascript' | 'turbo-module' | 'nitro-cpp' | 'nitro-platform'
 
 export type BenchmarkFamily =
   | 'control'
@@ -44,9 +40,7 @@ export interface AsyncBenchmarkDefinition extends BenchmarkDefinitionBase {
   run(iterations: number): Promise<number>
 }
 
-export type BenchmarkDefinition =
-  | SyncBenchmarkDefinition
-  | AsyncBenchmarkDefinition
+export type BenchmarkDefinition = SyncBenchmarkDefinition | AsyncBenchmarkDefinition
 
 export interface BenchmarkRunnerOptions {
   warmupCount: number

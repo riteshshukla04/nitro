@@ -19,9 +19,7 @@ export class Int64Type implements Type {
       case 'kotlin':
         return 'Long'
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for Int64Type!`
-        )
+        throw new Error(`Language ${language} is not yet supported for Int64Type!`)
     }
   }
   getExtraFiles(): SourceFile[] {

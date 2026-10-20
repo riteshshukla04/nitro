@@ -48,4 +48,5 @@ jobs:
         working-directory: packages/react-native-nitro-modules
         run: npm pack --pack-destination "$RUNNER_TEMP"
       - name: Validate packed packages outside the workspace
-        run: bun check-consumer "$RUNNER_TEMP"/nitro-core-*.tgz "$RUNNER_TEMP"/nitrogen-*.tgz "$RUNNER_TEMP"/react-native-nitro-modules-*.tgz
+        run:
+          bun check-consumer "$RUNNER_TEMP"/nitro-core-*.tgz "$RUNNER_TEMP"/nitrogen-*.tgz "$RUNNER_TEMP"/react-native-nitro-modules-*.tgz

@@ -3,10 +3,7 @@ import { getImportsCode } from '../../syntax/getImportCode.js'
 import { createFileMetadataString } from '../../syntax/helpers.js'
 import type { SourceFile } from '../../syntax/SourceFile.js'
 import { getSwiftImports } from '../../syntax/swift/getSwiftImports.js'
-import {
-  getQualifiedSwiftName,
-  getSwiftMetadataAccessorName,
-} from '../../syntax/swift/ImportedCxxRecord.js'
+import { getQualifiedSwiftName, getSwiftMetadataAccessorName } from '../../syntax/swift/ImportedCxxRecord.js'
 import { SwiftArrayType } from '../../syntax/swift/types/SwiftArrayType.js'
 import { SwiftOptionalType } from '../../syntax/swift/types/SwiftOptionalType.js'
 import { SwiftRecordType } from '../../syntax/swift/types/SwiftRecordType.js'
@@ -61,9 +58,7 @@ function getForeignTypeMetadata(types: SwiftType[]): ForeignTypeMetadata[] {
       forwarder: `nitro_${moduleName}_metadata_${record.identifier}`,
     })
   }
-  return [...metadata.values()].toSorted((a, b) =>
-    a.forwarder.localeCompare(b.forwarder)
-  )
+  return [...metadata.values()].toSorted((a, b) => a.forwarder.localeCompare(b.forwarder))
 }
 
 /**
@@ -75,10 +70,7 @@ export function createForeignTypeMetadataPragmas(types: SwiftType[]): string {
   if (metadata.length === 0) return ''
   const moduleName = NitroConfig.current.getIosModuleName()
   // Mach-O symbols of C and Swift functions start with an underscore.
-  const pragmas = metadata.map(
-    ({ accessor, forwarder }) =>
-      `#pragma redefine_extname ${accessor} _${forwarder}`
-  )
+  const pragmas = metadata.map(({ accessor, forwarder }) => `#pragma redefine_extname ${accessor} _${forwarder}`)
   return `
 // TODO: Remove once react-nitro's minimum Xcode includes https://github.com/swiftlang/swift/pull/93293.
 // Works around https://github.com/swiftlang/swift/issues/93289: ${moduleName}-Swift.h calls hidden
@@ -92,9 +84,7 @@ ${pragmas.join('\n')}
 }
 
 /** Exports the type metadata that the umbrella header's pragmas redirect to. */
-export function createSwiftForeignTypeMetadata(
-  types: SwiftType[]
-): SourceFile[] {
+export function createSwiftForeignTypeMetadata(types: SwiftType[]): SourceFile[] {
   const metadata = getForeignTypeMetadata(types)
   if (metadata.length === 0) return []
   const moduleName = NitroConfig.current.getIosModuleName()

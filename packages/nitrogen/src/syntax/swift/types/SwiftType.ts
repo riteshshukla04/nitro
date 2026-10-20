@@ -21,10 +21,7 @@ export interface SwiftType extends Type {
   getProtocolConformances(): ProtocolConformance[]
   readonly requiredCppHelpers: CppHelper[]
   /** Header imports may forward-declare types; implementations need their definitions. */
-  getRequiredImports(
-    language: Language,
-    context?: 'declaration' | 'implementation'
-  ): SourceImport[]
+  getRequiredImports(language: Language, context?: 'declaration' | 'implementation'): SourceImport[]
   /** Whether Swift can import this C++ representation directly. */
   readonly canImportFromCpp: boolean
   /** Whether this Swift value uses the retained class-reference bridge. */

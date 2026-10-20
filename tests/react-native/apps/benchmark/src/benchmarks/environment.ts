@@ -18,9 +18,7 @@ export function getBenchmarkEnvironment(): BenchmarkRunEnvironment {
   }
 }
 
-export function assertReleaseBenchmarkEnvironment(
-  environment: BenchmarkRunEnvironment
-): void {
+export function assertReleaseBenchmarkEnvironment(environment: BenchmarkRunEnvironment): void {
   if (environment.dev) {
     throw new Error('Performance benchmarks require __DEV__ === false.')
   }
@@ -28,8 +26,6 @@ export function assertReleaseBenchmarkEnvironment(
     throw new Error('Performance benchmarks require the Hermes runtime.')
   }
   if (environment.nitroBuildType !== 'release') {
-    throw new Error(
-      `Performance benchmarks require a release Nitro build, got ${environment.nitroBuildType}.`
-    )
+    throw new Error(`Performance benchmarks require a release Nitro build, got ${environment.nitroBuildType}.`)
   }
 }

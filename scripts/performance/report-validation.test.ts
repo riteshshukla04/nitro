@@ -23,14 +23,10 @@ async function fixture(eventName = 'pull_request') {
       event: metadata.eventName,
       // Comment events describe the default branch, not the benchmarked PR.
       display_title: `Nitro Performance for PR #${metadata.pullRequestNumber}`,
-      head_sha:
-        eventName === 'issue_comment' ? 'd'.repeat(40) : metadata.headSha,
+      head_sha: eventName === 'issue_comment' ? 'd'.repeat(40) : metadata.headSha,
       head_branch: eventName === 'issue_comment' ? 'main' : 'feature',
       head_repository: {
-        full_name:
-          eventName === 'issue_comment'
-            ? metadata.repository
-            : 'contributor/nitro',
+        full_name: eventName === 'issue_comment' ? metadata.repository : 'contributor/nitro',
       },
     },
   }
@@ -42,8 +38,7 @@ async function fixture(eventName = 'pull_request') {
   }
   const artifact = path.join(root, 'artifact')
   const output = path.join(root, 'output')
-  const markdown =
-    '## Report from HEAD\n\n<table><tr><td>🟢 faster</td></tr></table>\n\n`$(touch should-not-exist)`\n'
+  const markdown = '## Report from HEAD\n\n<table><tr><td>🟢 faster</td></tr></table>\n\n`$(touch should-not-exist)`\n'
   await Bun.write(path.join(artifact, 'performance-summary.md'), markdown)
   async function validate() {
     for (const [file, data] of [
@@ -97,94 +92,63 @@ async function fixture(eventName = 'pull_request') {
 test('forwards HEAD Markdown unchanged without reading the raw schema or recomputing results', async () => {
   await using f = await fixture()
   // Future raw schemas and arbitrary artifact source code are never loaded by the publisher.
-  await Bun.write(
-    path.join(f.artifact, 'performance-report.json'),
-    '{"schemaVersion":999}'
-  )
+  await Bun.write(path.join(f.artifact, 'performance-report.json'), '{"schemaVersion":999}')
   await Bun.write(path.join(f.artifact, 'raw/ios/head-1.json'), 'not JSON')
-  await Bun.write(
-    path.join(f.artifact, 'report.ts'),
-    'throw new Error("PR code executed")'
-  )
+  await Bun.write(path.join(f.artifact, 'report.ts'), 'throw new Error("PR code executed")')
   expect((await f.validate()).exitCode).toBe(0)
-  expect(
-    await Bun.file(path.join(f.output, 'performance-summary.md')).text()
-  ).toBe(f.markdown)
-  expect(await Bun.file(path.join(f.output, 'metadata.json')).json()).toEqual(
-    f.metadata
-  )
+  expect(await Bun.file(path.join(f.output, 'performance-summary.md')).text()).toBe(f.markdown)
+  expect(await Bun.file(path.join(f.output, 'metadata.json')).json()).toEqual(f.metadata)
 })
 
-test.each([
-  'repository',
-  'event',
-  'run',
-  'attempt',
-  'head',
-  'pr',
-  'fork',
-  'base-repository',
-  'platform',
-  'duplicate-platform',
-])('rejects a publication with mismatched %s', async (kind) => {
+test.each(['repository', 'event', 'run', 'attempt', 'head', 'pr', 'fork', 'base-repository', 'platform', 'duplicate-platform'])(
+  'rejects a publication with mismatched %s',
+  async (kind) => {
+    await using f = await fixture()
+    if (kind === 'repository') f.metadata.repository = 'other/repo'
+    if (kind === 'event') f.metadata.eventName = 'push'
+    if (kind === 'run') f.metadata.workflowRunId++
+    if (kind === 'attempt') f.metadata.runAttempt++
+    if (kind === 'head') f.metadata.headSha = 'c'.repeat(40)
+    if (kind === 'pr') f.metadata.pullRequestNumber++
+    if (kind === 'fork') f.pr.head.repo.full_name = 'another/nitro'
+    if (kind === 'base-repository') f.pr.base.repo.full_name = 'other/repo'
+    if (kind === 'platform') f.metadata.platforms = ['../../injected']
+    if (kind === 'duplicate-platform') f.metadata.platforms = ['ios', 'ios']
+    expect((await f.validate()).exitCode).not.toBe(0)
+  }
+)
+
+test.each(['head', 'base', 'closed'])('skips stale PR results: %s', async (change) => {
   await using f = await fixture()
-  if (kind === 'repository') f.metadata.repository = 'other/repo'
-  if (kind === 'event') f.metadata.eventName = 'push'
-  if (kind === 'run') f.metadata.workflowRunId++
-  if (kind === 'attempt') f.metadata.runAttempt++
-  if (kind === 'head') f.metadata.headSha = 'c'.repeat(40)
-  if (kind === 'pr') f.metadata.pullRequestNumber++
-  if (kind === 'fork') f.pr.head.repo.full_name = 'another/nitro'
-  if (kind === 'base-repository') f.pr.base.repo.full_name = 'other/repo'
-  if (kind === 'platform') f.metadata.platforms = ['../../injected']
-  if (kind === 'duplicate-platform') f.metadata.platforms = ['ios', 'ios']
+  if (change === 'head') f.pr.head.sha = 'c'.repeat(40)
+  if (change === 'base') f.pr.base.sha = 'c'.repeat(40)
+  if (change === 'closed') f.pr.state = 'closed'
+  const result = await f.validate()
+  expect(result.exitCode).toBe(0)
+  expect(result.text).toContain('Skipping stale')
+  expect(await Bun.file(path.join(f.root, 'outputs')).text()).toContain('stale=true')
+  expect(await Bun.file(path.join(f.output, 'performance-summary.md')).exists()).toBe(false)
+})
+
+test.each(['', 'x'.repeat(60_001)])('rejects empty or oversized comments', async (markdown) => {
+  await using f = await fixture()
+  await Bun.write(path.join(f.artifact, 'performance-summary.md'), markdown)
   expect((await f.validate()).exitCode).not.toBe(0)
 })
 
-test.each(['head', 'base', 'closed'])(
-  'skips stale PR results: %s',
-  async (change) => {
-    await using f = await fixture()
-    if (change === 'head') f.pr.head.sha = 'c'.repeat(40)
-    if (change === 'base') f.pr.base.sha = 'c'.repeat(40)
-    if (change === 'closed') f.pr.state = 'closed'
-    const result = await f.validate()
-    expect(result.exitCode).toBe(0)
-    expect(result.text).toContain('Skipping stale')
-    expect(await Bun.file(path.join(f.root, 'outputs')).text()).toContain(
-      'stale=true'
-    )
-    expect(
-      await Bun.file(path.join(f.output, 'performance-summary.md')).exists()
-    ).toBe(false)
-  }
-)
-
-test.each(['', 'x'.repeat(60_001)])(
-  'rejects empty or oversized comments',
-  async (markdown) => {
-    await using f = await fixture()
-    await Bun.write(path.join(f.artifact, 'performance-summary.md'), markdown)
-    expect((await f.validate()).exitCode).not.toBe(0)
-  }
-)
-
-test.each(['push', 'schedule', 'workflow_dispatch'])(
-  'allows %s history only from main in this repository',
-  async (eventName) => {
-    await using f = await fixture()
-    f.metadata.eventName = f.event.workflow_run.event = eventName
-    Object.assign(f.metadata, { pullRequestNumber: null })
-    f.event.workflow_run.head_branch = 'main'
-    f.event.workflow_run.head_repository.full_name = 'margelo/nitro'
-    expect((await f.validate()).exitCode).toBe(0)
-    f.event.workflow_run.head_branch = 'feature'
-    expect((await f.validate()).exitCode).not.toBe(0)
-    f.event.workflow_run.head_branch = 'main'
-    f.event.workflow_run.head_repository.full_name = 'contributor/nitro'
-    expect((await f.validate()).exitCode).not.toBe(0)
-  }
-)
+test.each(['push', 'schedule', 'workflow_dispatch'])('allows %s history only from main in this repository', async (eventName) => {
+  await using f = await fixture()
+  f.metadata.eventName = f.event.workflow_run.event = eventName
+  Object.assign(f.metadata, { pullRequestNumber: null })
+  f.event.workflow_run.head_branch = 'main'
+  f.event.workflow_run.head_repository.full_name = 'margelo/nitro'
+  expect((await f.validate()).exitCode).toBe(0)
+  f.event.workflow_run.head_branch = 'feature'
+  expect((await f.validate()).exitCode).not.toBe(0)
+  f.event.workflow_run.head_branch = 'main'
+  f.event.workflow_run.head_repository.full_name = 'contributor/nitro'
+  expect((await f.validate()).exitCode).not.toBe(0)
+})
 
 test('rejects a symlink instead of posting a file outside the publication', async () => {
   await using f = await fixture()
@@ -202,34 +166,23 @@ test.each(['margelo/nitro', 'contributor/nitro'])(
     await using f = await fixture('issue_comment')
     f.pr.head.repo.full_name = headRepository
     expect((await f.validate()).exitCode).toBe(0)
-    expect(await Bun.file(path.join(f.output, 'metadata.json')).json()).toEqual(
-      f.metadata
-    )
+    expect(await Bun.file(path.join(f.output, 'metadata.json')).json()).toEqual(f.metadata)
   }
 )
 
-test.each(['title', 'repository', 'pr', 'sha'])(
-  'rejects a comment-triggered publication with mismatched %s',
-  async (kind) => {
-    await using f = await fixture('issue_comment')
-    if (kind === 'title')
-      f.event.workflow_run.display_title = 'Nitro Performance for PR #999'
-    if (kind === 'repository')
-      f.event.workflow_run.head_repository.full_name = 'contributor/nitro'
-    if (kind === 'pr') f.metadata.pullRequestNumber = f.pr.number = 999
-    if (kind === 'sha') f.metadata.headSha = 'invalid'
-    expect((await f.validate()).exitCode).not.toBe(0)
-  }
-)
+test.each(['title', 'repository', 'pr', 'sha'])('rejects a comment-triggered publication with mismatched %s', async (kind) => {
+  await using f = await fixture('issue_comment')
+  if (kind === 'title') f.event.workflow_run.display_title = 'Nitro Performance for PR #999'
+  if (kind === 'repository') f.event.workflow_run.head_repository.full_name = 'contributor/nitro'
+  if (kind === 'pr') f.metadata.pullRequestNumber = f.pr.number = 999
+  if (kind === 'sha') f.metadata.headSha = 'invalid'
+  expect((await f.validate()).exitCode).not.toBe(0)
+})
 
 test('skips comment-triggered results if the PR head advances', async () => {
   await using f = await fixture('issue_comment')
   f.pr.head.sha = 'c'.repeat(40)
   expect((await f.validate()).exitCode).toBe(0)
-  expect(await Bun.file(path.join(f.root, 'outputs')).text()).toContain(
-    'stale=true'
-  )
-  expect(
-    await Bun.file(path.join(f.output, 'performance-summary.md')).exists()
-  ).toBe(false)
+  expect(await Bun.file(path.join(f.root, 'outputs')).text()).toContain('stale=true')
+  expect(await Bun.file(path.join(f.output, 'performance-summary.md')).exists()).toBe(false)
 })

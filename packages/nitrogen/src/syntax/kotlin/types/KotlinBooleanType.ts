@@ -29,11 +29,7 @@ export class KotlinBooleanType extends BooleanType implements KotlinType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniPrimitiveCode(
-          'jboolean',
-          options.context,
-          this.jniPrimitive
-        )
+        return getJniPrimitiveCode('jboolean', options.context, this.jniPrimitive)
       default:
         return super.getCode(language, options)
     }

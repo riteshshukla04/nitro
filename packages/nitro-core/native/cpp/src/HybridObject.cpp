@@ -2,11 +2,11 @@
 // Created by Marc Rousavy on 21.02.24.
 //
 
-#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/CommonGlobals.hpp>
-#include <NitroModules/detail/HybridNitroModulesProxy.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/NitroDefines.hpp>
+#include <NitroModules/detail/HybridNitroModulesProxy.hpp>
 
 namespace margelo::nitro {
 
@@ -41,7 +41,8 @@ std::shared_ptr<HybridObject> HybridObject::shared() {
     return shared;
   }
   // We are not managed inside a shared_ptr..
-  throw std::runtime_error(std::string("HybridObject \"") + getName() + "\" is not managed inside a std::shared_ptr - cannot access shared()!");
+  throw std::runtime_error(std::string("HybridObject \"") + getName() +
+                           "\" is not managed inside a std::shared_ptr - cannot access shared()!");
 }
 
 jsi::Value HybridObject::disposeRaw(jsi::Runtime& runtime, const jsi::Value& thisArg, const jsi::Value*, size_t) {

@@ -40,11 +40,7 @@ export class AnyHybridObjectType implements Type {
           {
             language,
             declaration: {
-              forwardDeclaration: getForwardDeclaration(
-                'class',
-                'HybridObject',
-                'margelo::nitro'
-              ),
+              forwardDeclaration: getForwardDeclaration('class', 'HybridObject', 'margelo::nitro'),
             },
             implementation: {
               name: `NitroModules/HybridObject.hpp`,

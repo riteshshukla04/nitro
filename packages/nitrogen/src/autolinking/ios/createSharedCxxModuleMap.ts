@@ -6,9 +6,7 @@ import { getViewComponentNames } from '../../views/CppHybridViewComponent.js'
 import { indent } from '../../utils.js'
 
 /** Keep implementation-only Fabric declarations out of Swift's C++ module. */
-export function createSharedCxxModuleMap(
-  specs: HybridObjectSpec[]
-): SourceFile[] {
+export function createSharedCxxModuleMap(specs: HybridObjectSpec[]): SourceFile[] {
   const views = specs.filter((spec) => spec.isHybridView)
   if (views.length === 0) return []
 

@@ -26,23 +26,11 @@ for (const format of ['module', 'commonjs']) {
       `js/lib/${format}`,
       '--declarationDir',
       `js/lib/typescript/${format}`,
-      ...(format === 'commonjs'
-        ? [
-            '--module',
-            'Node16',
-            '--moduleResolution',
-            'Node16',
-            '--verbatimModuleSyntax',
-            'false',
-          ]
-        : []),
+      ...(format === 'commonjs' ? ['--module', 'Node16', '--moduleResolution', 'Node16', '--verbatimModuleSyntax', 'false'] : []),
     ],
     { cwd: fileURLToPath(root), stdio: 'inherit' }
   )
   for (const directory of [format, `typescript/${format}`]) {
-    writeFileSync(
-      new URL(`js/lib/${directory}/package.json`, root),
-      `${JSON.stringify({ type: format })}\n`
-    )
+    writeFileSync(new URL(`js/lib/${directory}/package.json`, root), `${JSON.stringify({ type: format })}\n`)
   }
 }

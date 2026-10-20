@@ -45,9 +45,7 @@ export abstract class SwiftPointerType implements SwiftType {
         }
       }
       case 'swift': {
-        const type = this.isMutable
-          ? 'UnsafeMutableRawPointer'
-          : 'UnsafeRawPointer'
+        const type = this.isMutable ? 'UnsafeMutableRawPointer' : 'UnsafeRawPointer'
         // Swift drops nullability from C++ template arguments, e.g. std::function parameters.
         return options.context === 'type-argument' ? `${type}!` : type
       }

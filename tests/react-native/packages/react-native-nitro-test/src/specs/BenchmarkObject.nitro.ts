@@ -40,9 +40,7 @@ export declare class BenchmarkObjectCpp extends HybridObject {
   bounceCar(car: Car): Car
   bounceSimpleMap(map: Record<string, number>): Record<string, number>
   tryOptionalParams(num: number, boo: boolean, str?: string): string
-  passVariant(
-    either: number | string | number[] | string[] | boolean
-  ): number | string
+  passVariant(either: number | string | number[] | string[] | boolean): number | string
   bounceArrayBuffer(buffer: ArrayBuffer): ArrayBuffer
   copyBuffer(buffer: ArrayBuffer): ArrayBuffer
   callbackSync(callback: () => number): number
@@ -70,9 +68,7 @@ export declare class BenchmarkObjectSwiftKotlin extends HybridObject {
   bounceCar(car: Car): Car
   bounceSimpleMap(map: Record<string, number>): Record<string, number>
   tryOptionalParams(num: number, boo: boolean, str?: string): string
-  passVariant(
-    either: number | string | number[] | string[] | boolean
-  ): number | string
+  passVariant(either: number | string | number[] | string[] | boolean): number | string
   bounceArrayBuffer(buffer: ArrayBuffer): ArrayBuffer
   copyBuffer(buffer: ArrayBuffer): ArrayBuffer
   callbackSync(callback: () => number): number

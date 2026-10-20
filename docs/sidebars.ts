@@ -1,4 +1,4 @@
-import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs'
 
 /**
  * Creating a sidebar enables you to:
@@ -20,7 +20,7 @@ const sidebars: SidebarsConfig = {
         'getting-started/how-to-build-a-nitro-module',
         'getting-started/configuration-nitro-json',
         'getting-started/minimum-requirements',
-      ]
+      ],
     },
     {
       type: 'category',
@@ -31,7 +31,7 @@ const sidebars: SidebarsConfig = {
         'concepts/hybrid-views',
         'concepts/nitrogen',
         'concepts/platform-decorators',
-      ]
+      ],
     },
     {
       type: 'category',
@@ -46,7 +46,7 @@ const sidebars: SidebarsConfig = {
         'guides/view-components',
         'guides/troubleshooting',
         'guides/running-example-app',
-      ]
+      ],
     },
     {
       type: 'category',
@@ -81,9 +81,9 @@ const sidebars: SidebarsConfig = {
         'resources/comparison',
         'resources/for-library-users',
         'resources/contributing',
-      ]
+      ],
     },
   ],
-};
+}
 
-export default sidebars;
+export default sidebars

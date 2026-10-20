@@ -18,8 +18,7 @@ export interface BuildMetadata {
 if (import.meta.main) {
   const args = parseArguments(Bun.argv.slice(2))
   const platform = requiredArgument(args, 'platform')
-  if (platform !== 'android' && platform !== 'ios')
-    throw new Error('Invalid platform.')
+  if (platform !== 'android' && platform !== 'ios') throw new Error('Invalid platform.')
   const baseRoot = requiredArgument(args, 'base-root')
   const headRoot = requiredArgument(args, 'head-root')
   async function revision(root: string): Promise<string> {
@@ -27,8 +26,7 @@ if (import.meta.main) {
       stdout: 'pipe',
     })
     const sha = (await new Response(child.stdout).text()).trim()
-    if ((await child.exited) !== 0)
-      throw new Error('Cannot resolve built revision.')
+    if ((await child.exited) !== 0) throw new Error('Cannot resolve built revision.')
     return sha
   }
   const metadata: BuildMetadata = {
@@ -43,8 +41,5 @@ if (import.meta.main) {
     workflowRunId: Number(process.env.GITHUB_RUN_ID),
     runAttempt: Number(process.env.GITHUB_RUN_ATTEMPT),
   }
-  await Bun.write(
-    requiredArgument(args, 'output'),
-    `${JSON.stringify(metadata, null, 2)}\n`
-  )
+  await Bun.write(requiredArgument(args, 'output'), `${JSON.stringify(metadata, null, 2)}\n`)
 }

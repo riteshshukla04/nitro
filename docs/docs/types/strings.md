@@ -1,13 +1,11 @@
 ---
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Strings (`string`)
 
-A `string` handles like a [primitive](primitives), but technically isn't one.
-In C++, a `string` is represented using a UTF-8 `std::string`.
+A `string` handles like a [primitive](primitives), but technically isn't one. In C++, a `string` is represented using a UTF-8 `std::string`.
 
 <Tabs>
   <TabItem value="ts" label="TypeScript" default>
@@ -19,6 +17,7 @@ In C++, a `string` is represented using a UTF-8 `std::string`.
       concat(a: string, b: string): string
     }
     ```
+
   </TabItem>
   <TabItem value="swift" label="Swift">
     ```swift
@@ -26,6 +25,7 @@ In C++, a `string` is represented using a UTF-8 `std::string`.
       func concat(a: String, b: String) throws -> String
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin
@@ -33,6 +33,7 @@ In C++, a `string` is represented using a UTF-8 `std::string`.
       override fun concat(a: String, b: String): String
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp
@@ -40,5 +41,7 @@ In C++, a `string` is represented using a UTF-8 `std::string`.
       std::string concat(const std::string& a, const std::string& b) override;
     };
     ```
+
   </TabItem>
+
 </Tabs>

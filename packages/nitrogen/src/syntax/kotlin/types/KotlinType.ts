@@ -9,10 +9,7 @@ export interface KotlinTypeOptions {
 }
 
 /** A conversion of a value across JNI, written in either language. */
-export type KotlinConversion = (
-  | { from: 'c++'; to: 'kotlin' }
-  | { from: 'kotlin'; to: 'c++' }
-) & {
+export type KotlinConversion = ({ from: 'c++'; to: 'kotlin' } | { from: 'kotlin'; to: 'c++' }) & {
   /**
    * The language the conversion is written in. In C++, it converts between the
    * C++ value and its fbjni representation. In Kotlin, it converts between the
@@ -57,10 +54,7 @@ export interface KotlinType extends Type {
 }
 
 /** Renders an fbjni object reference for the context it is used in. */
-export function getJniReferenceCode(
-  jniType: string,
-  context: TypeContext
-): string {
+export function getJniReferenceCode(jniType: string, context: TypeContext): string {
   switch (context) {
     case 'parameter':
       return `jni::alias_ref<${jniType}>`
@@ -81,21 +75,13 @@ interface JniPrimitive {
 }
 
 /** Renders a JNI primitive, or the object that boxes it. */
-export function getJniPrimitiveCode(
-  jniType: string,
-  context: TypeContext,
-  { boxedType, boxed }: JniPrimitive
-): string {
+export function getJniPrimitiveCode(jniType: string, context: TypeContext, { boxedType, boxed }: JniPrimitive): string {
   if (boxed) return getJniReferenceCode(boxedType, context)
   return jniType
 }
 
 /** Boxes or unboxes a JNI primitive in C++ where JNI requires an object. */
-export function convertJniPrimitive(
-  value: string,
-  { from, in: language }: KotlinConversion,
-  { boxedType, boxed }: JniPrimitive
-): string {
+export function convertJniPrimitive(value: string, { from, in: language }: KotlinConversion, { boxedType, boxed }: JniPrimitive): string {
   if (language !== 'c++' || !boxed) return value
   switch (from) {
     case 'c++':

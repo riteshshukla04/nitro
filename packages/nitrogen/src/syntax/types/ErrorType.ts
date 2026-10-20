@@ -23,9 +23,7 @@ export class ErrorType implements Type {
       case 'kotlin':
         return `Throwable`
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for ThrowableType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for ThrowableType!`)
     }
   }
   getExtraFiles(): SourceFile[] {

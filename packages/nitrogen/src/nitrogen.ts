@@ -1,10 +1,4 @@
-import {
-  ModuleKind,
-  ModuleResolutionKind,
-  Project,
-  type ClassDeclaration,
-  type Node,
-} from 'ts-morph'
+import { ModuleKind, ModuleResolutionKind, Project, type ClassDeclaration, type Node } from 'ts-morph'
 import { mkdir } from 'fs/promises'
 import {
   isSomeHybridObject,
@@ -16,13 +10,7 @@ import {
 import { generatePlatformFiles } from './createPlatformSpec.js'
 import path from 'path'
 import { prettifyDirectory } from './prettifyDirectory.js'
-import {
-  capitalizeName,
-  deduplicateFiles,
-  errorToString,
-  getRealPath,
-  toUnixPath,
-} from './utils.js'
+import { capitalizeName, deduplicateFiles, errorToString, getRealPath, toUnixPath } from './utils.js'
 import { writeFile } from './writeFile.js'
 import chalk from 'chalk'
 import { groupByPlatform, type SourceFile } from './syntax/SourceFile.js'
@@ -35,27 +23,14 @@ import type { Autolinking } from './autolinking/Autolinking.js'
 import { createGitAttributes } from './createGitAttributes.js'
 import { NITROGEN_VERSION } from './config/nitrogenVersion.js'
 import type { HybridObjectSpec } from './syntax/HybridObjectSpec.js'
-import {
-  writeHybridClassRuntime,
-  type HybridViewRuntimeSpec,
-} from './createHybridClassRuntime.js'
-import {
-  getHybridViewComponentName,
-  getHybridViewProperties,
-} from './views/CppHybridViewComponent.js'
+import { writeHybridClassRuntime, type HybridViewRuntimeSpec } from './createHybridClassRuntime.js'
+import { getHybridViewComponentName, getHybridViewProperties } from './views/CppHybridViewComponent.js'
 import { addHybridClassRuntimeStubs } from './hybridClassReExports.js'
-import {
-  addMissingHybridClassReExports,
-  getHybridClassReExportErrors,
-  type HybridClassSpecFile,
-} from './addHybridClassReExports.js'
+import { addMissingHybridClassReExports, getHybridClassReExportErrors, type HybridClassSpecFile } from './addHybridClassReExports.js'
 import { getRuntimeImportsErrors } from './checkHybridClassRuntimeImports.js'
 import { getHybridViewExportErrors } from './checkHybridViewExports.js'
 import { getBobPackageScopeWarnings } from './checkBobPackageScopes.js'
-import {
-  writeHybridClassManifest,
-  type HybridClassManifestEntry,
-} from './hybridClassManifest.js'
+import { writeHybridClassManifest, type HybridClassManifestEntry } from './hybridClassManifest.js'
 
 interface NitrogenOptions {
   baseDirectory: string
@@ -68,10 +43,7 @@ interface NitrogenResult {
   generatedSpecsCount: number
 }
 
-export async function runNitrogen({
-  baseDirectory,
-  outputDirectory,
-}: NitrogenOptions): Promise<NitrogenResult> {
+export async function runNitrogen({ baseDirectory, outputDirectory }: NitrogenOptions): Promise<NitrogenResult> {
   let targetSpecs = 0
   let generatedSpecs = 0
   const generationErrors: Error[] = []
@@ -94,14 +66,10 @@ export async function runNitrogen({
     path.join(baseDirectory, '**', '*.nitro.ts'),
     // Installed packages can publish their own specs.
     '!' + path.join(baseDirectory, '**', 'node_modules', '**'),
-    ...ignorePaths.map(
-      (ignorePath) => '!' + path.join(baseDirectory, ignorePath)
-    ),
+    ...ignorePaths.map((ignorePath) => '!' + path.join(baseDirectory, ignorePath)),
   ])
   if (specPaths.length === 0) {
-    const searchDir = prettifyDirectory(
-      path.join(path.resolve(baseDirectory), '**', '*.nitro.ts')
-    )
+    const searchDir = prettifyDirectory(path.join(path.resolve(baseDirectory), '**', '*.nitro.ts'))
     throw new Error(
       `Nitrogen didn't find any spec files in ${chalk.underline(searchDir)}. ` +
         `To create a Nitro Module, create a TypeScript file with the "${chalk.underline('.nitro.ts')}" suffix ` +
@@ -113,33 +81,19 @@ export async function runNitrogen({
   // it was given, and Node and bundlers resolve it from the real path.
   // A symlink can match the same spec twice.
   // Use forward slashes like the glob, so the order is the same on every platform.
-  const uniqueRealSpecPaths = new Set(
-    specPaths.map((filePath) => toUnixPath(getRealPath(filePath)))
-  )
+  const uniqueRealSpecPaths = new Set(specPaths.map((filePath) => toUnixPath(getRealPath(filePath))))
   // Sort the real paths, so a symlink doesn't change the order of the specs.
   const realSpecPaths = Array.from(uniqueRealSpecPaths).toSorted()
   // The project also gets runtime stubs below, so use this list for the specs.
-  const specSourceFiles = realSpecPaths.map((filePath) =>
-    project.addSourceFileAtPath(filePath)
-  )
+  const specSourceFiles = realSpecPaths.map((filePath) => project.addSourceFileAtPath(filePath))
 
   // Report the selected spec files before resolving their imported types.
-  Logger.info(
-    chalk.reset(
-      `🚀  Nitrogen ${chalk.bold(NITROGEN_VERSION)} runs at ${chalk.underline(prettifyDirectory(baseDirectory))}`
-    )
-  )
-  const specDirectories = new Set(
-    specSourceFiles.map((sourceFile) => sourceFile.getDirectoryPath())
-  )
+  Logger.info(chalk.reset(`🚀  Nitrogen ${chalk.bold(NITROGEN_VERSION)} runs at ${chalk.underline(prettifyDirectory(baseDirectory))}`))
+  const specDirectories = new Set(specSourceFiles.map((sourceFile) => sourceFile.getDirectoryPath()))
   for (const directory of specDirectories) {
-    const specs = specSourceFiles.filter(
-      (sourceFile) => sourceFile.getDirectoryPath() === directory
-    ).length
+    const specs = specSourceFiles.filter((sourceFile) => sourceFile.getDirectoryPath() === directory).length
     const relativePath = prettifyDirectory(directory)
-    Logger.info(
-      `    🔍  Nitrogen found ${specs} spec${specs === 1 ? '' : 's'} in ${chalk.underline(relativePath)}`
-    )
+    Logger.info(`    🔍  Nitrogen found ${specs} spec${specs === 1 ? '' : 's'} in ${chalk.underline(relativePath)}`)
   }
 
   // Specs resolve `#nitro/*` through the "imports" field of their nearest package.json.
@@ -171,9 +125,7 @@ export async function runNitrogen({
 
   // Check all names first, so no class overwrites another class's files
   // and every name can reach JavaScript through JSI's ASCII functions.
-  const classDeclarations = specSourceFiles.flatMap((sourceFile) =>
-    sourceFile.getClasses()
-  )
+  const classDeclarations = specSourceFiles.flatMap((sourceFile) => sourceFile.getClasses())
   const nameErrors = [
     ...getHybridClassNameErrors(classDeclarations),
     ...getNonAsciiNameErrors(classDeclarations),
@@ -226,9 +178,7 @@ export async function runNitrogen({
         hybridClasses.push({ name: typeName, platforms: literalOptions })
 
         const allPlatforms: Platform[] = ['ios', 'android']
-        const platforms = allPlatforms.filter(
-          (platform) => platformSpec[platform] != null
-        )
+        const platforms = allPlatforms.filter((platform) => platformSpec[platform] != null)
         if (platforms.length === 0) {
           throw new Error(
             `${typeName} does not declare any platforms - nothing can be generated. ` +
@@ -236,9 +186,7 @@ export async function runNitrogen({
           )
         }
 
-        Logger.info(
-          `    ⚙️   Generating specs for HybridObject "${chalk.bold(typeName)}"...`
-        )
+        Logger.info(`    ⚙️   Generating specs for HybridObject "${chalk.bold(typeName)}"...`)
 
         // Create all files and throw it into a big list
         let allFiles = platforms.flatMap((p) => {
@@ -247,11 +195,7 @@ export async function runNitrogen({
           if (options == null) {
             throw new Error(`${typeName}: Missing platform options for ${p}.`)
           }
-          const { spec, files } = generatePlatformFiles(
-            declaration.getType(),
-            p,
-            options
-          )
+          const { spec, files } = generatePlatformFiles(declaration.getType(), p, options)
           specsByPlatform[p].push(spec)
           if (spec.isHybridView) {
             const properties = getHybridViewProperties(spec)
@@ -285,16 +229,10 @@ export async function runNitrogen({
             continue
           }
 
-          Logger.info(
-            `        ${chalk.dim(platform)}: Generating ${capitalizeName(language)} code...`
-          )
+          Logger.info(`        ${chalk.dim(platform)}: Generating ${capitalizeName(language)} code...`)
           // Write the actual files for this specific platform.
           for (const file of files) {
-            const basePath = path.join(
-              outputDirectory,
-              file.platform,
-              file.language
-            )
+            const basePath = path.join(outputDirectory, file.platform, file.language)
             const actualPath = await writeFile(basePath, file)
             filesAfter.push(actualPath)
           }
@@ -304,12 +242,7 @@ export async function runNitrogen({
         generatedSpecs++
       } catch (error) {
         const location = `${sourceFile.getFilePath()}:${declaration.getStartLineNumber()}`
-        generationErrors.push(
-          new Error(
-            `${location}: Failed to generate ${typeName}: ${errorToString(error)}`,
-            { cause: error }
-          )
-        )
+        generationErrors.push(new Error(`${location}: Failed to generate ${typeName}: ${errorToString(error)}`, { cause: error }))
       }
     }
 
@@ -347,23 +280,15 @@ export async function runNitrogen({
   }
 
   for (const autolinking of autolinkingFiles) {
-    Logger.info(
-      `    Creating autolinking build setup for ${chalk.dim(autolinking.platform)}...`
-    )
+    Logger.info(`    Creating autolinking build setup for ${chalk.dim(autolinking.platform)}...`)
     for (const file of autolinking.sourceFiles) {
       const basePath = path.join(outputDirectory, file.platform)
-      const actualPath = await writeFile(
-        basePath,
-        file as unknown as SourceFile
-      )
+      const actualPath = await writeFile(basePath, file as unknown as SourceFile)
       filesAfter.push(actualPath)
     }
   }
   if (usedPlatforms.includes('ios')) {
-    const moduleDependencies = getModuleDependencies(
-      specsByPlatform.ios,
-      NitroConfig.current
-    )
+    const moduleDependencies = getModuleDependencies(specsByPlatform.ios, NitroConfig.current)
     await updateSwiftPackageManifest({
       packageDirectory: process.cwd(),
       outputDirectory: outputDirectory,
@@ -390,9 +315,7 @@ export async function runNitrogen({
     const addedLines = await addMissingHybridClassReExports(specFile)
     const specPath = prettifyDirectory(specFile.sourceFile.getFilePath())
     for (const line of addedLines) {
-      Logger.info(
-        `📝  Added ${chalk.bold(line)} to ${chalk.underline(specPath)}`
-      )
+      Logger.info(`📝  Added ${chalk.bold(line)} to ${chalk.underline(specPath)}`)
     }
   }
 
@@ -416,9 +339,7 @@ export async function runNitrogen({
  * Returns errors for HybridObject classes whose names are equal ignoring case.
  * Class names name the generated files, and file systems can ignore case.
  */
-function getHybridClassNameErrors(
-  declarations: readonly ClassDeclaration[]
-): Error[] {
+function getHybridClassNameErrors(declarations: readonly ClassDeclaration[]): Error[] {
   const firstClasses = new Map<string, { name: string; location: string }>()
   const errors: Error[] = []
   for (const declaration of declarations) {
@@ -448,23 +369,15 @@ const NON_ASCII_CHARACTER_PATTERN = /\P{ASCII}/u
  * Returns errors for HybridObject classes and members whose names are not ASCII.
  * Nitro creates their JavaScript names with JSI's ASCII functions.
  */
-function getNonAsciiNameErrors(
-  declarations: readonly ClassDeclaration[]
-): Error[] {
+function getNonAsciiNameErrors(declarations: readonly ClassDeclaration[]): Error[] {
   const errors: Error[] = []
   for (const declaration of declarations) {
     const className = declaration.getName()
-    if (className == null || !isSomeHybridObject(declaration.getType()))
-      continue
+    if (className == null || !isSomeHybridObject(declaration.getType())) continue
     // Point at the class name, not at the decorators above it.
     const classNameNode = declaration.getNameNode() ?? declaration
-    const names: { name: string; displayName: string; node: Node }[] = [
-      { name: className, displayName: className, node: classNameNode },
-    ]
-    const members = [
-      ...declaration.getInstanceMembers(),
-      ...declaration.getStaticMembers(),
-    ]
+    const names: { name: string; displayName: string; node: Node }[] = [{ name: className, displayName: className, node: classNameNode }]
+    const members = [...declaration.getInstanceMembers(), ...declaration.getStaticMembers()]
     for (const member of members) {
       // The symbol's name has no quotes or escape sequences, unlike the source text.
       const memberName = member.getSymbol()?.getName()

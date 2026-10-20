@@ -17,9 +17,7 @@ export class TupleType implements Type {
   }
 
   getCode(language: Language, options: GetCodeOptions): string {
-    const types = this.itemTypes.map((t) =>
-      t.getCode(language, { ...options, context: 'type-argument' })
-    )
+    const types = this.itemTypes.map((t) => t.getCode(language, { ...options, context: 'type-argument' }))
 
     switch (language) {
       case 'c++': {
@@ -29,18 +27,14 @@ export class TupleType implements Type {
       case 'swift':
         return `(${types.join(', ')})`
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for TupleType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for TupleType!`)
     }
   }
   getExtraFiles(): SourceFile[] {
     return this.itemTypes.flatMap((t) => t.getExtraFiles())
   }
   getRequiredImports(language: Language): SourceImport[] {
-    const imports = this.itemTypes.flatMap((t) =>
-      t.getRequiredImports(language)
-    )
+    const imports = this.itemTypes.flatMap((t) => t.getRequiredImports(language))
     switch (language) {
       case 'c++':
         imports.push({

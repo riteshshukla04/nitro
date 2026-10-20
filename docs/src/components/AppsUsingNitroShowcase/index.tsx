@@ -1,15 +1,15 @@
-import React from 'react';
-import styles from './styles.module.css';
+import React from 'react'
+import styles from './styles.module.css'
 
 type App = {
-  name: string;
-  company: string;
-  scale: string;
-  category: string;
-  icon?: string;
-  accent: string;
-  featured?: boolean;
-};
+  name: string
+  company: string
+  scale: string
+  category: string
+  icon?: string
+  accent: string
+  featured?: boolean
+}
 
 const apps: App[] = [
   {
@@ -178,7 +178,7 @@ const apps: App[] = [
     icon: '/img/apps-using-nitro/juno.png',
     accent: '#fc5f2b',
   },
-];
+]
 
 function AppIcon({ app, size }: { app: App; size: 'large' | 'small' }) {
   const initials = app.name
@@ -186,30 +186,23 @@ function AppIcon({ app, size }: { app: App; size: 'large' | 'small' }) {
     .slice(0, 2)
     .map((word) => word[0])
     .join('')
-    .toUpperCase();
+    .toUpperCase()
 
   return (
     <div
       className={`${styles.iconFrame} ${size === 'large' ? styles.iconLarge : styles.iconSmall}`}
       style={{ '--app-accent': app.accent } as React.CSSProperties}
-      aria-hidden="true"
+      aria-hidden='true'
     >
-      {app.icon == null ? (
-        <span className={styles.iconFallback}>{initials}</span>
-      ) : (
-        <img src={app.icon} alt="" loading="lazy" />
-      )}
+      {app.icon == null ? <span className={styles.iconFallback}>{initials}</span> : <img src={app.icon} alt='' loading='lazy' />}
     </div>
-  );
+  )
 }
 
 function FeaturedAppCard({ app }: { app: App }) {
   return (
-    <article
-      className={styles.featuredCard}
-      style={{ '--app-accent': app.accent } as React.CSSProperties}
-    >
-      <AppIcon app={app} size="large" />
+    <article className={styles.featuredCard} style={{ '--app-accent': app.accent } as React.CSSProperties}>
+      <AppIcon app={app} size='large' />
       <div className={styles.cardBody}>
         <span className={styles.appCategory}>{app.category}</span>
         <h3>{app.name}</h3>
@@ -217,28 +210,25 @@ function FeaturedAppCard({ app }: { app: App }) {
         <span className={styles.scaleBadge}>{app.scale}</span>
       </div>
     </article>
-  );
+  )
 }
 
 function AppCard({ app }: { app: App }) {
   return (
-    <article
-      className={styles.appCard}
-      style={{ '--app-accent': app.accent } as React.CSSProperties}
-    >
-      <AppIcon app={app} size="small" />
+    <article className={styles.appCard} style={{ '--app-accent': app.accent } as React.CSSProperties}>
+      <AppIcon app={app} size='small' />
       <div className={styles.compactBody}>
         <h3>{app.name}</h3>
         <p>{app.company}</p>
       </div>
       <span className={styles.compactScale}>{app.scale}</span>
     </article>
-  );
+  )
 }
 
 export default function AppsUsingNitroShowcase() {
-  const featuredApps = apps.filter((app) => app.featured);
-  const regularApps = apps.filter((app) => !app.featured);
+  const featuredApps = apps.filter((app) => app.featured)
+  const regularApps = apps.filter((app) => !app.featured)
 
   return (
     <section className={styles.showcase}>
@@ -247,12 +237,11 @@ export default function AppsUsingNitroShowcase() {
           <span className={styles.eyebrow}>Production ready</span>
           <h2>Nitro is already running inside apps people use every day.</h2>
           <p>
-            From social networks and finance to developer tools, commerce,
-            food, connectivity, sports, health, music, and creator tools, Nitro
-            powers native code paths in real production apps.
+            From social networks and finance to developer tools, commerce, food, connectivity, sports, health, music, and creator tools,
+            Nitro powers native code paths in real production apps.
           </p>
         </div>
-        <div className={styles.statsGrid} aria-label="Nitro production usage stats">
+        <div className={styles.statsGrid} aria-label='Nitro production usage stats'>
           <div>
             <strong>18M+</strong>
             <span>npm downloads</span>
@@ -281,10 +270,9 @@ export default function AppsUsingNitroShowcase() {
       </div>
 
       <p className={styles.note}>
-        Based on public app data, public native symbols, and open-source notices. App
-        names and icons belong to their respective owners; no affiliation or
-        endorsement is implied.
+        Based on public app data, public native symbols, and open-source notices. App names and icons belong to their respective owners; no
+        affiliation or endorsement is implied.
       </p>
     </section>
-  );
+  )
 }

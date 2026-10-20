@@ -45,12 +45,7 @@ export class KotlinStaticMethod extends StaticMethod {
 
   createBridge(): KotlinMethodBridge {
     const nativeMethod = this.nativeMethod
-    const cppMethod = new StaticMethod(
-      nativeMethod.name,
-      nativeMethod.returnType,
-      nativeMethod.parameters,
-      { generated: true }
-    )
+    const cppMethod = new StaticMethod(nativeMethod.name, nativeMethod.returnType, nativeMethod.parameters, { generated: true })
     const cppBody = createCppJniCallBody({
       callable: this.callable,
       jvmName: this.name,
@@ -59,8 +54,7 @@ export class KotlinStaticMethod extends StaticMethod {
     })
     const kotlinBody = createKotlinForwarderBody({
       callable: this.callable,
-      getKotlinInvocation: (args) =>
-        `${this.implementationClassName}.${nativeMethod.name}(${args.join(', ')})`,
+      getKotlinInvocation: (args) => `${this.implementationClassName}.${nativeMethod.name}(${args.join(', ')})`,
     })
     return {
       kotlinMethods: [{ method: this, body: kotlinBody }],

@@ -1,13 +1,12 @@
 ---
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Sync vs Async
 
-By default, every method on a [Hybrid Object](../concepts/hybrid-objects) is synchronous and runs on the JS Thread.
-This means, as long as your native method is executing, the JS Thread is blocked and can not do any other work (like state updates or view changes).
+By default, every method on a [Hybrid Object](../concepts/hybrid-objects) is synchronous and runs on the JS Thread. This means, as long as
+your native method is executing, the JS Thread is blocked and can not do any other work (like state updates or view changes).
 
 ## Light Methods
 
@@ -30,7 +29,7 @@ function App() {
   const [name, setName] = useState(undefined)
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       const n = await mmkv.getString('username') // --> Marc
       setName(n)
     })()
@@ -40,7 +39,8 @@ function App() {
 
 ## Heavy Methods
 
-For larger/heavy methods that take a while to execute this can be problematic, because the JS Thread will be blocked for a longer duration then.
+For larger/heavy methods that take a while to execute this can be problematic, because the JS Thread will be blocked for a longer duration
+then.
 
 To free up the JS Thread while the long-running method is executing, you can make it **asynchronous** by just returning a `Promise`:
 
@@ -65,6 +65,7 @@ On the native side you still start out with a synchronous method, but you can re
       }
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin title="HybridMiner.kt"
@@ -77,6 +78,7 @@ On the native side you still start out with a synchronous method, but you can re
       }
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp title="HybridMiner.hpp"
@@ -89,17 +91,21 @@ On the native side you still start out with a synchronous method, but you can re
       });
     }
     ```
+
   </TabItem>
+
 </Tabs>
 
 ## When should it be async?
 
-It's up to you to decide when to make a native method asynchronous.
-Benchmark the total execution time of your method - a good rule of thumb is: _if it takes longer than 50ms, make it asynchronous_.
+It's up to you to decide when to make a native method asynchronous. Benchmark the total execution time of your method - a good rule of thumb
+is: _if it takes longer than 50ms, make it asynchronous_.
 
 ## Why isn't everything async?
 
 There's two reasons:
 
-1. Jumping from one thread (JS) to another (background) introduces a tiny overhead. Sometimes the total execution time of the method itself is smaller than just the Thread-jump, so it would make more sense to just keep it synchronous right away.
-2. For small/fast methods it's more ergonomic to keep them synchronous as the caller receives the return value right away - no awaiting or Promises.
+1. Jumping from one thread (JS) to another (background) introduces a tiny overhead. Sometimes the total execution time of the method itself
+   is smaller than just the Thread-jump, so it would make more sense to just keep it synchronous right away.
+2. For small/fast methods it's more ergonomic to keep them synchronous as the caller receives the return value right away - no awaiting or
+   Promises.

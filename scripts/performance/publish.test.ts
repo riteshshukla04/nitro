@@ -22,13 +22,7 @@ function option(args: string[], name: string) {
 
 describe('Bencher publications', () => {
   test('seeds an exact paired baseline without labelling a stacked base as main', () => {
-    const args = bencherArguments(
-      metadata,
-      'ios',
-      'base',
-      '/validated',
-      'nitro'
-    )
+    const args = bencherArguments(metadata, 'ios', 'base', '/validated', 'nitro')
     expect(option(args, '--branch')).toBe(`baseline-${metadata.baseSha}`)
     expect(option(args, '--hash')).toBe(metadata.baseSha)
     expect(option(args, '--file')).toBe('/validated/bencher-base-ios.json')
@@ -37,13 +31,7 @@ describe('Bencher publications', () => {
   })
 
   test('posts the PR head with the same-run baseline as its start point', () => {
-    const args = bencherArguments(
-      metadata,
-      'android',
-      'head',
-      '/validated',
-      'nitro'
-    )
+    const args = bencherArguments(metadata, 'android', 'head', '/validated', 'nitro')
     expect(option(args, '--branch')).toBe('pr-123')
     expect(option(args, '--hash')).toBe(metadata.headSha)
     expect(option(args, '--start-point')).toBe(`baseline-${metadata.baseSha}`)
@@ -55,9 +43,7 @@ describe('Bencher publications', () => {
 
   test('uploads both baselines before either head without resetting earlier testbeds', () => {
     const publications = bencherPublications(metadata, '/validated', 'nitro')
-    expect(
-      publications.map(({ platform, revision }) => [platform, revision])
-    ).toEqual([
+    expect(publications.map(({ platform, revision }) => [platform, revision])).toEqual([
       ['android', 'base'],
       ['ios', 'base'],
       ['android', 'head'],
@@ -80,14 +66,8 @@ describe('Bencher publications', () => {
     const args = bencherArguments(main, 'ios', 'head', '/validated', 'nitro')
     expect(option(args, '--branch')).toBe('main')
     expect(args).not.toContain('--start-point')
-    expect(
-      bencherPublications(main, '/validated', 'nitro').map(
-        ({ revision }) => revision
-      )
-    ).toEqual(['head', 'head'])
-    expect(() =>
-      bencherArguments(main, 'ios', 'base', '/validated', 'nitro')
-    ).toThrow()
+    expect(bencherPublications(main, '/validated', 'nitro').map(({ revision }) => revision)).toEqual(['head', 'head'])
+    expect(() => bencherArguments(main, 'ios', 'base', '/validated', 'nitro')).toThrow()
   })
 })
 
@@ -97,20 +77,11 @@ test('uploads pre-rendered Bencher data through fixed arguments, without executi
     const directory = path.join(root, 'validated')
     const data = path.join(root, 'artifact')
     const bmf = { 'case-from-head': { latency: { value: 123 } } }
-    await Bun.write(
-      path.join(directory, 'metadata.json'),
-      JSON.stringify(metadata)
-    )
+    await Bun.write(path.join(directory, 'metadata.json'), JSON.stringify(metadata))
     for (const name of ['base-android', 'base-ios', 'android', 'ios']) {
-      await Bun.write(
-        path.join(data, `bencher-${name}.json`),
-        JSON.stringify(bmf)
-      )
+      await Bun.write(path.join(data, `bencher-${name}.json`), JSON.stringify(bmf))
     }
-    await Bun.write(
-      path.join(data, 'publish.ts'),
-      'throw new Error("Artifact code executed")'
-    )
+    await Bun.write(path.join(data, 'publish.ts'), 'throw new Error("Artifact code executed")')
     const executable = path.join(root, 'bin', 'bencher')
     await Bun.write(
       executable,
@@ -123,27 +94,17 @@ await appendFile(process.env.CAPTURE, JSON.stringify({ args, data: await Bun.fil
     )
     await chmod(executable, 0o755)
     const capture = path.join(root, 'uploads.jsonl')
-    const child = Bun.spawn(
-      [
-        'bun',
-        path.join(import.meta.dir, 'publish.ts'),
-        '--directory',
-        directory,
-        '--data-directory',
-        data,
-      ],
-      {
-        env: {
-          ...process.env,
-          PATH: `${path.join(root, 'bin')}:${process.env.PATH}`,
-          BENCHER_PROJECT: 'nitro',
-          BENCHER_API_KEY: 'test-only',
-          CAPTURE: capture,
-        },
-        stdout: 'pipe',
-        stderr: 'pipe',
-      }
-    )
+    const child = Bun.spawn(['bun', path.join(import.meta.dir, 'publish.ts'), '--directory', directory, '--data-directory', data], {
+      env: {
+        ...process.env,
+        PATH: `${path.join(root, 'bin')}:${process.env.PATH}`,
+        BENCHER_PROJECT: 'nitro',
+        BENCHER_API_KEY: 'test-only',
+        CAPTURE: capture,
+      },
+      stdout: 'pipe',
+      stderr: 'pipe',
+    })
     const stderr = new Response(child.stderr).text()
     expect(await child.exited).toBe(0)
     expect(await stderr).toBe('')

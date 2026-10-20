@@ -164,8 +164,7 @@ private:
   static AnyObject jHashMapToAnyObject(jni::alias_ref<jni::JMap<jni::JString, jni::JObject>> jMap);
 
 public:
-  [[nodiscard]]
-  std::shared_ptr<AnyMap> getMap() const {
+  [[nodiscard]] std::shared_ptr<AnyMap> getMap() const {
     return _map;
   }
 

@@ -12,13 +12,13 @@ template <typename T>
 struct JSIConverter;
 } // namespace margelo::nitro
 
-#include <NitroModules/detail/CountTrailingOptionals.hpp>
 #include <NitroModules/InstanceMethod.hpp>
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/JSIString.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroTypeInfo.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/detail/CountTrailingOptionals.hpp>
 #include <exception>
 #include <functional>
 #include <jsi/jsi.h>
@@ -150,13 +150,13 @@ public:
   template <typename ReturnType, typename... Args>
     requires((JSIDecodable<std::decay_t<Args>> && ...) && (std::is_void_v<ReturnType> || JSIEncodable<ReturnType>))
   static HybridFunction createStaticHybridFunction(const std::string& name, ReturnType (*NON_NULL function)(Args...)) {
-    jsi::HostFunctionType hostFunction = [name, function](jsi::Runtime& runtime, const jsi::Value&,
-                                                         const jsi::Value* args, size_t count) -> jsi::Value {
+    jsi::HostFunctionType hostFunction = [name, function](jsi::Runtime& runtime, const jsi::Value&, const jsi::Value* args,
+                                                          size_t count) -> jsi::Value {
       constexpr size_t maximum = sizeof...(Args);
       constexpr size_t minimum = maximum - detail::trailing_optionals_count_v<Args...>;
       if (count < minimum || count > maximum) [[unlikely]] {
-        throw jsi::JSError(runtime, "`" + name + "` expected " + std::to_string(minimum) + " to " +
-                                       std::to_string(maximum) + " arguments, but received " + std::to_string(count) + "!");
+        throw jsi::JSError(runtime, "`" + name + "` expected " + std::to_string(minimum) + " to " + std::to_string(maximum) +
+                                        " arguments, but received " + std::to_string(count) + "!");
       }
       try {
         return callStaticFunction(function, runtime, args, count, std::index_sequence_for<Args...>{});
@@ -204,8 +204,8 @@ private:
   }
 
   template <typename ReturnType, typename... Args, size_t... Is>
-  static jsi::Value callStaticFunction(ReturnType (*NON_NULL function)(Args...), jsi::Runtime& runtime,
-                                        const jsi::Value* NULLABLE args, size_t count, std::index_sequence<Is...>) {
+  static jsi::Value callStaticFunction(ReturnType (*NON_NULL function)(Args...), jsi::Runtime& runtime, const jsi::Value* NULLABLE args,
+                                       size_t count, std::index_sequence<Is...>) {
     if constexpr (std::is_void_v<ReturnType>) {
       function(convertArgument<std::decay_t<Args>>(runtime, args, count, Is)...);
       return jsi::Value::undefined();
@@ -312,7 +312,8 @@ private:
   template <typename THybrid>
   static inline std::string getHybridFuncFullName(FunctionKind kind, const std::string& registrationName,
                                                   THybrid* NULLABLE hybridInstance = nullptr) {
-    std::string typeName = hybridInstance != nullptr ? hybridInstance->HybridObject::getName() : TypeInfo::getFriendlyTypename<THybrid>(true);
+    std::string typeName =
+        hybridInstance != nullptr ? hybridInstance->HybridObject::getName() : TypeInfo::getFriendlyTypename<THybrid>(true);
     switch (kind) {
       case FunctionKind::METHOD:
         return typeName + "." + registrationName + "(...)";

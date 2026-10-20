@@ -16,9 +16,7 @@ if (platform !== 'android' && platform !== 'ios') {
 const configuration: BenchmarkRunConfiguration = {
   ...(argumentsMap.has('benchmark-index')
     ? {
-        benchmarkIndex: Number(
-          requiredArgument(argumentsMap, 'benchmark-index')
-        ),
+        benchmarkIndex: Number(requiredArgument(argumentsMap, 'benchmark-index')),
       }
     : {}),
   runId: requiredArgument(argumentsMap, 'run-id'),
@@ -55,10 +53,7 @@ const server = Bun.serve({
     if (request.method === 'POST' && url.pathname === '/error') {
       const value: unknown = await request.json()
       const message =
-        value != null &&
-        typeof value === 'object' &&
-        'message' in value &&
-        typeof value.message === 'string'
+        value != null && typeof value === 'object' && 'message' in value && typeof value.message === 'string'
           ? value.message.slice(0, 1_000)
           : 'Unknown on-device benchmark failure.'
       rejectCompletion(new Error(message))
@@ -73,8 +68,7 @@ const server = Bun.serve({
         resolveCompletion()
         return new Response(null, { status: 202 })
       } catch (error) {
-        const failure =
-          error instanceof Error ? error : new Error(String(error))
+        const failure = error instanceof Error ? error : new Error(String(error))
         rejectCompletion(failure)
         return new Response(failure.message, { status: 400 })
       }

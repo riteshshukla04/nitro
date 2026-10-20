@@ -83,7 +83,7 @@ concept SwiftConvertible = requires(const T& cppValue, const typename SwiftConve
 
 #include <NitroModules/SwiftConverter+AnyJSON.hpp>
 #include <NitroModules/SwiftConverter+Array.hpp>
+#include <NitroModules/SwiftConverter+Callback.hpp>
 #include <NitroModules/SwiftConverter+Optional.hpp>
 #include <NitroModules/SwiftConverter+Promise.hpp>
 #include <NitroModules/SwiftConverter+String.hpp>
-#include <NitroModules/SwiftConverter+Callback.hpp>

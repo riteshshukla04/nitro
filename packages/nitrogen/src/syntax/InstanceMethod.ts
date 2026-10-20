@@ -1,10 +1,5 @@
 import type { Language } from '../getPlatformSpecs.js'
-import {
-  Method,
-  type MethodArguments,
-  type MethodOptions,
-  type MethodSignatureOptions,
-} from './Method.js'
+import { Method, type MethodArguments, type MethodOptions, type MethodSignatureOptions } from './Method.js'
 
 export interface InstanceMethodOptions extends MethodOptions {
   readonly virtual?: boolean
@@ -20,19 +15,12 @@ export class InstanceMethod extends Method<InstanceMethodOptions> {
     super(...args)
     if (this.name === 'dispose') {
       // dispose() manages the JSI NativeState and cannot be replaced by a spec method.
-      throw new Error(
-        `\`dispose()\` must not be overridden from TypeScript! You can override \`dispose()\` natively.`
-      )
+      throw new Error(`\`dispose()\` must not be overridden from TypeScript! You can override \`dispose()\` natively.`)
     }
   }
 
-  protected getSignature(
-    language: Language,
-    { isDefinition, className }: MethodSignatureOptions
-  ): string {
-    const parameters = this.parameters.map((parameter) =>
-      parameter.getCode(language)
-    )
+  protected getSignature(language: Language, { isDefinition, className }: MethodSignatureOptions): string {
+    const parameters = this.parameters.map((parameter) => parameter.getCode(language))
     const returnType = this.returnType.getCode(language, { context: 'return' })
     const options = this.options
     switch (language) {
@@ -48,8 +36,7 @@ export class InstanceMethod extends Method<InstanceMethodOptions> {
         if (className == null) {
           if (options.override) signature = `${signature} override`
           if (options.final) signature = `${signature} final`
-          if (!isDefinition && options.pureVirtual)
-            signature = `${signature} = 0`
+          if (!isDefinition && options.pureVirtual) signature = `${signature} = 0`
         }
         return signature
       }
@@ -84,9 +71,7 @@ ${signature}
         return [...annotations, signature].join('\n')
       }
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for methods!`
-        )
+        throw new Error(`Language ${language} is not yet supported for methods!`)
     }
   }
 }

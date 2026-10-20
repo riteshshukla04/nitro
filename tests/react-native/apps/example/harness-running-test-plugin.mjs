@@ -32,11 +32,7 @@ export const runningTestPlugin = () => {
         possibleCrash: (ctx) => report(ctx, 'The app crashed'),
       },
       runtime: {
-        disconnected: (ctx) =>
-          report(
-            ctx,
-            `The app disconnected (${ctx.reason ?? 'unknown reason'})`
-          ),
+        disconnected: (ctx) => report(ctx, `The app disconnected (${ctx.reason ?? 'unknown reason'})`),
       },
     },
   }

@@ -42,10 +42,7 @@ export class KotlinStaticProperty extends StaticProperty {
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
-    return [
-      ...this.getter.kotlinMethod.getRequiredImports(language),
-      ...(this.setter?.kotlinMethod.getRequiredImports(language) ?? []),
-    ]
+    return [...this.getter.kotlinMethod.getRequiredImports(language), ...(this.setter?.kotlinMethod.getRequiredImports(language) ?? [])]
   }
 
   createBridge(): KotlinMethodBridge {
@@ -56,9 +53,7 @@ export class KotlinStaticProperty extends StaticProperty {
         this.createAccessorBridge(this.setter, (args) => {
           const argument = args[0]
           if (argument == null) {
-            throw new Error(
-              'A Kotlin static property setter requires a value parameter.'
-            )
+            throw new Error('A Kotlin static property setter requires a value parameter.')
           }
           return `${property} = ${argument}`
         })
@@ -71,9 +66,7 @@ export class KotlinStaticProperty extends StaticProperty {
   }
 
   getCppRegistration(cppClassName: string): string {
-    const references = this.getStaticMethods().map(
-      (accessor) => `&${cppClassName}::${accessor.name}`
-    )
+    const references = this.getStaticMethods().map((accessor) => `&${cppClassName}::${accessor.name}`)
     return `clazz.registerStaticHybridProperty("${this.name}", ${references.join(', ')});`
   }
 

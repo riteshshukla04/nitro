@@ -12,11 +12,7 @@ export class Parameter implements CodeNode {
 
   constructor(name: string, type: Type, options?: { generated: boolean })
   constructor(parameter: ParameterDeclaration, language: Language)
-  constructor(
-    ...args:
-      | [string, Type, { generated: boolean }?]
-      | [ParameterDeclaration, Language]
-  ) {
+  constructor(...args: [string, Type, { generated: boolean }?] | [ParameterDeclaration, Language]) {
     if (typeof args[0] === 'string' && typeof args[1] === 'object') {
       // constructor(...) #1
       const [name, type] = args
@@ -26,26 +22,14 @@ export class Parameter implements CodeNode {
       const [param, language] = args
       const name = param.getSymbolOrThrow().getEscapedName()
       const type = param.getType()
-      const isOptional =
-        param.hasQuestionToken() ||
-        param.isOptional() ||
-        type.getUnionTypes().some((t) => t.isUndefined())
-      this.type = createNamedType(
-        language,
-        name,
-        type,
-        isOptional,
-        param.getTypeNode(),
-        { isParameter: true }
-      )
+      const isOptional = param.hasQuestionToken() || param.isOptional() || type.getUnionTypes().some((t) => t.isUndefined())
+      this.type = createNamedType(language, name, type, isOptional, param.getTypeNode(), { isParameter: true })
     } else {
       // constructor(...)???
       throw new Error(`Invalid constructor! Arguments: ${args}`)
     }
     if (this.type.name.startsWith('__') && args[2]?.generated !== true) {
-      throw new Error(
-        `Parameter names are not allowed to start with two underscores (__)! (In ${this.jsSignature})`
-      )
+      throw new Error(`Parameter names are not allowed to start with two underscores (__)! (In ${this.jsSignature})`)
     }
   }
 
@@ -68,9 +52,7 @@ export class Parameter implements CodeNode {
       case 'kotlin':
         return `${name}: ${this.type.getCode('kotlin', { context: 'parameter' })}`
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for parameters!`
-        )
+        throw new Error(`Language ${language} is not yet supported for parameters!`)
     }
   }
 

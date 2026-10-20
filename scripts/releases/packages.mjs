@@ -1,9 +1,5 @@
 // Publish in dependency order. Every package belongs to the same release.
-export const releasePackages = [
-  'nitro-core',
-  'nitrogen',
-  'react-native-nitro-modules',
-]
+export const releasePackages = ['nitro-core', 'nitrogen', 'react-native-nitro-modules']
 
 export const versionedManifests = [
   'package.json',
@@ -19,8 +15,4 @@ export const versionedSources = [
   'packages/nitro-core/js/src/version.ts',
 ]
 
-export const versionedFiles = [
-  ...versionedManifests,
-  ...versionedSources,
-  'bun.lock',
-]
+export const versionedFiles = [...versionedManifests, ...versionedSources, 'bun.lock']

@@ -26,9 +26,10 @@ permissions:
 jobs:
   resolve:
     if: >-
-      github.repository == 'margelo/nitro' && !github.event.deleted &&
-      ((github.event_name == 'release' && startsWith(github.ref, 'refs/tags/')) ||
-       ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v1')))
+      github.repository == 'margelo/nitro' && !github.event.deleted && ((github.event_name == 'release' && startsWith(github.ref,
+      'refs/tags/')) ||
+       ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main' || github.ref ==
+      'refs/heads/v1')))
     runs-on: ubuntu-latest
     outputs:
       commit: ${{ steps.resolve.outputs.commit }}
@@ -43,7 +44,9 @@ jobs:
       - name: Resolve release source
         id: resolve
         env:
-          RELEASE_BRANCH: ${{ github.event_name == 'release' && (startsWith(github.event.release.tag_name, 'v1.') && contains(github.event.release.tag_name, '-alpha.') && 'v1' || 'main') || github.ref_name }}
+          RELEASE_BRANCH:
+            ${{ github.event_name == 'release' && (startsWith(github.event.release.tag_name, 'v1.') &&
+            contains(github.event.release.tag_name, '-alpha.') && 'v1' || 'main') || github.ref_name }}
           RELEASE_MODE: ${{ github.event_name == 'push' && 'nightly' || 'manual' }}
           RELEASE_VERSION: ${{ inputs.version }}
           RELEASE_EVENT_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
@@ -191,7 +194,9 @@ jobs:
         id: release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_BRANCH: ${{ github.event_name == 'release' && (startsWith(github.event.release.tag_name, 'v1.') && contains(github.event.release.tag_name, '-alpha.') && 'v1' || 'main') || github.ref_name }}
+          RELEASE_BRANCH:
+            ${{ github.event_name == 'release' && (startsWith(github.event.release.tag_name, 'v1.') &&
+            contains(github.event.release.tag_name, '-alpha.') && 'v1' || 'main') || github.ref_name }}
           RELEASE_MODE: ${{ github.event_name == 'push' && 'nightly' || 'manual' }}
           RELEASE_VERSION: ${{ inputs.version }}
           RELEASE_NPM_TAG: ${{ inputs.npm-tag }}

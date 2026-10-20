@@ -1,8 +1,4 @@
-import {
-  REPORTING_THRESHOLD_PERCENT,
-  type MetricComparison,
-  type PlatformComparison,
-} from './comparison'
+import { REPORTING_THRESHOLD_PERCENT, type MetricComparison, type PlatformComparison } from './comparison'
 import type { PerformanceReport } from './report'
 
 const OPERATION_NAMES: Readonly<Record<string, string>> = {
@@ -12,8 +8,7 @@ const OPERATION_NAMES: Readonly<Record<string, string>> = {
   'bounce-4-kib': 'bounce(4 KiB)',
   'bounce-native-4-kib': 'bounce native-owned buffer (4 KiB)',
   'bounce-native-1-mib': 'bounce native-owned buffer (1 MiB)',
-  'deferred-worker-with-trigger':
-    'deferred worker Promise (includes trigger call)',
+  'deferred-worker-with-trigger': 'deferred worker Promise (includes trigger call)',
   'copy-1-mib': 'copy(1 MiB)',
   'copy-4-kib': 'copy(4 KiB)',
   'create': 'create()',
@@ -35,10 +30,7 @@ function platformName(platform: PlatformComparison['platform']): string {
   return platform === 'ios' ? 'iOS' : 'Android'
 }
 
-function implementationName(
-  metricId: string,
-  platform: PlatformComparison['platform']
-): string {
+function implementationName(metricId: string, platform: PlatformComparison['platform']): string {
   if (metricId.startsWith('javascript/')) return 'JavaScript'
   if (metricId.startsWith('turbo-module/')) return 'TurboModule'
   if (metricId.startsWith('nitro-cpp/')) return 'C++'
@@ -52,22 +44,14 @@ function fallbackOperationName(operation: string): string {
   return `${operation.replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())}()`
 }
 
-function benchmarkName(
-  metricId: string,
-  platform: PlatformComparison['platform']
-): string {
+function benchmarkName(metricId: string, platform: PlatformComparison['platform']): string {
   const operation = metricId.split('/').at(-1)!
   const name = OPERATION_NAMES[operation] ?? fallbackOperationName(operation)
   return `<strong>${escapeHtml(implementationName(metricId, platform))}</strong> <code>${escapeHtml(name)}</code>`
 }
 
 function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;')
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;')
 }
 
 function formatNumber(value: number): string {
@@ -91,33 +75,23 @@ function directionalChange(deltaPercent: number): string {
 
 function difference(metric: MetricComparison): string {
   if (metric.deltaPercent === null) return '—'
-  if (metric.deltaPercent > 0)
-    return `🔴 ${directionalChange(metric.deltaPercent)}`
-  if (metric.deltaPercent < 0)
-    return `🟢 ${directionalChange(metric.deltaPercent)}`
+  if (metric.deltaPercent > 0) return `🔴 ${directionalChange(metric.deltaPercent)}`
+  if (metric.deltaPercent < 0) return `🟢 ${directionalChange(metric.deltaPercent)}`
   return `⚪ ${directionalChange(metric.deltaPercent)}`
 }
 
-function measurement(
-  metric: MetricComparison,
-  revision: 'base' | 'head'
-): string {
+function measurement(metric: MetricComparison, revision: 'base' | 'head'): string {
   const before = metric.baseMedianNsPerOp
   const after = metric.headMedianNsPerOp
   const value = revision === 'base' ? before : after
   if (value === null) return revision === 'base' ? '—' : '❌ Removed'
   const formatted = formatNumber(value)
   if (before === null) return `⭐️ New (${formatted})`
-  const isFaster =
-    after !== null && (revision === 'base' ? before < after : after < before)
+  const isFaster = after !== null && (revision === 'base' ? before < after : after < before)
   return isFaster ? `<strong>${formatted}</strong>` : formatted
 }
 
-function renderMetricTable(
-  metrics: readonly MetricComparison[],
-  platform: PlatformComparison['platform'],
-  indentation = 0
-): string {
+function renderMetricTable(metrics: readonly MetricComparison[], platform: PlatformComparison['platform'], indentation = 0): string {
   const indent = ' '.repeat(indentation)
   const level1 = ' '.repeat(indentation + 2)
   const level2 = ' '.repeat(indentation + 4)
@@ -162,24 +136,15 @@ export function renderPerformanceReportMarkdown(
 ): string {
   const lines = ['## Performance Report']
   if (options.baseSha === options.headSha) {
-    lines.push(
-      '',
-      'Same-revision baseline run. Differences show measurement variation, not a code change.'
-    )
+    lines.push('', 'Same-revision baseline run. Differences show measurement variation, not a code change.')
   }
-  for (const platform of [...platforms].sort((a, b) =>
-    b.platform.localeCompare(a.platform)
-  )) {
+  for (const platform of [...platforms].sort((a, b) => b.platform.localeCompare(a.platform))) {
     lines.push('', `### ${platformName(platform.platform)}`, '')
     const changed = platform.comparisons.filter(
-      (metric) =>
-        metric.deltaPercent === null ||
-        Math.abs(metric.deltaPercent) >= REPORTING_THRESHOLD_PERCENT
+      (metric) => metric.deltaPercent === null || Math.abs(metric.deltaPercent) >= REPORTING_THRESHOLD_PERCENT
     )
     const other = platform.comparisons.filter(
-      (metric) =>
-        metric.deltaPercent !== null &&
-        Math.abs(metric.deltaPercent) < REPORTING_THRESHOLD_PERCENT
+      (metric) => metric.deltaPercent !== null && Math.abs(metric.deltaPercent) < REPORTING_THRESHOLD_PERCENT
     )
     lines.push(
       changed.length === 0
@@ -188,9 +153,7 @@ export function renderPerformanceReportMarkdown(
       '',
       '<details>',
       '  <summary>All Benchmarks</summary>',
-      other.length === 0
-        ? '  <p>All benchmarks are shown above.</p>'
-        : renderMetricTable(other, platform.platform, 2),
+      other.length === 0 ? '  <p>All benchmarks are shown above.</p>' : renderMetricTable(other, platform.platform, 2),
       '</details>'
     )
   }
@@ -199,15 +162,9 @@ export function renderPerformanceReportMarkdown(
     `Benchmarking Code Diff [\`${options.baseSha.slice(0, 8)}\`...\`${options.headSha.slice(0, 8)}\`](https://github.com/${options.repository}/compare/${options.baseSha}..${options.headSha})${options.workflowRunUrl == null ? '' : ` ([view raw output](${options.workflowRunUrl}))`}`,
     ''
   )
-  const hasArtifacts =
-    options.workflowRunUrl != null &&
-    (options.artifactId != null || options.artifacts != null)
+  const hasArtifacts = options.workflowRunUrl != null && (options.artifactId != null || options.artifacts != null)
   if (hasArtifacts) {
-    lines.push(
-      '<details>',
-      '  <summary>Raw measurements and artifacts</summary>',
-      ''
-    )
+    lines.push('<details>', '  <summary>Raw measurements and artifacts</summary>', '')
   }
   if (options.artifactId != null && options.workflowRunUrl != null) {
     lines.push(

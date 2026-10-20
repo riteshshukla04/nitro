@@ -1,11 +1,7 @@
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import type { GetCodeOptions, Type } from '../../types/Type.js'
-import type {
-  JniValueKind,
-  KotlinConversion,
-  KotlinType,
-} from './KotlinType.js'
+import type { JniValueKind, KotlinConversion, KotlinType } from './KotlinType.js'
 
 /**
  * A type without a JNI representation yet, such as `AnyJSON` or tuples.
@@ -41,10 +37,7 @@ export class KotlinUnsupportedType implements KotlinType {
     return this.children.flatMap((child) => child.getExtraFiles())
   }
   getRequiredImports(language: Language): SourceImport[] {
-    return [
-      ...this.type.getRequiredImports(language),
-      ...this.children.flatMap((child) => child.getRequiredImports(language)),
-    ]
+    return [...this.type.getRequiredImports(language), ...this.children.flatMap((child) => child.getRequiredImports(language))]
   }
 
   private throwUnsupported(): never {

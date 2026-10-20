@@ -1,8 +1,7 @@
 ---
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Errors
 
@@ -20,6 +19,7 @@ Every method in a [Hybrid Object](../concepts/hybrid-objects) can throw an error
       }
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin title="HybridMath.kt"
@@ -32,6 +32,7 @@ Every method in a [Hybrid Object](../concepts/hybrid-objects) can throw an error
       }
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp title="HybridMath.hpp"
@@ -44,7 +45,9 @@ Every method in a [Hybrid Object](../concepts/hybrid-objects) can throw an error
       }
     };
     ```
+
   </TabItem>
+
 </Tabs>
 
 Errors will be propagated upwards to JS and can be caught just like any other kind of error using `try`/`catch`:
@@ -72,6 +75,7 @@ Promises can also be rejected using error throwing syntax on the native side:
       }
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin title="HybridMath.kt"
@@ -86,6 +90,7 @@ Promises can also be rejected using error throwing syntax on the native side:
       }
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp title="HybridMath.hpp"
@@ -100,7 +105,9 @@ Promises can also be rejected using error throwing syntax on the native side:
       }
     };
     ```
+
   </TabItem>
+
 </Tabs>
 
 Promise rejections are handled as usual using the `.catch`, or `await`/`catch` syntax in JS:

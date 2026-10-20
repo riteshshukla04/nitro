@@ -1,16 +1,15 @@
 ---
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Callbacks (`(...) => T`)
 
 Callbacks are functions created in one language and passed to another to provide a way to "call back" later.
 
-Nitro has a clever reference counting system to allow users to use callbacks/functions from JS safely, and without any limitations.
-Each callback holds a strong reference on the native side and can be called as often as needed.
-Once the callback is no longer used, it will be safely deleted from memory.
+Nitro has a clever reference counting system to allow users to use callbacks/functions from JS safely, and without any limitations. Each
+callback holds a strong reference on the native side and can be called as often as needed. Once the callback is no longer used, it will be
+safely deleted from memory.
 
 <Tabs>
   <TabItem value="ts" label="TypeScript" default>
@@ -22,6 +21,7 @@ Once the callback is no longer used, it will be safely deleted from memory.
       start(onNewUserJoined: (user: User) => void): void
     }
     ```
+
   </TabItem>
   <TabItem value="swift" label="Swift">
     ```swift
@@ -37,6 +37,7 @@ Once the callback is no longer used, it will be safely deleted from memory.
       onNewUserJoined(user)
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp
@@ -44,13 +45,15 @@ Once the callback is no longer used, it will be safely deleted from memory.
       onNewUserJoined(user);
     }
     ```
+
   </TabItem>
+
 </Tabs>
 
 ## Events
 
-Since callbacks can be safely kept in memory for longer and called multiple times, Nitro does not have a special type for an "event".
-It is simply a function you store in memory and call later, just like in a normal JS class. ✨
+Since callbacks can be safely kept in memory for longer and called multiple times, Nitro does not have a special type for an "event". It is
+simply a function you store in memory and call later, just like in a normal JS class. ✨
 
 <Tabs>
   <TabItem value="ts" label="TypeScript" default>
@@ -67,6 +70,7 @@ It is simply a function you store in memory and call later, just like in a norma
       console.log(`Orientation changed to ${o}!`)
     })
     ```
+
   </TabItem>
   <TabItem value="swift" label="Swift">
     ```swift
@@ -80,6 +84,7 @@ It is simply a function you store in memory and call later, just like in a norma
       }
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin
@@ -93,6 +98,7 @@ It is simply a function you store in memory and call later, just like in a norma
       }
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp
@@ -106,7 +112,9 @@ It is simply a function you store in memory and call later, just like in a norma
       }
     }
     ```
+
   </TabItem>
+
 </Tabs>
 
 ## Callbacks that return a value (`(...) => T`)
@@ -145,7 +153,8 @@ func call(callback: any Callback<(), Void>) {
 }
 ```
 
-Additionally, the call operator overload either chooses `callAndForget()` when the callback returns `Void`, or `callAsync()` when it returns a value.
+Additionally, the call operator overload either chooses `callAndForget()` when the callback returns `Void`, or `callAsync()` when it returns
+a value.
 
 ```swift
 func callVoid(callback: any Callback<(), Void>) {
@@ -157,7 +166,9 @@ func callResult(callback: any Callback<(), Double>) {
 ```
 
 :::warning
+
 Use `callSync()` only when you can ensure that you call it on the JS Runtime's Thread - otherwise it will throw.
+
 :::
 
 ## Inline Callbacks
@@ -185,21 +196,22 @@ class HybridMath: HybridMathSpec {
 
 ## How was it before Nitro?
 
-Conventionally (in legacy React Native Native Modules), a native method could only have a maximum of two callbacks, one "success" and one "failure" callback.
-Once one of these callbacks is called, both will be destroyed and can no longer be called later.
-This is why React Native introduced "Events" as a way to call into JS more than just once.
-This also meant that an asynchronous function could not have any callbacks, since a Promise's resolve and reject functions are already two callbacks.
-For example, this was **not possible**:
+Conventionally (in legacy React Native Native Modules), a native method could only have a maximum of two callbacks, one "success" and one
+"failure" callback. Once one of these callbacks is called, both will be destroyed and can no longer be called later. This is why React
+Native introduced "Events" as a way to call into JS more than just once. This also meant that an asynchronous function could not have any
+callbacks, since a Promise's resolve and reject functions are already two callbacks. For example, this was **not possible**:
 
 ```ts
 interface Camera {
-  startRecording(onStatusUpdate: () => void,
-  // code-error
-                 onRecordingFailed: () => void,
-  // code-error
-                 onRecordingFinished: () => void): Promise<void>
+  startRecording(
+    onStatusUpdate: () => void,
+    // code-error
+    onRecordingFailed: () => void,
+    // code-error
+    onRecordingFinished: () => void
+  ): Promise<void>
 }
 ```
 
-Thanks to Nitro's clever reference system, functions can be safely held in memory and called as many times as you like, just like in a normal JS class.
-This makes "Events" obsolete, and allows using as many callbacks per native method as required.
+Thanks to Nitro's clever reference system, functions can be safely held in memory and called as many times as you like, just like in a
+normal JS class. This makes "Events" obsolete, and allows using as many callbacks per native method as required.

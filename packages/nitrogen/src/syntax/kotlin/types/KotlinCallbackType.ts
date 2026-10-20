@@ -1,18 +1,11 @@
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
-import {
-  CallbackType,
-  type GetCallbackCodeOptions,
-} from '../../types/CallbackType.js'
+import { CallbackType, type GetCallbackCodeOptions } from '../../types/CallbackType.js'
 import { createKotlinCallback } from '../KotlinCallback.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
 import { KotlinNamedType } from './KotlinNamedType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 /**
  * JNI represents a callback as a Kotlin `fun interface`.
@@ -28,9 +21,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
 
   constructor(readonly type: CallbackType) {
     const returnType = wrapKotlinType(type.returnType)
-    const parameters = type.parameters.map(
-      (p) => new KotlinNamedType(p.name, wrapKotlinType(p))
-    )
+    const parameters = type.parameters.map((p) => new KotlinNamedType(p.name, wrapKotlinType(p)))
     super(returnType, parameters, type.isInline)
     this.returnType = returnType
     this.boxedReturnType = wrapKotlinType(type.returnType, { boxed: true })
@@ -51,9 +42,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
   convert(value: string, { from, in: language }: KotlinConversion): string {
     switch (language) {
       case 'kotlin':
-        return from === 'kotlin'
-          ? `${this.specializationName}_java(${value})`
-          : value
+        return from === 'kotlin' ? `${this.specializationName}_java(${value})` : value
       case 'c++':
         switch (from) {
           case 'c++':
@@ -68,9 +57,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     const returnType = this.type.returnType.getCode('c++', {
       context: 'return',
     })
-    const paramTypes = this.type.parameters.map((p) =>
-      p.getCode('c++', { context: 'parameter' })
-    )
+    const paramTypes = this.type.parameters.map((p) => p.getCode('c++', { context: 'parameter' }))
     const jniType = `${this.jniName}_cxx`
     const cppCallbackType = this.type.getCode('c++', { context: 'return' })
     return `
@@ -85,16 +72,10 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
 }()
 `.trim()
   }
-  override getCode(
-    language: Language,
-    options: GetCallbackCodeOptions
-  ): string {
+  override getCode(language: Language, options: GetCallbackCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniReferenceCode(
-          `${this.jniName}::javaobject`,
-          options.context
-        )
+        return getJniReferenceCode(`${this.jniName}::javaobject`, options.context)
       case 'kotlin':
         return this.specializationName
       default:
@@ -113,10 +94,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
         imports.push(
           {
             language: language,
-            declaration: NitroConfig.current.getCxxHeader(
-              `${this.jniName}.hpp`,
-              'private'
-            ),
+            declaration: NitroConfig.current.getCxxHeader(`${this.jniName}.hpp`, 'private'),
           },
           {
             language: language,
@@ -128,10 +106,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
         )
         break
     }
-    imports.push(
-      ...this.returnType.getRequiredImports(language),
-      ...this.parameters.flatMap((p) => p.getRequiredImports(language))
-    )
+    imports.push(...this.returnType.getRequiredImports(language), ...this.parameters.flatMap((p) => p.getRequiredImports(language)))
     return imports
   }
 }

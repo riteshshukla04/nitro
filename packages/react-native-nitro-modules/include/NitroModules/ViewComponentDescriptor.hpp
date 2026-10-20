@@ -33,8 +33,7 @@ class ViewComponentDescriptor final : public react::ConcreteComponentDescriptor<
 #endif
 
 public:
-  explicit ViewComponentDescriptor(const react::ComponentDescriptorParameters& parameters)
-      : Base(parameters) {}
+  explicit ViewComponentDescriptor(const react::ComponentDescriptorParameters& parameters) : Base(parameters) {}
 
 public:
   /**

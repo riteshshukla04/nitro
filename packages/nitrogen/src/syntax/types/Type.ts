@@ -27,13 +27,7 @@ export type TypeKind =
   | 'unsafe-void-pointer'
   | 'swift-result'
 
-export type TypeContext =
-  | 'value'
-  | 'parameter'
-  | 'parameter-type'
-  | 'return'
-  | 'property'
-  | 'type-argument'
+export type TypeContext = 'value' | 'parameter' | 'parameter-type' | 'return' | 'property' | 'type-argument'
 
 export interface GetCodeOptions {
   /**

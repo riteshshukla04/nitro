@@ -13,9 +13,9 @@
 #include <NitroModules/WeakReference.hpp>
 #include <jsi/jsi.h>
 #include <memory>
+#include <typeindex>
 #include <unordered_map>
 #include <vector>
-#include <typeindex>
 
 namespace margelo::nitro {
 
@@ -52,8 +52,7 @@ public:
    Gets or creates the `JSICache` for the given `jsi::Runtime`.
    Like the `jsi::Runtime`, only use it on the `jsi::Runtime`'s Thread. It lives until the `jsi::Runtime` is destroyed.
    */
-  [[nodiscard]]
-  static JSICache& getOrCreateCache(jsi::Runtime& runtime);
+  [[nodiscard]] static JSICache& getOrCreateCache(jsi::Runtime& runtime);
 
 public:
   const JSClass* NULLABLE getClass(const std::type_index& type) const {

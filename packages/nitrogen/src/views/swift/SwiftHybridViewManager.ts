@@ -1,51 +1,29 @@
 import type { SourceFile } from '../../syntax/SourceFile.js'
 import type { HybridObjectSpec } from '../../syntax/HybridObjectSpec.js'
-import {
-  createViewComponentShadowNodeFiles,
-  getViewComponentNames,
-  getHybridViewProperties,
-} from '../CppHybridViewComponent.js'
-import {
-  createFileMetadataString,
-  escapeCppName,
-} from '../../syntax/helpers.js'
+import { createViewComponentShadowNodeFiles, getViewComponentNames, getHybridViewProperties } from '../CppHybridViewComponent.js'
+import { createFileMetadataString, escapeCppName } from '../../syntax/helpers.js'
 import { getUmbrellaHeaderName } from '../../autolinking/ios/createSwiftUmbrellaHeader.js'
 import { getHybridObjectName } from '../../syntax/getHybridObjectName.js'
 import { indent } from '../../utils.js'
 import { getImportsCode } from '../../syntax/getImportCode.js'
 
-export function createSwiftHybridViewManager(
-  spec: HybridObjectSpec<'swift'>
-): SourceFile[] {
+export function createSwiftHybridViewManager(spec: HybridObjectSpec<'swift'>): SourceFile[] {
   const cppFiles = createViewComponentShadowNodeFiles(spec)
   const namespace = spec.config.getCxxNamespace('c++')
   const swiftNamespace = spec.config.getIosModuleName()
   const { HybridTSpecSwift, HybridTSpecCxx } = getHybridObjectName(spec.name)
-  const {
-    component,
-    descriptorClassName,
-    propsClassName,
-    shadowNodeClassName,
-  } = getViewComponentNames(spec)
+  const { component, descriptorClassName, propsClassName, shadowNodeClassName } = getViewComponentNames(spec)
   if (spec.implementation == null) {
-    throw new Error(
-      `Cannot create Swift HybridView ViewManager for ${spec.name} without an iOS implementation class.`
-    )
+    throw new Error(`Cannot create Swift HybridView ViewManager for ${spec.name} without an iOS implementation class.`)
   }
   const imports = getImportsCode([
     {
       language: 'c++',
-      declaration: spec.config.getCxxHeader(
-        `views/${component}.hpp`,
-        'private'
-      ),
+      declaration: spec.config.getCxxHeader(`views/${component}.hpp`, 'private'),
     },
     {
       language: 'c++',
-      declaration: spec.config.getCxxHeader(
-        `${HybridTSpecSwift}.hpp`,
-        'private'
-      ),
+      declaration: spec.config.getCxxHeader(`${HybridTSpecSwift}.hpp`, 'private'),
     },
     {
       language: 'c++',

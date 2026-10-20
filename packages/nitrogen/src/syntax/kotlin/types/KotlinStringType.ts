@@ -1,11 +1,7 @@
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { GetCodeOptions } from '../../types/Type.js'
 import { StringType } from '../../types/StringType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinStringType extends StringType implements KotlinType {
   readonly jniValueKind = 'wrapper'

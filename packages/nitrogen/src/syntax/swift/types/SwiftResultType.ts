@@ -4,11 +4,7 @@ import type { Language } from '../../../getPlatformSpecs.js'
 import type { CppHelper } from '../../c++/CppHelper.js'
 import { escapeCppName } from '../../helpers.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
-import {
-  getClangImporterReferenceName,
-  getQualifiedSwiftName,
-  type ImportedCxxRecord,
-} from '../ImportedCxxRecord.js'
+import { getClangImporterReferenceName, getQualifiedSwiftName, type ImportedCxxRecord } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
 
@@ -17,9 +13,7 @@ export class SwiftResultType implements SwiftType {
   constructor(
     readonly payload: SwiftType,
     readonly sourceConfig = NitroConfig.current,
-    private readonly swiftNamespace = sourceConfig.getSwiftBridgeNamespace(
-      'swift'
-    )
+    private readonly swiftNamespace = sourceConfig.getSwiftBridgeNamespace('swift')
   ) {}
 
   readonly kind = 'swift-result'
@@ -104,10 +98,7 @@ using ${this.specializationName} = ${this.getCode('c++', { context: 'value' })};
     ]
   }
 
-  getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports: SourceImport[] = []
     switch (language) {
       case 'c++':

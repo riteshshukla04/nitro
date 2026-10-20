@@ -10,9 +10,7 @@ const manifests = versionedManifests.map((relativePath) => {
   return { filename, json: JSON.parse(readFileSync(filename, 'utf8')) }
 })
 const check = process.argv[2] === '--check'
-const version = check
-  ? manifests[0].json.version
-  : (process.argv[2] ?? manifests[0].json.version)
+const version = check ? manifests[0].json.version : (process.argv[2] ?? manifests[0].json.version)
 parseVersion(version)
 
 const sourceVersions = [
@@ -36,10 +34,7 @@ const sourceVersions = [
 
 if (check) {
   for (const { filename, json } of manifests) {
-    if (json.version !== version)
-      throw new Error(
-        `${filename}: expected version ${version}, found ${json.version}`
-      )
+    if (json.version !== version) throw new Error(`${filename}: expected version ${version}, found ${json.version}`)
   }
   for (const { filename, json } of manifests) {
     for (const field of ['dependencies', 'devDependencies']) {
@@ -52,8 +47,7 @@ if (check) {
     }
   }
   for (const entry of sourceVersions) {
-    if (entry.match[1] !== version)
-      throw new Error(`${entry.path} must use ${version}`)
+    if (entry.match[1] !== version) throw new Error(`${entry.path} must use ${version}`)
   }
   console.log(`Nitro packages, test apps and native versions match: ${version}`)
 } else {
@@ -67,12 +61,7 @@ if (check) {
     writeFileSync(filename, `${JSON.stringify(json, null, 2)}\n`)
   }
   for (const entry of sourceVersions) {
-    writeFileSync(
-      entry.filename,
-      entry.source.replace(entry.match[0], entry.line)
-    )
+    writeFileSync(entry.filename, entry.source.replace(entry.match[0], entry.line))
   }
-  console.log(
-    `Updated Nitro packages and test apps to ${version}. Run bun install to update bun.lock.`
-  )
+  console.log(`Updated Nitro packages and test apps to ${version}. Run bun install to update bun.lock.`)
 }

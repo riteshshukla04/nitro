@@ -68,7 +68,9 @@ jobs:
             ~/.gradle/wrapper
             tests/react-native/apps/example/android/.gradle
             tests/react-native/apps/example/android/app/.cxx
-          key: ${{ runner.os }}-gradle-${{ matrix.min-sdk }}-${{ env.TARGET_ANDROID_ARCH }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/CMakeLists.txt', '**/*.cmake') }}
+          key:
+            ${{ runner.os }}-gradle-${{ matrix.min-sdk }}-${{ env.TARGET_ANDROID_ARCH }}-${{ hashFiles('**/*.gradle*',
+            '**/gradle-wrapper.properties', '**/CMakeLists.txt', '**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-gradle-${{ matrix.min-sdk }}-${{ env.TARGET_ANDROID_ARCH }}-
             ${{ runner.os }}-gradle-

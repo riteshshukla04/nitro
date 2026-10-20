@@ -5,10 +5,7 @@ import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { SwiftVariantType } from './types/SwiftVariantType.js'
 import { getImportsCode } from '../getImportCode.js'
-import {
-  getProtocolConformanceImports,
-  getSwiftImports,
-} from './getSwiftImports.js'
+import { getProtocolConformanceImports, getSwiftImports } from './getSwiftImports.js'
 import { SwiftOutPointerType } from './types/SwiftOutPointerType.js'
 
 export function createSwiftVariant(type: SwiftVariantType): SourceFile[] {
@@ -30,9 +27,7 @@ export function createSwiftVariant(type: SwiftVariantType): SourceFile[] {
     })
     .join('\n')
 
-  const indexCases = variantType.cases.map(
-    ([label], index) => `case .${label}: return ${index}`
-  )
+  const indexCases = variantType.cases.map(([label], index) => `case .${label}: return ${index}`)
   // C++ initializes the variant in Swift storage.
   const storage = new SwiftOutPointerType(type)
   const payloads = variantType.cases.map(([label, inner]) => ({
@@ -45,11 +40,7 @@ export function createSwiftVariant(type: SwiftVariantType): SourceFile[] {
     imports.push(...getSwiftImports([swiftType], 'public'))
     const payloadType = swiftType.getCode('swift', { context: 'property' })
     const storageType = storage.getCode('swift', { context: 'parameter' })
-    const initializeCode = storage.initialize(
-      'swift',
-      'result',
-      `Self(.${label}(${swiftType.toSwift('payload')}))`
-    )
+    const initializeCode = storage.initialize('swift', 'result', `Self(.${label}(${swiftType.toSwift('payload')}))`)
     return `
 @_spi(NitroCxx)
 public static func initialize${name}(_ payload: ${payloadType}, result: ${storageType}) {

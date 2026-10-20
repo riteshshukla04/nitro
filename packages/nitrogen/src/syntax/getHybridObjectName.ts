@@ -34,9 +34,7 @@ export interface HybridObjectName {
   HybridTSpecSwift: string
 }
 
-export function getHybridObjectName(
-  hybridObjectName: string
-): HybridObjectName {
+export function getHybridObjectName(hybridObjectName: string): HybridObjectName {
   return {
     T: hybridObjectName,
     HybridT: `Hybrid${hybridObjectName}`,

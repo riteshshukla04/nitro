@@ -39,9 +39,7 @@ interface ViewComponentNames {
   manager: `${string}Manager`
 }
 
-export function getViewComponentNames(
-  spec: HybridObjectSpec
-): ViewComponentNames {
+export function getViewComponentNames(spec: HybridObjectSpec): ViewComponentNames {
   const name = getHybridObjectName(spec.name)
   return {
     propsClassName: `${name.HybridT}Props`,
@@ -56,41 +54,23 @@ export function getViewComponentNames(
 
 function getHybridRefProperty(spec: HybridObjectSpec): Property {
   const hybrid = new HybridObjectType(spec)
-  const type = new CallbackType(new VoidType(), [
-    new NamedWrappingType('ref', hybrid),
-  ])
+  const type = new CallbackType(new VoidType(), [new NamedWrappingType('ref', hybrid)])
   return new Property('hybridRef', new OptionalType(type), false)
 }
 
-export function createViewComponentShadowNodeFiles(
-  spec: HybridObjectSpec
-): SourceFile[] {
+export function createViewComponentShadowNodeFiles(spec: HybridObjectSpec): SourceFile[] {
   if (!spec.isHybridView) {
-    throw new Error(
-      `Cannot create View Component ShadowNode code for ${spec.name} - it's not a HybridView!`
-    )
+    throw new Error(`Cannot create View Component ShadowNode code for ${spec.name} - it's not a HybridView!`)
   }
 
   const { HybridT } = getHybridObjectName(spec.name)
-  const {
-    propsClassName,
-    stateClassName,
-    nameVariable,
-    shadowNodeClassName,
-    descriptorClassName,
-    component,
-  } = getViewComponentNames(spec)
+  const { propsClassName, stateClassName, nameVariable, shadowNodeClassName, descriptorClassName, component } = getViewComponentNames(spec)
 
   const namespace = spec.config.getCxxNamespace('c++', 'views')
 
   const props = [...getHybridViewProperties(spec), getHybridRefProperty(spec)]
-  const properties = props.map(
-    (p) =>
-      `nitro::ReactProp<${p.type.getCode('c++', { context: 'property' })}> ${escapeCppName(p.name)};`
-  )
-  const filterCases = props.map(
-    (prop) => `case hashString("${prop.name}"): return true;`
-  )
+  const properties = props.map((p) => `nitro::ReactProp<${p.type.getCode('c++', { context: 'property' })}> ${escapeCppName(p.name)};`)
+  const filterCases = props.map((prop) => `case hashString("${prop.name}"): return true;`)
   const comparisons = props.map((prop) => {
     const name = escapeCppName(prop.name)
     return `${name}.hasSameValue(other.${name})`
@@ -99,17 +79,12 @@ export function createViewComponentShadowNodeFiles(
     const name = escapeCppName(prop.name)
     return `${name}.isProvided()`
   })
-  const imports = props.flatMap((property) =>
-    property.getRequiredImports('c++')
-  )
+  const imports = props.flatMap((property) => property.getRequiredImports('c++'))
   const includes = getImportsCode(imports, 'implementation')
   const componentHeaderImport = getImportsCode([
     {
       language: 'c++',
-      declaration: spec.config.getCxxHeader(
-        `views/${component}.hpp`,
-        'private'
-      ),
+      declaration: spec.config.getCxxHeader(`views/${component}.hpp`, 'private'),
     },
   ])
   const componentName = getHybridViewComponentName(spec)

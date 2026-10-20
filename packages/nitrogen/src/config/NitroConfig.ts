@@ -17,9 +17,7 @@ export class NitroConfig {
 
   static get current(): NitroConfig {
     if (this.singleton == null) {
-      console.log(
-        chalk.reset(`🔧  Loading ${chalk.underline('nitro.json')} config...`)
-      )
+      console.log(chalk.reset(`🔧  Loading ${chalk.underline('nitro.json')} config...`))
       const defaultConfigPath = './nitro.json'
       const config = readUserConfig(defaultConfigPath)
       this.singleton = new NitroConfig(config)
@@ -29,9 +27,7 @@ export class NitroConfig {
 
   /** Returns the package to import Nitro's JavaScript runtime from. */
   getRuntimePackageName(): string {
-    return this.config.environment === 'react-native'
-      ? 'react-native-nitro-modules'
-      : 'nitro-core'
+    return this.config.environment === 'react-native' ? 'react-native-nitro-modules' : 'nitro-core'
   }
 
   /**
@@ -61,16 +57,9 @@ export class NitroConfig {
    * This can have multiple sub-namespaces, and is always relative to `margelo::nitro`.
    * @example `['image']` -> `margelo::nitro::image`
    */
-  getCxxNamespace(
-    language: 'c++' | 'swift',
-    ...subDefinitionName: string[]
-  ): string {
+  getCxxNamespace(language: 'c++' | 'swift', ...subDefinitionName: string[]): string {
     const userNamespace = this.config.cxxNamespace
-    const namespace = [
-      ...CXX_BASE_NAMESPACE,
-      ...userNamespace,
-      ...subDefinitionName,
-    ]
+    const namespace = [...CXX_BASE_NAMESPACE, ...userNamespace, ...subDefinitionName]
     switch (language) {
       case 'c++':
         return namespace.join('::')
@@ -86,10 +75,7 @@ export class NitroConfig {
    * This can have multiple sub-namespaces, and is always relative to `com.margelo.nitro`.
    * @example `['image']` -> `com.margelo.nitro.image`
    */
-  getAndroidPackage(
-    language: 'java/kotlin' | 'c++/jni',
-    ...subPackage: string[]
-  ): string {
+  getAndroidPackage(language: 'java/kotlin' | 'c++/jni', ...subPackage: string[]): string {
     const userPackage = this.config.android.androidNamespace
     const namespace = [...ANDROID_BASE_NAMESPACE, ...userPackage, ...subPackage]
 
@@ -122,18 +108,13 @@ export class NitroConfig {
 
   get isExternalConfig(): boolean {
     // If the C++ namespaces are NOT equal, we are an external config.
-    return (
-      this.getCxxNamespace('c++') !== NitroConfig.current.getCxxNamespace('c++')
-    )
+    return this.getCxxNamespace('c++') !== NitroConfig.current.getCxxNamespace('c++')
   }
 
   /**
    * Get the include of a generated C++ header that belongs to this module.
    */
-  getCxxHeader(
-    fileName: string,
-    visibility: CxxHeaderVisibility = 'public'
-  ): { name: string; space: 'system' } {
+  getCxxHeader(fileName: string, visibility: CxxHeaderVisibility = 'public'): { name: string; space: 'system' } {
     const directory = this.getCxxHeaderDirectory(visibility).slice(1)
     return {
       name: [...directory, fileName].join('/'),

@@ -41,7 +41,7 @@ public:
     destroy();
   }
 
-  Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_constructible<T>::value && std::is_nothrow_destructible<T>::value) {
+  Result& operator=(const Result& other) noexcept(std::is_nothrow_copy_constructible<T>::value&& std::is_nothrow_destructible<T>::value) {
     if (this == &other)
       return *this;
     destroy();
@@ -54,7 +54,7 @@ public:
     return *this;
   }
 
-  Result& operator=(Result&& other) noexcept(std::is_nothrow_move_constructible<T>::value && std::is_nothrow_destructible<T>::value) {
+  Result& operator=(Result&& other) noexcept(std::is_nothrow_move_constructible<T>::value&& std::is_nothrow_destructible<T>::value) {
     if (this == &other)
       return *this;
     destroy();

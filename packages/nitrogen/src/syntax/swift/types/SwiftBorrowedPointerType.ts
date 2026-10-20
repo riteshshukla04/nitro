@@ -38,10 +38,7 @@ export class SwiftBorrowedPointerType extends SwiftPointerType {
    * Runs `body` with `pointer` borrowing `value`; the pointer must not escape it.
    * Swift returns `body`'s result, C++ returns a statement.
    */
-  borrow(
-    language: 'swift' | 'c++',
-    { value, pointer, body, returnType = 'Void' }: BorrowOptions
-  ): string {
+  borrow(language: 'swift' | 'c++', { value, pointer, body, returnType = 'Void' }: BorrowOptions): string {
     switch (language) {
       case 'swift': {
         const type = this.pointee.getCode(language, {

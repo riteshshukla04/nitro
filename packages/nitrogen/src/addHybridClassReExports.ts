@@ -1,16 +1,6 @@
 import { readFile, writeFile } from 'fs/promises'
-import {
-  QuoteKind,
-  ts,
-  type ImportDeclaration,
-  type Node,
-  type SourceFile,
-} from 'ts-morph'
-import {
-  getHybridClassReExports,
-  RUNTIME_IMPORT_PREFIX,
-  type HybridClassReExport,
-} from './hybridClassReExports.js'
+import { QuoteKind, ts, type ImportDeclaration, type Node, type SourceFile } from 'ts-morph'
+import { getHybridClassReExports, RUNTIME_IMPORT_PREFIX, type HybridClassReExport } from './hybridClassReExports.js'
 
 const BYTE_ORDER_MARK = '\uFEFF'
 // An ECMAScript identifier, e.g. `Image` but not `Image.cjs` or `sub/Image`.
@@ -26,13 +16,8 @@ export interface HybridClassSpecFile {
  * Returns errors for `#nitro/*` re-exports that do not name a HybridObject
  * class declared in the spec.
  */
-export function getHybridClassReExportErrors({
-  sourceFile,
-  classNames,
-}: HybridClassSpecFile): Error[] {
-  const unmatchedReExports = getHybridClassReExports(sourceFile).filter(
-    (reExport) => !classNames.includes(reExport.className)
-  )
+export function getHybridClassReExportErrors({ sourceFile, classNames }: HybridClassSpecFile): Error[] {
+  const unmatchedReExports = getHybridClassReExports(sourceFile).filter((reExport) => !classNames.includes(reExport.className))
   return unmatchedReExports.map((reExport) => {
     const line = reExport.declaration.getStartLineNumber()
     const message = getUnmatchedReExportMessage(sourceFile, reExport)
@@ -40,10 +25,7 @@ export function getHybridClassReExportErrors({
   })
 }
 
-function getUnmatchedReExportMessage(
-  sourceFile: SourceFile,
-  { declaration, specifier, className }: HybridClassReExport
-): string {
+function getUnmatchedReExportMessage(sourceFile: SourceFile, { declaration, specifier, className }: HybridClassReExport): string {
   const code = declaration.getText()
   if (!IDENTIFIER_PATTERN.test(className)) {
     let reason: string
@@ -73,15 +55,10 @@ function getUnmatchedReExportMessage(
  * Adds `export * from '#nitro/<ClassName>'` for each class the spec does not
  * re-export yet, and returns the added lines.
  */
-export async function addMissingHybridClassReExports({
-  sourceFile,
-  classNames,
-}: HybridClassSpecFile): Promise<string[]> {
+export async function addMissingHybridClassReExports({ sourceFile, classNames }: HybridClassSpecFile): Promise<string[]> {
   const reExports = getHybridClassReExports(sourceFile)
   const exportedNames = reExports.map((reExport) => reExport.className)
-  const missingNames = classNames.filter(
-    (name) => !exportedNames.includes(name)
-  )
+  const missingNames = classNames.filter((name) => !exportedNames.includes(name))
   if (missingNames.length === 0) return []
 
   const text = sourceFile.getFullText()
@@ -91,14 +68,10 @@ export async function addMissingHybridClassReExports({
 
   // Use the quotes and semicolons of the statement the new lines follow.
   const styleStatement = lastReExport?.declaration ?? lastImport
-  const quote =
-    styleStatement?.getModuleSpecifier()?.getQuoteKind() ?? QuoteKind.Single
+  const quote = styleStatement?.getModuleSpecifier()?.getQuoteKind() ?? QuoteKind.Single
   const hasSemicolon = styleStatement?.getText().endsWith(';') ?? false
   const semicolon = hasSemicolon ? ';' : ''
-  const reExportLines = missingNames.map(
-    (name) =>
-      `export * from ${quote}${RUNTIME_IMPORT_PREFIX}${name}${quote}${semicolon}`
-  )
+  const reExportLines = missingNames.map((name) => `export * from ${quote}${RUNTIME_IMPORT_PREFIX}${name}${quote}${semicolon}`)
   const reExportsCode = reExportLines.join(newLine)
 
   const headerEnd = getHeaderEnd(text, lastImport)
@@ -118,14 +91,11 @@ export async function addMissingHybridClassReExports({
     insertedText = `${reExportsCode}${newLine}${newLine}`
   }
 
-  const updatedText =
-    text.slice(0, position) + insertedText + text.slice(position)
+  const updatedText = text.slice(0, position) + insertedText + text.slice(position)
   // ts-morph's text omits the byte order mark, so keep the one on disk.
   const filePath = sourceFile.getFilePath()
   const fileText = await readFile(filePath, 'utf8')
-  const byteOrderMark = fileText.startsWith(BYTE_ORDER_MARK)
-    ? BYTE_ORDER_MARK
-    : ''
+  const byteOrderMark = fileText.startsWith(BYTE_ORDER_MARK) ? BYTE_ORDER_MARK : ''
   await writeFile(filePath, byteOrderMark + updatedText, 'utf8')
   return reExportLines
 }
@@ -135,15 +105,10 @@ export async function addMissingHybridClassReExports({
  * directive if the spec has no imports. Directives only work above the first
  * statement, so new statements must go below them.
  */
-function getHeaderEnd(
-  text: string,
-  lastImport: ImportDeclaration | undefined
-): number | undefined {
+function getHeaderEnd(text: string, lastImport: ImportDeclaration | undefined): number | undefined {
   if (lastImport != null) return getLineEnd(text, lastImport)
   const leadingComments = ts.getLeadingCommentRanges(text, 0) ?? []
-  const directives = leadingComments.filter((comment) =>
-    text.startsWith('///', comment.pos)
-  )
+  const directives = leadingComments.filter((comment) => text.startsWith('///', comment.pos))
   // A single-line comment ends at the end of its line.
   return directives.at(-1)?.end
 }

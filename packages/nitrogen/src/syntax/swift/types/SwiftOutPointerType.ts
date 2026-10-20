@@ -24,11 +24,7 @@ export class SwiftOutPointerType extends SwiftPointerType {
   }
 
   /** Initializes the storage behind `pointer` with a bridge `value`. */
-  initialize(
-    language: 'swift' | 'c++',
-    pointer: string,
-    value: string
-  ): string {
+  initialize(language: 'swift' | 'c++', pointer: string, value: string): string {
     const type = this.pointee.getCode(language, { context: 'type-argument' })
     switch (language) {
       case 'swift':
@@ -42,10 +38,7 @@ export class SwiftOutPointerType extends SwiftPointerType {
    * Allocates temporary storage, runs `body` to initialize it, and returns
    * the stored value. Swift converts it with `toSwift()`.
    */
-  allocate(
-    language: 'swift' | 'c++',
-    { storage, body, returnType = 'Void' }: AllocateOptions
-  ): string {
+  allocate(language: 'swift' | 'c++', { storage, body, returnType = 'Void' }: AllocateOptions): string {
     const type = this.pointee.getCode(language, { context: 'type-argument' })
     switch (language) {
       case 'swift': {

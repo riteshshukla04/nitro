@@ -11,8 +11,7 @@ permissions:
 jobs:
   request:
     if: >-
-      github.event.issue.pull_request &&
-      github.event.comment.body == '@nitro-modules-bot please test performance'
+      github.event.issue.pull_request && github.event.comment.body == '@nitro-modules-bot please test performance'
     runs-on: ubuntu-24.04
     # Serialize status writes with the publisher, without cancelling requests.
     concurrency:
@@ -251,14 +250,10 @@ jobs:
           pre-emulator-launch-script: '"$ANDROID_HOME/emulator/emulator" -version; "$ANDROID_HOME/emulator/emulator" -accel-check'
           emulator-options: -accel on -no-window -gpu swiftshader -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: >-
-            bun scripts/performance/run-sequence.ts
-            --platform android --base-app apps/base.apk --head-app apps/head.apk
-            --build-metadata apps/build.json
-            --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA"
-            --output-directory performance-android
-            --device-id "$(adb get-serialno)"
-            --device "Pixel 7 emulator / KVM / Blacksmith 4 vCPU" --os-version "Android 16 / API 36"
-            --architecture x86_64 --toolchain "$(jq -r .toolchain apps/build.json)"
+            bun scripts/performance/run-sequence.ts --platform android --base-app apps/base.apk --head-app apps/head.apk --build-metadata
+            apps/build.json --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --output-directory performance-android --device-id "$(adb
+            get-serialno)" --device "Pixel 7 emulator / KVM / Blacksmith 4 vCPU" --os-version "Android 16 / API 36" --architecture x86_64
+            --toolchain "$(jq -r .toolchain apps/build.json)"
       - name: Preserve Android host failure diagnostics
         if: always() && steps.measure.outcome == 'failure'
         continue-on-error: true

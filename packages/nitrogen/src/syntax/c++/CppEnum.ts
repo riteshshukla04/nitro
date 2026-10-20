@@ -8,22 +8,11 @@ import { getImportsCode } from '../getImportCode.js'
 /**
  * Creates a C++ enum that converts to a JS enum (aka just int)
  */
-export function createCppEnum(
-  typename: string,
-  enumMembers: EnumMember[]
-): SourceFile {
+export function createCppEnum(typename: string, enumMembers: EnumMember[]): SourceFile {
   // Namespace typename
-  const fullyQualifiedTypename = NitroConfig.current.getCxxNamespace(
-    'c++',
-    typename
-  )
+  const fullyQualifiedTypename = NitroConfig.current.getCxxNamespace('c++', typename)
   // Map enum to C++ code
-  const cppEnumMembers = enumMembers
-    .map(
-      (m) =>
-        `${m.name}      SWIFT_NAME(${toLowerCamelCase(m.name)}) = ${m.value},`
-    )
-    .join('\n')
+  const cppEnumMembers = enumMembers.map((m) => `${m.name}      SWIFT_NAME(${toLowerCamelCase(m.name)}) = ${m.value},`).join('\n')
   const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
 
   // Aliases share a value, so only emit one case for each number.

@@ -46,9 +46,7 @@ function result(index: number): BenchmarkRunResult {
 describe('fresh-process benchmark cases', () => {
   test('assembles every case in order without changing samples or revision metadata', () => {
     const combined = combineIsolatedCases([0, 1, 2].map(result))
-    expect(combined.metrics.map((m) => m.id)).toEqual(
-      [0, 1, 2].map((i) => result(i).metrics[0]!.id)
-    )
+    expect(combined.metrics.map((m) => m.id)).toEqual([0, 1, 2].map((i) => result(i).metrics[0]!.id))
     expect(combined.metrics[2]!.samplesNsPerOp).toEqual([102, 103])
     expect(combined.configuration.benchmarkIndex).toBeUndefined()
     expect(combined.configuration.reverse).toBe(true)
@@ -58,9 +56,7 @@ describe('fresh-process benchmark cases', () => {
 
   test('rejects incomplete suites', () => {
     expect(() => combineIsolatedCases([])).toThrow()
-    expect(() => combineIsolatedCases([result(0), result(1)])).toThrow(
-      'Incomplete'
-    )
+    expect(() => combineIsolatedCases([result(0), result(1)])).toThrow('Incomplete')
   })
 
   test('rejects duplicate cases, wrong revisions, changed settings, and wrong indices', () => {
@@ -93,9 +89,7 @@ describe('fresh-process benchmark cases', () => {
 
   test('rejects an unbounded suite or a non-isolated result', () => {
     for (const count of [0, 101]) {
-      expect(() =>
-        combineIsolatedCases([{ ...result(0), benchmarkCount: count }])
-      ).toThrow()
+      expect(() => combineIsolatedCases([{ ...result(0), benchmarkCount: count }])).toThrow()
     }
     const runs = [0, 1, 2].map(result)
     runs[0]!.metrics.push(result(1).metrics[0]!)

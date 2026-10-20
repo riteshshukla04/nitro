@@ -53,11 +53,7 @@ export interface CustomTypeConfig {
  * }
  * ```
  */
-export type CustomType<
-  T,
-  TypeName extends string,
-  Config extends CustomTypeConfig,
-> = T & {
+export type CustomType<T, TypeName extends string, Config extends CustomTypeConfig> = T & {
   readonly __customTypeName?: TypeName
   readonly __customTypeConfig?: Config
 }

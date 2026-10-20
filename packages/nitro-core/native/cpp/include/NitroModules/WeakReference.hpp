@@ -89,15 +89,13 @@ public:
    * Try to lock the weak reference to a borrowing reference, or an empty reference if this weak reference is empty
    * or the value has already been deleted.
    */
-  [[nodiscard]]
-  BorrowingReference<T> lock() const;
+  [[nodiscard]] BorrowingReference<T> lock() const;
 
   /**
    * Get whether the value this weak reference points to has already been deleted, or whether this weak reference is empty.
    * If this returns `true` for a non-empty weak reference, `lock()` will never return a value again.
    */
-  [[nodiscard]]
-  bool isExpired() const noexcept {
+  [[nodiscard]] bool isExpired() const noexcept {
     return _state == nullptr || _state->isDeleted;
   }
 

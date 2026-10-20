@@ -75,7 +75,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: tests/react-native/apps/example/ios/build
-          key: ${{ runner.os }}-${{ runner.arch }}-spm-xcode${{ env.XCODE_VERSION }}-dd-${{ hashFiles('bun.lock', '**/Package.swift', '**/Package.resolved') }}
+          key:
+            ${{ runner.os }}-${{ runner.arch }}-spm-xcode${{ env.XCODE_VERSION }}-dd-${{ hashFiles('bun.lock', '**/Package.swift',
+            '**/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-spm-xcode${{ env.XCODE_VERSION }}-dd-
 

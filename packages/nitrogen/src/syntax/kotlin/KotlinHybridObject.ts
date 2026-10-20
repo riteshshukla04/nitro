@@ -12,19 +12,14 @@ import { HybridObjectType } from '../types/HybridObjectType.js'
 import { createFbjniHybridObject } from './FbjniHybridObject.js'
 import type { KotlinConstructor } from './KotlinConstructor.js'
 import { getKotlinClassMembers } from './KotlinHybridClassBindings.js'
-import {
-  getKotlinPropertyAccessors,
-  KotlinInstanceMethod,
-} from './KotlinInstanceMethod.js'
+import { getKotlinPropertyAccessors, KotlinInstanceMethod } from './KotlinInstanceMethod.js'
 import { getKotlinImplementation } from './KotlinMethodHelpers.js'
 import type { KotlinStaticMethod } from './KotlinStaticMethod.js'
 import type { KotlinStaticProperty } from './KotlinStaticProperty.js'
 import { wrapKotlinType } from './wrapKotlinType.js'
 import { getImportCode } from '../getImportCode.js'
 
-export function createKotlinHybridObject(
-  spec: HybridObjectSpec<'kotlin'>
-): SourceFile[] {
+export function createKotlinHybridObject(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {
   const name = getHybridObjectName(spec.name)
   const properties = spec.properties.map(getKotlinPropertyCode).join('\n\n')
   const methods = spec.methods.map(getKotlinMethodCode).join('\n\n')
@@ -37,9 +32,7 @@ export function createKotlinHybridObject(
     ...spec.staticMethods.flatMap((m) => m.getRequiredImports('kotlin')),
     ...(spec.constructor?.getRequiredImports('kotlin') ?? []),
     ...companion.imports,
-    ...spec.baseTypes.flatMap((b) =>
-      new HybridObjectType(b).getRequiredImports('kotlin')
-    ),
+    ...spec.baseTypes.flatMap((b) => new HybridObjectType(b).getRequiredImports('kotlin')),
     {
       name: 'com.margelo.nitro.core.HybridObject',
       language: 'kotlin',
@@ -50,9 +43,7 @@ export function createKotlinHybridObject(
   let cxxPartBase: string
   if (spec.baseTypes.length > 0) {
     if (spec.baseTypes.length > 1) {
-      throw new Error(
-        `${name.T}: Inheriting from multiple HybridObject bases is not yet supported in Kotlin!`
-      )
+      throw new Error(`${name.T}: Inheriting from multiple HybridObject bases is not yet supported in Kotlin!`)
     }
     const base = spec.baseTypes[0]!
     const baseHybrid = new HybridObjectType(base)
@@ -68,14 +59,10 @@ export function createKotlinHybridObject(
     }
     cxxPartBase = 'HybridObject.CxxPart'
   }
-  const interfaceNames = spec.implementedInterfaces.map(
-    (implementedInterface) => implementedInterface.interface
-  )
+  const interfaceNames = spec.implementedInterfaces.map((implementedInterface) => implementedInterface.interface)
   const supertypes = [`${kotlinBase}()`, ...interfaceNames].join(', ')
 
-  const imports = extraImports
-    .map((i) => getImportCode(i))
-    .filter(isNotDuplicate)
+  const imports = extraImports.map((i) => getImportCode(i)).filter(isNotDuplicate)
 
   const javaPackage = spec.config.getAndroidPackage('java/kotlin')
 
@@ -179,8 +166,7 @@ function getKotlinCompanion(spec: HybridObjectSpec<'kotlin'>): KotlinCompanion {
   const tagCode = `
 protected const val TAG = "${name.HybridTSpec}"
 `.trim()
-  const { constructor, staticMethods, staticProperties } =
-    getKotlinClassMembers(spec)
+  const { constructor, staticMethods, staticProperties } = getKotlinClassMembers(spec)
   const groups: KotlinCompanionGroup[] = []
   if (constructor != null) {
     groups.push({ comment: 'Constructor', callables: [constructor] })
@@ -216,29 +202,20 @@ ${forwarders.join('\n\n')}
 function getKotlinMethodCode(method: InstanceMethod): string {
   const kotlinMethod = new KotlinInstanceMethod({ method: method })
   // Without a forwarder, JNI calls the abstract member directly.
-  const declaration = new InstanceMethod(
-    method.name,
-    method.returnType,
-    method.parameters,
-    {
-      doNotStrip: !kotlinMethod.needsKotlinForwarder,
-      pureVirtual: true,
-    }
-  )
+  const declaration = new InstanceMethod(method.name, method.returnType, method.parameters, {
+    doNotStrip: !kotlinMethod.needsKotlinForwarder,
+    pureVirtual: true,
+  })
   const forwarders = kotlinMethod
     .createBridge()
-    .kotlinMethods.map(({ method: forwarder, body }) =>
-      forwarder.getDefinition('kotlin', { body: body })
-    )
+    .kotlinMethods.map(({ method: forwarder, body }) => forwarder.getDefinition('kotlin', { body: body }))
   return [declaration.getDeclaration('kotlin'), ...forwarders].join('\n\n')
 }
 
 function getKotlinPropertyCode(property: Property): string {
   const accessors = getKotlinPropertyAccessors(property)
   // Without forwarders, JNI calls the abstract accessors directly.
-  const isCalledFromJni = accessors.every(
-    (accessor) => !accessor.needsKotlinForwarder
-  )
+  const isCalledFromJni = accessors.every((accessor) => !accessor.needsKotlinForwarder)
   const declaration = property.getCode('kotlin', {
     doNotStrip: isCalledFromJni,
     virtual: true,
@@ -249,9 +226,7 @@ function getKotlinPropertyCode(property: Property): string {
   return [declaration, ...forwarders].join('\n\n')
 }
 
-function getImplementedInterfaceImport(
-  implementedInterface: KotlinImplementedInterface
-): SourceImport<'kotlin'> {
+function getImplementedInterfaceImport(implementedInterface: KotlinImplementedInterface): SourceImport<'kotlin'> {
   return {
     name: `${implementedInterface.package}.${implementedInterface.interface}`,
     language: 'kotlin',

@@ -21,9 +21,8 @@
 namespace margelo::nitro::test {
 
 const std::shared_ptr<const HybridClass>& HybridTestObjectCpp::Class::get() {
-  static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-    clazz.registerRawHybridMethod("rawJsiFunc", 0, &HybridTestObjectCpp::rawJsiFunc);
-  });
+  static const auto hybridClass = HybridClass::create<Class>(
+      [](HybridClass& clazz) { clazz.registerRawHybridMethod("rawJsiFunc", 0, &HybridTestObjectCpp::rawJsiFunc); });
   return hybridClass;
 }
 
@@ -295,19 +294,24 @@ std::vector<Powertrain> HybridTestObjectCpp::bounceEnums(const std::vector<Power
   return array;
 }
 
-void HybridTestObjectCpp::complexEnumCallback(const std::vector<Powertrain>& array, const Callback<void(const std::vector<Powertrain>& /* array */)>& callback) {
+void HybridTestObjectCpp::complexEnumCallback(const std::vector<Powertrain>& array,
+                                              const Callback<void(const std::vector<Powertrain>& /* array */)>& callback) {
   callback(array);
 }
 
-std::vector<Powertrain> HybridTestObjectCpp::callEnumArrayCallback(const std::vector<Powertrain>& array, const Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)>& callback) {
+std::vector<Powertrain>
+HybridTestObjectCpp::callEnumArrayCallback(const std::vector<Powertrain>& array,
+                                           const Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)>& callback) {
   return callback.callSync(array);
 }
 
 Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)> HybridTestObjectCpp::getEnumArrayCallback() {
-  return Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)>::make([](const std::vector<Powertrain>& array) { return array; });
+  return Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)>::make(
+      [](const std::vector<Powertrain>& array) { return array; });
 }
 
-Promise<std::vector<Powertrain>> HybridTestObjectCpp::callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) {
+Promise<std::vector<Powertrain>>
+HybridTestObjectCpp::callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) {
   return Promise<std::vector<Powertrain>>::async([=]() {
     Promise<std::vector<Powertrain>> promise = callback().await().get();
     return promise.await().get();
@@ -315,16 +319,17 @@ Promise<std::vector<Powertrain>> HybridTestObjectCpp::callEnumArrayPromiseCallba
 }
 
 Promise<std::vector<Powertrain>> HybridTestObjectCpp::awaitEnumArrayPromise(const Promise<std::vector<Powertrain>>& promise) {
-  return Promise<std::vector<Powertrain>>::async([=]() {
-    return promise.await().get();
-  });
+  return Promise<std::vector<Powertrain>>::async([=]() { return promise.await().get(); });
 }
 
-std::vector<std::vector<std::optional<Person>>> HybridTestObjectCpp::callNestedStructCallback(const std::vector<std::vector<std::optional<Person>>>& value, const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>&)>& callback) {
+std::vector<std::vector<std::optional<Person>>> HybridTestObjectCpp::callNestedStructCallback(
+    const std::vector<std::vector<std::optional<Person>>>& value,
+    const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>&)>& callback) {
   return callback.callSync(value);
 }
 
-std::vector<std::shared_ptr<HybridChildSpec>> HybridTestObjectCpp::bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) {
+std::vector<std::shared_ptr<HybridChildSpec>>
+HybridTestObjectCpp::bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) {
   return array;
 }
 
@@ -344,39 +349,41 @@ std::vector<ArrayBuffer> HybridTestObjectCpp::bounceArrayBuffers(const std::vect
   return arrayBuffers;
 }
 
-std::vector<std::optional<std::string>> HybridTestObjectCpp::bounceOptionals(const std::vector<std::optional<std::string>>& strings, const std::vector<std::optional<ArrayBuffer>>& arrayBuffers) {
+std::vector<std::optional<std::string>> HybridTestObjectCpp::bounceOptionals(const std::vector<std::optional<std::string>>& strings,
+                                                                             const std::vector<std::optional<ArrayBuffer>>& arrayBuffers) {
   return strings;
 }
 
-std::vector<std::variant<nitro::NullType, std::string>> HybridTestObjectCpp::bounceNulls(const std::vector<std::variant<nitro::NullType, std::string>>& strings) {
+std::vector<std::variant<nitro::NullType, std::string>>
+HybridTestObjectCpp::bounceNulls(const std::vector<std::variant<nitro::NullType, std::string>>& strings) {
   return strings;
 }
 
-std::vector<std::optional<std::variant<nitro::NullType, std::string>>> HybridTestObjectCpp::bounceOptionalNulls(const std::vector<std::optional<std::variant<nitro::NullType, std::string>>>& strings) {
+std::vector<std::optional<std::variant<nitro::NullType, std::string>>>
+HybridTestObjectCpp::bounceOptionalNulls(const std::vector<std::optional<std::variant<nitro::NullType, std::string>>>& strings) {
   return strings;
 }
 
-std::unordered_map<std::string, std::optional<std::string>> HybridTestObjectCpp::bounceOptionalMap(const std::unordered_map<std::string, std::optional<std::string>>& map) {
+std::unordered_map<std::string, std::optional<std::string>>
+HybridTestObjectCpp::bounceOptionalMap(const std::unordered_map<std::string, std::optional<std::string>>& map) {
   return map;
 }
 
-std::unordered_map<std::string, std::variant<nitro::NullType, std::string>> HybridTestObjectCpp::bounceNullMap(const std::unordered_map<std::string, std::variant<nitro::NullType, std::string>>& map) {
+std::unordered_map<std::string, std::variant<nitro::NullType, std::string>>
+HybridTestObjectCpp::bounceNullMap(const std::unordered_map<std::string, std::variant<nitro::NullType, std::string>>& map) {
   return map;
 }
 
-std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>> HybridTestObjectCpp::bounceOptionalNullMap(const std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>>& map) {
+std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>> HybridTestObjectCpp::bounceOptionalNullMap(
+    const std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>>& map) {
   return map;
 }
 
 AnyJSON HybridTestObjectCpp::createMap() {
   auto array = nlohmann::json::array({getNumberValue(), getBoolValue(), getStringValue(), getInt64Value()});
   nlohmann::json object = {
-      {"number", getNumberValue()},
-      {"bool", getBoolValue()},
-      {"string", getStringValue()},
-      {"int64", getInt64Value()},
-      {"null", nullptr},
-      {"array", array},
+      {"number", getNumberValue()}, {"bool", getBoolValue()}, {"string", getStringValue()},
+      {"int64", getInt64Value()},   {"null", nullptr},        {"array", array},
   };
   auto nestedObject = object;
   nestedObject["array"].push_back(array);
@@ -488,7 +495,8 @@ bool HybridTestObjectCpp::tryTrailingOptional(double /* num */, const std::strin
   return boo.has_value() ? boo.value() : false;
 }
 
-std::variant<double, std::string> HybridTestObjectCpp::passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) {
+std::variant<double, std::string>
+HybridTestObjectCpp::passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) {
   if (std::holds_alternative<std::string>(either)) {
     return std::get<std::string>(either);
   } else if (std::holds_alternative<double>(either)) {
@@ -498,11 +506,14 @@ std::variant<double, std::string> HybridTestObjectCpp::passVariant(const std::va
   }
 }
 
-std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper> HybridTestObjectCpp::passAllEmptyObjectVariant(const std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>& variant) {
+std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>
+HybridTestObjectCpp::passAllEmptyObjectVariant(const std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>& variant) {
   return variant;
 }
 
-std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON> HybridTestObjectCpp::bounceComplexVariant(const std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON>& variant) {
+std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON>
+HybridTestObjectCpp::bounceComplexVariant(
+    const std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON>& variant) {
   return variant;
 }
 
@@ -522,15 +533,18 @@ std::variant<Person, Car> HybridTestObjectCpp::getVariantObjects(const std::vari
   return variant;
 }
 
-std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Person> HybridTestObjectCpp::getVariantHybrid(const std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Person>& variant) {
+std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Person>
+HybridTestObjectCpp::getVariantHybrid(const std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Person>& variant) {
   return variant;
 }
 
-std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Powertrain> HybridTestObjectCpp::getVariantHybridEnum(const std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Powertrain>& variant) {
+std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Powertrain>
+HybridTestObjectCpp::getVariantHybridEnum(const std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Powertrain>& variant) {
   return variant;
 }
 
-std::variant<std::tuple<double, double>, std::tuple<double, double, double>> HybridTestObjectCpp::getVariantTuple(const std::variant<std::tuple<double, double>, std::tuple<double, double, double>>& variant) {
+std::variant<std::tuple<double, double>, std::tuple<double, double, double>>
+HybridTestObjectCpp::getVariantTuple(const std::variant<std::tuple<double, double>, std::tuple<double, double, double>>& variant) {
   return variant;
 }
 
@@ -550,7 +564,8 @@ int64_t HybridTestObjectCpp::calculateFibonacciSync(double value) {
   return calculateFibonacci(value);
 }
 
-std::unordered_map<std::string, std::variant<bool, double>> HybridTestObjectCpp::bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map) {
+std::unordered_map<std::string, std::variant<bool, double>>
+HybridTestObjectCpp::bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map) {
   return map;
 }
 
@@ -589,7 +604,8 @@ Callback<void(double /* num */)> HybridTestObjectCpp::createNativeCallback(const
   return Callback<void(double)>::make([=](double num) { wrappingJsCallback(num); });
 }
 
-void HybridTestObjectCpp::callWithOptional(const std::optional<double>& value, const Callback<void(const std::optional<double>& /* maybe */)>& callback) {
+void HybridTestObjectCpp::callWithOptional(const std::optional<double>& value,
+                                           const Callback<void(const std::optional<double>& /* maybe */)>& callback) {
   callback(value);
 }
 
@@ -629,7 +645,8 @@ Callback<void(double /* value */)> HybridTestObjectCpp::getComplexCallback() {
   return Callback<void(double)>::make([](double value) { Logger::log(LogLevel::Info, Class::name, "Callback called with %f", value); });
 }
 
-void HybridTestObjectCpp::twoOptionalCallbacks(double value, const std::optional<Callback<void(double /* value */)>>& first, const std::optional<Callback<void(const std::string& /* value */)>>& second) {
+void HybridTestObjectCpp::twoOptionalCallbacks(double value, const std::optional<Callback<void(double /* value */)>>& first,
+                                               const std::optional<Callback<void(const std::string& /* value */)>>& second) {
   if (first.has_value()) {
     first.value()(value);
   }
@@ -725,7 +742,8 @@ void HybridTestObjectCpp::callAll(const Callback<void()>& first, const Callback<
   third();
 }
 
-Promise<void> HybridTestObjectCpp::getValueFromJsCallback(const Callback<std::string()>& callback, const Callback<void(const std::string& /* valueFromJs */)>& andThenCall) {
+Promise<void> HybridTestObjectCpp::getValueFromJsCallback(const Callback<std::string()>& callback,
+                                                          const Callback<void(const std::string& /* valueFromJs */)>& andThenCall) {
   return Promise<void>::async([=]() {
     Promise<std::string> promise = callback();
     std::future<std::string> future = promise.await();
@@ -918,11 +936,13 @@ Callback<double()> HybridTestObjectCpp::getSyncNumberCallback() {
   return Callback<double()>::make([]() -> double { return 55; });
 }
 
-Callback<int64_t(int64_t /* value */)> HybridTestObjectCpp::bounceSyncInt64Callback(const Callback<int64_t(int64_t /* value */)>& callback) {
+Callback<int64_t(int64_t /* value */)>
+HybridTestObjectCpp::bounceSyncInt64Callback(const Callback<int64_t(int64_t /* value */)>& callback) {
   return callback;
 }
 
-std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> HybridTestObjectCpp::bounceExternalHybrid(const std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>& externalObject) {
+std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> HybridTestObjectCpp::bounceExternalHybrid(
+    const std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>& externalObject) {
   return externalObject;
 }
 
@@ -930,11 +950,14 @@ ExternalObjectStruct HybridTestObjectCpp::bounceExternalStruct(const ExternalObj
   return externalStruct;
 }
 
-std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string> HybridTestObjectCpp::bounceExternalVariant(const std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>& variant) {
+std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>
+HybridTestObjectCpp::bounceExternalVariant(
+    const std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>& variant) {
   return variant;
 }
 
-std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> HybridTestObjectCpp::createExternalVariantFromFunc(const Callback<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>()>& factory) {
+std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> HybridTestObjectCpp::createExternalVariantFromFunc(
+    const Callback<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>()>& factory) {
   auto obj = factory.callSync();
   return obj;
 }

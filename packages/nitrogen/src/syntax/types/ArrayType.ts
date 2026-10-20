@@ -44,18 +44,14 @@ export class ArrayType implements Type {
             return `Array<${itemCode}>`
         }
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for ArrayType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for ArrayType!`)
     }
   }
   getExtraFiles(): SourceFile[] {
     return this.itemType.getExtraFiles()
   }
   getRequiredImports(language: Language): SourceImport[] {
-    const imports: SourceImport[] = [
-      ...this.itemType.getRequiredImports(language),
-    ]
+    const imports: SourceImport[] = [...this.itemType.getRequiredImports(language)]
     switch (language) {
       case 'c++':
         imports.push({

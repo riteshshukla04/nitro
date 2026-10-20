@@ -21,10 +21,7 @@ import { createSwiftHybridObject } from './syntax/swift/SwiftHybridObject.js'
 import { createKotlinHybridObject } from './syntax/kotlin/KotlinHybridObject.js'
 import { createType } from './syntax/createType.js'
 import { Parameter } from './syntax/Parameter.js'
-import {
-  getDirectBaseTypes,
-  getHybridObjectNitroModuleConfig,
-} from './utils.js'
+import { getDirectBaseTypes, getHybridObjectNitroModuleConfig } from './utils.js'
 import { NitroConfig } from './config/NitroConfig.js'
 import { isMemberOverridingFromBase } from './syntax/isMemberOverridingFromBase.js'
 
@@ -53,11 +50,7 @@ export function generatePlatformFiles(
   }
 }
 
-function getHybridObjectSpec(
-  type: Type,
-  platform: Platform,
-  options: HybridObjectPlatformOptions
-): HybridObjectSpec {
+function getHybridObjectSpec(type: Type, platform: Platform, options: HybridObjectPlatformOptions): HybridObjectSpec {
   const language = options.language
   const config = getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
   const view = isHybridView(type)
@@ -66,9 +59,7 @@ function getHybridObjectSpec(
   const name = symbol.getEscapedName()
   const typeDeclarations = symbol.getDeclarations()
   if (typeDeclarations.length > 1) {
-    throw new Error(
-      `${name}: HybridObject declaration merging is not supported. Declare all native members in a single class.`
-    )
+    throw new Error(`${name}: HybridObject declaration merging is not supported. Declare all native members in a single class.`)
   }
   let constructorParameters: Parameter[] | undefined
   const declaration = typeDeclarations[0]
@@ -78,22 +69,15 @@ function getHybridObjectSpec(
   const fileName = declaration.getSourceFile().getBaseName()
   const expectedSyntax = `Use \`export declare class ${name}\` in a .nitro.ts spec.`
   // Base classes from built packages are declared in tsc's .nitro.d.ts output.
-  const isSpecFile =
-    fileName.endsWith('.nitro.ts') || fileName.endsWith('.nitro.d.ts')
+  const isSpecFile = fileName.endsWith('.nitro.ts') || fileName.endsWith('.nitro.d.ts')
   if (!isSpecFile) {
-    throw new Error(
-      `${name}: HybridObject classes must be declared in a .nitro.ts file. ${expectedSyntax}`
-    )
+    throw new Error(`${name}: HybridObject classes must be declared in a .nitro.ts file. ${expectedSyntax}`)
   }
   if (!declaration.isAmbient()) {
-    throw new Error(
-      `${name}: HybridObject classes must be ambient. ${expectedSyntax}`
-    )
+    throw new Error(`${name}: HybridObject classes must be ambient. ${expectedSyntax}`)
   }
   if (!declaration.hasExportKeyword() || declaration.isDefaultExport()) {
-    throw new Error(
-      `${name}: HybridObject classes must be named exports. ${expectedSyntax}`
-    )
+    throw new Error(`${name}: HybridObject classes must be named exports. ${expectedSyntax}`)
   }
   const constructors = declaration.getConstructors()
   if (constructors.length > 1) {
@@ -104,19 +88,13 @@ function getHybridObjectSpec(
   const constructorDeclaration = constructors[0]
   if (view) {
     if (language === 'c++') {
-      throw new Error(
-        `${name}: HybridViews require a Swift or Kotlin view implementation.`
-      )
+      throw new Error(`${name}: HybridViews require a Swift or Kotlin view implementation.`)
     }
     if (options.implementation == null) {
-      throw new Error(
-        `${name}: HybridViews require a concrete native implementation.`
-      )
+      throw new Error(`${name}: HybridViews require a concrete native implementation.`)
     }
     if (constructorDeclaration?.getScope() === Scope.Public) {
-      throw new Error(
-        `${name}: React Native creates HybridViews. Omit the constructor or declare it protected.`
-      )
+      throw new Error(`${name}: React Native creates HybridViews. Omit the constructor or declare it protected.`)
     }
   }
   if (constructorDeclaration?.getScope() === Scope.Public) {
@@ -126,32 +104,21 @@ function getHybridObjectSpec(
       )
     }
     if (declaration.isAbstract()) {
-      throw new Error(
-        `${name}: Abstract HybridObject classes cannot be constructed from JavaScript. Use a protected constructor.`
-      )
+      throw new Error(`${name}: Abstract HybridObject classes cannot be constructed from JavaScript. Use a protected constructor.`)
     }
-    const parameters = constructorDeclaration
-      .getParameters()
-      .map((parameter) => new Parameter(parameter, language))
+    const parameters = constructorDeclaration.getParameters().map((parameter) => new Parameter(parameter, language))
     constructorParameters = parameters
   }
   const staticMethods: StaticMethod[] = []
   const staticProperties: StaticProperty[] = []
   for (const member of declaration.getStaticMembers()) {
-    if (
-      !Node.isMethodDeclaration(member) &&
-      !Node.isPropertyDeclaration(member)
-    ) {
-      throw new Error(
-        `${name}.${member.getName()}: Static accessors are not supported. Declare a static property instead.`
-      )
+    if (!Node.isMethodDeclaration(member) && !Node.isPropertyDeclaration(member)) {
+      throw new Error(`${name}.${member.getName()}: Static accessors are not supported. Declare a static property instead.`)
     }
     const scope = member.getScope()
     const isPrivate = Node.isPrivateIdentifier(member.getNameNode())
     if (scope !== Scope.Public || isPrivate) {
-      throw new Error(
-        `${name}.${member.getName()}: HybridObject members must be public.`
-      )
+      throw new Error(`${name}.${member.getName()}: HybridObject members must be public.`)
     }
     if (options.implementation == null) {
       throw new Error(
@@ -162,26 +129,12 @@ function getHybridObjectSpec(
       staticMethods.push(new StaticMethod(member, language))
     } else if (Node.isPropertyDeclaration(member)) {
       const memberType = member.getType()
-      const isOptional =
-        member.getSymbolOrThrow().isOptional() ||
-        memberType.getUnionTypes().some((unionType) => unionType.isUndefined())
-      const propType = createType(
-        language,
-        memberType,
-        isOptional,
-        member.getTypeNode()
-      )
-      staticProperties.push(
-        new StaticProperty(
-          member.getSymbolOrThrow().getName(),
-          propType,
-          member.isReadonly()
-        )
-      )
+      const isOptional = member.getSymbolOrThrow().isOptional() || memberType.getUnionTypes().some((unionType) => unionType.isUndefined())
+      const propType = createType(language, memberType, isOptional, member.getTypeNode())
+      staticProperties.push(new StaticProperty(member.getSymbolOrThrow().getName(), propType, member.isReadonly()))
     }
   }
-  const allowMultipleImplementations =
-    options.allowMultipleImplementations === true
+  const allowMultipleImplementations = options.allowMultipleImplementations === true
   if (
     allowMultipleImplementations &&
     options.implementation != null &&
@@ -201,30 +154,19 @@ function getHybridObjectSpec(
     const scope = member.getScope()
     const isPrivate = Node.isPrivateIdentifier(member.getNameNode())
     if (scope !== Scope.Public || isPrivate) {
-      throw new Error(
-        `${name}.${member.getName()}: HybridObject members must be public.`
-      )
+      throw new Error(`${name}.${member.getName()}: HybridObject members must be public.`)
     }
     const memberSymbol = member.getSymbolOrThrow()
     const memberName = memberSymbol.getName()
     if (Node.isPropertyDeclaration(member)) {
       const memberType = member.getType()
-      const isOptional =
-        memberSymbol.isOptional() ||
-        memberType.getUnionTypes().some((unionType) => unionType.isUndefined())
-      const propType = createType(
-        language,
-        memberType,
-        isOptional,
-        member.getTypeNode()
-      )
+      const isOptional = memberSymbol.isOptional() || memberType.getUnionTypes().some((unionType) => unionType.isUndefined())
+      const propType = createType(language, memberType, isOptional, member.getTypeNode())
       properties.push(new Property(memberName, propType, member.isReadonly()))
     } else if (Node.isMethodDeclaration(member)) {
       methods.push(new InstanceMethod(member, language))
     } else {
-      throw new Error(
-        `${name}: Property "${memberName}" is neither a property, nor a method!`
-      )
+      throw new Error(`${name}: Property "${memberName}" is neither a property, nor a method!`)
     }
   }
 
@@ -233,9 +175,7 @@ function getHybridObjectSpec(
     .map((baseType) => {
       const baseOptions = getHybridObjectPlatformsForType(baseType)[platform]
       if (baseOptions == null) {
-        throw new Error(
-          `${name}: Base ${baseType.getText()} does not support ${platform}.`
-        )
+        throw new Error(`${name}: Base ${baseType.getText()} does not support ${platform}.`)
       }
       const base = getHybridObjectSpec(baseType, platform, baseOptions)
       if (!base.allowInheritance) {
@@ -244,9 +184,7 @@ function getHybridObjectSpec(
         )
       }
       if (base.language !== language) {
-        throw new Error(
-          `${name}: Base ${base.name} uses ${base.language} on ${platform}, but this spec uses ${language}.`
-        )
+        throw new Error(`${name}: Base ${base.name} uses ${base.language} on ${platform}, but this spec uses ${language}.`)
       }
       if (base.constructor != null && constructorDeclaration == null) {
         // TypeScript would let JavaScript construct this class with the base's constructor.
@@ -259,8 +197,7 @@ function getHybridObjectSpec(
 
   let constructor: Constructor | undefined
   if (constructorParameters != null) {
-    const swiftProtocolConformances =
-      options.language === 'swift' ? options.protocolConformances : []
+    const swiftProtocolConformances = options.language === 'swift' ? options.protocolConformances : []
     const constructedType = new HybridObjectType(
       name,
       language,
@@ -268,11 +205,7 @@ function getHybridObjectSpec(
       config,
       swiftProtocolConformances
     )
-    constructor = new Constructor(
-      getHybridObjectName(name).HybridTSpec,
-      constructedType,
-      constructorParameters
-    )
+    constructor = new Constructor(getHybridObjectName(name).HybridTSpec, constructedType, constructorParameters)
   }
 
   const spec: HybridObjectSpec = {
@@ -293,33 +226,18 @@ function getHybridObjectSpec(
   const accessorNames = new Set(getPropertyAccessorNames(spec))
   const staticMembers = [...staticMethods, ...staticProperties]
   for (const member of staticMembers) {
-    if (
-      type.getProperty(member.name) != null ||
-      accessorNames.has(member.name)
-    ) {
-      throw new Error(
-        `${name}.${member.name}: Static members cannot share a name with an instance member or its generated accessor.`
-      )
+    if (type.getProperty(member.name) != null || accessorNames.has(member.name)) {
+      throw new Error(`${name}.${member.name}: Static members cannot share a name with an instance member or its generated accessor.`)
     }
   }
-  const staticCallables = [
-    ...staticMethods,
-    ...staticProperties.flatMap((property) => property.getStaticMethods()),
-  ]
+  const staticCallables = [...staticMethods, ...staticProperties.flatMap((property) => property.getStaticMethods())]
   const callableNames = new Set<string>()
   for (const method of staticCallables) {
     if (callableNames.has(method.name)) {
-      throw new Error(
-        `${name}.${method.name}: Static methods and generated property accessors must have distinct names.`
-      )
+      throw new Error(`${name}.${method.name}: Static methods and generated property accessors must have distinct names.`)
     }
-    if (
-      type.getProperty(method.name) != null ||
-      accessorNames.has(method.name)
-    ) {
-      throw new Error(
-        `${name}.${method.name}: Static members cannot share a name with an instance member or its generated accessor.`
-      )
+    if (type.getProperty(method.name) != null || accessorNames.has(method.name)) {
+      throw new Error(`${name}.${method.name}: Static members cannot share a name with an instance member or its generated accessor.`)
     }
     callableNames.add(method.name)
   }
@@ -327,10 +245,7 @@ function getHybridObjectSpec(
     case 'kotlin': {
       // Kotlin statics forward through `<name>_cxx` on the spec class, next to the JVM
       // methods of its instance members and accessors (e.g. `setEnabled` for `isEnabled`).
-      const jvmNames = new Set([
-        ...getInstanceMethodNames(spec),
-        ...getJvmAccessorNames(spec),
-      ])
+      const jvmNames = new Set([...getInstanceMethodNames(spec), ...getJvmAccessorNames(spec)])
       for (const method of staticCallables) {
         if (jvmNames.has(method.name) || jvmNames.has(`${method.name}_cxx`)) {
           throw new Error(
@@ -341,19 +256,12 @@ function getHybridObjectSpec(
       break
     }
     case 'swift': {
-      const instanceNames = [
-        ...getInstanceMethodNames(spec),
-        ...getPropertyAccessorNames(spec),
-      ]
-      const bridgeNames = new Set(
-        instanceNames.flatMap((member) => [member, `${member}_Swift`])
-      )
+      const instanceNames = [...getInstanceMethodNames(spec), ...getPropertyAccessorNames(spec)]
+      const bridgeNames = new Set(instanceNames.flatMap((member) => [member, `${member}_Swift`]))
       for (const method of staticCallables) {
         for (const bridgeName of [method.name, `${method.name}_Swift`]) {
           if (bridgeNames.has(bridgeName)) {
-            throw new Error(
-              `${name}.${method.name}: Static members cannot share a generated Swift bridge name with another member.`
-            )
+            throw new Error(`${name}.${method.name}: Static members cannot share a generated Swift bridge name with another member.`)
           }
           bridgeNames.add(bridgeName)
         }
@@ -392,11 +300,7 @@ function getHybridObjectSpec(
   }
 
   for (const member of [...properties, ...methods]) {
-    const isOverridingBaseMember = isMemberOverridingFromBase(
-      member.name,
-      spec,
-      language
-    )
+    const isOverridingBaseMember = isMemberOverridingFromBase(member.name, spec, language)
     if (isOverridingBaseMember) {
       throw new Error(
         `\`${name}.${member.name}\` is overriding a member of one of it's base classes. ` +
@@ -415,9 +319,7 @@ function getInstanceMethodNames(spec: HybridObjectSpec): string[] {
 }
 
 function getPropertyAccessorNames(spec: HybridObjectSpec): string[] {
-  const ownNames = spec.properties.flatMap((property) =>
-    property.getCppMethods().map((method) => method.name)
-  )
+  const ownNames = spec.properties.flatMap((property) => property.getCppMethods().map((method) => method.name))
   const inheritedNames = spec.baseTypes.flatMap(getPropertyAccessorNames)
   return [...ownNames, ...inheritedNames]
 }
@@ -432,10 +334,7 @@ function getJvmAccessorNames(spec: HybridObjectSpec): string[] {
   return [...ownNames, ...inheritedNames]
 }
 
-function generateCppFiles(
-  spec: HybridObjectSpec,
-  platform: Platform
-): SourceFile[] {
+function generateCppFiles(spec: HybridObjectSpec, platform: Platform): SourceFile[] {
   const cppFiles = createCppHybridObject(spec, platform)
   return cppFiles
 }

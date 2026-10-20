@@ -9,15 +9,11 @@ import { getProtocolConformanceImports } from './getSwiftImports.js'
 export function createSwiftEnumBridge(type: SwiftEnumType): SourceFile[] {
   const enumType = type.type
   const protocolConformances = type.getProtocolConformances()
-  const protocolNames = protocolConformances.map(
-    (conformance) => conformance.name
-  )
+  const protocolNames = protocolConformances.map((conformance) => conformance.name)
   const baseTypes = ['Int32', ...protocolNames]
   const protocolImports = getProtocolConformanceImports(protocolConformances)
   const imports = getImportsCode(protocolImports)
-  const enumCases = enumType.enumMembers.map(
-    (m) => `case \`${toLowerCamelCase(m.name)}\` = ${m.value}`
-  )
+  const enumCases = enumType.enumMembers.map((m) => `case \`${toLowerCamelCase(m.name)}\` = ${m.value}`)
   const initializeCases = enumType.enumMembers.map((m) =>
     `
 case "${m.stringValue}":
@@ -92,15 +88,11 @@ public extension ${enumType.enumName} {
   let jsCanConvertCode: string
   if (enumType.jsType === 'union') {
     const fromJSICases = enumType.enumMembers.map(
-      (member) =>
-        `case hashString("${member.stringValue}"): return ${cppEnumType}::fromRawValue(${member.value});`
+      (member) => `case hashString("${member.stringValue}"): return ${cppEnumType}::fromRawValue(${member.value});`
     )
-    const canConvertCases = enumType.enumMembers.map(
-      (member) => `case hashString("${member.stringValue}"): return true;`
-    )
+    const canConvertCases = enumType.enumMembers.map((member) => `case hashString("${member.stringValue}"): return true;`)
     const toJSICases = enumType.enumMembers.map(
-      (member) =>
-        `case ${member.value}: return createJSIString<"${member.stringValue}">(runtime);`
+      (member) => `case ${member.value}: return createJSIString<"${member.stringValue}">(runtime);`
     )
     jsToSwiftConverterCode = `
 const auto string = value.asString(runtime).utf8(runtime);
@@ -128,9 +120,7 @@ switch (value.getRawValue()) {
   } else {
     const minimum = Math.min(...enumValues)
     const maximum = Math.max(...enumValues)
-    const fromJSICases = enumValues.map(
-      (raw) => `case ${raw}: return ${cppEnumType}::fromRawValue(${raw});`
-    )
+    const fromJSICases = enumValues.map((raw) => `case ${raw}: return ${cppEnumType}::fromRawValue(${raw});`)
     const canConvertCases = enumValues.map((raw) => `case ${raw}: return true;`)
     // Reject NaN, infinities, and out-of-range values before the integer cast.
     const readInteger = (onInvalid: string) =>
@@ -172,9 +162,7 @@ ${canConvertIntegerBody}
   const swiftToCppConverterCode = `
 return static_cast<${enumType.getCode('c++', { context: 'value', fullyQualified: true })}>(value.getRawValue());
 `.trim()
-  const enumMemberComparisons = enumValues.map(
-    (value) => `rawValue != ${value}`
-  )
+  const enumMemberComparisons = enumValues.map((value) => `rawValue != ${value}`)
   const cppToSwiftConverterCode = `
 const auto rawValue = static_cast<int32_t>(value);
 #ifdef NITRO_DEBUG

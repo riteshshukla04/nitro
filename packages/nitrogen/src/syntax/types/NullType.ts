@@ -19,9 +19,7 @@ export class NullType implements Type {
       case 'kotlin':
         return 'NullType'
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for NullType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for NullType!`)
     }
   }
   getExtraFiles(): SourceFile[] {

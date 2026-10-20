@@ -44,17 +44,13 @@ export interface MethodSignatureOptions {
 }
 
 /** Copies and freezes the options, which are all optional. */
-function freezeOptions<Options extends MethodOptions>(
-  options: Options | undefined
-): Readonly<Partial<Options>> {
+function freezeOptions<Options extends MethodOptions>(options: Options | undefined): Readonly<Partial<Options>> {
   if (options == null) return Object.freeze({})
   return Object.freeze({ ...options })
 }
 
 /** Signature data and formatting shared by native callable declarations. */
-export abstract class Method<
-  Options extends MethodOptions = MethodOptions,
-> implements CodeNode {
+export abstract class Method<Options extends MethodOptions = MethodOptions> implements CodeNode {
   readonly name: string
   readonly returnType: Type
   readonly parameters: Parameter[]
@@ -71,39 +67,23 @@ export abstract class Method<
       const [declaration, language, options] = args
       const name = declaration.getSymbolOrThrow().getName()
       if (declaration.getOverloads().length > 1) {
-        throw new Error(
-          `Function overloading is not supported, but \`${name}(...)\` is declared multiple times!`
-        )
+        throw new Error(`Function overloading is not supported, but \`${name}(...)\` is declared multiple times!`)
       }
       const returnType = declaration.getReturnType()
-      const isOptional = returnType
-        .getUnionTypes()
-        .some((type) => type.isUndefined())
+      const isOptional = returnType.getUnionTypes().some((type) => type.isUndefined())
       this.name = name
-      this.returnType = createType(
-        language,
-        returnType,
-        isOptional,
-        declaration.getReturnTypeNode()
-      )
-      this.parameters = declaration
-        .getParameters()
-        .map((parameter) => new Parameter(parameter, language))
+      this.returnType = createType(language, returnType, isOptional, declaration.getReturnTypeNode())
+      this.parameters = declaration.getParameters().map((parameter) => new Parameter(parameter, language))
       this.options = freezeOptions(options)
     } else {
       throw new Error('Invalid method constructor arguments.')
     }
     if (!this.options.generated && this.name.startsWith('__')) {
-      throw new Error(
-        `Method names are not allowed to start with two underscores (__)! (In ${this.jsSignature})`
-      )
+      throw new Error(`Method names are not allowed to start with two underscores (__)! (In ${this.jsSignature})`)
     }
   }
 
-  protected abstract getSignature(
-    language: Language,
-    options: MethodSignatureOptions
-  ): string
+  protected abstract getSignature(language: Language, options: MethodSignatureOptions): string
 
   getCode(language: Language): string {
     return this.getDeclaration(language)
@@ -118,17 +98,12 @@ export abstract class Method<
       case 'kotlin':
         return signature
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for methods!`
-        )
+        throw new Error(`Language ${language} is not yet supported for methods!`)
     }
   }
 
   getDefinition(language: 'c++', options: CppMethodDefinitionOptions): string
-  getDefinition(
-    language: 'swift' | 'kotlin',
-    options: MethodDefinitionOptions
-  ): string
+  getDefinition(language: 'swift' | 'kotlin', options: MethodDefinitionOptions): string
   getDefinition(...args: MethodDefinitionArguments): string {
     const [language, options] = args
     let className: string | undefined
@@ -152,25 +127,19 @@ ${signature} {
 
   get jsSignature(): string {
     const returnType = this.returnType.kind
-    const parameters = this.parameters.map(
-      (parameter) => `${parameter.name}: ${parameter.type.kind}`
-    )
+    const parameters = this.parameters.map((parameter) => `${parameter.name}: ${parameter.type.kind}`)
     return `${this.name}(${parameters.join(', ')}): ${returnType}`
   }
 
   getExtraFiles(): SourceFile[] {
     const returnTypeFiles = this.returnType.getExtraFiles()
-    const parameterFiles = this.parameters.flatMap((parameter) =>
-      parameter.getExtraFiles()
-    )
+    const parameterFiles = this.parameters.flatMap((parameter) => parameter.getExtraFiles())
     return [...returnTypeFiles, ...parameterFiles]
   }
 
   getRequiredImports(language: Language): SourceImport[] {
     const returnTypeImports = this.returnType.getRequiredImports(language)
-    const parameterImports = this.parameters.flatMap((parameter) =>
-      parameter.getRequiredImports(language)
-    )
+    const parameterImports = this.parameters.flatMap((parameter) => parameter.getRequiredImports(language))
     return [...returnTypeImports, ...parameterImports]
   }
 }

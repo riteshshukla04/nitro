@@ -3,8 +3,7 @@ import { NitroModules } from 'nitro-core'
 
 export function installWorkletsSupport() {
   try {
-    const { registerCustomSerializable } =
-      require('react-native-worklets') as typeof import('react-native-worklets')
+    const { registerCustomSerializable } = require('react-native-worklets') as typeof import('react-native-worklets')
 
     const boxedNitroProxy = NitroModules.box(NitroModules)
     registerCustomSerializable({

@@ -10,15 +10,11 @@ export function readJsonFile<T>(filePath: string, schema: z.ZodType<T>): T {
     json = JSON.parse(text)
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error)
-    throw new Error(
-      `Failed to parse ${prettifyDirectory(filePath)} as JSON: ${reason}`
-    )
+    throw new Error(`Failed to parse ${prettifyDirectory(filePath)} as JSON: ${reason}`)
   }
   const result = schema.safeParse(json)
   if (!result.success) {
-    throw new Error(
-      `Invalid ${prettifyDirectory(filePath)}: ${z.prettifyError(result.error)}`
-    )
+    throw new Error(`Invalid ${prettifyDirectory(filePath)}: ${z.prettifyError(result.error)}`)
   }
   return result.data
 }

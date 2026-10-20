@@ -24,18 +24,10 @@ test.each([
 ] as const)(
   '%s per-case comparisons: %s, saved apps = %s',
   async (platform, mode, savedApps) => {
-    const changedSuite = [
-      'changed-suite',
-      'added-case',
-      'removed-case',
-    ].includes(mode)
+    const changedSuite = ['changed-suite', 'added-case', 'removed-case'].includes(mode)
     const baseIds = ['javascript/control/first', 'javascript/control/second']
     const headIds =
-      mode === 'added-case'
-        ? [baseIds[1]!, 'javascript/control/new', baseIds[0]!]
-        : mode === 'removed-case'
-          ? [baseIds[1]!]
-          : baseIds
+      mode === 'added-case' ? [baseIds[1]!, 'javascript/control/new', baseIds[0]!] : mode === 'removed-case' ? [baseIds[1]!] : baseIds
     const sameBinary = mode === 'same-sha'
     const headSha = sameBinary ? 'a'.repeat(40) : 'b'.repeat(40)
     const directory = await mkdtemp(path.join(os.tmpdir(), 'nitro-sequence-'))
@@ -89,10 +81,7 @@ test.each([
       `
       )
       const tool = path.join(directory, platform === 'ios' ? 'xcrun' : 'adb')
-      await Bun.write(
-        tool,
-        `#!/bin/sh\nexec '${process.execPath}' '${fakeDevice}' "$@"\n`
-      )
+      await Bun.write(tool, `#!/bin/sh\nexec '${process.execPath}' '${fakeDevice}' "$@"\n`)
       await chmod(tool, 0o755)
       const output = path.join(directory, 'results')
       const log = path.join(directory, 'processes.jsonl')
@@ -102,10 +91,7 @@ test.each([
         await mkdir(path.join(baseRoot, 'tests/react-native/apps/benchmark/src/benchmarks'), {
           recursive: true,
         })
-        await Bun.write(
-          path.join(baseRoot, 'tests/react-native/apps/benchmark/index.js'),
-          '// old benchmark'
-        )
+        await Bun.write(path.join(baseRoot, 'tests/react-native/apps/benchmark/index.js'), '// old benchmark')
       }
       const metadataPath = path.join(directory, 'build.json')
       await Bun.write(
@@ -114,9 +100,7 @@ test.each([
           platform,
           baseSha: 'a'.repeat(40),
           headSha,
-          baseSuiteHash: await calculateSuiteHash(
-            changedSuite ? baseRoot : root
-          ),
+          baseSuiteHash: await calculateSuiteHash(changedSuite ? baseRoot : root),
           headSuiteHash: await calculateSuiteHash(root),
           architecture: 'arm64',
           toolchain: 'fixture',
@@ -135,14 +119,7 @@ test.each([
           path.join(directory, 'base.app'),
           '--head-app',
           path.join(directory, 'head.app'),
-          ...(savedApps
-            ? ['--build-metadata', metadataPath]
-            : [
-                '--base-root',
-                changedSuite ? baseRoot : root,
-                '--head-root',
-                root,
-              ]),
+          ...(savedApps ? ['--build-metadata', metadataPath] : ['--base-root', changedSuite ? baseRoot : root, '--head-root', root]),
           '--base-sha',
           'a'.repeat(40),
           '--head-sha',
@@ -186,18 +163,13 @@ test.each([
       ])
       if (mode === 'dead-device') {
         expect(exitCode).not.toBe(0)
-        const failure = await readFile(
-          path.join(output, 'base-1-cases/case-0.failure.log'),
-          'utf8'
-        )
+        const failure = await readFile(path.join(output, 'base-1-cases/case-0.failure.log'), 'utf8')
         expect(failure).toContain('failed with exit code 255')
         expect(failure).toContain('adb: device emulator-5554 not found')
         expect(failure).toContain('"exitCode": 1')
         expect(failure).toContain('"timedOut": false')
         expect(stderr).toContain('failed with exit code 255')
-        expect(await Bun.file(path.join(output, 'base-1.json')).exists()).toBe(
-          false
-        )
+        expect(await Bun.file(path.join(output, 'base-1.json')).exists()).toBe(false)
         return
       }
       const processes = (await readFile(log, 'utf8'))
@@ -211,18 +183,9 @@ test.each([
       if (mode === 'invalid-result') {
         expect(exitCode).not.toBe(0)
         expect(processes).toHaveLength(2)
-        expect(
-          processes.every((entry) => entry.configuration.benchmarkIndex === 0)
-        ).toBe(true)
-        expect(commands.at(-1)).toEqual([
-          'simctl',
-          'terminate',
-          'fixture',
-          'com.margelo.nitrobenchmark.head',
-        ])
-        expect(await Bun.file(path.join(output, 'head-1.json')).exists()).toBe(
-          false
-        )
+        expect(processes.every((entry) => entry.configuration.benchmarkIndex === 0)).toBe(true)
+        expect(commands.at(-1)).toEqual(['simctl', 'terminate', 'fixture', 'com.margelo.nitrobenchmark.head'])
+        expect(await Bun.file(path.join(output, 'head-1.json')).exists()).toBe(false)
         return
       }
       expect({
@@ -231,128 +194,55 @@ test.each([
       }).toEqual({ exitCode: 0, error: '' })
       const installs = commands.filter((args) => args.includes('install'))
       expect(installs.map((args) => args.at(-1))).toEqual(
-        sameBinary
-          ? [path.join(directory, 'head.app')]
-          : [path.join(directory, 'head.app'), path.join(directory, 'base.app')]
+        sameBinary ? [path.join(directory, 'head.app')] : [path.join(directory, 'head.app'), path.join(directory, 'base.app')]
       )
-      const launches = commands.filter(
-        (args) => args.includes('launch') || args.includes('start')
-      )
+      const launches = commands.filter((args) => args.includes('launch') || args.includes('start'))
       expect(launches.map((args) => args.at(-1))).toEqual(
-        processes.map((entry) =>
-          platform === 'ios'
-            ? entry.appId
-            : `${entry.appId}/com.margelo.nitrobenchmark.MainActivity`
-        )
+        processes.map((entry) => (platform === 'ios' ? entry.appId : `${entry.appId}/com.margelo.nitrobenchmark.MainActivity`))
       )
       // Every app is stopped before starting the next case.
-      const lifecycle = commands.filter((args) =>
-        ['launch', 'start', 'terminate', 'force-stop'].some((op) =>
-          args.includes(op)
-        )
-      )
-      const firstLaunch = lifecycle.findIndex(
-        (args) => args.includes('launch') || args.includes('start')
-      )
+      const lifecycle = commands.filter((args) => ['launch', 'start', 'terminate', 'force-stop'].some((op) => args.includes(op)))
+      const firstLaunch = lifecycle.findIndex((args) => args.includes('launch') || args.includes('start'))
       expect(
-        lifecycle
-          .slice(firstLaunch)
-          .map((args) =>
-            args.includes('terminate') || args.includes('force-stop')
-              ? 'stop'
-              : 'start'
-          )
+        lifecycle.slice(firstLaunch).map((args) => (args.includes('terminate') || args.includes('force-stop') ? 'stop' : 'start'))
       ).toEqual(processes.flatMap(() => ['start', 'stop']))
       if (savedApps) {
-        expect(
-          (await Bun.file(path.join(output, 'build.json')).json()).runAttempt
-        ).toBe(1)
-        expect(
-          await Bun.file(path.join(output, 'measurement.json')).json()
-        ).toEqual({ buildArtifactId: 456, runAttempt: 2, pairCount: 4 })
+        expect((await Bun.file(path.join(output, 'build.json')).json()).runAttempt).toBe(1)
+        expect(await Bun.file(path.join(output, 'measurement.json')).json()).toEqual({ buildArtifactId: 456, runAttempt: 2, pairCount: 4 })
       }
-      expect(new Set(processes.map((entry) => entry.pid)).size).toBe(
-        4 * (baseIds.length + headIds.length)
-      )
-      expect(
-        processes.map((entry) => [
-          entry.configuration.benchmarkIndex,
-          entry.configuration.runId,
-        ])
-      ).toEqual(
-        Array.from(
-          { length: Math.max(baseIds.length, headIds.length) },
-          (_, index) =>
-            [
-              'base-1',
-              'head-1',
-              'head-2',
-              'base-2',
-              'head-3',
-              'base-3',
-              'base-4',
-              'head-4',
-            ]
-              .filter(
-                (name) =>
-                  index <
-                  (name.startsWith('base') ? baseIds.length : headIds.length)
-              )
-              .map((name) => [index, `${platform}-${name}`])
+      expect(new Set(processes.map((entry) => entry.pid)).size).toBe(4 * (baseIds.length + headIds.length))
+      expect(processes.map((entry) => [entry.configuration.benchmarkIndex, entry.configuration.runId])).toEqual(
+        Array.from({ length: Math.max(baseIds.length, headIds.length) }, (_, index) =>
+          ['base-1', 'head-1', 'head-2', 'base-2', 'head-3', 'base-3', 'base-4', 'head-4']
+            .filter((name) => index < (name.startsWith('base') ? baseIds.length : headIds.length))
+            .map((name) => [index, `${platform}-${name}`])
         ).flat()
       )
-      expect(
-        (await readdir(output)).some((name) => name.startsWith('calibration'))
-      ).toBe(false)
+      expect((await readdir(output)).some((name) => name.startsWith('calibration'))).toBe(false)
       const baseRuns = []
       const headRuns = []
       for (let pair = 1; pair <= 4; pair++) {
-        const base = await Bun.file(
-          path.join(output, `base-${pair}.json`)
-        ).json()
-        const head = await Bun.file(
-          path.join(output, `head-${pair}.json`)
-        ).json()
-        expect(base.metrics.map((metric: { id: string }) => metric.id)).toEqual(
-          baseIds
-        )
-        expect(head.metrics.map((metric: { id: string }) => metric.id)).toEqual(
-          headIds
-        )
+        const base = await Bun.file(path.join(output, `base-${pair}.json`)).json()
+        const head = await Bun.file(path.join(output, `head-${pair}.json`)).json()
+        expect(base.metrics.map((metric: { id: string }) => metric.id)).toEqual(baseIds)
+        expect(head.metrics.map((metric: { id: string }) => metric.id)).toEqual(headIds)
         expect(base.configuration.runId).toBe(`${platform}-base-${pair}`)
         expect(head.configuration.runId).toBe(`${platform}-head-${pair}`)
-        expect(
-          await readdir(path.join(output, `base-${pair}-cases`))
-        ).toHaveLength(baseIds.length)
-        expect(
-          await readdir(path.join(output, `head-${pair}-cases`))
-        ).toHaveLength(headIds.length)
+        expect(await readdir(path.join(output, `base-${pair}-cases`))).toHaveLength(baseIds.length)
+        expect(await readdir(path.join(output, `head-${pair}-cases`))).toHaveLength(headIds.length)
         baseRuns.push(base)
         headRuns.push(head)
       }
       const comparisons = compareRuns(baseRuns, headRuns).comparisons
-      expect(
-        comparisons.find((metric) => metric.id === baseIds[1])
-          ?.pairChangesPercent
-      ).toEqual([0, 0, 0, 0])
-      expect(
-        comparisons.find((metric) => metric.id === baseIds[1])?.deltaPercent
-      ).toBe(0)
+      expect(comparisons.find((metric) => metric.id === baseIds[1])?.pairChangesPercent).toEqual([0, 0, 0, 0])
+      expect(comparisons.find((metric) => metric.id === baseIds[1])?.deltaPercent).toBe(0)
       if (mode === 'added-case') {
-        expect(
-          comparisons.find((metric) => metric.id === 'javascript/control/new')
-            ?.baseMedianNsPerOp
-        ).toBeNull()
+        expect(comparisons.find((metric) => metric.id === 'javascript/control/new')?.baseMedianNsPerOp).toBeNull()
         // The first case moved to index 2, but still compares against base index 0.
-        expect(
-          comparisons.find((metric) => metric.id === baseIds[0])?.deltaPercent
-        ).toBe(0)
+        expect(comparisons.find((metric) => metric.id === baseIds[0])?.deltaPercent).toBe(0)
       }
       if (mode === 'removed-case') {
-        expect(
-          comparisons.find((metric) => metric.id === baseIds[0])
-            ?.headMedianNsPerOp
-        ).toBeNull()
+        expect(comparisons.find((metric) => metric.id === baseIds[0])?.headMedianNsPerOp).toBeNull()
       }
     } finally {
       await rm(directory, { recursive: true, force: true })

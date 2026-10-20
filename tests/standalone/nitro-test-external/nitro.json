@@ -1,22 +1,13 @@
 {
   "$schema": "https://nitro.margelo.com/nitro.schema.json",
   "environment": "bare",
-  "cxxNamespace": [
-    "test",
-    "external"
-  ],
+  "cxxNamespace": ["test", "external"],
   "ios": {
     "iosModuleName": "NitroTestExternal"
   },
   "android": {
-    "androidNamespace": [
-      "test",
-      "external"
-    ],
+    "androidNamespace": ["test", "external"],
     "androidCxxLibName": "NitroTestExternal"
   },
-  "ignorePaths": [
-    "**/node_modules",
-    "**/build"
-  ]
+  "ignorePaths": ["**/node_modules", "**/build"]
 }

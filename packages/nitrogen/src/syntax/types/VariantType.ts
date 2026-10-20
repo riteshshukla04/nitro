@@ -3,18 +3,7 @@ import { escapeCppName, isNotDuplicate } from '../helpers.js'
 import { type SourceFile, type SourceImport } from '../SourceFile.js'
 import type { GetCodeOptions, Type, TypeKind } from './Type.js'
 
-export const VariantLabels = [
-  'first',
-  'second',
-  'third',
-  'fourth',
-  'fifth',
-  'sixth',
-  'seventh',
-  'eigth',
-  'ninth',
-  'tenth',
-] as const
+export const VariantLabels = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eigth', 'ninth', 'tenth'] as const
 type VariantLabel = (typeof VariantLabels)[number]
 
 export class VariantType implements Type {
@@ -40,28 +29,21 @@ export class VariantType implements Type {
   get cases(): [VariantLabel, Type][] {
     return this.variants.map((v, i) => {
       const label = VariantLabels[i]
-      if (label == null)
-        throw new Error(
-          `Variant<...> (\`${this.jsType}\`) does not support ${i} cases!`
-        )
+      if (label == null) throw new Error(`Variant<...> (\`${this.jsType}\`) does not support ${i} cases!`)
       return [label, v]
     })
   }
 
   getAliasName(language: Language, options?: GetCodeOptions): string {
     if (this.aliasName == null) {
-      const variants = this.variants.map((v) =>
-        v.getCode(language, { ...options, context: 'type-argument' })
-      )
+      const variants = this.variants.map((v) => v.getCode(language, { ...options, context: 'type-argument' }))
       return escapeCppName(`Variant_${variants.join('_')}`)
     }
     return this.aliasName
   }
 
   getCode(language: Language, options: GetCodeOptions): string {
-    const types = this.variants
-      .map((v) => v.getCode(language, { ...options, context: 'type-argument' }))
-      .filter(isNotDuplicate)
+    const types = this.variants.map((v) => v.getCode(language, { ...options, context: 'type-argument' })).filter(isNotDuplicate)
 
     switch (language) {
       case 'c++': {
@@ -72,9 +54,7 @@ export class VariantType implements Type {
       case 'kotlin':
         return this.getAliasName(language, options)
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for VariantType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for VariantType!`)
     }
   }
   getExtraFiles(): SourceFile[] {

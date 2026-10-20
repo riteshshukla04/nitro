@@ -76,14 +76,10 @@ function variantChecksum(iterations: number): number {
 }
 
 function collectJavaGarbage(): void {
-  if (!ExampleTurboModule.collectGarbage())
-    throw new Error('Java heap cleanup failed.')
+  if (!ExampleTurboModule.collectGarbage()) throw new Error('Java heap cleanup failed.')
 }
 
-function createObjectBenchmarks(
-  object: BenchmarkObject,
-  implementation: BenchmarkImplementation
-): BenchmarkDefinition[] {
+function createObjectBenchmarks(object: BenchmarkObject, implementation: BenchmarkImplementation): BenchmarkDefinition[] {
   const prefix = implementation
   const synchronousCallback = () => 1
   return [
@@ -211,16 +207,11 @@ function createObjectBenchmarks(
       implementation,
       kind: 'sync',
       maxChunkIterations: 50_000,
-      expectedChecksum: (iterations) =>
-        Math.ceil(iterations / 2) * 5 + Math.floor(iterations / 2) * 14,
+      expectedChecksum: (iterations) => Math.ceil(iterations / 2) * 5 + Math.floor(iterations / 2) * 14,
       run(iterations) {
         let checksum = 0
         for (let index = 0; index < iterations; index++) {
-          const result = object.tryOptionalParams(
-            index,
-            true,
-            index % 2 === 0 ? 'nitro' : undefined
-          )
+          const result = object.tryOptionalParams(index, true, index % 2 === 0 ? 'nitro' : undefined)
           checksum += result.length
         }
         return assertNumber(checksum, 'tryOptionalParams')
@@ -277,48 +268,12 @@ function createObjectBenchmarks(
         return assertNumber(checksum, 'thisObject')
       },
     },
-    createBufferBenchmark(
-      object,
-      implementation,
-      'bounce-4-kib',
-      smallBuffer,
-      'bounce'
-    ),
-    createBufferBenchmark(
-      object,
-      implementation,
-      'bounce-1-mib',
-      largeBuffer,
-      'bounce'
-    ),
-    createBufferBenchmark(
-      object,
-      implementation,
-      'bounce-native-4-kib',
-      object.copyBuffer(smallBuffer),
-      'bounce'
-    ),
-    createBufferBenchmark(
-      object,
-      implementation,
-      'bounce-native-1-mib',
-      object.copyBuffer(largeBuffer),
-      'bounce'
-    ),
-    createBufferBenchmark(
-      object,
-      implementation,
-      'copy-4-kib',
-      smallBuffer,
-      'copy'
-    ),
-    createBufferBenchmark(
-      object,
-      implementation,
-      'copy-1-mib',
-      largeBuffer,
-      'copy'
-    ),
+    createBufferBenchmark(object, implementation, 'bounce-4-kib', smallBuffer, 'bounce'),
+    createBufferBenchmark(object, implementation, 'bounce-1-mib', largeBuffer, 'bounce'),
+    createBufferBenchmark(object, implementation, 'bounce-native-4-kib', object.copyBuffer(smallBuffer), 'bounce'),
+    createBufferBenchmark(object, implementation, 'bounce-native-1-mib', object.copyBuffer(largeBuffer), 'bounce'),
+    createBufferBenchmark(object, implementation, 'copy-4-kib', smallBuffer, 'copy'),
+    createBufferBenchmark(object, implementation, 'copy-1-mib', largeBuffer, 'copy'),
     {
       id: `${prefix}/callback/synchronous`,
       version: 2,
@@ -343,10 +298,7 @@ function createObjectBenchmarks(
       kind: 'async',
       // Release fulfilled Promise chains between chunks, outside the timer.
       maxChunkIterations: 5_000,
-      collectNativeGarbage:
-        implementation === 'nitro-platform' && Platform.OS === 'android'
-          ? collectJavaGarbage
-          : undefined,
+      collectNativeGarbage: implementation === 'nitro-platform' && Platform.OS === 'android' ? collectJavaGarbage : undefined,
       expectedChecksum: (iterations) => iterations * 55,
       async run(iterations) {
         let checksum = 0
@@ -363,10 +315,7 @@ function createObjectBenchmarks(
       implementation,
       kind: 'async',
       maxChunkIterations: 5_000,
-      collectNativeGarbage:
-        implementation === 'nitro-platform' && Platform.OS === 'android'
-          ? collectJavaGarbage
-          : undefined,
+      collectNativeGarbage: implementation === 'nitro-platform' && Platform.OS === 'android' ? collectJavaGarbage : undefined,
       expectedChecksum: (iterations) => iterations * 55,
       async run(iterations) {
         let checksum = 0
@@ -396,8 +345,7 @@ function createArrayBenchmark(
     implementation,
     kind: 'sync',
     maxChunkIterations: input.length >= 1_024 ? 1_000 : 10_000,
-    expectedChecksum: (iterations) =>
-      repeatedSequenceSum(iterations, input.length),
+    expectedChecksum: (iterations) => repeatedSequenceSum(iterations, input.length),
     run(iterations) {
       let checksum = 0
       for (let index = 0; index < iterations; index++) {
@@ -419,8 +367,7 @@ function createBufferBenchmark(
   // Android direct ByteBuffers use ART's non-moving heap. Leave room for the
   // Java/HybridData cleaner stages as well as Hermes GC. Collect both heaps
   // between bounded copy chunks; cleanup is not part of the copy measurement.
-  const javaBuffer =
-    implementation === 'nitro-platform' && Platform.OS === 'android'
+  const javaBuffer = implementation === 'nitro-platform' && Platform.OS === 'android'
   return {
     id: `${implementation}/array-buffer/${name}`,
     version: 2,
@@ -431,25 +378,13 @@ function createBufferBenchmark(
     // Keep Android's existing policy, including JVM-backed Kotlin copies.
     cleanup: operation === 'copy' && Platform.OS === 'ios' ? 'gc' : undefined,
     // Bounce does not copy the payload; its chunk bound is independent of size.
-    maxChunkIterations:
-      operation === 'bounce'
-        ? 50_000
-        : input.byteLength >= 1024 * 1024
-          ? javaBuffer
-            ? 10
-            : 50
-          : 5_000,
-    collectNativeGarbage:
-      javaBuffer && operation === 'copy' ? collectJavaGarbage : undefined,
-    expectedChecksum: (iterations) =>
-      input.byteLength * iterations + Math.floor(iterations / 2),
+    maxChunkIterations: operation === 'bounce' ? 50_000 : input.byteLength >= 1024 * 1024 ? (javaBuffer ? 10 : 50) : 5_000,
+    collectNativeGarbage: javaBuffer && operation === 'copy' ? collectJavaGarbage : undefined,
+    expectedChecksum: (iterations) => input.byteLength * iterations + Math.floor(iterations / 2),
     run(iterations) {
       let checksum = 0
       for (let index = 0; index < iterations; index++) {
-        const result =
-          operation === 'bounce'
-            ? object.bounceArrayBuffer(input)
-            : object.copyBuffer(input)
+        const result = operation === 'bounce' ? object.bounceArrayBuffer(input) : object.copyBuffer(input)
         checksum += result.byteLength + (index % 2)
       }
       return assertNumber(checksum, `${operation}Buffer ${name}`)
@@ -499,9 +434,6 @@ export function createBenchmarkSuite(): BenchmarkDefinition[] {
   return [
     ...controls,
     ...createObjectBenchmarks(HybridBenchmarkObjectCpp, 'nitro-cpp'),
-    ...createObjectBenchmarks(
-      HybridBenchmarkObjectSwiftKotlin,
-      'nitro-platform'
-    ),
+    ...createObjectBenchmarks(HybridBenchmarkObjectSwiftKotlin, 'nitro-platform'),
   ]
 }

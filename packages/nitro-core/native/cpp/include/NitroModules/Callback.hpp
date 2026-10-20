@@ -50,24 +50,25 @@ class Callback<R(Args...)> final {
 
   struct JSCallback;
   using NativeCallback = std::function<R(Args...)>;
+
 public:
   static Callback make(std::function<R(Args...)> function) {
     return Callback(std::move(function));
   }
-  static Callback make(jsi::Runtime& runtime,
-                       BorrowingReference<jsi::Function>&& function,
-                       const std::shared_ptr<Dispatcher>& dispatcher) {
+  static Callback make(jsi::Runtime& runtime, BorrowingReference<jsi::Function>&& function, const std::shared_ptr<Dispatcher>& dispatcher) {
     return Callback(JSCallback(runtime, std::move(function), dispatcher));
   }
+
 public:
   Callback(const Callback& other) = default;
   Callback(Callback&& other) = default;
   Callback& operator=(const Callback& other) = default;
   Callback& operator=(Callback&& other) = default;
   ~Callback() = default;
+
 private:
-  Callback(std::function<R(Args...)>&& function): _impl(std::move(function)) { }
-  Callback(JSCallback&& callback): _impl(std::move(callback)) { }
+  Callback(std::function<R(Args...)>&& function) : _impl(std::move(function)) {}
+  Callback(JSCallback&& callback) : _impl(std::move(callback)) {}
 
 public:
   using DefaultAsyncCallReturnT = std::conditional_t<std::is_void_v<R>, void, Promise<R>>;
@@ -134,8 +135,8 @@ private:
     friend struct SwiftCallbackConverter;
 
   public:
-    JSCallback(jsi::Runtime& runtime, BorrowingReference<jsi::Function>&& function, const std::weak_ptr<Dispatcher>& dispatcher):
-      _runtime(runtime), _function(std::move(function)), _dispatcher(dispatcher) { }
+    JSCallback(jsi::Runtime& runtime, BorrowingReference<jsi::Function>&& function, const std::weak_ptr<Dispatcher>& dispatcher)
+        : _runtime(runtime), _function(std::move(function)), _dispatcher(dispatcher) {}
 
     R callSync(Args&&... args) const {
       std::shared_ptr<Dispatcher> dispatcher = _dispatcher.lock();
@@ -162,7 +163,7 @@ private:
         return Promise<R>::rejected(std::make_exception_ptr(std::runtime_error(getDispatcherDestroyedMessage())));
       }
       jsi::Runtime& runtime = _runtime;
-      return dispatcher->runAsyncAwaitable([&runtime, function = _function, ...args = std::move(args)]() mutable -> R {
+      return dispatcher->runAsyncAwaitable([&runtime, function = _function, ... args = std::move(args)]() mutable -> R {
         assertFunctionNotNull(function);
 
         if constexpr (std::is_void_v<R>) {
@@ -183,7 +184,7 @@ private:
         return;
       }
       jsi::Runtime& runtime = _runtime;
-      dispatcher->runAsync([&runtime, function = _function, ...args = std::move(args)]() mutable -> void {
+      dispatcher->runAsync([&runtime, function = _function, ... args = std::move(args)]() mutable -> void {
         try {
           assertFunctionNotNull(function);
 
@@ -202,9 +203,11 @@ private:
     static void assertFunctionNotNull(const BorrowingReference<jsi::Function>& function) {
       if (!function) [[unlikely]] {
         std::string typeName = TypeInfo::getFriendlyTypename<Callback<R(Args...)>>(true);
-        throw std::runtime_error("Cannot call " + typeName + " - the underlying `jsi::Function`/`jsi::Runtime` has already been destroyed!");
+        throw std::runtime_error("Cannot call " + typeName +
+                                 " - the underlying `jsi::Function`/`jsi::Runtime` has already been destroyed!");
       }
     }
+
   private:
     // A reference_wrapper keeps the callback assignable, e.g. as the result of a Promise.
     std::reference_wrapper<jsi::Runtime> _runtime;

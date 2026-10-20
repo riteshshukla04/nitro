@@ -15,19 +15,14 @@ import { getModuleDependencies } from '../syntax/getModuleDependencies.js'
 
 interface IOSAutolinking extends Autolinking {}
 
-export function createIOSAutolinking(
-  specs: HybridObjectSpec[]
-): IOSAutolinking {
+export function createIOSAutolinking(specs: HybridObjectSpec[]): IOSAutolinking {
   const swiftTypes = getAllKnownTypes('swift').map(wrapSwiftType)
   const moduleDependencies = getModuleDependencies(
     specs.filter((spec) => spec.language === 'swift'),
     NitroConfig.current
   )
   const swiftCxxBridge = createSwiftCxxBridge(swiftTypes)
-  const swiftUmbrellaHeader = createSwiftUmbrellaHeader(
-    swiftTypes,
-    moduleDependencies
-  )
+  const swiftUmbrellaHeader = createSwiftUmbrellaHeader(swiftTypes, moduleDependencies)
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   const swiftForeignTypeMetadata = createSwiftForeignTypeMetadata(swiftTypes)

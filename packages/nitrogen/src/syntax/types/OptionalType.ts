@@ -47,17 +47,14 @@ export class OptionalType implements Type {
           return `${wrapping}?`
         }
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for OptionalType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for OptionalType!`)
     }
   }
   getExtraFiles(): SourceFile[] {
     return this.wrappingType.getExtraFiles()
   }
   getRequiredImports(language: Language): SourceImport[] {
-    const imports: SourceImport[] =
-      this.wrappingType.getRequiredImports(language)
+    const imports: SourceImport[] = this.wrappingType.getRequiredImports(language)
     switch (language) {
       case 'c++':
         imports.push({

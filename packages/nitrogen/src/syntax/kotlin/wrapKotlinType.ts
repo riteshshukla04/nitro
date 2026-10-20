@@ -32,10 +32,7 @@ import { KotlinUnsupportedType } from './types/KotlinUnsupportedType.js'
 import { KotlinVariantType } from './types/KotlinVariantType.js'
 import { KotlinVoidType } from './types/KotlinVoidType.js'
 
-export function wrapKotlinType(
-  type: Type,
-  options: KotlinTypeOptions = {}
-): KotlinType {
+export function wrapKotlinType(type: Type, options: KotlinTypeOptions = {}): KotlinType {
   if (type instanceof NamedWrappingType) {
     return wrapKotlinType(type.type, options)
   }

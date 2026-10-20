@@ -14,19 +14,19 @@ on:
   workflow_dispatch:
     inputs:
       device_model:
-        description: "iOS Simulator device model"
+        description: 'iOS Simulator device model'
         required: false
-        default: "iPhone 18 Pro"
+        default: 'iPhone 18 Pro'
         type: string
       ios_version:
-        description: "iOS version"
+        description: 'iOS version'
         required: false
-        default: "27.0"
+        default: '27.0'
         type: string
       xcode_version:
-        description: "Xcode version, or default for the selected Xcode"
+        description: 'Xcode version, or default for the selected Xcode'
         required: false
-        default: "27.1"
+        default: '27.1'
         type: string
   pull_request:
     paths:
@@ -105,7 +105,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: tests/react-native/apps/example/ios/build
-          key: ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-Default-dd-${{ hashFiles('bun.lock', '**/Package.swift', '**/Package.resolved') }}
+          key:
+            ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-Default-dd-${{ hashFiles('bun.lock', '**/Package.swift',
+            '**/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-Default-dd-
 

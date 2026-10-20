@@ -49,19 +49,14 @@ export class RecordType implements Type {
       case 'kotlin':
         return `Map<${keyCode}, ${valueCode}>`
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for RecordType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for RecordType!`)
     }
   }
   getExtraFiles(): SourceFile[] {
     return [...this.keyType.getExtraFiles(), ...this.valueType.getExtraFiles()]
   }
   getRequiredImports(language: Language): SourceImport[] {
-    const imports: SourceImport[] = [
-      ...this.keyType.getRequiredImports(language),
-      ...this.valueType.getRequiredImports(language),
-    ]
+    const imports: SourceImport[] = [...this.keyType.getRequiredImports(language), ...this.valueType.getRequiredImports(language)]
     switch (language) {
       case 'c++':
         imports.push({

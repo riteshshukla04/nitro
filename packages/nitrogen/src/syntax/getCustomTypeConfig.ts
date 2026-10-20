@@ -15,32 +15,21 @@ export function getCustomTypeConfig(type: TSMorphType): Result {
     if (typeConfigProperty == null) continue
 
     const declaration = type.getAliasSymbolOrThrow().getDeclarations()[0]
-    if (declaration == null)
-      throw new Error(`Type has no declaration! ${type.getText()}`)
+    if (declaration == null) throw new Error(`Type has no declaration! ${type.getText()}`)
 
-    const typeNameTypeOrUndefined =
-      typeNameProperty.getTypeAtLocation(declaration)
-    const typeConfigTypeOrUndefined =
-      typeConfigProperty.getTypeAtLocation(declaration)
+    const typeNameTypeOrUndefined = typeNameProperty.getTypeAtLocation(declaration)
+    const typeConfigTypeOrUndefined = typeConfigProperty.getTypeAtLocation(declaration)
 
-    const typeNameType = typeNameTypeOrUndefined
-      .getUnionTypes()
-      .find((t) => t.isLiteral())
+    const typeNameType = typeNameTypeOrUndefined.getUnionTypes().find((t) => t.isLiteral())
     if (typeNameType == null) continue
-    const typeConfigType = typeConfigTypeOrUndefined
-      .getUnionTypes()
-      .find((t) => t.isObject())
+    const typeConfigType = typeConfigTypeOrUndefined.getUnionTypes().find((t) => t.isObject())
     if (typeConfigType == null) continue
 
     const typeName = typeNameType.getLiteralValue()
     if (typeof typeName !== 'string') {
-      throw new Error(
-        `CustomType's second argument (TypeName) needs to be a string! Instead, it is a ${typeof typeName} (${typeName})`
-      )
+      throw new Error(`CustomType's second argument (TypeName) needs to be a string! Instead, it is a ${typeof typeName} (${typeName})`)
     }
-    const includeType = typeConfigType
-      .getPropertyOrThrow('include')
-      .getTypeAtLocation(declaration)
+    const includeType = typeConfigType.getPropertyOrThrow('include').getTypeAtLocation(declaration)
     const include = includeType.getLiteralValue()
     if (typeof include !== 'string')
       throw new Error(
@@ -52,10 +41,7 @@ export function getCustomTypeConfig(type: TSMorphType): Result {
       .getUnionTypes()
       .find((u) => u.isBooleanLiteral())
       ?.getLiteralValue()
-    const canBePassedByReference =
-      typeof canBePassedByReferenceType === 'boolean'
-        ? canBePassedByReferenceType
-        : false
+    const canBePassedByReference = typeof canBePassedByReferenceType === 'boolean' ? canBePassedByReferenceType : false
 
     return {
       name: typeName,
@@ -65,7 +51,5 @@ export function getCustomTypeConfig(type: TSMorphType): Result {
       },
     }
   }
-  throw new Error(
-    `Type looks like a CustomType<...>, but doesn't have generic arguments! ${type.getText()}`
-  )
+  throw new Error(`Type looks like a CustomType<...>, but doesn't have generic arguments! ${type.getText()}`)
 }

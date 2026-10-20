@@ -1,12 +1,5 @@
 import assert from 'node:assert/strict'
-import {
-  copyFileSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs'
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -20,17 +13,11 @@ function fixture(t, sourceVersion = '0.37.1', releaseVersion = '0.37.2') {
   git(['init', '--quiet'], { cwd })
   git(['config', 'user.name', 'Marc Rousavy'], { cwd })
   git(['config', 'user.email', 'me@mrousavy.com'], { cwd })
-  writeFileSync(
-    path.join(cwd, 'package.json'),
-    JSON.stringify({ version: sourceVersion }) + '\n'
-  )
+  writeFileSync(path.join(cwd, 'package.json'), JSON.stringify({ version: sourceVersion }) + '\n')
   git(['add', 'package.json'], { cwd })
   git(['commit', '--quiet', '--no-gpg-sign', '--message', 'Source'], { cwd })
   const sourceCommit = git(['rev-parse', 'HEAD'], { cwd })
-  writeFileSync(
-    path.join(cwd, 'package.json'),
-    JSON.stringify({ version: releaseVersion }) + '\n'
-  )
+  writeFileSync(path.join(cwd, 'package.json'), JSON.stringify({ version: releaseVersion }) + '\n')
   git(['add', 'package.json'], { cwd })
   git(['commit', '--quiet', '--no-gpg-sign', '--message', 'Release'], { cwd })
   const releaseCommit = git(['rev-parse', 'HEAD'], { cwd })
@@ -40,10 +27,7 @@ function fixture(t, sourceVersion = '0.37.1', releaseVersion = '0.37.2') {
 
 test('new manual and nightly releases validate the checked-out event commit', (t) => {
   const { cwd, sourceCommit } = fixture(t)
-  for (const env of [
-    { RELEASE_VERSION: '0.37.2' },
-    { RELEASE_MODE: 'nightly', GITHUB_RUN_NUMBER: '42' },
-  ]) {
+  for (const env of [{ RELEASE_VERSION: '0.37.2' }, { RELEASE_MODE: 'nightly', GITHUB_RUN_NUMBER: '42' }]) {
     assert.equal(resolveCICommit({ cwd, env }), sourceCommit)
   }
 })
@@ -53,10 +37,7 @@ test('manual and release-event recovery validate the peeled release tag', (t) =>
   git(['tag', '--annotate', 'v0.37.2', releaseCommit, '--message', 'Release'], {
     cwd,
   })
-  for (const env of [
-    { RELEASE_VERSION: '0.37.2' },
-    { RELEASE_EVENT_TAG: 'v0.37.2', RELEASE_VERSION: 'invalid' },
-  ]) {
+  for (const env of [{ RELEASE_VERSION: '0.37.2' }, { RELEASE_EVENT_TAG: 'v0.37.2', RELEASE_VERSION: 'invalid' }]) {
     assert.equal(resolveCICommit({ cwd, env }), releaseCommit)
     assert.equal(git(['rev-parse', 'HEAD'], { cwd }), sourceCommit)
   }
@@ -76,17 +57,10 @@ test('nightly retries validate their existing tag instead of the event commit', 
 })
 
 test('fresh v1 nightlies validate the source and ignore the main nightly tag', (t) => {
-  const { cwd, sourceCommit, releaseCommit } = fixture(
-    t,
-    '1.0.0-alpha.0',
-    '1.0.0-alpha.1'
-  )
+  const { cwd, sourceCommit, releaseCommit } = fixture(t, '1.0.0-alpha.0', '1.0.0-alpha.1')
   const mainVersion = nightlyVersion('1.0.0-alpha.0', '42', sourceCommit)
   git(['tag', `v${mainVersion}`, releaseCommit], { cwd })
-  for (const branchEnv of [
-    { RELEASE_BRANCH: 'v1', GITHUB_REF_NAME: 'main' },
-    { GITHUB_REF_NAME: 'v1' },
-  ]) {
+  for (const branchEnv of [{ RELEASE_BRANCH: 'v1', GITHUB_REF_NAME: 'main' }, { GITHUB_REF_NAME: 'v1' }]) {
     assert.equal(
       resolveCICommit({
         cwd,
@@ -98,32 +72,17 @@ test('fresh v1 nightlies validate the source and ignore the main nightly tag', (
 })
 
 test('v1 nightly retries validate the existing alpha-nightly release commit', (t) => {
-  const { cwd, sourceCommit, releaseCommit } = fixture(
-    t,
-    '1.0.0-alpha.0',
-    '1.0.0-alpha.1'
-  )
-  const version = nightlyVersion(
-    '1.0.0-alpha.0',
-    '42',
-    sourceCommit,
-    'alpha-nightly'
-  )
-  git(
-    ['tag', '--annotate', `v${version}`, releaseCommit, '--message', 'Release'],
-    {
-      cwd,
-    }
-  )
+  const { cwd, sourceCommit, releaseCommit } = fixture(t, '1.0.0-alpha.0', '1.0.0-alpha.1')
+  const version = nightlyVersion('1.0.0-alpha.0', '42', sourceCommit, 'alpha-nightly')
+  git(['tag', '--annotate', `v${version}`, releaseCommit, '--message', 'Release'], {
+    cwd,
+  })
   for (const env of [
     { RELEASE_MODE: 'nightly', GITHUB_RUN_NUMBER: '42' },
     { RELEASE_VERSION: version },
     { RELEASE_EVENT_TAG: `v${version}` },
   ]) {
-    assert.equal(
-      resolveCICommit({ cwd, env: { ...env, RELEASE_BRANCH: 'v1' } }),
-      releaseCommit
-    )
+    assert.equal(resolveCICommit({ cwd, env: { ...env, RELEASE_BRANCH: 'v1' } }), releaseCommit)
     assert.equal(git(['rev-parse', 'HEAD'], { cwd }), sourceCommit)
   }
 })
@@ -154,10 +113,7 @@ test('invalid versions and missing release-event tags fail before selecting CI',
   ]) {
     assert.throws(() => resolveCICommit({ cwd, env }))
   }
-  assert.throws(
-    () => resolveCICommit({ cwd, env: { RELEASE_EVENT_TAG: 'v0.37.2' } }),
-    /The GitHub release tag is missing/
-  )
+  assert.throws(() => resolveCICommit({ cwd, env: { RELEASE_EVENT_TAG: 'v0.37.2' } }), /The GitHub release tag is missing/)
 })
 
 test('the resolver writes the immutable commit to the workflow output file', (t) => {

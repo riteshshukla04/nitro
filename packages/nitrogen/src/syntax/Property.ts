@@ -61,9 +61,7 @@ export class Property implements CodeNode {
     this.type = type
     this.isReadonly = isReadonly
     if (this.name.startsWith('__')) {
-      throw new Error(
-        `Property names are not allowed to start with two underscores (__)! (In ${this.jsSignature})`
-      )
+      throw new Error(`Property names are not allowed to start with two underscores (__)! (In ${this.jsSignature})`)
     }
   }
 
@@ -89,10 +87,7 @@ export class Property implements CodeNode {
         break
       case 'swift':
         // Swift only shortens boolean accessors that start with "is" or "has"
-        if (
-          this.type.kind === 'boolean' &&
-          (this.name.startsWith('is') || this.name.startsWith('has'))
-        ) {
+        if (this.type.kind === 'boolean' && (this.name.startsWith('is') || this.name.startsWith('has'))) {
           // isSomething -> isSomething()
           return this.name
         }
@@ -121,33 +116,15 @@ export class Property implements CodeNode {
     return this.getCppMethods()[1]
   }
 
-  getCppMethods(
-    options: InstanceMethodOptions = {}
-  ):
-    | [getter: InstanceMethod]
-    | [getter: InstanceMethod, setter: InstanceMethod] {
-    const getter = new InstanceMethod(
-      this.getGetterName('other'),
-      this.type,
-      [],
-      options
-    )
+  getCppMethods(options: InstanceMethodOptions = {}): [getter: InstanceMethod] | [getter: InstanceMethod, setter: InstanceMethod] {
+    const getter = new InstanceMethod(this.getGetterName('other'), this.type, [], options)
     if (this.isReadonly) return [getter]
     const parameter = new Parameter(this.name, this.type)
-    const setter = new InstanceMethod(
-      this.getSetterName('other'),
-      new VoidType(),
-      [parameter],
-      options
-    )
+    const setter = new InstanceMethod(this.getSetterName('other'), new VoidType(), [parameter], options)
     return [getter, setter]
   }
 
-  getCode(
-    language: Language,
-    modifiers?: PropertyModifiers,
-    body?: PropertyBody
-  ): string {
+  getCode(language: Language, modifiers?: PropertyModifiers, body?: PropertyBody): string {
     if (body != null) {
       body.getter = body.getter.trim()
       body.setter = body.setter.trim()
@@ -155,18 +132,14 @@ export class Property implements CodeNode {
 
     switch (language) {
       case 'c++': {
-        const { classDefinitionName, virtual, ...sharedModifiers } =
-          modifiers ?? {}
+        const { classDefinitionName, virtual, ...sharedModifiers } = modifiers ?? {}
         const methods = this.getCppMethods({
           ...sharedModifiers,
           virtual: virtual,
           pureVirtual: virtual === true && body == null,
         })
         const [getter, setter] = methods
-        function renderMethod(
-          method: InstanceMethod,
-          methodBody: string | undefined
-        ): string {
+        function renderMethod(method: InstanceMethod, methodBody: string | undefined): string {
           if (methodBody == null) return method.getDeclaration('c++')
           if (classDefinitionName != null) {
             return method.getDefinition('c++', {
@@ -240,9 +213,7 @@ set {
         return lines.join('\n')
       }
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for properties!`
-        )
+        throw new Error(`Language ${language} is not yet supported for properties!`)
     }
   }
 }

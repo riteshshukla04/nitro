@@ -9,8 +9,8 @@
 
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroTypeInfo.hpp>
-#include <NitroModules/detail/ReferenceState.hpp>
 #include <NitroModules/WeakReference.hpp>
+#include <NitroModules/detail/ReferenceState.hpp>
 #include <atomic>
 #include <cstddef>
 #include <mutex>
@@ -106,16 +106,14 @@ public:
   /**
    * Get whether the `BorrowingReference<T>` is still pointing to a valid value, or not.
    */
-  [[nodiscard]]
-  inline bool hasValue() const {
+  [[nodiscard]] inline bool hasValue() const {
     return _value != nullptr && !_state->isDeleted;
   }
 
   /**
    * Get a weak reference to this borrowing reference.
    */
-  [[nodiscard]]
-  WeakReference<T> weak() const {
+  [[nodiscard]] WeakReference<T> weak() const {
     return WeakReference(*this);
   }
 

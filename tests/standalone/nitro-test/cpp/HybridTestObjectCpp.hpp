@@ -96,8 +96,10 @@ public:
   std::variant<double, std::string> getSomeVariant() override;
   void setSomeVariant(const std::variant<double, std::string>& someVariant) override;
   std::variant<std::string, Car> passNamedVariant(const std::variant<std::string, Car>& variant) override;
-  std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper> passAllEmptyObjectVariant(const std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>& variant) override;
-  std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON> bounceComplexVariant(const std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON>& variant) override;
+  std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>
+  passAllEmptyObjectVariant(const std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>& variant) override;
+  std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON> bounceComplexVariant(
+      const std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON>& variant) override;
   std::tuple<double, std::string> getSomeTuple() override;
   void setSomeTuple(const std::tuple<double, std::string>& someTuple) override;
   std::shared_ptr<HybridTestObjectCppSpec> getThisObject() override;
@@ -145,7 +147,8 @@ public:
   std::string tryMiddleParam(double num, const std::optional<bool>& boo, const std::string& str) override;
   std::optional<Powertrain> tryOptionalEnum(const std::optional<Powertrain>& value) override;
   bool tryTrailingOptional(double num, const std::string& str, const std::optional<bool>& boo) override;
-  std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) override;
+  std::variant<double, std::string>
+  passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) override;
   std::vector<std::string> bounceStrings(const std::vector<std::string>& array) override;
   std::vector<double> bounceNumbers(const std::vector<double>& array) override;
   std::vector<Person> bounceStructs(const std::vector<Person>& array) override;
@@ -153,35 +156,50 @@ public:
   PartialPerson bouncePartialStruct(const PartialPerson& person) override;
   std::string sumUpAllPassengers(const std::vector<Car>& cars) override;
   std::vector<Powertrain> bounceEnums(const std::vector<Powertrain>& array) override;
-  void complexEnumCallback(const std::vector<Powertrain>& array, const Callback<void(const std::vector<Powertrain>& /* array */)>& callback) override;
-  std::vector<Powertrain> callEnumArrayCallback(const std::vector<Powertrain>& array, const Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)>& callback) override;
+  void complexEnumCallback(const std::vector<Powertrain>& array,
+                           const Callback<void(const std::vector<Powertrain>& /* array */)>& callback) override;
+  std::vector<Powertrain> callEnumArrayCallback(const std::vector<Powertrain>& array,
+                                                const Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)>& callback) override;
   Callback<std::vector<Powertrain>(const std::vector<Powertrain>&)> getEnumArrayCallback() override;
   Promise<std::vector<Powertrain>> callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) override;
   Promise<std::vector<Powertrain>> awaitEnumArrayPromise(const Promise<std::vector<Powertrain>>& promise) override;
-  std::vector<std::vector<std::optional<Person>>> callNestedStructCallback(const std::vector<std::vector<std::optional<Person>>>& value, const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>&)>& callback) override;
+  std::vector<std::vector<std::optional<Person>>> callNestedStructCallback(
+      const std::vector<std::vector<std::optional<Person>>>& value,
+      const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>&)>& callback)
+      override;
 
   std::vector<std::shared_ptr<HybridChildSpec>> bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) override;
   std::vector<Callback<void()>> bounceFunctions(const std::vector<Callback<void()>>& functions) override;
   std::vector<AnyJSON> bounceMaps(const std::vector<AnyJSON>& maps) override;
   std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map) override;
-  std::unordered_map<std::string, std::optional<std::string>> bounceOptionalMap(const std::unordered_map<std::string, std::optional<std::string>>& map) override;
-  std::unordered_map<std::string, std::variant<nitro::NullType, std::string>> bounceNullMap(const std::unordered_map<std::string, std::variant<nitro::NullType, std::string>>& map) override;
-  std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>> bounceOptionalNullMap(const std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>>& map) override;
+  std::unordered_map<std::string, std::optional<std::string>>
+  bounceOptionalMap(const std::unordered_map<std::string, std::optional<std::string>>& map) override;
+  std::unordered_map<std::string, std::variant<nitro::NullType, std::string>>
+  bounceNullMap(const std::unordered_map<std::string, std::variant<nitro::NullType, std::string>>& map) override;
+  std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>>
+  bounceOptionalNullMap(const std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>>& map) override;
   std::vector<Promise<double>> bouncePromises(const std::vector<Promise<double>>& promises) override;
   std::vector<ArrayBuffer> bounceArrayBuffers(const std::vector<ArrayBuffer>& arrayBuffers) override;
-  std::vector<std::optional<std::string>> bounceOptionals(const std::vector<std::optional<std::string>>& strings, const std::vector<std::optional<ArrayBuffer>>& arrayBuffers) override;
-  std::vector<std::variant<nitro::NullType, std::string>> bounceNulls(const std::vector<std::variant<nitro::NullType, std::string>>& strings) override;
-  std::vector<std::optional<std::variant<nitro::NullType, std::string>>> bounceOptionalNulls(const std::vector<std::optional<std::variant<nitro::NullType, std::string>>>& strings) override;
+  std::vector<std::optional<std::string>> bounceOptionals(const std::vector<std::optional<std::string>>& strings,
+                                                          const std::vector<std::optional<ArrayBuffer>>& arrayBuffers) override;
+  std::vector<std::variant<nitro::NullType, std::string>>
+  bounceNulls(const std::vector<std::variant<nitro::NullType, std::string>>& strings) override;
+  std::vector<std::optional<std::variant<nitro::NullType, std::string>>>
+  bounceOptionalNulls(const std::vector<std::optional<std::variant<nitro::NullType, std::string>>>& strings) override;
   std::variant<OldEnum, bool> getVariantEnum(const std::variant<OldEnum, bool>& variant) override;
   std::variant<Powertrain, Car> bounceVariantUnionEnum(const std::variant<Powertrain, Car>& variant) override;
   std::variant<WeirdNumbersEnum, bool> getVariantWeirdNumbersEnum(const std::variant<WeirdNumbersEnum, bool>& variant) override;
   std::variant<Person, Car> getVariantObjects(const std::variant<Person, Car>& variant) override;
-  std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Person> getVariantHybrid(const std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Person>& variant) override;
-  std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Powertrain> getVariantHybridEnum(const std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Powertrain>& variant) override;
-  std::variant<std::tuple<double, double>, std::tuple<double, double, double>> getVariantTuple(const std::variant<std::tuple<double, double>, std::tuple<double, double, double>>& variant) override;
+  std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Person>
+  getVariantHybrid(const std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Person>& variant) override;
+  std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Powertrain>
+  getVariantHybridEnum(const std::variant<std::shared_ptr<HybridTestObjectCppSpec>, Powertrain>& variant) override;
+  std::variant<std::tuple<double, double>, std::tuple<double, double, double>>
+  getVariantTuple(const std::variant<std::tuple<double, double>, std::tuple<double, double, double>>& variant) override;
   std::tuple<double, double, double> flip(const std::tuple<double, double, double>& tuple) override;
   std::tuple<double, std::string, bool> passTuple(const std::tuple<double, std::string, bool>& tuple) override;
-  std::unordered_map<std::string, std::variant<bool, double>> bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map) override;
+  std::unordered_map<std::string, std::variant<bool, double>>
+  bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map) override;
   std::unordered_map<std::string, std::string> extractMap(const MapWrapper& mapWrapper) override;
   int64_t calculateFibonacciSync(double value) override;
   Promise<int64_t> calculateFibonacciAsync(double value) override;
@@ -191,16 +209,19 @@ public:
   double callInlineCallbackWithValue(double value, const InlineCallback<double(double)>& callback) override;
   Promise<void> callCallbackThatReturnsPromiseVoid(const Callback<Promise<void>()>& callback) override;
   Callback<void(double /* num */)> createNativeCallback(const Callback<void(double /* num */)>& wrappingJsCallback) override;
-  void callWithOptional(const std::optional<double>& value, const Callback<void(const std::optional<double>& /* maybe */)>& callback) override;
+  void callWithOptional(const std::optional<double>& value,
+                        const Callback<void(const std::optional<double>& /* maybe */)>& callback) override;
   Promise<double> getValueFromJSCallbackAndWait(const Callback<double()>& getValue) override;
   void callAll(const Callback<void()>& first, const Callback<void()>& second, const Callback<void()>& third) override;
   Promise<double> callSumUpNTimes(const Callback<double()>& callback, double n) override;
   Promise<double> callbackAsyncPromise(const Callback<Promise<double>()>& callback) override;
   Promise<ArrayBuffer> callbackAsyncPromiseBuffer(const Callback<Promise<ArrayBuffer>()>& callback) override;
   Callback<void(double /* value */)> getComplexCallback() override;
-  void twoOptionalCallbacks(double value, const std::optional<Callback<void(double /* value */)>>& first, const std::optional<Callback<void(const std::string& /* value */)>>& second) override;
+  void twoOptionalCallbacks(double value, const std::optional<Callback<void(double /* value */)>>& first,
+                            const std::optional<Callback<void(const std::string& /* value */)>>& second) override;
   void errorCallback(const Callback<void(const std::exception_ptr& /* error */)>& onError) override;
-  Promise<void> getValueFromJsCallback(const Callback<std::string()>& callback, const Callback<void(const std::string& /* valueFromJs */)>& andThenCall) override;
+  Promise<void> getValueFromJsCallback(const Callback<std::string()>& callback,
+                                       const Callback<void(const std::string& /* valueFromJs */)>& andThenCall) override;
   Promise<double> awaitAndGetPromise(const Promise<double>& promise) override;
   Promise<Car> awaitAndGetComplexPromise(const Promise<Car>& promise) override;
   Promise<void> awaitPromise(const Promise<void>& promise) override;
@@ -242,11 +263,14 @@ public:
   double callbackSync(const Callback<double()>& callback) override;
   Callback<double()> getSyncNumberCallback() override;
   Callback<int64_t(int64_t /* value */)> bounceSyncInt64Callback(const Callback<int64_t(int64_t /* value */)>& callback) override;
-  std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> bounceExternalHybrid(const std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>& externalObject) override;
+  std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>
+  bounceExternalHybrid(const std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>& externalObject) override;
   std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> createInternalObject() override;
   ExternalObjectStruct bounceExternalStruct(const ExternalObjectStruct& externalStruct) override;
-  std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string> bounceExternalVariant(const std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>& variant) override;
-  std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> createExternalVariantFromFunc(const Callback<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>()>& factory) override;
+  std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string> bounceExternalVariant(
+      const std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>& variant) override;
+  std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> createExternalVariantFromFunc(
+      const Callback<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>()>& factory) override;
 
   jsi::Value rawJsiFunc(jsi::Runtime& runtime, const jsi::Value& thisValue, const jsi::Value* args, size_t count);
   void dispose() override;

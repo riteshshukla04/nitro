@@ -4,18 +4,11 @@ import { mkdir, readFile } from 'node:fs/promises'
 import { validateBenchmarkRun } from './schema'
 import { commandOutput, saveAndroidFailure } from './diagnostics'
 
-async function command(
-  executable: string,
-  argumentsList: string[],
-  allowFailure = false
-): Promise<void> {
+async function command(executable: string, argumentsList: string[], allowFailure = false): Promise<void> {
   const result = await commandOutput(executable, argumentsList, 120_000)
   if (result.stdout) console.info(result.stdout)
   if (result.stderr) console.error(result.stderr)
-  if (
-    (result.exitCode !== 0 || result.timedOut || result.truncated) &&
-    !allowFailure
-  ) {
+  if ((result.exitCode !== 0 || result.timedOut || result.truncated) && !allowFailure) {
     throw new Error(
       `${executable} ${argumentsList.join(' ')} failed with exit code ${result.exitCode}.\n${JSON.stringify(result, null, 2)}`
     )
@@ -53,16 +46,7 @@ export async function runDeviceCase(
     configuration.toolchain,
   ]
   const receiver = Bun.spawn(
-    [
-      'bun',
-      ...receiverArguments,
-      '--output',
-      output,
-      '--benchmark-index',
-      String(index),
-      '--timeout-ms',
-      '120000',
-    ],
+    ['bun', ...receiverArguments, '--output', output, '--benchmark-index', String(index), '--timeout-ms', '120000'],
     {
       stdout: 'inherit',
       stderr: 'inherit',
@@ -73,23 +57,10 @@ export async function runDeviceCase(
   async function monitorAndroidProcess(): Promise<void> {
     await Bun.sleep(1_000)
     while (!monitorCancelled) {
-      const process = await commandOutput('adb', [
-        '-s',
-        deviceId,
-        'shell',
-        'pidof',
-        appId,
-      ])
+      const process = await commandOutput('adb', ['-s', deviceId, 'shell', 'pidof', appId])
       if (monitorCancelled) return
-      if (
-        process.exitCode !== 0 ||
-        process.timedOut ||
-        process.truncated ||
-        process.stdout.trim().length === 0
-      ) {
-        throw new Error(
-          `Android benchmark app could not be found before reporting results.\n${JSON.stringify(process, null, 2)}`
-        )
+      if (process.exitCode !== 0 || process.timedOut || process.truncated || process.stdout.trim().length === 0) {
+        throw new Error(`Android benchmark app could not be found before reporting results.\n${JSON.stringify(process, null, 2)}`)
       }
       await Bun.sleep(1_000)
     }
@@ -113,39 +84,18 @@ export async function runDeviceCase(
     if (!ready) throw new Error('Benchmark receiver did not start.')
 
     if (platform === 'android') {
-      await command('adb', [
-        '-s',
-        deviceId,
-        'shell',
-        'am',
-        'start',
-        '-W',
-        '-n',
-        `${appId}/com.margelo.nitrobenchmark.MainActivity`,
-      ])
+      await command('adb', ['-s', deviceId, 'shell', 'am', 'start', '-W', '-n', `${appId}/com.margelo.nitrobenchmark.MainActivity`])
     } else {
-      await command('xcrun', [
-        'simctl',
-        'launch',
-        '--terminate-running-process',
-        deviceId,
-        appId,
-      ])
+      await command('xcrun', ['simctl', 'launch', '--terminate-running-process', deviceId, appId])
     }
 
     const receiverCompletion = receiver.exited.then((receiverExitCode) => {
       if (receiverExitCode !== 0) {
-        throw new Error(
-          `Benchmark receiver failed with exit code ${receiverExitCode}.`
-        )
+        throw new Error(`Benchmark receiver failed with exit code ${receiverExitCode}.`)
       }
     })
-    await (platform === 'android'
-      ? Promise.race([receiverCompletion, monitorAndroidProcess()])
-      : receiverCompletion)
-    const result = validateBenchmarkRun(
-      JSON.parse(await readFile(output, 'utf8'))
-    )
+    await (platform === 'android' ? Promise.race([receiverCompletion, monitorAndroidProcess()]) : receiverCompletion)
+    const result = validateBenchmarkRun(JSON.parse(await readFile(output, 'utf8')))
     const metric = result.metrics[0]!
     console.info(
       `[NitroBenchmark] ${new Date().toISOString()} ${configuration.runId} measurement case ${index + 1}/${result.benchmarkCount}: ${metric.id}, ${metric.iterations} ops/sample`
@@ -162,11 +112,7 @@ export async function runDeviceCase(
   } finally {
     monitorCancelled = true
     if (platform === 'android') {
-      await command(
-        'adb',
-        ['-s', deviceId, 'shell', 'am', 'force-stop', appId],
-        true
-      )
+      await command('adb', ['-s', deviceId, 'shell', 'am', 'force-stop', appId], true)
     } else {
       await command('xcrun', ['simctl', 'terminate', deviceId, appId], true)
     }
@@ -176,12 +122,7 @@ export async function runDeviceCase(
 }
 
 /** Install once; app identities let revisions coexist on the same device. */
-export async function installApp(
-  platform: 'android' | 'ios',
-  deviceId: string,
-  app: string,
-  appId: string
-): Promise<void> {
+export async function installApp(platform: 'android' | 'ios', deviceId: string, app: string, appId: string): Promise<void> {
   if (platform === 'android') {
     await command('adb', ['-s', deviceId, 'uninstall', appId], true)
     await command('adb', ['-s', deviceId, 'install', '-r', app])

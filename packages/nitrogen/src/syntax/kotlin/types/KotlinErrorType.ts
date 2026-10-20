@@ -1,11 +1,7 @@
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { GetCodeOptions } from '../../types/Type.js'
 import { ErrorType } from '../../types/ErrorType.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinErrorType extends ErrorType implements KotlinType {
   readonly jniValueKind = 'wrapper'

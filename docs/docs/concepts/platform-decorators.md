@@ -3,8 +3,7 @@ title: Platform decorators
 description: Configure native implementations, inheritance, Swift protocol conformances, and Kotlin interfaces with @iOS and @Android.
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Platform decorators
 
@@ -23,16 +22,20 @@ export * from '#nitro/Math'
 ```
 
 :::tip
-Hybrid Objects with constructors or static methods always require a concrete `implementation`, while Hybrid Objects without constructors or static methods can also be declared abstract via `allowMultipleImplementations: true`.
+
+Hybrid Objects with constructors or static methods always require a concrete `implementation`, while Hybrid Objects without constructors or
+static methods can also be declared abstract via `allowMultipleImplementations: true`.
+
 :::
 
 ## Native `language`
 
-Hybrid Objects can be implemented in different languages. C++ is supported on all platforms, and each platform supports other platform-specific languages:
+Hybrid Objects can be implemented in different languages. C++ is supported on all platforms, and each platform supports other
+platform-specific languages:
 
-| Decorator | Languages |
-| --- | --- |
-| `@iOS` | `'swift'`, `'c++'` |
+| Decorator  | Languages           |
+| ---------- | ------------------- |
+| `@iOS`     | `'swift'`, `'c++'`  |
 | `@Android` | `'kotlin'`, `'c++'` |
 
 ## Concrete implementations
@@ -71,8 +74,11 @@ Now, ensure `HybridMath` is implemented:
     ```
 
     :::tip
+
     Ensure `HybridMath.swift` is being built by your project/SPM package.
+
     :::
+
   </TabItem>
   <TabItem value="Kotlin">
     ```kotlin title="HybridMath.kt"
@@ -84,15 +90,18 @@ Now, ensure `HybridMath` is implemented:
     ```
 
     :::tip
+
     If `HybridMath` lives in a different Java `package` pass `package: [...]` to `@Android(...)`.
+
     :::
+
   </TabItem>
+
 </Tabs>
 
 ### Allow inheritance
 
-Hybrid Objects can be extended to create inheritance chains.
-If you want your Hybrid Object to be extendable, set `allowInheritance: true`:
+Hybrid Objects can be extended to create inheritance chains. If you want your Hybrid Object to be extendable, set `allowInheritance: true`:
 
 ```ts
 import { type HybridObject, iOS, Android } from 'nitro-core'
@@ -146,8 +155,8 @@ export * from '#nitro/Math'
 
 ## Multiple implementations
 
-If your Hybrid Object is not bound to one specific implementation, set `allowMultipleImplementations: true`.
-For example, an `Image` could be backed by a `UIImage`, a `CGImage`, or a GPU buffer:
+If your Hybrid Object is not bound to one specific implementation, set `allowMultipleImplementations: true`. For example, an `Image` could
+be backed by a `UIImage`, a `CGImage`, or a GPU buffer:
 
 ```ts title="Image.nitro.ts"
 import { type HybridObject, iOS } from 'nitro-core'
@@ -155,7 +164,7 @@ import { type HybridObject, iOS } from 'nitro-core'
 @iOS({
   language: 'swift',
   // highlight-next-line
-  allowMultipleImplementations: true
+  allowMultipleImplementations: true,
 })
 export declare class Image extends HybridObject {
   readonly width: number
@@ -178,14 +187,15 @@ class HybridGPUImage: HybridImageSpec {
 }
 ```
 
-`Image` can no longer have a constructor or static methods, but you can still create other Hybrid Objects that can create `Image` instances - this is a factory pattern:
+`Image` can no longer have a constructor or static methods, but you can still create other Hybrid Objects that can create `Image`
+instances - this is a factory pattern:
 
 ```ts title="ImageFactory.nitro.ts"
 import { type HybridObject, iOS } from 'nitro-core'
 
 @iOS({
   language: 'swift',
-  implementation: { className: 'HybridImageFactory' }
+  implementation: { className: 'HybridImageFactory' },
 })
 export declare class ImageFactory extends HybridObject {
   static createUIImage(): Image
@@ -213,8 +223,8 @@ class HybridImageFactory: HybridImageFactorySpec {
 
 ## Additional native interface/protocol conformances
 
-Hybrid Objects are natively represented as interfaces in Kotlin and protocols in Swift.
-If you often pass Hybrid Objects around, you may end up writing such cast-patterns repeatedly:
+Hybrid Objects are natively represented as interfaces in Kotlin and protocols in Swift. If you often pass Hybrid Objects around, you may end
+up writing such cast-patterns repeatedly:
 
 ```swift
 class HybridImage: HybridImageSpec {
@@ -246,6 +256,7 @@ To avoid these repeated downcasts, simply declare a native Kotlin interface/Swif
       var uiImage: UIImage { get }
     }
     ```
+
   </TabItem>
   <TabItem value="Kotlin">
     ```kotlin title="NativeImage.kt"
@@ -255,7 +266,9 @@ To avoid these repeated downcasts, simply declare a native Kotlin interface/Swif
       public val bitmap: android.graphics.Bitmap
     }
     ```
+
   </TabItem>
+
 </Tabs>
 
 Then declare your interface/protocol conformance via `implementedInterfaces`/`protocolConformances`:
@@ -267,13 +280,13 @@ import { type HybridObject, iOS } from 'nitro-core'
   language: 'swift',
   allowMultipleImplementations: true,
   // highlight-next-line
-  protocolConformances: [{ protocol: 'NativeImage' }]
+  protocolConformances: [{ protocol: 'NativeImage' }],
 })
 @Android({
   language: 'kotlin',
   allowMultipleImplementations: true,
   // highlight-next-line
-  implementedInterfaces: [{ interface: 'NativeImage', package: 'com.margelo.nitro.image' }]
+  implementedInterfaces: [{ interface: 'NativeImage', package: 'com.margelo.nitro.image' }],
 })
 export declare class Image extends HybridObject {
   readonly width: number

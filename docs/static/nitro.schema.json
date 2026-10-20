@@ -2,19 +2,11 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Nitro Modules Configuration",
   "type": "object",
-  "required": [
-    "cxxNamespace",
-    "ios",
-    "android",
-    "autolinking"
-  ],
+  "required": ["cxxNamespace", "ios", "android", "autolinking"],
   "properties": {
     "environment": {
       "type": "string",
-      "enum": [
-        "react-native",
-        "bare"
-      ],
+      "enum": ["react-native", "bare"],
       "default": "react-native",
       "description": "Selects the package imported by generated JavaScript runtime modules: react-native-nitro-modules for react-native, or nitro-core for bare."
     },
@@ -28,9 +20,7 @@
     },
     "ios": {
       "type": "object",
-      "required": [
-        "iosModuleName"
-      ],
+      "required": ["iosModuleName"],
       "properties": {
         "iosModuleName": {
           "type": "string",
@@ -42,10 +32,7 @@
     },
     "android": {
       "type": "object",
-      "required": [
-        "androidNamespace",
-        "androidCxxLibName"
-      ],
+      "required": ["androidNamespace", "androidCxxLibName"],
       "properties": {
         "androidNamespace": {
           "type": "array",
@@ -71,22 +58,15 @@
           "type": "object",
           "oneOf": [
             {
-              "required": [
-                "all"
-              ],
+              "required": ["all"],
               "properties": {
                 "all": {
                   "type": "object",
-                  "required": [
-                    "language",
-                    "implementationClassName"
-                  ],
+                  "required": ["language", "implementationClassName"],
                   "properties": {
                     "language": {
                       "type": "string",
-                      "enum": [
-                        "c++"
-                      ]
+                      "enum": ["c++"]
                     },
                     "implementationClassName": {
                       "type": "string"
@@ -100,25 +80,17 @@
             {
               "type": "object",
               "not": {
-                "required": [
-                  "all"
-                ]
+                "required": ["all"]
               },
               "minProperties": 1,
               "properties": {
                 "ios": {
                   "type": "object",
-                  "required": [
-                    "language",
-                    "implementationClassName"
-                  ],
+                  "required": ["language", "implementationClassName"],
                   "properties": {
                     "language": {
                       "type": "string",
-                      "enum": [
-                        "c++",
-                        "swift"
-                      ]
+                      "enum": ["c++", "swift"]
                     },
                     "implementationClassName": {
                       "type": "string"
@@ -128,17 +100,11 @@
                 },
                 "android": {
                   "type": "object",
-                  "required": [
-                    "language",
-                    "implementationClassName"
-                  ],
+                  "required": ["language", "implementationClassName"],
                   "properties": {
                     "language": {
                       "type": "string",
-                      "enum": [
-                        "c++",
-                        "kotlin"
-                      ]
+                      "enum": ["c++", "kotlin"]
                     },
                     "implementationClassName": {
                       "type": "string"
@@ -150,18 +116,11 @@
               "patternProperties": {
                 "^(?!all$|ios$|android$).+$": {
                   "type": "object",
-                  "required": [
-                    "language",
-                    "implementationClassName"
-                  ],
+                  "required": ["language", "implementationClassName"],
                   "properties": {
                     "language": {
                       "type": "string",
-                      "enum": [
-                        "c++",
-                        "swift",
-                        "kotlin"
-                      ]
+                      "enum": ["c++", "swift", "kotlin"]
                     },
                     "implementationClassName": {
                       "type": "string"

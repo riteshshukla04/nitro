@@ -55,9 +55,7 @@ export class KotlinInstanceMethod extends InstanceMethod {
     let parameters: Parameter[]
     if (accessor?.kind === 'setter') {
       // Like Kotlin setters, name it `value`, which no conversion uses.
-      parameters = callable.parameters.map(
-        (parameter) => new Parameter('value', parameter.type)
-      )
+      parameters = callable.parameters.map((parameter) => new Parameter('value', parameter.type))
     } else {
       parameters = callable.parameters.map((parameter) => parameter.kotlin)
     }
@@ -79,12 +77,10 @@ export class KotlinInstanceMethod extends InstanceMethod {
 
   createBridge(): KotlinMethodBridge {
     const nativeMethod = this.nativeMethod
-    const cppMethod = new InstanceMethod(
-      nativeMethod.name,
-      nativeMethod.returnType,
-      nativeMethod.parameters,
-      { override: true, generated: true }
-    )
+    const cppMethod = new InstanceMethod(nativeMethod.name, nativeMethod.returnType, nativeMethod.parameters, {
+      override: true,
+      generated: true,
+    })
     const cppBody = createCppJniCallBody({
       callable: this.callable,
       jvmName: this.name,
@@ -105,8 +101,7 @@ export class KotlinInstanceMethod extends InstanceMethod {
     if (this.accessor == null) {
       return createKotlinForwarderBody({
         callable: this.callable,
-        getKotlinInvocation: (args) =>
-          `${this.nativeMethod.name}(${args.join(', ')})`,
+        getKotlinInvocation: (args) => `${this.nativeMethod.name}(${args.join(', ')})`,
       })
     }
     // Kotlin property accessors cannot be called like methods.
@@ -123,9 +118,7 @@ export class KotlinInstanceMethod extends InstanceMethod {
       case 'setter': {
         const [parameter] = this.callable.parameters
         if (parameter == null) {
-          throw new Error(
-            'A Kotlin property setter requires a value parameter.'
-          )
+          throw new Error('A Kotlin property setter requires a value parameter.')
         }
         const publicValue = parameter.type.convert('value', {
           from: 'c++',
@@ -139,9 +132,7 @@ export class KotlinInstanceMethod extends InstanceMethod {
 }
 
 /** The JNI accessors C++ calls for a property. */
-export function getKotlinPropertyAccessors(
-  property: Property
-): KotlinInstanceMethod[] {
+export function getKotlinPropertyAccessors(property: Property): KotlinInstanceMethod[] {
   const accessors = [
     new KotlinInstanceMethod({
       method: property.cppGetter,

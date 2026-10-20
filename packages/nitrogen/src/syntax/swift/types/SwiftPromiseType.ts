@@ -6,11 +6,7 @@ import { escapeCppName } from '../../helpers.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import { PromiseType } from '../../types/PromiseType.js'
 import { createSwiftPromiseBridge } from '../SwiftPromise.js'
-import {
-  getClangImporterReferenceName,
-  getQualifiedSwiftName,
-  type ImportedCxxRecord,
-} from '../ImportedCxxRecord.js'
+import { getClangImporterReferenceName, getQualifiedSwiftName, type ImportedCxxRecord } from '../ImportedCxxRecord.js'
 import { wrapSwiftTypeForBridge } from '../wrapSwiftType.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
@@ -79,8 +75,7 @@ export class SwiftPromiseType extends PromiseType implements SwiftType {
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   get importedCxxRecord(): ImportedCxxRecord {
-    const resultingType =
-      this.resultingType.getClangImporterName('type-argument')
+    const resultingType = this.resultingType.getClangImporterName('type-argument')
     return {
       namespaces: ['margelo', 'nitro'],
       swiftName: `Promise<${resultingType}>`,
@@ -93,33 +88,21 @@ export class SwiftPromiseType extends PromiseType implements SwiftType {
   }
 
   override getExtraFiles(): SourceFile[] {
-    return [
-      ...this.resultingType.getExtraFiles(),
-      ...createSwiftPromiseBridge(this),
-    ]
+    return [...this.resultingType.getExtraFiles(), ...createSwiftPromiseBridge(this)]
   }
 
   get requiredCppHelpers(): CppHelper[] {
-    return [
-      ...this.resultingType.requiredCppHelpers,
-      ...this.createCppHelpers(),
-    ]
+    return [...this.resultingType.requiredCppHelpers, ...this.createCppHelpers()]
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports: SourceImport[] = []
     switch (language) {
       case 'c++':
-        imports.push(
-          ...this.resultingType.getRequiredImports(language, context),
-          {
-            language,
-            declaration: { name: 'NitroModules/Promise.hpp', space: 'system' },
-          }
-        )
+        imports.push(...this.resultingType.getRequiredImports(language, context), {
+          language,
+          declaration: { name: 'NitroModules/Promise.hpp', space: 'system' },
+        })
         break
       case 'swift':
         imports.push({

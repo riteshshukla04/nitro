@@ -130,7 +130,8 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
   }
 
   override fun callEnumArrayCallback(
-    array: Array<Powertrain>, callback: (Array<Powertrain>) -> Array<Powertrain>,
+    array: Array<Powertrain>,
+    callback: (Array<Powertrain>) -> Array<Powertrain>,
   ): Array<Powertrain> {
     return callback(array)
   }
@@ -139,9 +140,7 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     return { array -> array }
   }
 
-  override fun callEnumArrayPromiseCallback(
-    callback: () -> Promise<Promise<Array<Powertrain>>>,
-  ): Promise<Array<Powertrain>> {
+  override fun callEnumArrayPromiseCallback(callback: () -> Promise<Promise<Array<Powertrain>>>): Promise<Array<Powertrain>> {
     return Promise.async {
       val promise = callback().await()
       return@async promise.await()
@@ -155,7 +154,8 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
   }
 
   override fun callNestedStructCallback(
-    value: Array<Array<Person?>>, callback: (Array<Array<Person?>>) -> Array<Array<Person?>>,
+    value: Array<Array<Person?>>,
+    callback: (Array<Array<Person?>>) -> Array<Array<Person?>>,
   ): Array<Array<Person?>> {
     return callback(value)
   }
@@ -194,8 +194,6 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
   override fun bounceOptionalNulls(strings: Array<Variant_NullType_String?>): Array<Variant_NullType_String?> {
     return strings
   }
-
-
 
   override fun createMap(): AnyMap {
     val map = AnyMap()
@@ -411,7 +409,10 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     callback()
   }
 
-  override fun callInlineCallbackWithValue(value: Double, callback: (Double) -> Double): Double {
+  override fun callInlineCallbackWithValue(
+    value: Double,
+    callback: (Double) -> Double,
+  ): Double {
     return callback(value)
   }
 

@@ -1,11 +1,14 @@
 ---
 title: Configuration (nitro.json)
-description: Configure nitro.json for a React Native Nitro Module, including C++ namespace, iOS module name, Android package, and code generation paths.
+description:
+  Configure nitro.json for a React Native Nitro Module, including C++ namespace, iOS module name, Android package, and code generation
+  paths.
 ---
 
 # Configuration (`nitro.json`)
 
-[Nitrogen](../concepts/nitrogen) requires a `nitro.json` file to be configured at the root of each [Nitro Module](../concepts/nitro-modules).
+[Nitrogen](../concepts/nitrogen) requires a `nitro.json` file to be configured at the root of each
+[Nitro Module](../concepts/nitro-modules).
 
 ```json
 {
@@ -23,7 +26,8 @@ description: Configure nitro.json for a React Native Nitro Module, including C++
 }
 ```
 
-Nitrogen parses this file with Zod, see [`NitroUserConfig.ts`](https://github.com/margelo/nitro/blob/v1/packages/nitrogen/src/config/NitroUserConfig.ts) for more information.
+Nitrogen parses this file with Zod, see
+[`NitroUserConfig.ts`](https://github.com/margelo/nitro/blob/v1/packages/nitrogen/src/config/NitroUserConfig.ts) for more information.
 
 ## `environment`
 
@@ -36,7 +40,8 @@ This setting only changes the JavaScript imports. Native code generation is the 
 
 ## `cxxNamespace`
 
-The `cxxNamespace` is the C++ namespace that all C++ specs will be generated in. It is always relative to `margelo::nitro`, and can also have multiple sub-namespaces:
+The `cxxNamespace` is the C++ namespace that all C++ specs will be generated in. It is always relative to `margelo::nitro`, and can also
+have multiple sub-namespaces:
 
 <div className="side-by-side-container">
   <div className="side-by-side-block">
@@ -85,7 +90,8 @@ The `iosModuleName` names the generated Swift module and SwiftPM library product
   </div>
 </div>
 
-See [Nitrogen's build setup](../concepts/nitrogen#3-add-generated-sources-to-your-library) for `Package.swift` and generated source configuration.
+See [Nitrogen's build setup](../concepts/nitrogen#3-add-generated-sources-to-your-library) for `Package.swift` and generated source
+configuration.
 
 ## `android`
 
@@ -93,8 +99,8 @@ Settings specifically for the Android platform.
 
 ### `androidNamespace`
 
-The `androidNamespace` represents the package namespace in which all Java/Kotlin files are generated and written in.
-Similar to the `cxxNamespace`, this is always relative to `com.margelo.nitro`, and can also have multiple sub-namespaces.
+The `androidNamespace` represents the package namespace in which all Java/Kotlin files are generated and written in. Similar to the
+`cxxNamespace`, this is always relative to `com.margelo.nitro`, and can also have multiple sub-namespaces.
 
 In most cases, you should keep this in sync with the `namespace` specified in your `build.gradle`.
 
@@ -112,9 +118,10 @@ In most cases, you should keep this in sync with the `namespace` specified in yo
   ```kotlin
   package com.margelo.nitro.math.extra
 
-  // ...
-  ```
-  </div>
+// ...
+
+````
+</div>
 </div>
 
 ### `androidCxxLibName`
@@ -125,14 +132,15 @@ When this Nitro Module is using CMake, this is the same thing as the library def
 Nitro will load this library at runtime using `System.loadLibrary`.
 
 <div className="side-by-side-container">
-  <div className="side-by-side-block">
-  ```json
-  {
-    "android": {
-      "androidCxxLibName": "NitroMath"
-    }
+<div className="side-by-side-block">
+```json
+{
+  "android": {
+    "androidCxxLibName": "NitroMath"
   }
-  ```
+}
+````
+
   </div>
   <div className="side-by-side-block">
   ```cmake

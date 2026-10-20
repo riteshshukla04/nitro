@@ -41,8 +41,7 @@ export async function validatePerformanceRequest(
     run.id < 1 ||
     !Number.isSafeInteger(metadata.pullRequestNumber) ||
     metadata.pullRequestNumber < 1 ||
-    run.display_title !==
-      `Nitro Performance for PR #${metadata.pullRequestNumber}` ||
+    run.display_title !== `Nitro Performance for PR #${metadata.pullRequestNumber}` ||
     !Number.isSafeInteger(metadata.requestAttempt) ||
     metadata.requestAttempt < 1 ||
     metadata.requestAttempt > run.run_attempt ||
@@ -54,9 +53,7 @@ export async function validatePerformanceRequest(
   // job, proves this workflow was authorized to test this exact commit.
   let latestRequestUrl: string | undefined
   for (let page = 1; page <= 10; page++) {
-    const statuses = (await request(
-      `/repos/${repository}/commits/${metadata.headSha}/statuses?per_page=100&page=${page}`
-    )) as {
+    const statuses = (await request(`/repos/${repository}/commits/${metadata.headSha}/statuses?per_page=100&page=${page}`)) as {
       context: string
       state: string
       target_url: string
@@ -65,19 +62,11 @@ export async function validatePerformanceRequest(
     // GitHub returns newest first. Only pending statuses identify requests:
     // a publishing failure can change the final status URL to the publisher.
     for (const status of statuses) {
+      if (status.creator.login !== 'github-actions[bot]' || status.creator.type !== 'Bot' || status.state !== 'pending') continue
+      if (status.context === 'Nitro Performance') latestRequestUrl ??= status.target_url
       if (
-        status.creator.login !== 'github-actions[bot]' ||
-        status.creator.type !== 'Bot' ||
-        status.state !== 'pending'
-      )
-        continue
-      if (status.context === 'Nitro Performance')
-        latestRequestUrl ??= status.target_url
-      if (
-        (status.context === 'Nitro Performance' ||
-          status.context === `Nitro Performance / ${run.id}`) &&
-        status.target_url ===
-          `https://github.com/${repository}/actions/runs/${run.id}`
+        (status.context === 'Nitro Performance' || status.context === `Nitro Performance / ${run.id}`) &&
+        status.target_url === `https://github.com/${repository}/actions/runs/${run.id}`
       )
         return { context: status.context, latestRequestUrl }
     }
@@ -92,21 +81,11 @@ export async function updatePerformanceStatus(
   publication: { status: string; runId: number },
   request: GitHubRequest
 ): Promise<void> {
-  const { context, latestRequestUrl } = await validatePerformanceRequest(
-    metadata,
-    event,
-    metadata.repository,
-    request
-  )
+  const { context, latestRequestUrl } = await validatePerformanceRequest(metadata, event, metadata.repository, request)
   const run = event.workflow_run
   // Request and publication jobs share a concurrency group, so a new request
   // cannot replace this owner between the lookup and the status write.
-  if (
-    context === 'Nitro Performance' &&
-    latestRequestUrl !==
-      `https://github.com/${metadata.repository}/actions/runs/${run.id}`
-  )
-    return
+  if (context === 'Nitro Performance' && latestRequestUrl !== `https://github.com/${metadata.repository}/actions/runs/${run.id}`) return
   const root = `/repos/${metadata.repository}`
   const latest = (await request(`${root}/actions/runs/${run.id}`)) as {
     run_attempt: number
@@ -114,11 +93,7 @@ export async function updatePerformanceStatus(
   }
   // A delayed webhook must not overwrite the status of a newer attempt, or set
   // a completed run back to pending.
-  if (
-    latest.run_attempt !== run.run_attempt ||
-    (event.action === 'in_progress' && latest.status === 'completed')
-  )
-    return
+  if (latest.run_attempt !== run.run_attempt || (event.action === 'in_progress' && latest.status === 'completed')) return
   const state =
     event.action === 'in_progress'
       ? 'pending'
@@ -147,15 +122,8 @@ if (import.meta.main) {
   const token = process.env.GITHUB_TOKEN
   if (token == null) throw new Error('GITHUB_TOKEN is required.')
   const args = parseArguments(Bun.argv.slice(2))
-  const metadata = JSON.parse(
-    await readFile(
-      path.join(requiredArgument(args, 'directory'), 'request.json'),
-      'utf8'
-    )
-  ) as PerformanceRequest
-  const event = JSON.parse(
-    await readFile(process.env.GITHUB_EVENT_PATH!, 'utf8')
-  ) as WorkflowEvent
+  const metadata = JSON.parse(await readFile(path.join(requiredArgument(args, 'directory'), 'request.json'), 'utf8')) as PerformanceRequest
+  const event = JSON.parse(await readFile(process.env.GITHUB_EVENT_PATH!, 'utf8')) as WorkflowEvent
   const request = createGitHubRequest(token)
   if (requiredArgument(args, 'mode') === 'update') {
     await updatePerformanceStatus(
@@ -168,11 +136,6 @@ if (import.meta.main) {
       request
     )
   } else {
-    await validatePerformanceRequest(
-      metadata,
-      event,
-      process.env.GITHUB_REPOSITORY!,
-      request
-    )
+    await validatePerformanceRequest(metadata, event, process.env.GITHUB_REPOSITORY!, request)
   }
 }

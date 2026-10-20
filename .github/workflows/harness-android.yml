@@ -14,16 +14,16 @@ on:
   workflow_dispatch:
     inputs:
       device_api_level:
-        description: "Android API level"
+        description: 'Android API level'
         required: false
         type: string
       device_profile:
-        description: "Device profile"
+        description: 'Device profile'
         required: false
-        default: "pixel_7"
+        default: 'pixel_7'
         type: string
       avd_name:
-        description: "AVD name"
+        description: 'AVD name'
         required: false
         type: string
   pull_request:
@@ -85,7 +85,7 @@ jobs:
       - name: Setup JDK 17
         uses: actions/setup-java@v6
         with:
-          distribution: "zulu"
+          distribution: 'zulu'
           java-version: 17
           java-package: jdk
 
@@ -97,7 +97,9 @@ jobs:
             ~/.gradle/wrapper
             tests/react-native/apps/example/android/.gradle
             tests/react-native/apps/example/android/app/.cxx
-          key: ${{ runner.os }}-gradle-26-${{ env.DEVICE_ARCH }}-Default-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/CMakeLists.txt', '**/*.cmake') }}
+          key:
+            ${{ runner.os }}-gradle-26-${{ env.DEVICE_ARCH }}-Default-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties',
+            '**/CMakeLists.txt', '**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-gradle-26-${{ env.DEVICE_ARCH }}-Default-
       - name: Build React Native Android app

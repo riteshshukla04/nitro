@@ -101,19 +101,11 @@ export class SwiftArrayType extends ArrayType implements SwiftType {
     return this.itemType.requiredCppHelpers
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports = this.itemType.getRequiredImports(language, context)
     switch (language) {
       case 'c++':
-        imports.push(
-          getSwiftGenericImport(
-            'Array',
-            'NitroModules/JSIConverter+SwiftArray.hpp'
-          )
-        )
+        imports.push(getSwiftGenericImport('Array', 'NitroModules/JSIConverter+SwiftArray.hpp'))
         break
     }
     return imports

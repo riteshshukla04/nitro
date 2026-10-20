@@ -1,8 +1,7 @@
 ---
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Typed maps (`Record<string, T>`)
 
@@ -20,6 +19,7 @@ For example, if your API returns a map of users with their ages, you _could_ use
       getAllUsers(): Record<string, number>
     }
     ```
+
   </TabItem>
   <TabItem value="swift" label="Swift">
     ```swift
@@ -27,6 +27,7 @@ For example, if your API returns a map of users with their ages, you _could_ use
       func getAllUsers() throws -> Dictionary<String, Double>
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin
@@ -34,6 +35,7 @@ For example, if your API returns a map of users with their ages, you _could_ use
       override fun getAllUsers(): Map<String, Double>
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp
@@ -41,10 +43,15 @@ For example, if your API returns a map of users with their ages, you _could_ use
       std::unordered_map<std::string, double> getAllUsers() override;
     };
     ```
+
   </TabItem>
+
 </Tabs>
 
 :::tip
-While typed maps are very efficient, Nitro cannot sufficiently optimize the object as keys are not known in advance.
-If possible, **avoid typed maps** and use [arrays](arrays) for unknown number of items, or [strongly typed objects](custom-structs) for known number of items instead.
+
+While typed maps are very efficient, Nitro cannot sufficiently optimize the object as keys are not known in advance. If possible, **avoid
+typed maps** and use [arrays](arrays) for unknown number of items, or [strongly typed objects](custom-structs) for known number of items
+instead.
+
 :::

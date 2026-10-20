@@ -17,9 +17,7 @@ const config = {
   // Resolve peer dependencies from this app so Metro loads one copy of each.
   resolver: {
     extraNodeModules: modules.reduce((acc, name) => {
-      acc[name] = path.dirname(
-        require.resolve(`${name}/package.json`, { paths: [__dirname] })
-      )
+      acc[name] = path.dirname(require.resolve(`${name}/package.json`, { paths: [__dirname] }))
       return acc
     }, {}),
   },

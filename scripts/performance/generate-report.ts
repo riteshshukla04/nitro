@@ -12,20 +12,13 @@ const METRIC_ID_PATTERN = /^[a-z0-9][a-z0-9/._-]{0,199}$/
 const argumentsMap = parseArguments(Bun.argv.slice(2))
 const artifactDirectory = requiredArgument(argumentsMap, 'artifact-directory')
 const outputDirectory = requiredArgument(argumentsMap, 'output-directory')
-const report: PerformanceReport = JSON.parse(
-  await readFile(
-    path.join(artifactDirectory, 'performance-report.json'),
-    'utf8'
-  )
-)
+const report: PerformanceReport = JSON.parse(await readFile(path.join(artifactDirectory, 'performance-report.json'), 'utf8'))
 const workflowRunUrl = `https://github.com/${report.repository}/actions/runs/${report.workflowRunId}`
 const builds = new Map<string, BuildMetadata>()
 const pairCounts = new Map<string, number>()
 for (const platform of ['android', 'ios'] as const) {
   const ids = report.artifacts[platform]
-  const build: BuildMetadata = await Bun.file(
-    path.join(artifactDirectory, 'raw', platform, 'build.json')
-  ).json()
+  const build: BuildMetadata = await Bun.file(path.join(artifactDirectory, 'raw', platform, 'build.json')).json()
   if (
     build.platform !== platform ||
     build.baseSha !== report.baseSha ||
@@ -38,25 +31,15 @@ for (const platform of ['android', 'ios'] as const) {
     ids.buildAttempt > ids.measurementAttempt ||
     ids.measurementAttempt > report.runAttempt
   ) {
-    throw new Error(
-      `${platform} app build metadata does not match this report.`
-    )
+    throw new Error(`${platform} app build metadata does not match this report.`)
   }
-  const measurement = await Bun.file(
-    path.join(artifactDirectory, 'raw', platform, 'measurement.json')
-  ).json()
-  if (
-    measurement.buildArtifactId !== ids.buildId ||
-    measurement.runAttempt !== ids.measurementAttempt
-  ) {
-    throw new Error(
-      `${platform} measurement provenance does not match this report.`
-    )
+  const measurement = await Bun.file(path.join(artifactDirectory, 'raw', platform, 'measurement.json')).json()
+  if (measurement.buildArtifactId !== ids.buildId || measurement.runAttempt !== ids.measurementAttempt) {
+    throw new Error(`${platform} measurement provenance does not match this report.`)
   }
   // A retained measurement from before balanced repeats contains one pair.
   // Explicit counts prevent an incomplete four-pair artifact passing as one.
-  const pairCount =
-    measurement.pairCount === undefined ? 1 : measurement.pairCount
+  const pairCount = measurement.pairCount === undefined ? 1 : measurement.pairCount
   if (pairCount !== 1 && pairCount !== 4) {
     throw new Error(`${platform} measurement pair count is invalid.`)
   }
@@ -64,32 +47,18 @@ for (const platform of ['android', 'ios'] as const) {
   builds.set(platform, build)
 }
 
-async function loadRawRuns(
-  platform: 'android' | 'ios',
-  revision: 'base' | 'head',
-  expectedSha: string
-): Promise<BenchmarkRunResult[]> {
+async function loadRawRuns(platform: 'android' | 'ios', revision: 'base' | 'head', expectedSha: string): Promise<BenchmarkRunResult[]> {
   const directory = path.join(artifactDirectory, 'raw', platform)
   const filePattern = new RegExp(`^${revision}-[0-9]+\\.json$`)
-  const files = (await readdir(directory)).filter((file) =>
-    filePattern.test(file)
-  )
+  const files = (await readdir(directory)).filter((file) => filePattern.test(file))
   const pairCount = pairCounts.get(platform)!
-  const expectedFiles = Array.from(
-    { length: pairCount },
-    (_, index) => `${revision}-${index + 1}.json`
-  )
-  if (
-    files.length !== pairCount ||
-    expectedFiles.some((file) => !files.includes(file))
-  ) {
+  const expectedFiles = Array.from({ length: pairCount }, (_, index) => `${revision}-${index + 1}.json`)
+  if (files.length !== pairCount || expectedFiles.some((file) => !files.includes(file))) {
     throw new Error(`Expected ${pairCount} ${platform} ${revision} runs.`)
   }
   return Promise.all(
     expectedFiles.map(async (file, index) => {
-      const run = validateBenchmarkRun(
-        JSON.parse(await readFile(path.join(directory, file), 'utf8'))
-      )
+      const run = validateBenchmarkRun(JSON.parse(await readFile(path.join(directory, file), 'utf8')))
       if (
         run.configuration.runId !== `${platform}-${revision}-${index + 1}` ||
         run.configuration.reverse !== false ||
@@ -99,8 +68,7 @@ async function loadRawRuns(
         run.configuration.benchmarkIndex !== undefined ||
         run.metrics.length !== run.benchmarkCount ||
         run.configuration.commitSha !== expectedSha ||
-        run.configuration.suiteHash !==
-          (revision === 'base' ? report.baseSuiteHash : report.headSuiteHash) ||
+        run.configuration.suiteHash !== (revision === 'base' ? report.baseSuiteHash : report.headSuiteHash) ||
         run.metrics.some((metric) => !METRIC_ID_PATTERN.test(metric.id))
       ) {
         throw new Error(`${platform} ${revision} run metadata is invalid.`)
@@ -158,10 +126,7 @@ for (const { comparison, baseRuns, headRuns } of comparisons) {
     [comparison.platform, headRuns],
   ] as const) {
     if (runs.length === 0) continue
-    await Bun.write(
-      path.join(outputDirectory, `bencher-${suffix}.json`),
-      `${JSON.stringify(toBencherMetricFormat(runs), null, 2)}\n`
-    )
+    await Bun.write(path.join(outputDirectory, `bencher-${suffix}.json`), `${JSON.stringify(toBencherMetricFormat(runs), null, 2)}\n`)
   }
 }
 

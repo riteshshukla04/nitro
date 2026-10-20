@@ -18,7 +18,7 @@ let swiftSettings: [SwiftSetting] = [
   .unsafeFlags(["-Xfrontend", "-clang-header-expose-decls=has-expose-attr-or-stdlib"]),
 ]
 let bridgeSettings: [CXXSetting] = [
-  .unsafeFlags(["-I${GENERATED_MODULEMAP_DIR}", "-fno-modules"]),
+  .unsafeFlags(["-I${GENERATED_MODULEMAP_DIR}", "-fno-modules"])
 ]
 
 let package = Package(
@@ -184,7 +184,7 @@ func addFixtureTargets(
       sources: bridgeSources,
       publicHeadersPath: "c++/include",
       cxxSettings: cxxSettings + bridgeSettings + [
-        .unsafeFlags(userHeaderFlags),
+        .unsafeFlags(userHeaderFlags)
       ]
     ),
   ]

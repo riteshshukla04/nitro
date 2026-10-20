@@ -3,8 +3,8 @@
 
 # Other Hybrid Objects (`HybridObject`)
 
-Since Nitro Modules are object-oriented, a `HybridObject` itself is a first-class citizen.
-This means you can pass around instances of native `HybridObject`s between JS and native, allowing for safe interface-level abstractions:
+Since Nitro Modules are object-oriented, a `HybridObject` itself is a first-class citizen. This means you can pass around instances of
+native `HybridObject`s between JS and native, allowing for safe interface-level abstractions:
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -48,7 +48,8 @@ class HybridCamera: HybridCameraSpec {
 
 ## Interface-level abstraction
 
-With [`allowMultipleImplementations: true`](../concepts/platform-decorators#multiple-implementations), `Image` can have different native implementations:
+With [`allowMultipleImplementations: true`](../concepts/platform-decorators#multiple-implementations), `Image` can have different native
+implementations:
 
 ```swift
 class HybridUIImage: HybridImageSpec {
@@ -65,8 +66,8 @@ class HybridBufferImage: HybridImageSpec {
 }
 ```
 
-...but still be used exactly the same in other places, as it is all an `any HybridImageSpec`.
-Even if they use different implementations under the hood, they all share a common interface with properties like `width`, `height` and more:
+...but still be used exactly the same in other places, as it is all an `any HybridImageSpec`. Even if they use different implementations
+under the hood, they all share a common interface with properties like `width`, `height` and more:
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">

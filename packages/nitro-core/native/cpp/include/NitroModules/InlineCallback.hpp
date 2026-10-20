@@ -41,6 +41,7 @@ class SWIFT_NONCOPYABLE SWIFT_NONESCAPABLE InlineCallback<R(Args...)> final {
 
   struct JSCallback;
   using NativeCallback = std::function<R(Args...)>;
+
 public:
   // Swift only imports factories of non-escapable types with lifetime annotations.
   static InlineCallback make(jsi::Runtime& runtime [[clang::lifetimebound]], jsi::Function&& function) {
@@ -49,6 +50,7 @@ public:
   static InlineCallback make(std::function<R(Args...)>&& function) SWIFT_RETURNS_INDEPENDENT_VALUE {
     return InlineCallback(std::move(function));
   }
+
 public:
   InlineCallback(const InlineCallback&) = delete;
   InlineCallback(InlineCallback&&) {
@@ -57,9 +59,10 @@ public:
     std::abort();
   }
   ~InlineCallback() = default;
+
 private:
-  explicit InlineCallback(NativeCallback&& function): _impl(std::move(function)) {}
-  explicit InlineCallback(JSCallback&& callback): _impl(std::move(callback)) {}
+  explicit InlineCallback(NativeCallback&& function) : _impl(std::move(function)) {}
+  explicit InlineCallback(JSCallback&& callback) : _impl(std::move(callback)) {}
 
 public:
   [[nodiscard]] R call(Args... args) const SWIFT_PRIVATE {
@@ -75,7 +78,7 @@ public:
   // Copy the implementation so this inline callback remains usable.
   // TODO: Think about removing escape() const& in favor of only keeping escape() &&,
   //       or at least renaming it to escapeCopy() for explicitness
-  [[nodiscard]] Callback<R(Args...)> escape() const & {
+  [[nodiscard]] Callback<R(Args...)> escape() const& {
     if (auto* nativeCallback = std::get_if<NativeCallback>(&_impl)) {
       // It holds a native Callback (`std::function`)
       return Callback<R(Args...)>::make(*nativeCallback);
@@ -110,7 +113,7 @@ private:
     friend struct SwiftCallbackConverter;
 
   public:
-    JSCallback(jsi::Runtime& runtime, jsi::Function&& function): _runtime(runtime), _function(std::move(function)) { }
+    JSCallback(jsi::Runtime& runtime, jsi::Function&& function) : _runtime(runtime), _function(std::move(function)) {}
     R operator()(Args&&... args) const {
       if constexpr (std::is_void_v<R>) {
         _function.call(_runtime, JSIConverter<std::decay_t<Args>>::toJSI(_runtime, std::forward<Args>(args))...);
@@ -120,17 +123,16 @@ private:
       }
     }
 
-    [[nodiscard]]
-    BorrowingReference<jsi::Function> escapeFunction() const & {
+    [[nodiscard]] BorrowingReference<jsi::Function> escapeFunction() const& {
       jsi::Function copiedFunction = jsi::Value(_runtime, _function).getObject(_runtime).getFunction(_runtime);
       JSICache& cache = JSICache::getOrCreateCache(_runtime);
       return cache.makeShared(std::move(copiedFunction));
     }
-    [[nodiscard]]
-    BorrowingReference<jsi::Function> escapeFunction() && {
+    [[nodiscard]] BorrowingReference<jsi::Function> escapeFunction() && {
       JSICache& cache = JSICache::getOrCreateCache(_runtime);
       return cache.makeShared(std::move(_function));
     }
+
   private:
     jsi::Runtime& _runtime;
     jsi::Function _function;

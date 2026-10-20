@@ -1,490 +1,419 @@
-import { expect } from "chai";
-import { casesForTestObjects, recordCallback, waitFor } from "./utils/cases";
+import { expect } from 'chai'
+import { casesForTestObjects, recordCallback, waitFor } from './utils/cases'
 
-import { OldEnum } from "nitro-test";
-import { debugOnly } from "./utils/helpers";
+import { OldEnum } from 'nitro-test'
+import { debugOnly } from './utils/helpers'
 
-const TRUCK_POWERTRAINS = ["electric", "gas", "hybrid", "diesel"] as const;
+const TRUCK_POWERTRAINS = ['electric', 'gas', 'hybrid', 'diesel'] as const
 export const cases = {
-  ...casesForTestObjects("Nullability & optional properties", {
-    "stringOrUndefined roundtrips a string and undefined": (testObject) => {
-      testObject.stringOrUndefined = "hello";
-      expect(Object.is(testObject.stringOrUndefined, "hello")).to.equal(true);
-      testObject.stringOrUndefined = undefined;
-      expect(testObject.stringOrUndefined).to.equal(undefined);
+  ...casesForTestObjects('Nullability & optional properties', {
+    'stringOrUndefined roundtrips a string and undefined': (testObject) => {
+      testObject.stringOrUndefined = 'hello'
+      expect(Object.is(testObject.stringOrUndefined, 'hello')).to.equal(true)
+      testObject.stringOrUndefined = undefined
+      expect(testObject.stringOrUndefined).to.equal(undefined)
     },
 
-    "stringOrUndefined setter throws for null": (testObject) => {
+    'stringOrUndefined setter throws for null': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.stringOrUndefined = null;
-      }).to.throw(`${testObject.constructor.name}.stringOrUndefined`);
+        testObject.stringOrUndefined = null
+      }).to.throw(`${testObject.constructor.name}.stringOrUndefined`)
     },
 
-    "optionalString roundtrips a string and undefined": (testObject) => {
-      testObject.optionalString = "hello";
-      expect(Object.is(testObject.optionalString, "hello")).to.equal(true);
-      testObject.optionalString = undefined;
-      expect(testObject.optionalString).to.equal(undefined);
+    'optionalString roundtrips a string and undefined': (testObject) => {
+      testObject.optionalString = 'hello'
+      expect(Object.is(testObject.optionalString, 'hello')).to.equal(true)
+      testObject.optionalString = undefined
+      expect(testObject.optionalString).to.equal(undefined)
     },
 
-    "nullValue roundtrips null": (testObject) => {
-      expect(testObject.nullValue).to.equal(null);
-      testObject.nullValue = null;
-      expect(testObject.nullValue).to.equal(null);
+    'nullValue roundtrips null': (testObject) => {
+      expect(testObject.nullValue).to.equal(null)
+      testObject.nullValue = null
+      expect(testObject.nullValue).to.equal(null)
     },
 
-    "nullValue setter throws for undefined": (testObject) => {
+    'nullValue setter throws for undefined': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.nullValue = undefined;
-      }).to.throw(`${testObject.constructor.name}.nullValue`);
+        testObject.nullValue = undefined
+      }).to.throw(`${testObject.constructor.name}.nullValue`)
     },
 
-    "nullValue setter throws for a number": (testObject) => {
+    'nullValue setter throws for a number': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.nullValue = 19;
-      }).to.throw(`${testObject.constructor.name}.nullValue`);
+        testObject.nullValue = 19
+      }).to.throw(`${testObject.constructor.name}.nullValue`)
     },
 
-    "stringOrNull roundtrips a string and null": (testObject) => {
-      testObject.stringOrNull = "hello";
-      expect(Object.is(testObject.stringOrNull, "hello")).to.equal(true);
-      testObject.stringOrNull = null;
-      expect(testObject.stringOrNull).to.equal(null);
+    'stringOrNull roundtrips a string and null': (testObject) => {
+      testObject.stringOrNull = 'hello'
+      expect(Object.is(testObject.stringOrNull, 'hello')).to.equal(true)
+      testObject.stringOrNull = null
+      expect(testObject.stringOrNull).to.equal(null)
     },
 
-    "optionalArray roundtrips undefined": (testObject) => {
-      testObject.optionalArray = undefined;
-      expect(testObject.optionalArray).to.equal(undefined);
+    'optionalArray roundtrips undefined': (testObject) => {
+      testObject.optionalArray = undefined
+      expect(testObject.optionalArray).to.equal(undefined)
     },
 
-    "optionalArray roundtrips an array": (testObject) => {
-      testObject.optionalArray = ["hello", "world"];
-      expect(testObject.optionalArray).to.deep.equal(["hello", "world"]);
+    'optionalArray roundtrips an array': (testObject) => {
+      testObject.optionalArray = ['hello', 'world']
+      expect(testObject.optionalArray).to.deep.equal(['hello', 'world'])
     },
 
-    "optionalHybrid roundtrips undefined": (testObject) => {
-      testObject.optionalHybrid = undefined;
-      expect(testObject.optionalHybrid).to.equal(undefined);
+    'optionalHybrid roundtrips undefined': (testObject) => {
+      testObject.optionalHybrid = undefined
+      expect(testObject.optionalHybrid).to.equal(undefined)
     },
 
-    "optionalHybrid roundtrips the same HybridObject": (testObject) => {
+    'optionalHybrid roundtrips the same HybridObject': (testObject) => {
       try {
-        testObject.optionalHybrid = testObject;
-        expect(Object.is(testObject.optionalHybrid, testObject)).to.equal(true);
+        testObject.optionalHybrid = testObject
+        expect(Object.is(testObject.optionalHybrid, testObject)).to.equal(true)
       } finally {
         // Break the reference cycle (testObject holding itself)
-        testObject.optionalHybrid = undefined;
+        testObject.optionalHybrid = undefined
       }
     },
 
-    "optionalEnum roundtrips undefined": (testObject) => {
-      testObject.optionalEnum = undefined;
-      expect(testObject.optionalEnum).to.equal(undefined);
+    'optionalEnum roundtrips undefined': (testObject) => {
+      testObject.optionalEnum = undefined
+      expect(testObject.optionalEnum).to.equal(undefined)
     },
 
-    "optionalEnum roundtrips a value": (testObject) => {
-      testObject.optionalEnum = "gas";
-      expect(Object.is(testObject.optionalEnum, "gas")).to.equal(true);
+    'optionalEnum roundtrips a value': (testObject) => {
+      testObject.optionalEnum = 'gas'
+      expect(Object.is(testObject.optionalEnum, 'gas')).to.equal(true)
     },
 
-    "optionalOldEnum roundtrips undefined": (testObject) => {
-      testObject.optionalOldEnum = undefined;
-      expect(testObject.optionalOldEnum).to.equal(undefined);
+    'optionalOldEnum roundtrips undefined': (testObject) => {
+      testObject.optionalOldEnum = undefined
+      expect(testObject.optionalOldEnum).to.equal(undefined)
     },
 
-    "optionalOldEnum roundtrips a value": (testObject) => {
-      testObject.optionalOldEnum = OldEnum.SECOND;
-      expect(Object.is(testObject.optionalOldEnum, OldEnum.SECOND)).to.equal(
-        true,
-      );
+    'optionalOldEnum roundtrips a value': (testObject) => {
+      testObject.optionalOldEnum = OldEnum.SECOND
+      expect(Object.is(testObject.optionalOldEnum, OldEnum.SECOND)).to.equal(true)
     },
 
-    "optionalOldEnum rejects an unknown integer": (testObject) => {
+    'optionalOldEnum rejects an unknown integer': (testObject) => {
       expect(() => {
         // @ts-expect-error passing an unknown OldEnum value
-        testObject.optionalOldEnum = 9999;
-      }).to.throw(
-        `${testObject.constructor.name}.optionalOldEnum: Cannot convert 9999 to enum OldEnum - invalid value!`,
-      );
+        testObject.optionalOldEnum = 9999
+      }).to.throw(`${testObject.constructor.name}.optionalOldEnum: Cannot convert 9999 to enum OldEnum - invalid value!`)
     },
 
-    "optionalOldEnum rejects fractional and out-of-range numbers": (
-      testObject,
-    ) => {
+    'optionalOldEnum rejects fractional and out-of-range numbers': (testObject) => {
       for (const value of [1.5, 2147483648]) {
         expect(() => {
-          testObject.optionalOldEnum = value;
+          testObject.optionalOldEnum = value
         }).to.throw(
-          `${testObject.constructor.name}.optionalOldEnum: Cannot convert ${value.toFixed(6)} to int - expected an integer within the int range!`,
-        );
+          `${testObject.constructor.name}.optionalOldEnum: Cannot convert ${value.toFixed(6)} to int - expected an integer within the int range!`
+        )
       }
     },
 
-    "optionalOldEnum rejects a string": (testObject) => {
+    'optionalOldEnum rejects a string': (testObject) => {
       expect(() => {
         // @ts-expect-error passing a string instead of a numeric enum
-        testObject.optionalOldEnum = "1";
-      }).to.throw(
-        `${testObject.constructor.name}.optionalOldEnum: Value is a string, expected a number`,
-      );
+        testObject.optionalOldEnum = '1'
+      }).to.throw(`${testObject.constructor.name}.optionalOldEnum: Value is a string, expected a number`)
     },
 
-    "optionalCallback roundtrips a function and undefined": (testObject) => {
-      testObject.optionalCallback = () => {};
-      expect(testObject.optionalCallback).to.be.a("function");
-      testObject.optionalCallback = undefined;
-      expect(testObject.optionalCallback).to.equal(undefined);
+    'optionalCallback roundtrips a function and undefined': (testObject) => {
+      testObject.optionalCallback = () => {}
+      expect(testObject.optionalCallback).to.be.a('function')
+      testObject.optionalCallback = undefined
+      expect(testObject.optionalCallback).to.equal(undefined)
     },
   }),
-  ...casesForTestObjects("Optional parameters & argument-count validation", {
-    "tryOptionalParams(...) with the optional param omitted": (testObject) => {
-      expect(
-        Object.is(testObject.tryOptionalParams(13, true), "value omitted!"),
-      ).to.equal(true);
+  ...casesForTestObjects('Optional parameters & argument-count validation', {
+    'tryOptionalParams(...) with the optional param omitted': (testObject) => {
+      expect(Object.is(testObject.tryOptionalParams(13, true), 'value omitted!')).to.equal(true)
     },
 
-    "tryOptionalParams(...) with the optional param provided": (testObject) => {
-      expect(
-        Object.is(testObject.tryOptionalParams(13, true, "hello"), "hello"),
-      ).to.equal(true);
+    'tryOptionalParams(...) with the optional param provided': (testObject) => {
+      expect(Object.is(testObject.tryOptionalParams(13, true, 'hello'), 'hello')).to.equal(true)
     },
 
-    "tryOptionalParams(...) throws for one argument too many": (testObject) => {
+    'tryOptionalParams(...) throws for one argument too many': (testObject) => {
       expect(() =>
         testObject.tryOptionalParams(
           13,
           true,
-          "hello",
+          'hello',
           // @ts-expect-error
-          "too many args!",
-        ),
-      ).to.throw(
-        `\`${testObject.constructor.name}.tryOptionalParams(...)\` expected between 2 and 3 arguments, but received 4!`,
-      );
+          'too many args!'
+        )
+      ).to.throw(`\`${testObject.constructor.name}.tryOptionalParams(...)\` expected between 2 and 3 arguments, but received 4!`)
     },
 
-    "tryOptionalParams(...) throws for one argument too few": (testObject) => {
+    'tryOptionalParams(...) throws for one argument too few': (testObject) => {
       // @ts-expect-error
       expect(() => testObject.tryOptionalParams(13)).to.throw(
-        `\`${testObject.constructor.name}.tryOptionalParams(...)\` expected between 2 and 3 arguments, but received 1!`,
-      );
+        `\`${testObject.constructor.name}.tryOptionalParams(...)\` expected between 2 and 3 arguments, but received 1!`
+      )
     },
 
-    "tryMiddleParam(...) with undefined in the middle": (testObject) => {
-      expect(
-        Object.is(testObject.tryMiddleParam(13, undefined, "hello!"), "hello!"),
-      ).to.equal(true);
+    'tryMiddleParam(...) with undefined in the middle': (testObject) => {
+      expect(Object.is(testObject.tryMiddleParam(13, undefined, 'hello!'), 'hello!')).to.equal(true)
     },
 
-    "tryMiddleParam(...) with true in the middle": (testObject) => {
-      expect(
-        Object.is(testObject.tryMiddleParam(13, true, "passed"), "passed"),
-      ).to.equal(true);
+    'tryMiddleParam(...) with true in the middle': (testObject) => {
+      expect(Object.is(testObject.tryMiddleParam(13, true, 'passed'), 'passed')).to.equal(true)
     },
 
-    "tryOptionalEnum(...) with a value": (testObject) => {
-      expect(Object.is(testObject.tryOptionalEnum("gas"), "gas")).to.equal(
-        true,
-      );
+    'tryOptionalEnum(...) with a value': (testObject) => {
+      expect(Object.is(testObject.tryOptionalEnum('gas'), 'gas')).to.equal(true)
     },
 
-    "tryOptionalEnum(...) with undefined": (testObject) => {
-      expect(testObject.tryOptionalEnum(undefined)).to.equal(undefined);
+    'tryOptionalEnum(...) with undefined': (testObject) => {
+      expect(testObject.tryOptionalEnum(undefined)).to.equal(undefined)
     },
 
-    "tryTrailingOptional(...) with false": (testObject) => {
-      expect(
-        Object.is(testObject.tryTrailingOptional(0, "", false), false),
-      ).to.equal(true);
+    'tryTrailingOptional(...) with false': (testObject) => {
+      expect(Object.is(testObject.tryTrailingOptional(0, '', false), false)).to.equal(true)
     },
 
-    "tryTrailingOptional(...) with true": (testObject) => {
-      expect(
-        Object.is(testObject.tryTrailingOptional(0, "", true), true),
-      ).to.equal(true);
+    'tryTrailingOptional(...) with true': (testObject) => {
+      expect(Object.is(testObject.tryTrailingOptional(0, '', true), true)).to.equal(true)
     },
 
-    "tryOptionalParams(...) treats an explicit undefined as omitted": (
-      testObject,
-    ) => {
-      expect(
-        Object.is(
-          testObject.tryOptionalParams(13, true, undefined),
-          "value omitted!",
-        ),
-      ).to.equal(true);
+    'tryOptionalParams(...) treats an explicit undefined as omitted': (testObject) => {
+      expect(Object.is(testObject.tryOptionalParams(13, true, undefined), 'value omitted!')).to.equal(true)
     },
 
-    "tryOptionalParams(...) keeps an empty string": (testObject) => {
-      expect(
-        Object.is(testObject.tryOptionalParams(13, true, ""), ""),
-      ).to.equal(true);
+    'tryOptionalParams(...) keeps an empty string': (testObject) => {
+      expect(Object.is(testObject.tryOptionalParams(13, true, ''), '')).to.equal(true)
     },
 
-    "tryOptionalParams(...) throws for null as the optional param": (
-      testObject,
-    ) => {
+    'tryOptionalParams(...) throws for null as the optional param': (testObject) => {
       // @ts-expect-error
       expect(() => testObject.tryOptionalParams(13, true, null)).to.throw(
-        `${testObject.constructor.name}.tryOptionalParams(...): Value is null, expected a String`,
-      );
+        `${testObject.constructor.name}.tryOptionalParams(...): Value is null, expected a String`
+      )
     },
 
-    "tryMiddleParam(...) throws when the last param is omitted": (
-      testObject,
-    ) => {
+    'tryMiddleParam(...) throws when the last param is omitted': (testObject) => {
       // A middle optional param does not make the params after it optional
       // @ts-expect-error
       expect(() => testObject.tryMiddleParam(13, undefined)).to.throw(
-        `\`${testObject.constructor.name}.tryMiddleParam(...)\` expected 3 arguments, but received 2!`,
-      );
+        `\`${testObject.constructor.name}.tryMiddleParam(...)\` expected 3 arguments, but received 2!`
+      )
     },
 
-    "tryOptionalEnum() with no arguments returns undefined": (testObject) => {
-      expect(testObject.tryOptionalEnum()).to.equal(undefined);
+    'tryOptionalEnum() with no arguments returns undefined': (testObject) => {
+      expect(testObject.tryOptionalEnum()).to.equal(undefined)
     },
 
-    "tryOptionalEnum(...) throws for an invalid enum value": (testObject) => {
+    'tryOptionalEnum(...) throws for an invalid enum value': (testObject) => {
       // @ts-expect-error
-      expect(() => testObject.tryOptionalEnum("diesel")).to.throw(
-        `${testObject.constructor.name}.tryOptionalEnum(...): Cannot convert "diesel" to enum Powertrain - invalid value!`,
-      );
+      expect(() => testObject.tryOptionalEnum('diesel')).to.throw(
+        `${testObject.constructor.name}.tryOptionalEnum(...): Cannot convert "diesel" to enum Powertrain - invalid value!`
+      )
     },
 
-    "tryOptionalEnum(...) throws for two arguments": (testObject) => {
+    'tryOptionalEnum(...) throws for two arguments': (testObject) => {
       // @ts-expect-error
-      expect(() => testObject.tryOptionalEnum("gas", "gas")).to.throw(
-        `\`${testObject.constructor.name}.tryOptionalEnum(...)\` expected between 0 and 1 arguments, but received 2!`,
-      );
+      expect(() => testObject.tryOptionalEnum('gas', 'gas')).to.throw(
+        `\`${testObject.constructor.name}.tryOptionalEnum(...)\` expected between 0 and 1 arguments, but received 2!`
+      )
     },
 
-    "tryTrailingOptional(...) returns false with the optional param omitted": (
-      testObject,
-    ) => {
-      expect(Object.is(testObject.tryTrailingOptional(0, ""), false)).to.equal(
-        true,
-      );
+    'tryTrailingOptional(...) returns false with the optional param omitted': (testObject) => {
+      expect(Object.is(testObject.tryTrailingOptional(0, ''), false)).to.equal(true)
     },
 
-    "tryTrailingOptional(...) throws for one argument": (testObject) => {
+    'tryTrailingOptional(...) throws for one argument': (testObject) => {
       // @ts-expect-error
       expect(() => testObject.tryTrailingOptional(0)).to.throw(
-        `\`${testObject.constructor.name}.tryTrailingOptional(...)\` expected between 2 and 3 arguments, but received 1!`,
-      );
+        `\`${testObject.constructor.name}.tryTrailingOptional(...)\` expected between 2 and 3 arguments, but received 1!`
+      )
     },
   }),
-  ...casesForTestObjects("optionalEnumPlusOne", {
+  ...casesForTestObjects('optionalEnumPlusOne', {
     "optionalEnumPlusOne roundtrips 'electric'": (testObject) => {
-      const value = TRUCK_POWERTRAINS[0]!;
+      const value = TRUCK_POWERTRAINS[0]!
 
-      testObject.optionalEnumPlusOne = value;
-      expect(Object.is(testObject.optionalEnumPlusOne, value)).to.equal(true);
+      testObject.optionalEnumPlusOne = value
+      expect(Object.is(testObject.optionalEnumPlusOne, value)).to.equal(true)
     },
 
     "optionalEnumPlusOne roundtrips 'gas'": (testObject) => {
-      const value = TRUCK_POWERTRAINS[1]!;
+      const value = TRUCK_POWERTRAINS[1]!
 
-      testObject.optionalEnumPlusOne = value;
-      expect(Object.is(testObject.optionalEnumPlusOne, value)).to.equal(true);
+      testObject.optionalEnumPlusOne = value
+      expect(Object.is(testObject.optionalEnumPlusOne, value)).to.equal(true)
     },
 
     "optionalEnumPlusOne roundtrips 'hybrid'": (testObject) => {
-      const value = TRUCK_POWERTRAINS[2]!;
+      const value = TRUCK_POWERTRAINS[2]!
 
-      testObject.optionalEnumPlusOne = value;
-      expect(Object.is(testObject.optionalEnumPlusOne, value)).to.equal(true);
+      testObject.optionalEnumPlusOne = value
+      expect(Object.is(testObject.optionalEnumPlusOne, value)).to.equal(true)
     },
 
     "optionalEnumPlusOne roundtrips 'diesel'": (testObject) => {
-      const value = TRUCK_POWERTRAINS[3]!;
+      const value = TRUCK_POWERTRAINS[3]!
 
-      testObject.optionalEnumPlusOne = value;
-      expect(Object.is(testObject.optionalEnumPlusOne, value)).to.equal(true);
+      testObject.optionalEnumPlusOne = value
+      expect(Object.is(testObject.optionalEnumPlusOne, value)).to.equal(true)
     },
 
-    "optionalEnumPlusOne roundtrips undefined": (testObject) => {
-      testObject.optionalEnumPlusOne = "diesel";
-      testObject.optionalEnumPlusOne = undefined;
-      expect(testObject.optionalEnumPlusOne).to.equal(undefined);
+    'optionalEnumPlusOne roundtrips undefined': (testObject) => {
+      testObject.optionalEnumPlusOne = 'diesel'
+      testObject.optionalEnumPlusOne = undefined
+      expect(testObject.optionalEnumPlusOne).to.equal(undefined)
     },
 
-    "optionalEnumPlusOne setter throws for a value outside the union": (
-      testObject,
-    ) => {
+    'optionalEnumPlusOne setter throws for a value outside the union': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.optionalEnumPlusOne = "petrol";
-      }).to.throw(
-        `${testObject.constructor.name}.optionalEnumPlusOne: Cannot convert "petrol" to enum TruckPowertrain - invalid value!`,
-      );
+        testObject.optionalEnumPlusOne = 'petrol'
+      }).to.throw(`${testObject.constructor.name}.optionalEnumPlusOne: Cannot convert "petrol" to enum TruckPowertrain - invalid value!`)
     },
 
-    "optionalEnumPlusOne setter is case-sensitive": (testObject) => {
+    'optionalEnumPlusOne setter is case-sensitive': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.optionalEnumPlusOne = "Diesel";
-      }).to.throw(
-        `${testObject.constructor.name}.optionalEnumPlusOne: Cannot convert "Diesel" to enum TruckPowertrain - invalid value!`,
-      );
+        testObject.optionalEnumPlusOne = 'Diesel'
+      }).to.throw(`${testObject.constructor.name}.optionalEnumPlusOne: Cannot convert "Diesel" to enum TruckPowertrain - invalid value!`)
     },
 
-    "optionalEnum setter throws for the TruckPowertrain-only value": (
-      testObject,
-    ) => {
+    'optionalEnum setter throws for the TruckPowertrain-only value': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.optionalEnum = "diesel";
-      }).to.throw(
-        `${testObject.constructor.name}.optionalEnum: Cannot convert "diesel" to enum Powertrain - invalid value!`,
-      );
+        testObject.optionalEnum = 'diesel'
+      }).to.throw(`${testObject.constructor.name}.optionalEnum: Cannot convert "diesel" to enum Powertrain - invalid value!`)
     },
   }),
-  ...casesForTestObjects("Optional properties reject null", {
-    "optionalString setter throws for null": (testObject) => {
+  ...casesForTestObjects('Optional properties reject null', {
+    'optionalString setter throws for null': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.optionalString = null;
-      }).to.throw(
-        `${testObject.constructor.name}.optionalString: Value is null, expected a String`,
-      );
+        testObject.optionalString = null
+      }).to.throw(`${testObject.constructor.name}.optionalString: Value is null, expected a String`)
     },
 
-    "optionalString keeps its value when the setter throws": (testObject) => {
-      testObject.optionalString = "hello";
+    'optionalString keeps its value when the setter throws': (testObject) => {
+      testObject.optionalString = 'hello'
       expect(() => {
         // @ts-expect-error
-        testObject.optionalString = null;
-      }).to.throw();
-      expect(Object.is(testObject.optionalString, "hello")).to.equal(true);
+        testObject.optionalString = null
+      }).to.throw()
+      expect(Object.is(testObject.optionalString, 'hello')).to.equal(true)
     },
 
-    "optionalArray setter throws for null": (testObject) => {
+    'optionalArray setter throws for null': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.optionalArray = null;
-      }).to.throw(
-        `${testObject.constructor.name}.optionalArray: Value is null, expected an Object`,
-      );
+        testObject.optionalArray = null
+      }).to.throw(`${testObject.constructor.name}.optionalArray: Value is null, expected an Object`)
     },
 
-    "optionalEnum setter throws for null": (testObject) => {
+    'optionalEnum setter throws for null': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.optionalEnum = null;
-      }).to.throw(
-        `${testObject.constructor.name}.optionalEnum: Value is null, expected a String`,
-      );
+        testObject.optionalEnum = null
+      }).to.throw(`${testObject.constructor.name}.optionalEnum: Value is null, expected a String`)
     },
 
-    "optionalEnumPlusOne setter throws for null": (testObject) => {
+    'optionalEnumPlusOne setter throws for null': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.optionalEnumPlusOne = null;
-      }).to.throw(
-        `${testObject.constructor.name}.optionalEnumPlusOne: Value is null, expected a String`,
-      );
+        testObject.optionalEnumPlusOne = null
+      }).to.throw(`${testObject.constructor.name}.optionalEnumPlusOne: Value is null, expected a String`)
     },
 
-    "optionalOldEnum setter throws for null": (testObject) => {
+    'optionalOldEnum setter throws for null': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.optionalOldEnum = null;
-      }).to.throw(
-        `${testObject.constructor.name}.optionalOldEnum: Value is null, expected a number`,
-      );
+        testObject.optionalOldEnum = null
+      }).to.throw(`${testObject.constructor.name}.optionalOldEnum: Value is null, expected a number`)
     },
 
-    "optionalCallback setter throws for null": (testObject) => {
+    'optionalCallback setter throws for null': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.optionalCallback = null;
-      }).to.throw(
-        `${testObject.constructor.name}.optionalCallback: Value is null, expected an Object`,
-      );
+        testObject.optionalCallback = null
+      }).to.throw(`${testObject.constructor.name}.optionalCallback: Value is null, expected an Object`)
     },
 
-    "optionalHybrid setter throws for null": (testObject) => {
+    'optionalHybrid setter throws for null': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.optionalHybrid = null;
-      }).to.throw(
-        `${testObject.constructor.name}.optionalHybrid: ${debugOnly('Cannot convert "null" to NativeState<')}`,
-      );
+        testObject.optionalHybrid = null
+      }).to.throw(`${testObject.constructor.name}.optionalHybrid: ${debugOnly('Cannot convert "null" to NativeState<')}`)
     },
 
-    "stringOrNull setter throws for undefined": (testObject) => {
+    'stringOrNull setter throws for undefined': (testObject) => {
       expect(() => {
         // @ts-expect-error
-        testObject.stringOrNull = undefined;
-      }).to.throw(
-        `${testObject.constructor.name}.stringOrNull: Cannot convert "undefined" to any type in variant<`,
-      );
+        testObject.stringOrNull = undefined
+      }).to.throw(`${testObject.constructor.name}.stringOrNull: Cannot convert "undefined" to any type in variant<`)
     },
   }),
-  ...casesForTestObjects("Optional properties keep falsy values", {
-    "optionalString keeps an empty string": (testObject) => {
-      testObject.optionalString = "";
-      expect(Object.is(testObject.optionalString, "")).to.equal(true);
+  ...casesForTestObjects('Optional properties keep falsy values', {
+    'optionalString keeps an empty string': (testObject) => {
+      testObject.optionalString = ''
+      expect(Object.is(testObject.optionalString, '')).to.equal(true)
     },
 
-    "stringOrUndefined keeps an empty string": (testObject) => {
-      testObject.stringOrUndefined = "";
-      expect(Object.is(testObject.stringOrUndefined, "")).to.equal(true);
+    'stringOrUndefined keeps an empty string': (testObject) => {
+      testObject.stringOrUndefined = ''
+      expect(Object.is(testObject.stringOrUndefined, '')).to.equal(true)
     },
 
-    "stringOrNull keeps an empty string": (testObject) => {
-      testObject.stringOrNull = "";
-      expect(Object.is(testObject.stringOrNull, "")).to.equal(true);
+    'stringOrNull keeps an empty string': (testObject) => {
+      testObject.stringOrNull = ''
+      expect(Object.is(testObject.stringOrNull, '')).to.equal(true)
     },
 
-    "optionalArray keeps an empty array": (testObject) => {
-      testObject.optionalArray = [];
-      expect(testObject.optionalArray).to.deep.equal([]);
+    'optionalArray keeps an empty array': (testObject) => {
+      testObject.optionalArray = []
+      expect(testObject.optionalArray).to.deep.equal([])
     },
 
-    "optionalOldEnum keeps OldEnum.FIRST (0)": (testObject) => {
-      testObject.optionalOldEnum = OldEnum.FIRST;
-      expect(Object.is(testObject.optionalOldEnum, OldEnum.FIRST)).to.equal(
-        true,
-      );
+    'optionalOldEnum keeps OldEnum.FIRST (0)': (testObject) => {
+      testObject.optionalOldEnum = OldEnum.FIRST
+      expect(Object.is(testObject.optionalOldEnum, OldEnum.FIRST)).to.equal(true)
     },
   }),
-  ...casesForTestObjects("optionalCallback getter", {
-    "optionalCallback getter returns a function that calls the JS callback":
-      async (testObject) => {
-        const callback = recordCallback<(value: number) => void>();
-        try {
-          testObject.optionalCallback = callback;
-          const forward = testObject.optionalCallback;
-          expect(forward).to.be.a("function");
-          forward?.(55);
-          await waitFor(() => expect(callback.calls).to.deep.include([55]), {
-            timeout: 2000,
-          });
-        } finally {
-          testObject.optionalCallback = undefined;
-        }
-      },
+  ...casesForTestObjects('optionalCallback getter', {
+    'optionalCallback getter returns a function that calls the JS callback': async (testObject) => {
+      const callback = recordCallback<(value: number) => void>()
+      try {
+        testObject.optionalCallback = callback
+        const forward = testObject.optionalCallback
+        expect(forward).to.be.a('function')
+        forward?.(55)
+        await waitFor(() => expect(callback.calls).to.deep.include([55]), {
+          timeout: 2000,
+        })
+      } finally {
+        testObject.optionalCallback = undefined
+      }
+    },
 
-    "optionalCallback getter preserves the original JS function":
-      (testObject) => {
-        const callback = recordCallback<(value: number) => void>();
-        try {
-          testObject.optionalCallback = callback;
-          const forward = testObject.optionalCallback;
-          expect(forward).to.equal(callback);
-          // Returning a JS callback preserves its identity and JS call semantics.
-          // @ts-expect-error intentionally omit the callback argument
-          forward?.();
-          // @ts-expect-error intentionally pass an extra callback argument
-          forward?.(55, 89);
-          expect(callback.calls).to.deep.equal([[], [55, 89]]);
-        } finally {
-          testObject.optionalCallback = undefined;
-        }
-      },
+    'optionalCallback getter preserves the original JS function': (testObject) => {
+      const callback = recordCallback<(value: number) => void>()
+      try {
+        testObject.optionalCallback = callback
+        const forward = testObject.optionalCallback
+        expect(forward).to.equal(callback)
+        // Returning a JS callback preserves its identity and JS call semantics.
+        // @ts-expect-error intentionally omit the callback argument
+        forward?.()
+        // @ts-expect-error intentionally pass an extra callback argument
+        forward?.(55, 89)
+        expect(callback.calls).to.deep.equal([[], [55, 89]])
+      } finally {
+        testObject.optionalCallback = undefined
+      }
+    },
   }),
-};
+}

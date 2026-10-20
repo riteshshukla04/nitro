@@ -15,10 +15,7 @@ import type { Type } from './types/Type.js'
 import { VariantType } from './types/VariantType.js'
 
 /** Collect the external Nitro modules referenced by these specs and their types. */
-export function getModuleDependencies(
-  specs: HybridObjectSpec[],
-  config: NitroConfig
-): NitroConfig[] {
+export function getModuleDependencies(specs: HybridObjectSpec[], config: NitroConfig): NitroConfig[] {
   const namespace = config.getCxxNamespace('c++')
   const dependencies = new Map<string, NitroConfig>()
   const visitedSpecs = new Set<HybridObjectSpec>()

@@ -17,11 +17,7 @@ export function getReferencedTypes(type: Type): Type[] {
 
     case 'callback':
       const callback = getTypeAs(type, CallbackType)
-      return [
-        type,
-        ...getReferencedTypes(callback.returnType),
-        ...callback.parameters.flatMap((t) => getReferencedTypes(t)),
-      ]
+      return [type, ...getReferencedTypes(callback.returnType), ...callback.parameters.flatMap((t) => getReferencedTypes(t))]
 
     case 'optional':
       const optional = getTypeAs(type, OptionalType)
@@ -33,11 +29,7 @@ export function getReferencedTypes(type: Type): Type[] {
 
     case 'record':
       const record = getTypeAs(type, RecordType)
-      return [
-        type,
-        ...getReferencedTypes(record.keyType),
-        ...getReferencedTypes(record.valueType),
-      ]
+      return [type, ...getReferencedTypes(record.keyType), ...getReferencedTypes(record.valueType)]
 
     case 'struct':
       const struct = getTypeAs(type, StructType)

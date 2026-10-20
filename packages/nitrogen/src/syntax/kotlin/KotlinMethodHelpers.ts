@@ -42,9 +42,7 @@ export function prepareKotlinMethod(nativeMethod: Method): KotlinMethodInfo {
       type: kotlinType,
     }
   })
-  const needsKotlinConversion =
-    returnType.needsKotlinConversion ||
-    parameters.some((parameter) => parameter.type.needsKotlinConversion)
+  const needsKotlinConversion = returnType.needsKotlinConversion || parameters.some((parameter) => parameter.type.needsKotlinConversion)
   return {
     nativeMethod: nativeMethod,
     returnType: returnType,
@@ -59,10 +57,7 @@ interface KotlinForwarderBodyOptions {
 }
 
 /** Kotlin forwarders convert JNI values to the public API and back. */
-export function createKotlinForwarderBody({
-  callable,
-  getKotlinInvocation,
-}: KotlinForwarderBodyOptions): string {
+export function createKotlinForwarderBody({ callable, getKotlinInvocation }: KotlinForwarderBodyOptions): string {
   const kotlinArguments = callable.parameters.map((parameter) =>
     parameter.type.convert(parameter.native.type.escapedName, {
       from: 'c++',
@@ -101,12 +96,7 @@ interface CppJniCallBodyOptions {
  * Calls Kotlin through a cached fbjni method, converting values between C++ and JNI.
  * Generated locals use the reserved `__` prefix, so they cannot shadow parameters.
  */
-export function createCppJniCallBody({
-  callable,
-  jvmName,
-  jniMethodLookup,
-  jniReceiver,
-}: CppJniCallBodyOptions): string {
+export function createCppJniCallBody({ callable, jvmName, jniMethodLookup, jniReceiver }: CppJniCallBodyOptions): string {
   const jniReturnType = callable.returnType.getCode('c++', {
     context: 'return',
   })
@@ -149,20 +139,13 @@ interface KotlinImplementation {
 }
 
 /** The Kotlin class implementing the spec, which constructors and static methods call. */
-export function getKotlinImplementation(
-  spec: HybridObjectSpec<'kotlin'>
-): KotlinImplementation {
+export function getKotlinImplementation(spec: HybridObjectSpec<'kotlin'>): KotlinImplementation {
   const implementation = spec.implementation
   if (implementation == null) {
-    throw new Error(
-      `${spec.name}: Constructors and static methods require a Kotlin implementation.`
-    )
+    throw new Error(`${spec.name}: Constructors and static methods require a Kotlin implementation.`)
   }
   // The package is already resolved within the spec's Android namespace.
-  const qualifiedName = [
-    ...implementation.package,
-    implementation.className,
-  ].join('.')
+  const qualifiedName = [...implementation.package, implementation.className].join('.')
   return {
     className: implementation.className,
     kotlinImport: { language: 'kotlin', name: qualifiedName },

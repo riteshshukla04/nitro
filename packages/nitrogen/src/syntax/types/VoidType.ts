@@ -19,9 +19,7 @@ export class VoidType implements Type {
       case 'kotlin':
         return 'Unit'
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for VoidType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for VoidType!`)
     }
   }
   getExtraFiles(): SourceFile[] {

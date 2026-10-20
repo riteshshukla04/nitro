@@ -26,11 +26,7 @@ export class SwiftEnumType extends EnumType implements SwiftType {
   readonly isSendable = true
 
   getProtocolConformances(): ProtocolConformance[] {
-    return [
-      { name: 'CaseIterable' },
-      { name: 'Sendable' },
-      { name: 'CustomStringConvertible' },
-    ]
+    return [{ name: 'CaseIterable' }, { name: 'Sendable' }, { name: 'CustomStringConvertible' }]
   }
 
   get isReferenceType(): boolean {
@@ -78,10 +74,7 @@ export class SwiftEnumType extends EnumType implements SwiftType {
     return []
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports: SourceImport[] = []
     switch (language) {
       case 'c++':
@@ -92,10 +85,7 @@ export class SwiftEnumType extends EnumType implements SwiftType {
         if (context === 'implementation') {
           imports.push({
             language: language,
-            declaration: NitroConfig.current.getCxxHeader(
-              `${this.name}-Swift.hpp`,
-              'private'
-            ),
+            declaration: NitroConfig.current.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
           })
         }
         break

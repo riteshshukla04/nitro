@@ -21,10 +21,7 @@ export async function executeBatch(
   definition: BenchmarkDefinition,
   iterations: number,
   runtime: BenchmarkRuntime,
-  chunkIterations = Math.min(
-    iterations,
-    definition.maxChunkIterations ?? iterations
-  )
+  chunkIterations = Math.min(iterations, definition.maxChunkIterations ?? iterations)
 ): Promise<{ durationMs: number; checksum: number }> {
   if (!Number.isSafeInteger(chunkIterations) || chunkIterations < 1) {
     throw new Error(`Benchmark ${definition.id} has an invalid chunk size.`)
@@ -36,17 +33,10 @@ export async function executeBatch(
     runtime.collectGarbage()
     definition.collectNativeGarbage?.()
   }
-  for (
-    let remaining = iterations;
-    remaining > 0;
-    remaining -= chunkIterations
-  ) {
+  for (let remaining = iterations; remaining > 0; remaining -= chunkIterations) {
     const count = Math.min(remaining, chunkIterations)
     const start = performance.now()
-    const result =
-      definition.kind === 'async'
-        ? await definition.run(count)
-        : definition.run(count)
+    const result = definition.kind === 'async' ? await definition.run(count) : definition.run(count)
     const elapsed = performance.now() - start
 
     // Timing stops before checksum validation and explicit garbage collection.
@@ -55,9 +45,7 @@ export async function executeBatch(
     }
     const expected = definition.expectedChecksum(count)
     if (result !== expected) {
-      throw new Error(
-        `Benchmark ${definition.id} returned checksum ${result}, expected ${expected}.`
-      )
+      throw new Error(`Benchmark ${definition.id} returned checksum ${result}, expected ${expected}.`)
     }
     durationMs += elapsed
     checksum += result

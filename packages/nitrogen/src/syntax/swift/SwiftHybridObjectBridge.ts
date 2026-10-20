@@ -13,10 +13,7 @@ import { SwiftStaticMethod } from './SwiftStaticMethod.js'
 import { SwiftStaticProperty } from './SwiftStaticProperty.js'
 import { SwiftConstructor } from './SwiftConstructor.js'
 import { getImportCode, getImportsCode } from '../getImportCode.js'
-import {
-  getProtocolConformanceImports,
-  getSwiftImports,
-} from './getSwiftImports.js'
+import { getProtocolConformanceImports, getSwiftImports } from './getSwiftImports.js'
 import type { SwiftMethodBridge } from './SwiftMethodHelpers.js'
 
 function getCxxPartName(type: HybridObjectType): string {
@@ -35,9 +32,7 @@ function getBaseTypesFromRoot(type: HybridObjectType): HybridObjectType[] {
   return type.baseTypes.flatMap((base) => [...getBaseTypesFromRoot(base), base])
 }
 
-export function createSwiftHybridObjectCxxBridge(
-  spec: HybridObjectSpec<'swift'>
-): SourceFile[] {
+export function createSwiftHybridObjectCxxBridge(spec: HybridObjectSpec<'swift'>): SourceFile[] {
   const hybridObjectNames = getHybridObjectName(spec.name)
   const swiftModuleName = spec.config.getIosModuleName()
   const cppNamespace = spec.config.getCxxNamespace('c++')
@@ -64,9 +59,7 @@ export function createSwiftHybridObjectCxxBridge(
   } else {
     swiftSuperclass = ''
   }
-  const cppBaseImports = getImportsCode(
-    baseHybridObjects.map((base) => base.cppImport)
-  )
+  const cppBaseImports = getImportsCode(baseHybridObjects.map((base) => base.cppImport))
   let hybridClassBase: string
   if (baseHybridObject != null) {
     hybridClassBase = baseHybridObject.cppName
@@ -88,9 +81,7 @@ self.__implementation = implementation
     swiftImplementationAssignment = 'self.__implementation = implementation'
   }
   const cppFinality = spec.allowInheritance ? '' : ' final'
-  const swiftClassDeclaration = spec.allowInheritance
-    ? 'open class'
-    : 'public final class'
+  const swiftClassDeclaration = spec.allowInheritance ? 'open class' : 'public final class'
   const swiftMemberAccess = spec.allowInheritance ? 'open' : 'public'
   const swiftOverrideModifier = hasBase ? 'override ' : ''
   const cppClassName = hybridObjectNames.HybridTSpecSwift
@@ -116,9 +107,7 @@ self.__implementation = implementation
       properties.push(setter)
       accessors.push(`&${cppClassName}::${setter.name}`)
     }
-    cppMethodRegistrations.push(
-      `clazz.registerHybridProperty("${property.name}", ${accessors.join(', ')});`
-    )
+    cppMethodRegistrations.push(`clazz.registerHybridProperty("${property.name}", ${accessors.join(', ')});`)
   }
   callableGroups.push({
     name: 'Properties',
@@ -126,20 +115,11 @@ self.__implementation = implementation
   })
   callableGroups.push({
     name: 'Methods',
-    bridges: spec.methods.map((method) =>
-      new SwiftInstanceMethod({ method: method }).createBridge(cppClassName)
-    ),
+    bridges: spec.methods.map((method) => new SwiftInstanceMethod({ method: method }).createBridge(cppClassName)),
   })
-  const { constructor, staticMethods, staticProperties } =
-    getSwiftClassMembers(spec)
-  const inheritedClassMethods = new Set(
-    spec.baseTypes.flatMap((base) =>
-      getSwiftClassMethodDeclarations(base, swiftModuleName)
-    )
-  )
-  const createClassMethodBridge = (
-    callable: SwiftConstructor | SwiftStaticMethod
-  ): SwiftMethodBridge => {
+  const { constructor, staticMethods, staticProperties } = getSwiftClassMembers(spec)
+  const inheritedClassMethods = new Set(spec.baseTypes.flatMap((base) => getSwiftClassMethodDeclarations(base, swiftModuleName)))
+  const createClassMethodBridge = (callable: SwiftConstructor | SwiftStaticMethod): SwiftMethodBridge => {
     const declaration = getSwiftClassMethodDeclaration(callable, cppClassName)
     return callable.createBridge(cppClassName, {
       override: inheritedClassMethods.has(declaration),
@@ -160,9 +140,7 @@ self.__implementation = implementation
   if (staticProperties.length > 0) {
     callableGroups.push({
       name: 'Static properties',
-      bridges: staticProperties.flatMap((property) =>
-        property.createBridges(inheritedClassMethods)
-      ),
+      bridges: staticProperties.flatMap((property) => property.createBridges(inheritedClassMethods)),
     })
     for (const property of staticProperties) {
       cppMethodRegistrations.push(property.getCppRegistration(cppClassName))
@@ -187,24 +165,16 @@ self.__implementation = implementation
       )
     }
     for (const { method, body } of swiftMethods) {
-      swiftMethodImplementations.push(
-        method.getDefinition('swift', { body: body })
-      )
+      swiftMethodImplementations.push(method.getDefinition('swift', { body: body }))
     }
-    swiftRequiredImports.push(
-      ...bridges.flatMap((bridge) => bridge.swiftImports)
-    )
-    cppMethodRegistrations.push(
-      ...bridges.flatMap((bridge) => bridge.cppRegistrations)
-    )
+    swiftRequiredImports.push(...bridges.flatMap((bridge) => bridge.swiftImports))
+    cppMethodRegistrations.push(...bridges.flatMap((bridge) => bridge.cppRegistrations))
   }
 
   if (spec.isHybridView) {
     const implementation = spec.implementation
     if (implementation == null) {
-      throw new Error(
-        `${spec.name}: A HybridView needs a Swift implementation class.`
-      )
+      throw new Error(`${spec.name}: A HybridView needs a Swift implementation class.`)
     }
     swiftMethodImplementations.push(
       `
@@ -261,13 +231,8 @@ ${swiftMemberAccess} override func getCxxPart() -> bridge.${getHybridObjectBridg
   // protocols the spec or its bases conform to, and MemberImportVisibility
   // requires the modules declaring them.
   const conformanceTypes = [type, ...getBaseTypesFromRoot(type)]
-  const conformances = conformanceTypes.flatMap((conformanceType) =>
-    new SwiftHybridObjectType(conformanceType).getProtocolConformances()
-  )
-  const conformanceImports = getProtocolConformanceImports(
-    conformances,
-    'internal'
-  )
+  const conformances = conformanceTypes.flatMap((conformanceType) => new SwiftHybridObjectType(conformanceType).getProtocolConformances())
+  const conformanceImports = getProtocolConformanceImports(conformances, 'internal')
   const swiftImports = getImportsCode([
     { language: 'swift', name: 'NitroModules', access: 'internal' },
     { language: 'swift', name: 'CxxStdlib', access: 'internal' },
@@ -277,15 +242,7 @@ ${swiftMemberAccess} override func getCxxPart() -> bridge.${getHybridObjectBridg
       access: 'public',
     },
     ...getSwiftImports(type.baseTypes, 'public'),
-    ...getSwiftImports(
-      [
-        ...spec.methods,
-        ...spec.properties,
-        ...spec.staticMethods,
-        ...spec.staticProperties,
-      ],
-      'internal'
-    ),
+    ...getSwiftImports([...spec.methods, ...spec.properties, ...spec.staticMethods, ...spec.staticProperties], 'internal'),
     ...(spec.constructor?.getRequiredImports('swift') ?? []),
     ...swiftRequiredImports,
     ...conformanceImports,
@@ -416,10 +373,7 @@ ${swiftClassDeclaration} ${hybridObjectNames.HybridTSpecCxx}${swiftSuperclass} {
   ]
   // The most derived class initializes every virtual base, including indirect ones.
   const cppVirtualBaseNames = getBaseTypesFromRoot(type).map(getCxxPartName)
-  const cppConstructorInitializers = [
-    ...cppVirtualBaseNames.map((name) => `${name}(swiftPart)`),
-    '_swiftPart(swiftPart)',
-  ]
+  const cppConstructorInitializers = [...cppVirtualBaseNames.map((name) => `${name}(swiftPart)`), '_swiftPart(swiftPart)']
   const cppClassDeclaration = `
 /**
  * The C++ part of ${hybridObjectNames.HybridTSpecCxx}.swift.
@@ -479,12 +433,8 @@ private:
         language: 'c++',
         declaration: type.getCppHeader(),
       },
-      ...spec.staticMethods.flatMap((method) =>
-        method.getRequiredImports('c++')
-      ),
-      ...spec.staticProperties.flatMap((property) =>
-        property.getRequiredImports('c++')
-      ),
+      ...spec.staticMethods.flatMap((method) => method.getRequiredImports('c++')),
+      ...spec.staticProperties.flatMap((property) => property.getRequiredImports('c++')),
       ...(spec.constructor?.getRequiredImports('c++') ?? []),
       {
         language: 'c++',
@@ -502,10 +452,7 @@ private:
   })
   const cppImplementationInclude = getImportCode({
     language: 'c++',
-    declaration: spec.config.getCxxHeader(
-      `${hybridObjectNames.HybridTSpecSwift}.hpp`,
-      'private'
-    ),
+    declaration: spec.config.getCxxHeader(`${hybridObjectNames.HybridTSpecSwift}.hpp`, 'private'),
   })
   const cppHeaderCode = `
 ${createFileMetadataString(`${hybridObjectNames.HybridTSpecSwift}.hpp`)}
@@ -585,9 +532,7 @@ interface SwiftClassMembers {
 }
 
 /** The constructor and static accessors and methods C++ calls on the spec's `_cxx` class. */
-function getSwiftClassMembers(
-  spec: HybridObjectSpec<'swift'>
-): SwiftClassMembers {
+function getSwiftClassMembers(spec: HybridObjectSpec<'swift'>): SwiftClassMembers {
   let constructor: SwiftConstructor | undefined
   if (spec.constructor != null) {
     constructor = new SwiftConstructor({
@@ -595,12 +540,8 @@ function getSwiftClassMembers(
       constructor: spec.constructor,
     })
   }
-  const staticMethods = spec.staticMethods.map(
-    (method) => new SwiftStaticMethod({ spec: spec, method: method })
-  )
-  const staticProperties = spec.staticProperties.map(
-    (property) => new SwiftStaticProperty({ spec: spec, property: property })
-  )
+  const staticMethods = spec.staticMethods.map((method) => new SwiftStaticMethod({ spec: spec, method: method }))
+  const staticProperties = spec.staticProperties.map((property) => new SwiftStaticProperty({ spec: spec, property: property }))
   return {
     constructor: constructor,
     staticMethods: staticMethods,
@@ -609,10 +550,7 @@ function getSwiftClassMembers(
 }
 
 /** The `_cxx` declaration of a constructor or static method, before inheritance modifiers. */
-function getSwiftClassMethodDeclaration(
-  callable: SwiftConstructor | SwiftStaticMethod,
-  cppClassName: string
-): string {
+function getSwiftClassMethodDeclaration(callable: SwiftConstructor | SwiftStaticMethod, cppClassName: string): string {
   const { swiftMethod } = callable.createBridge(cppClassName)
   return swiftMethod.method.getDeclaration('swift')
 }
@@ -623,34 +561,19 @@ function getSwiftClassMethodDeclaration(
  * signature. Bases from other Swift modules never match, since each module's
  * bridge declares its own result types.
  */
-function getSwiftClassMethodDeclarations(
-  spec: HybridObjectSpec,
-  swiftModuleName: string
-): string[] {
-  if (
-    spec.language !== 'swift' ||
-    spec.config.getIosModuleName() !== swiftModuleName
-  ) {
+function getSwiftClassMethodDeclarations(spec: HybridObjectSpec, swiftModuleName: string): string[] {
+  if (spec.language !== 'swift' || spec.config.getIosModuleName() !== swiftModuleName) {
     return []
   }
-  const { constructor, staticMethods, staticProperties } =
-    getSwiftClassMembers(spec)
+  const { constructor, staticMethods, staticProperties } = getSwiftClassMembers(spec)
   const callables: (SwiftConstructor | SwiftStaticMethod)[] = []
   if (constructor != null) callables.push(constructor)
   callables.push(...staticMethods)
   const { HybridTSpecSwift } = getHybridObjectName(spec.name)
-  const ownDeclarations = callables.map((callable) =>
-    getSwiftClassMethodDeclaration(callable, HybridTSpecSwift)
-  )
+  const ownDeclarations = callables.map((callable) => getSwiftClassMethodDeclaration(callable, HybridTSpecSwift))
   ownDeclarations.push(
-    ...staticProperties.flatMap((property) =>
-      property
-        .createBridges()
-        .map(({ swiftMethod }) => swiftMethod.method.getDeclaration('swift'))
-    )
+    ...staticProperties.flatMap((property) => property.createBridges().map(({ swiftMethod }) => swiftMethod.method.getDeclaration('swift')))
   )
-  const inheritedDeclarations = spec.baseTypes.flatMap((base) =>
-    getSwiftClassMethodDeclarations(base, swiftModuleName)
-  )
+  const inheritedDeclarations = spec.baseTypes.flatMap((base) => getSwiftClassMethodDeclarations(base, swiftModuleName))
   return [...ownDeclarations, ...inheritedDeclarations]
 }

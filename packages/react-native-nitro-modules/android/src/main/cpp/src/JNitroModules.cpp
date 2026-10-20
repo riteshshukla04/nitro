@@ -3,8 +3,8 @@
 //
 
 #include "JNitroModules.hpp"
-#include <NitroModulesReactNative/detail/CallInvokerDispatcher.hpp>
 #include <NitroModules/InstallNitro.hpp>
+#include <NitroModulesReactNative/detail/CallInvokerDispatcher.hpp>
 
 namespace margelo::nitro {
 

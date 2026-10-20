@@ -17,12 +17,7 @@ export async function getFiles(directory: string): Promise<string[]> {
 
     return files.filter((f) => f.isFile()).map((f) => getFilePath(f, directory))
   } catch (error) {
-    if (
-      typeof error === 'object' &&
-      error != null &&
-      'code' in error &&
-      error.code === 'ENOENT'
-    ) {
+    if (typeof error === 'object' && error != null && 'code' in error && error.code === 'ENOENT') {
       // directory does not exist
       return []
     } else {

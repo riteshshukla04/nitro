@@ -93,8 +93,7 @@ declare abstract class HybridObject {
  * }
  * ```
  */
-const NativeHybridObject: typeof HybridObject =
-  NitroModules.getHybridClass('HybridObject')
+const NativeHybridObject: typeof HybridObject = NitroModules.getHybridClass('HybridObject')
 type NativeHybridObject = HybridObject
 
 export { NativeHybridObject as HybridObject }

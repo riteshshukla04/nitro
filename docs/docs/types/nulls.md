@@ -1,8 +1,7 @@
 ---
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Nulls (`null`)
 
@@ -20,6 +19,7 @@ While it can be used as a separate type directly, `null` most commonly used to m
       a: number | null
     }
     ```
+
   </TabItem>
   <TabItem value="swift" label="Swift">
     ```swift
@@ -27,6 +27,7 @@ While it can be used as a separate type directly, `null` most commonly used to m
       var a: Variant_NullType_Double
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin
@@ -34,6 +35,7 @@ While it can be used as a separate type directly, `null` most commonly used to m
       override var a: Variant_NullType_Double
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp
@@ -42,7 +44,9 @@ While it can be used as a separate type directly, `null` most commonly used to m
       void setA(const std::variant<NullType, double>& value) override;
     };
     ```
+
   </TabItem>
+
 </Tabs>
 
 The `NullType` is a singleton structure in Nitro. To return `null` to JS:
@@ -54,6 +58,7 @@ The `NullType` is a singleton structure in Nitro. To return `null` to JS:
       return .null
     }
     ```
+
   </TabItem>
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin
@@ -61,6 +66,7 @@ The `NullType` is a singleton structure in Nitro. To return `null` to JS:
       return NullType.NULL
     }
     ```
+
   </TabItem>
   <TabItem value="cpp" label="C++">
     ```cpp
@@ -68,11 +74,14 @@ The `NullType` is a singleton structure in Nitro. To return `null` to JS:
       return nitro::null;
     }
     ```
+
   </TabItem>
+
 </Tabs>
 
 ## Optionals vs `null`
 
-In the same way that JavaScript distinguishes between an optional type/`undefined` and `null`, Nitro also has two separate concepts for the two.
+In the same way that JavaScript distinguishes between an optional type/`undefined` and `null`, Nitro also has two separate concepts for the
+two.
 
 If you simply want to make an existing type _optional_, use [Optionals](optionals) instead.

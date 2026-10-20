@@ -1,23 +1,14 @@
 import { appendFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import {
-  git,
-  nightlyVersion,
-  parseVersion,
-  readJSON,
-  versionFromTag,
-} from './lib.mjs'
+import { git, nightlyVersion, parseVersion, readJSON, versionFromTag } from './lib.mjs'
 
 const root = fileURLToPath(new URL('../../', import.meta.url))
 
 export function resolveCICommit({ cwd = root, env = process.env } = {}) {
   const sourceCommit = git(['rev-parse', 'HEAD'], { cwd })
   const releaseEventTag = env.RELEASE_EVENT_TAG || undefined
-  const branch =
-    env.RELEASE_BRANCH ||
-    env.GITHUB_REF_NAME ||
-    git(['branch', '--show-current'], { cwd })
+  const branch = env.RELEASE_BRANCH || env.GITHUB_REF_NAME || git(['branch', '--show-current'], { cwd })
   const version =
     env.RELEASE_MODE === 'nightly'
       ? nightlyVersion(

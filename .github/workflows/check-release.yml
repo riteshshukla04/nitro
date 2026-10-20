@@ -42,21 +42,9 @@ jobs:
         with:
           # queue:max is supported by GitHub; actionlint 1.7.12 predates it.
           args: >-
-            -color -ignore unexpected.key..queue..for..concurrency..section
-            .github/workflows/release.yml
-            .github/workflows/build.yml
-            .github/workflows/build-docs.yml
-            .github/workflows/format-prettier.yml
-            .github/workflows/lint-cpp.yml
-            .github/workflows/lint-swift.yml
-            .github/workflows/lint-kotlin.yml
-            .github/workflows/lint-typescript.yml
-            .github/workflows/run-nitrogen.yml
-            .github/workflows/run-nitrogen-init.yml
-            .github/workflows/check-release.yml
-            .github/workflows/test-runtime-ios.yml
-            .github/workflows/test-runtime-android.yml
-            .github/workflows/build-ios.yml
-            .github/workflows/build-android.yml
-            .github/workflows/harness-ios.yml
-            .github/workflows/harness-android.yml
+            -color -ignore unexpected.key..queue..for..concurrency..section .github/workflows/release.yml .github/workflows/build.yml
+            .github/workflows/build-docs.yml .github/workflows/format-prettier.yml .github/workflows/lint-cpp.yml
+            .github/workflows/lint-swift.yml .github/workflows/lint-kotlin.yml .github/workflows/lint-typescript.yml
+            .github/workflows/run-nitrogen.yml .github/workflows/run-nitrogen-init.yml .github/workflows/check-release.yml
+            .github/workflows/test-runtime-ios.yml .github/workflows/test-runtime-android.yml .github/workflows/build-ios.yml
+            .github/workflows/build-android.yml .github/workflows/harness-ios.yml .github/workflows/harness-android.yml

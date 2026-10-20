@@ -11,10 +11,7 @@ import type { SourceImport } from '../SourceFile.js'
  * once our minimum Xcode includes https://github.com/swiftlang/swift/pull/93299. Its toolchain header
  * declares these types before any -Swift.h.
  */
-export function getSwiftGenericImport(
-  name: 'Optional' | 'Array',
-  jsiConverterHeader: string
-): SourceImport<'c++'> {
+export function getSwiftGenericImport(name: 'Optional' | 'Array', jsiConverterHeader: string): SourceImport<'c++'> {
   const forwardDeclaration = `
 #ifndef SWIFT_SWIFT_H
 namespace swift { template <class T> class ${name}; }

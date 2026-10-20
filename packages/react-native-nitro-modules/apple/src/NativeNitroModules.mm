@@ -7,8 +7,8 @@
 
 #import <NitroModulesReactNative/NativeNitroModules.h>
 
-#import <NitroModulesReactNative/detail/CallInvokerDispatcher.hpp>
 #import <NitroModules/InstallNitro.hpp>
+#import <NitroModulesReactNative/detail/CallInvokerDispatcher.hpp>
 
 #import <ReactCommon/CallInvoker.h>
 #import <ReactCommon/RCTTurboModuleWithJSIBindings.h>

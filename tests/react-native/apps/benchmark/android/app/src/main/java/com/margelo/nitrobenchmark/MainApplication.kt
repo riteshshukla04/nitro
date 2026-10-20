@@ -8,8 +8,9 @@ import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.nitroexample.exampleturbomodule.ExampleTurboModulePackage
 
-class MainApplication : Application(), ReactApplication {
-
+class MainApplication :
+  Application(),
+  ReactApplication {
   override val reactHost: ReactHost by lazy {
     getDefaultReactHost(
       context = applicationContext,

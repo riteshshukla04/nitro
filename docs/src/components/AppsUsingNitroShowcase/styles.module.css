@@ -21,9 +21,7 @@
   padding: 2rem;
   border: 2px solid #232a3f;
   border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 219, 229, 0.72) 42%, rgba(213, 241, 255, 0.82)),
-    #f8fbff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 219, 229, 0.72) 42%, rgba(213, 241, 255, 0.82)), #f8fbff;
   box-shadow: 8px 8px 0 #232a3f;
   width: 100%;
   max-width: 100%;
@@ -32,9 +30,7 @@
 
 [data-theme='dark'] .hero {
   border-color: #4e5b79;
-  background:
-    linear-gradient(135deg, rgba(35, 42, 63, 0.96), rgba(74, 46, 80, 0.74) 44%, rgba(20, 74, 104, 0.76)),
-    #171e31;
+  background: linear-gradient(135deg, rgba(35, 42, 63, 0.96), rgba(74, 46, 80, 0.74) 44%, rgba(20, 74, 104, 0.76)), #171e31;
   box-shadow: 8px 8px 0 #0c101d;
 }
 

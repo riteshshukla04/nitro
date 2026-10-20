@@ -19,9 +19,7 @@ export class UInt64Type implements Type {
       case 'kotlin':
         return 'ULong'
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for UInt64Type!`
-        )
+        throw new Error(`Language ${language} is not yet supported for UInt64Type!`)
     }
   }
   getExtraFiles(): SourceFile[] {

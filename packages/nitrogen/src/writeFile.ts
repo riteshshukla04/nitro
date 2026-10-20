@@ -9,19 +9,11 @@ import { NitroConfig } from './config/NitroConfig.js'
 /**
  * Writes the given file to disk and returns its actual path.
  */
-export async function writeFile(
-  basePath: string,
-  file: SourceFile
-): Promise<string> {
+export async function writeFile(basePath: string, file: SourceFile): Promise<string> {
   let directory = file.subdirectory
   if (file.language === 'c++' && file.name.endsWith('.hpp')) {
-    const visibility =
-      file.headerVisibility ??
-      (file.platform === 'shared' ? 'public' : 'private')
-    directory = [
-      ...directory,
-      ...NitroConfig.current.getCxxHeaderDirectory(visibility),
-    ]
+    const visibility = file.headerVisibility ?? (file.platform === 'shared' ? 'public' : 'private')
+    directory = [...directory, ...NitroConfig.current.getCxxHeaderDirectory(visibility)]
   }
   const filepath = path.join(basePath, ...directory, file.name)
   const language = capitalizeName(file.language)
@@ -32,11 +24,7 @@ export async function writeFile(
   await fs.mkdir(dir, { recursive: true })
 
   // Write file
-  await fs.writeFile(
-    filepath,
-    file.content.replaceAll(/[ \t]+$/gm, '').trim() + '\n',
-    'utf8'
-  )
+  await fs.writeFile(filepath, file.content.replaceAll(/[ \t]+$/gm, '').trim() + '\n', 'utf8')
 
   return filepath
 }

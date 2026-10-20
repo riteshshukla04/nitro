@@ -70,12 +70,8 @@ const iterations: Readonly<Record<string, { android: number; ios: number }>> = {
   },
 }
 
-export function getBenchmarkIterations(
-  id: string,
-  platform: 'android' | 'ios'
-): number {
+export function getBenchmarkIterations(id: string, platform: 'android' | 'ios'): number {
   const count = iterations[id]?.[platform]
-  if (count == null)
-    throw new Error(`Missing fixed iteration count for ${id} on ${platform}.`)
+  if (count == null) throw new Error(`Missing fixed iteration count for ${id} on ${platform}.`)
   return count
 }

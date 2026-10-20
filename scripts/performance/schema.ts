@@ -18,31 +18,15 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 function stringValue(value: unknown, name: string): string {
-  if (
-    typeof value !== 'string' ||
-    value.length === 0 ||
-    value.length > MAX_STRING_LENGTH
-  ) {
+  if (typeof value !== 'string' || value.length === 0 || value.length > MAX_STRING_LENGTH) {
     throw new Error(`${name} must be a non-empty bounded string.`)
   }
   return value
 }
 
-function finiteNumber(
-  value: unknown,
-  name: string,
-  minimum = 0,
-  maximum = Number.MAX_SAFE_INTEGER
-): number {
-  if (
-    typeof value !== 'number' ||
-    !Number.isFinite(value) ||
-    value < minimum ||
-    value > maximum
-  ) {
-    throw new Error(
-      `${name} must be a finite number between ${minimum} and ${maximum}.`
-    )
+function finiteNumber(value: unknown, name: string, minimum = 0, maximum = Number.MAX_SAFE_INTEGER): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < minimum || value > maximum) {
+    throw new Error(`${name} must be a finite number between ${minimum} and ${maximum}.`)
   }
   return value
 }
@@ -73,12 +57,7 @@ function validateConfiguration(value: unknown): BenchmarkRunConfiguration {
       : {
           benchmarkIndex:
             positiveInteger(
-              finiteNumber(
-                value.benchmarkIndex,
-                'configuration.benchmarkIndex',
-                0,
-                MAX_METRICS - 1
-              ) + 1,
+              finiteNumber(value.benchmarkIndex, 'configuration.benchmarkIndex', 0, MAX_METRICS - 1) + 1,
               'configuration.benchmarkIndex + 1'
             ) - 1,
         }),
@@ -108,10 +87,7 @@ function validateEnvironment(value: unknown): BenchmarkRunEnvironment {
     throw new Error('Benchmarks must run with Nitro release bindings.')
   }
   return {
-    reactNativeVersion: stringValue(
-      value.reactNativeVersion,
-      'environment.reactNativeVersion'
-    ),
+    reactNativeVersion: stringValue(value.reactNativeVersion, 'environment.reactNativeVersion'),
     hermes: true,
     dev: false,
     nitroBuildType: 'release',
@@ -125,12 +101,7 @@ function validateMetric(value: unknown, index: number): BenchmarkMetric {
     throw new Error(`metrics[${index}].samplesNsPerOp has invalid length.`)
   }
   const samplesNsPerOp = samples.map((sample, sampleIndex) =>
-    finiteNumber(
-      sample,
-      `metrics[${index}].samples[${sampleIndex}]`,
-      Number.MIN_VALUE,
-      MAX_NS_PER_OPERATION
-    )
+    finiteNumber(sample, `metrics[${index}].samples[${sampleIndex}]`, Number.MIN_VALUE, MAX_NS_PER_OPERATION)
   )
   const implementation = value.implementation
   if (
@@ -163,18 +134,10 @@ function validateMetric(value: unknown, index: number): BenchmarkMetric {
   if (!METRIC_ID_PATTERN.test(id)) {
     throw new Error(`metrics[${index}] has an invalid ID.`)
   }
-  const iterations = positiveInteger(
-    value.iterations,
-    `metrics[${index}].iterations`
-  )
-  const chunkIterations = positiveInteger(
-    value.chunkIterations,
-    `metrics[${index}].chunkIterations`
-  )
+  const iterations = positiveInteger(value.iterations, `metrics[${index}].iterations`)
+  const chunkIterations = positiveInteger(value.chunkIterations, `metrics[${index}].chunkIterations`)
   if (chunkIterations > iterations) {
-    throw new Error(
-      `metrics[${index}].chunkIterations exceeds its sample size.`
-    )
+    throw new Error(`metrics[${index}].chunkIterations exceeds its sample size.`)
   }
   return {
     id,
@@ -195,11 +158,7 @@ export function validateBenchmarkRun(value: unknown): BenchmarkRunResult {
   }
   if (!isObject(value.runner)) throw new Error('runner must be an object.')
   const metrics = value.metrics
-  if (
-    !Array.isArray(metrics) ||
-    metrics.length === 0 ||
-    metrics.length > MAX_METRICS
-  ) {
+  if (!Array.isArray(metrics) || metrics.length === 0 || metrics.length > MAX_METRICS) {
     throw new Error('metrics must be a non-empty bounded array.')
   }
   const configuration = validateConfiguration(value.configuration)
@@ -208,17 +167,11 @@ export function validateBenchmarkRun(value: unknown): BenchmarkRunResult {
   if (benchmarkCount > MAX_METRICS || benchmarkCount < metrics.length) {
     throw new Error('benchmarkCount is outside the bounded suite size.')
   }
-  if (
-    new Set(validatedMetrics.map((metric) => metric.id)).size !== metrics.length
-  ) {
+  if (new Set(validatedMetrics.map((metric) => metric.id)).size !== metrics.length) {
     throw new Error('Metric IDs must be unique.')
   }
   const sampleCount = value.runner.sampleCount
-  if (
-    validatedMetrics.some(
-      (metric) => metric.samplesNsPerOp.length !== sampleCount
-    )
-  ) {
+  if (validatedMetrics.some((metric) => metric.samplesNsPerOp.length !== sampleCount)) {
     throw new Error('Sample count does not match runner settings.')
   }
   const startedAt = stringValue(value.startedAt, 'startedAt')
@@ -232,14 +185,8 @@ export function validateBenchmarkRun(value: unknown): BenchmarkRunResult {
     configuration,
     environment: validateEnvironment(value.environment),
     runner: {
-      warmupCount: positiveInteger(
-        value.runner.warmupCount,
-        'runner.warmupCount'
-      ),
-      sampleCount: positiveInteger(
-        value.runner.sampleCount,
-        'runner.sampleCount'
-      ),
+      warmupCount: positiveInteger(value.runner.warmupCount, 'runner.warmupCount'),
+      sampleCount: positiveInteger(value.runner.sampleCount, 'runner.sampleCount'),
     },
     startedAt,
     durationMs: finiteNumber(value.durationMs, 'durationMs'),
@@ -247,14 +194,9 @@ export function validateBenchmarkRun(value: unknown): BenchmarkRunResult {
   }
 }
 
-export function validateExpectedRun(
-  result: BenchmarkRunResult,
-  expected: BenchmarkRunConfiguration
-): void {
+export function validateExpectedRun(result: BenchmarkRunResult, expected: BenchmarkRunConfiguration): void {
   const actual = result.configuration
-  for (const key of Object.keys(
-    expected
-  ) as (keyof BenchmarkRunConfiguration)[]) {
+  for (const key of Object.keys(expected) as (keyof BenchmarkRunConfiguration)[]) {
     if (JSON.stringify(actual[key]) !== JSON.stringify(expected[key])) {
       throw new Error(`Result configuration mismatch for ${key}.`)
     }

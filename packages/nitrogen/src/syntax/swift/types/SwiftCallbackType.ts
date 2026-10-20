@@ -5,20 +5,10 @@ import type { Language } from '../../../getPlatformSpecs.js'
 import { escapeCppName } from '../../helpers.js'
 import type { TypeContext } from '../../types/Type.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
-import {
-  CallbackType,
-  type GetCallbackCodeOptions,
-} from '../../types/CallbackType.js'
+import { CallbackType, type GetCallbackCodeOptions } from '../../types/CallbackType.js'
 import { PromiseType } from '../../types/PromiseType.js'
-import {
-  createSwiftCallbackBridge,
-  createSwiftInlineCallbackBridge,
-} from '../SwiftCallback.js'
-import {
-  getClangImporterReferenceName,
-  getQualifiedSwiftName,
-  type ImportedCxxRecord,
-} from '../ImportedCxxRecord.js'
+import { createSwiftCallbackBridge, createSwiftInlineCallbackBridge } from '../SwiftCallback.js'
+import { getClangImporterReferenceName, getQualifiedSwiftName, type ImportedCxxRecord } from '../ImportedCxxRecord.js'
 import { wrapSwiftTypeForBridge } from '../wrapSwiftType.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
@@ -42,10 +32,7 @@ interface CppCallHelperOptions {
   invocation: string
 }
 
-function getCppParameterDeclaration({
-  name,
-  type,
-}: SwiftBridgeParameter): string {
+function getCppParameterDeclaration({ name, type }: SwiftBridgeParameter): string {
   const cppType = type.getCode('c++', { context: 'parameter' })
   return `${cppType} ${name}`
 }
@@ -58,10 +45,7 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
   constructor(readonly type: CallbackType) {
     const asyncResult = new SwiftPromiseType(new PromiseType(type.returnType))
     const returnType = asyncResult.resultingType
-    const parameters = type.parameters.map(
-      (p, index) =>
-        new SwiftNamedType(`param${index}`, wrapSwiftTypeForBridge(p))
-    )
+    const parameters = type.parameters.map((p, index) => new SwiftNamedType(`param${index}`, wrapSwiftTypeForBridge(p)))
     super(returnType, parameters, type.isInline)
     this.returnType = returnType
     this.parameters = parameters
@@ -71,11 +55,7 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
   override get specializationName(): string {
     return (
       'Callback_' +
-      [this.returnType, ...this.parameters]
-        .map((t) =>
-          escapeCppName(t.getCode('c++', { context: 'type-argument' }))
-        )
-        .join('_')
+      [this.returnType, ...this.parameters].map((t) => escapeCppName(t.getCode('c++', { context: 'type-argument' }))).join('_')
     )
   }
   /** The bridge alias of the borrowed `Inline<...>` parameter. */
@@ -94,18 +74,13 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
   }
   readonly requiresSwiftGenericContext = true
   get containsSwiftGenerics(): boolean {
-    return [this.returnType, ...this.parameters].some(
-      (type) => type.containsSwiftGenerics
-    )
+    return [this.returnType, ...this.parameters].some((type) => type.containsSwiftGenerics)
   }
 
   readonly canImportFromCpp = true
 
   get requiresExplicitSwiftTarget(): boolean {
-    return (
-      this.returnType.requiresExplicitSwiftTarget ||
-      this.parameters.some((p) => p.requiresExplicitSwiftTarget)
-    )
+    return this.returnType.requiresExplicitSwiftTarget || this.parameters.some((p) => p.requiresExplicitSwiftTarget)
   }
   get needsSwiftConversion(): boolean {
     return true
@@ -117,10 +92,7 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
     return `${value}.toCpp()`
   }
 
-  override getCode(
-    language: Language,
-    options: GetCallbackCodeOptions
-  ): string {
+  override getCode(language: Language, options: GetCallbackCodeOptions): string {
     switch (language) {
       case 'c++':
         // Swift signatures omit the JS parameter names.
@@ -142,9 +114,7 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   get importedCxxRecord(): ImportedCxxRecord {
-    const parameters = this.parameters
-      .map((p) => p.getClangImporterName('parameter'))
-      .join(', ')
+    const parameters = this.parameters.map((p) => p.getClangImporterName('parameter')).join(', ')
     const returnType = this.returnType.getClangImporterName('return')
     // The C++ `Callback<R(Args...)>` has one function type argument, which Swift
     // names `((Args) -> R)`. The Swift protocol `Callback<Arguments, Return>` is unrelated.
@@ -180,18 +150,13 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
     return helpers
   }
 
-  override getRequiredImports(
-    language: Language,
-    context: 'declaration' | 'implementation' = 'implementation'
-  ): SourceImport[] {
+  override getRequiredImports(language: Language, context: 'declaration' | 'implementation' = 'implementation'): SourceImport[] {
     const imports: SourceImport[] = []
     switch (language) {
       case 'c++':
         imports.push(
           ...this.returnType.getRequiredImports(language, context),
-          ...this.parameters.flatMap((p) =>
-            p.getRequiredImports(language, context)
-          ),
+          ...this.parameters.flatMap((p) => p.getRequiredImports(language, context)),
           {
             language: language,
             declaration: { name: 'NitroModules/Callback.hpp', space: 'system' },
@@ -244,8 +209,7 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
   /** Arguments the C++ adapters pass on, after loading borrowed Swift values. */
   private get cppAdapterArguments(): string[] {
     return this.adapterParameters.map(({ name, type }) => {
-      if (type instanceof SwiftBorrowedPointerType)
-        return type.load('c++', name)
+      if (type instanceof SwiftBorrowedPointerType) return type.load('c++', name)
       return name
     })
   }
@@ -255,10 +219,7 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
     // Swift can omit std::function copy constructors when it instantiates the
     // Promise's JSI callbacks, so compile those calls in the C++ adapters.
     if (this.returnType.kind === 'promise') return true
-    const adapterTypes = [
-      this.adapterReturnType,
-      ...this.adapterParameters.map((parameter) => parameter.type),
-    ]
+    const adapterTypes = [this.adapterReturnType, ...this.adapterParameters.map((parameter) => parameter.type)]
     if (adapterTypes.some((type) => type instanceof SwiftPointerType)) {
       return true
     }
@@ -289,18 +250,10 @@ using ${alias} = ${callbackType};
       const type = p.getCode('c++', { context: 'parameter' })
       return `${type} ${p.escapedName}`
     })
-    const adapterParameterDeclarations = adapterParameters.map(
-      getCppParameterDeclaration
-    )
-    const bridgeParameterDeclarations = getSwiftBridgeParameters(
-      adapterParameters,
-      adapterReturnType
-    ).map(getCppParameterDeclaration)
+    const adapterParameterDeclarations = adapterParameters.map(getCppParameterDeclaration)
+    const bridgeParameterDeclarations = getSwiftBridgeParameters(adapterParameters, adapterReturnType).map(getCppParameterDeclaration)
     const argumentsCpp = this.cppAdapterArguments
-    const callParameters = [
-      `const ${alias}& callback`,
-      ...adapterParameterDeclarations,
-    ]
+    const callParameters = [`const ${alias}& callback`, ...adapterParameterDeclarations]
     const imports = this.getRequiredImports('c++', 'implementation')
     const syncResultType = this.syncResult.getCode('c++', { context: 'return' })
     const isVoid = this.returnType.kind === 'void'
@@ -413,26 +366,16 @@ using ${alias} = ${callbackType};
   }
 
   /** Swift calls a callback synchronously through a noexcept `Result` bridge. */
-  private createCppCallHelper({
-    name,
-    callbackAlias,
-    invocation,
-  }: CppCallHelperOptions): CppHelper {
+  private createCppCallHelper({ name, callbackAlias, invocation }: CppCallHelperOptions): CppHelper {
     // TODO: Replace this Result bridge with SWIFT_THROWS once
     // https://github.com/swiftlang/swift/pull/92569 and its dependencies are
     // merged, available in our minimum Swift toolchain, and support our reference
     // and aggregate callback signatures. Native Swift callbacks still need the
     // reverse error bridge in createCppHelpers().
     const adapterReturnType = this.adapterReturnType
-    const bridgeParameterDeclarations = getSwiftBridgeParameters(
-      this.adapterParameters,
-      adapterReturnType
-    ).map(getCppParameterDeclaration)
+    const bridgeParameterDeclarations = getSwiftBridgeParameters(this.adapterParameters, adapterReturnType).map(getCppParameterDeclaration)
     const syncResultType = this.syncResult.getCode('c++', { context: 'return' })
-    const syncParameters = [
-      `const ${callbackAlias}& callback`,
-      ...bridgeParameterDeclarations,
-    ]
+    const syncParameters = [`const ${callbackAlias}& callback`, ...bridgeParameterDeclarations]
     const syncSignature = `${syncResultType} ${name}(${syncParameters.join(', ')}) noexcept`
     let swiftToCppSyncBody: string
     if (this.returnType.kind === 'void') {
@@ -441,11 +384,7 @@ ${invocation};
 return ${syncResultType}::withValue();
 `.trim()
     } else if (adapterReturnType instanceof SwiftOutPointerType) {
-      const initializeCode = adapterReturnType.initialize(
-        'c++',
-        SWIFT_RESULT_STORAGE,
-        invocation
-      )
+      const initializeCode = adapterReturnType.initialize('c++', SWIFT_RESULT_STORAGE, invocation)
       swiftToCppSyncBody = `
 ${initializeCode};
 return ${syncResultType}::withValue();

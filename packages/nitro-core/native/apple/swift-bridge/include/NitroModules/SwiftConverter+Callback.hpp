@@ -115,7 +115,8 @@ template <typename R, typename... Args>
   requires requires { typename SwiftConverter<R>::SwiftType; } &&
            (requires { typename SwiftConverter<std::remove_cvref_t<Args>>::SwiftType; } && ...)
 struct SwiftConverter<InlineCallback<R(Args...)>> final
-    : SwiftCallbackConverter<InlineCallback<R(Args...)>, Callback<typename SwiftConverter<R>::SwiftType(SwiftCallbackArgument<Args>...)>> {};
+    : SwiftCallbackConverter<InlineCallback<R(Args...)>, Callback<typename SwiftConverter<R>::SwiftType(SwiftCallbackArgument<Args>...)>> {
+};
 
 template <typename R, typename... Args, typename SwiftResult, typename... SwiftArgs>
 struct SwiftConverter<Callback<R(Args...)>, Callback<SwiftResult(SwiftArgs...)>> final

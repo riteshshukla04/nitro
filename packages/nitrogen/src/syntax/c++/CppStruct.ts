@@ -1,8 +1,4 @@
-import type {
-  FileWithReferencedTypes,
-  SourceFile,
-  SourceImport,
-} from '../SourceFile.js'
+import type { FileWithReferencedTypes, SourceFile, SourceImport } from '../SourceFile.js'
 import { indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { NamedType } from '../types/Type.js'
@@ -10,32 +6,17 @@ import { NitroConfig } from '../../config/NitroConfig.js'
 import type { GetCallbackCodeOptions } from '../types/CallbackType.js'
 import { getImportsCode } from '../getImportCode.js'
 
-export function createCppStruct(
-  typename: string,
-  properties: NamedType[]
-): [header: FileWithReferencedTypes, implementation: SourceFile] {
+export function createCppStruct(typename: string, properties: NamedType[]): [header: FileWithReferencedTypes, implementation: SourceFile] {
   // Namespace typename
-  const fullyQualifiedTypename = NitroConfig.current.getCxxNamespace(
-    'c++',
-    typename
-  )
+  const fullyQualifiedTypename = NitroConfig.current.getCxxNamespace('c++', typename)
   // Get C++ code for all struct members
   const cppStructProps = properties
-    .map(
-      (p) =>
-        `${p.getCode('c++', { context: 'property' })} ${p.escapedName}     SWIFT_PRIVATE;`
-    )
+    .map((p) => `${p.getCode('c++', { context: 'property' })} ${p.escapedName}     SWIFT_PRIVATE;`)
     .join('\n')
-  const cppConstructorParams = properties
-    .map((p) => `${p.getCode('c++', { context: 'value' })} ${p.escapedName}`)
-    .join(', ')
+  const cppConstructorParams = properties.map((p) => `${p.getCode('c++', { context: 'value' })} ${p.escapedName}`).join(', ')
   // Parameters are taken by value, so move the ones that are expensive to copy
   // (the types that other signatures pass by `const&`) into the members.
-  const movedProperties = properties.filter(
-    (p) =>
-      p.getCode('c++', { context: 'parameter' }) !==
-      p.getCode('c++', { context: 'value' })
-  )
+  const movedProperties = properties.filter((p) => p.getCode('c++', { context: 'parameter' }) !== p.getCode('c++', { context: 'value' }))
   const cppInitializerParams = properties
     .map((p) => {
       if (movedProperties.includes(p)) {
@@ -77,9 +58,7 @@ export function createCppStruct(
   if (isEquatable) {
     equatableFunc = `friend bool operator==(const ${typename}& lhs, const ${typename}& rhs) = default;`
   } else {
-    const nonEquatableTypes = properties
-      .filter((p) => !p.isEquatable)
-      .map((p) => p.name)
+    const nonEquatableTypes = properties.filter((p) => !p.isEquatable).map((p) => p.name)
     equatableFunc = `// ${typename} is not equatable because these properties are not equatable: ${nonEquatableTypes.join(', ')}`
   }
 
@@ -129,14 +108,8 @@ export function createCppStruct(
     },
     ...includedTypes,
   ]
-  const cppDeclarationIncludes = getImportsCode(
-    declarationImports,
-    'declaration'
-  )
-  const cppImplementationIncludes = getImportsCode(
-    implementationImports,
-    'implementation'
-  )
+  const cppDeclarationIncludes = getImportsCode(declarationImports, 'declaration')
+  const cppImplementationIncludes = getImportsCode(implementationImports, 'implementation')
   const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
 
   const cppCode = `

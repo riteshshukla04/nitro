@@ -12,17 +12,11 @@ export interface HybridClassBindings {
 }
 
 /** Bind concrete C++ class calls inside the platform's `Class::get()`. */
-export function createCppHybridClassBindings(
-  spec: HybridObjectSpec<'c++'>
-): HybridClassBindings {
+export function createCppHybridClassBindings(spec: HybridObjectSpec<'c++'>): HybridClassBindings {
   const imports: SourceImport[] = []
   const definitions: string[] = []
   const registrations: string[] = []
-  if (
-    spec.constructor == null &&
-    spec.staticMethods.length === 0 &&
-    spec.staticProperties.length === 0
-  ) {
+  if (spec.constructor == null && spec.staticMethods.length === 0 && spec.staticProperties.length === 0) {
     return {
       imports: imports,
       definitions: definitions,
@@ -30,16 +24,10 @@ export function createCppHybridClassBindings(
     }
   }
   if (spec.implementation == null) {
-    throw new Error(
-      `${spec.name}: Constructors and static members require a concrete implementation.`
-    )
+    throw new Error(`${spec.name}: Constructors and static members require a concrete implementation.`)
   }
 
-  const implementation = [
-    '',
-    ...spec.implementation.namespace,
-    spec.implementation.className,
-  ].join('::')
+  const implementation = ['', ...spec.implementation.namespace, spec.implementation.className].join('::')
   const include = spec.implementation.include
   const headerName = include.slice(1, -1)
   const headerSpace = include.startsWith('<') ? 'system' : 'user'
@@ -55,12 +43,9 @@ export function createCppHybridClassBindings(
   )
   if (spec.constructor != null) {
     const method = spec.constructor.toStaticMethod(new HybridObjectType(spec))
-    const argumentTypes = method.parameters.map(
-      (parameter) => `decltype(${parameter.type.escapedName})`
-    )
+    const argumentTypes = method.parameters.map((parameter) => `decltype(${parameter.type.escapedName})`)
     const argumentsCode = method.parameters.map(
-      (parameter) =>
-        `std::forward<decltype(${parameter.type.escapedName})>(${parameter.type.escapedName})`
+      (parameter) => `std::forward<decltype(${parameter.type.escapedName})>(${parameter.type.escapedName})`
     )
     const constructibleArguments = [implementation, ...argumentTypes]
     const constructorBody = `
@@ -91,8 +76,7 @@ clazz.registerHybridConstructor(&${helper}::constructor);
   }
   for (const method of spec.staticMethods) {
     const argumentsCode = method.parameters.map(
-      (parameter) =>
-        `std::forward<decltype(${parameter.type.escapedName})>(${parameter.type.escapedName})`
+      (parameter) => `std::forward<decltype(${parameter.type.escapedName})>(${parameter.type.escapedName})`
     )
     const staticCallBody = `
 return ${implementation}::${method.name}(${argumentsCode.join(', ')});
@@ -112,8 +96,7 @@ clazz.registerStaticHybridMethod("${method.name}", &${helper}::${method.name});
     const accessors = property.getStaticMethods()
     for (const method of accessors) {
       const argumentsCode = method.parameters.map(
-        (parameter) =>
-          `std::forward<decltype(${parameter.type.escapedName})>(${parameter.type.escapedName})`
+        (parameter) => `std::forward<decltype(${parameter.type.escapedName})>(${parameter.type.escapedName})`
       )
       adapters.push(
         method.getDefinition('c++', {
@@ -122,12 +105,8 @@ clazz.registerStaticHybridMethod("${method.name}", &${helper}::${method.name});
         })
       )
     }
-    const accessorReferences = accessors.map(
-      (method) => `&${helper}::${method.name}`
-    )
-    registrations.push(
-      `clazz.registerStaticHybridProperty("${property.name}", ${accessorReferences.join(', ')});`
-    )
+    const accessorReferences = accessors.map((method) => `&${helper}::${method.name}`)
+    registrations.push(`clazz.registerStaticHybridProperty("${property.name}", ${accessorReferences.join(', ')});`)
   }
   const helperDefinition = `
 namespace {

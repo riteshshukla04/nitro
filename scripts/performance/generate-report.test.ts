@@ -9,15 +9,9 @@ const BASE_SHA = 'a'.repeat(40)
 const HEAD_SHA = 'b'.repeat(40)
 const SUITE_HASH = 'c'.repeat(64)
 
-function run(
-  platform: 'android' | 'ios',
-  revision: 'base' | 'head'
-): BenchmarkRunResult {
+function run(platform: 'android' | 'ios', revision: 'base' | 'head'): BenchmarkRunResult {
   const center = revision === 'base' ? 100 : 120
-  const samples = Array.from(
-    { length: 20 },
-    (_, index) => center - 1 + (index % 3)
-  )
+  const samples = Array.from({ length: 20 }, (_, index) => center - 1 + (index % 3))
   return {
     schemaVersion: 2,
     suiteVersion: 1,
@@ -90,10 +84,7 @@ async function createFixture(root: string): Promise<{
       runAttempt: 1,
     })
     for (const revision of ['base', 'head'] as const) {
-      await writeJson(
-        path.join(directory, `${revision}-1.json`),
-        run(platform, revision)
-      )
+      await writeJson(path.join(directory, `${revision}-1.json`), run(platform, revision))
     }
   }
 
@@ -150,11 +141,7 @@ async function generate(fixture: Awaited<ReturnType<typeof createFixture>>) {
   )
   const error = new Response(child.stderr).text()
   const output = new Response(child.stdout).text()
-  const [exitCode, errorMessage, outputMessage] = await Promise.all([
-    child.exited,
-    error,
-    output,
-  ])
+  const [exitCode, errorMessage, outputMessage] = await Promise.all([child.exited, error, output])
   return { exitCode, error: `${errorMessage}${outputMessage}` }
 }
 
@@ -164,34 +151,20 @@ describe('HEAD report generation', () => {
     try {
       const fixture = await createFixture(root)
       expect((await generate(fixture)).exitCode).toBe(0)
-      const markdown = await readFile(
-        path.join(fixture.output, 'performance-summary.md'),
-        'utf8'
-      )
-      expect(
-        await Bun.file(path.join(fixture.output, 'job-summary.md')).text()
-      ).toBe(markdown)
+      const markdown = await readFile(path.join(fixture.output, 'performance-summary.md'), 'utf8')
+      expect(await Bun.file(path.join(fixture.output, 'job-summary.md')).text()).toBe(markdown)
       expect(markdown).toContain('/artifacts/987')
       expect(markdown).toContain('## Performance Report')
       expect(markdown).toContain('### iOS')
       expect(markdown).toContain('### Android')
-      expect(markdown).toContain(
-        '<strong>C++</strong> <code>addNumbers()</code>'
-      )
+      expect(markdown).toContain('<strong>C++</strong> <code>addNumbers()</code>')
       expect(markdown).toContain('<summary>All Benchmarks</summary>')
       expect(markdown).toContain(
         `Benchmarking Code Diff [\`${BASE_SHA.slice(0, 8)}\`...\`${HEAD_SHA.slice(0, 8)}\`](https://github.com/margelo/nitro/compare/${BASE_SHA}..${HEAD_SHA}) ([view raw output](https://github.com/margelo/nitro/actions/runs/123456789))`
       )
-      const bmf = JSON.parse(
-        await readFile(path.join(fixture.output, 'bencher-ios.json'), 'utf8')
-      )
+      const bmf = JSON.parse(await readFile(path.join(fixture.output, 'bencher-ios.json'), 'utf8'))
       expect(bmf['nitro-cpp/primitive/add-numbers'].latency.value).toBe(120)
-      const baseBmf = JSON.parse(
-        await readFile(
-          path.join(fixture.output, 'bencher-base-ios.json'),
-          'utf8'
-        )
-      )
+      const baseBmf = JSON.parse(await readFile(path.join(fixture.output, 'bencher-base-ios.json'), 'utf8'))
       expect(baseBmf['nitro-cpp/primitive/add-numbers'].latency.value).toBe(100)
     } finally {
       await rm(root, { recursive: true, force: true })
@@ -256,36 +229,24 @@ describe('HEAD report generation', () => {
         await writeJson(headFile, head)
       }
       expect(await generate(fixture)).toEqual({ exitCode: 0, error: '' })
-      const markdown = await Bun.file(
-        path.join(fixture.output, 'performance-summary.md')
-      ).text()
+      const markdown = await Bun.file(path.join(fixture.output, 'performance-summary.md')).text()
       expect(markdown).toContain('🔴 +20% slower')
       expect(markdown).toContain('⭐️ New (120.0 ns)')
       expect(markdown).toContain('❌ Removed')
       expect(markdown).not.toContain('require a new baseline')
-      expect(
-        await Bun.file(
-          path.join(fixture.output, 'bencher-base-ios.json')
-        ).exists()
-      ).toBe(true)
+      expect(await Bun.file(path.join(fixture.output, 'bencher-base-ios.json')).exists()).toBe(true)
 
       // Suite changes cannot excuse a missing or duplicated process artifact.
       const baseFile = path.join(fixture.artifact, 'raw/ios/base-1.json')
       const base = await Bun.file(baseFile).json()
       await rm(baseFile)
-      expect((await generate(fixture)).error).toContain(
-        'Expected 1 ios base runs'
-      )
+      expect((await generate(fixture)).error).toContain('Expected 1 ios base runs')
       await writeJson(baseFile, base)
       await writeJson(
         path.join(fixture.artifact, 'raw/ios/head-2.json'),
-        await Bun.file(
-          path.join(fixture.artifact, 'raw/ios/head-1.json')
-        ).json()
+        await Bun.file(path.join(fixture.artifact, 'raw/ios/head-1.json')).json()
       )
-      expect((await generate(fixture)).error).toContain(
-        'Expected 1 ios head runs'
-      )
+      expect((await generate(fixture)).error).toContain('Expected 1 ios head runs')
     } finally {
       await rm(root, { recursive: true, force: true })
     }
@@ -301,25 +262,17 @@ test('rerunning Android retains the exact earlier iOS measurements and app build
     manifest.runAttempt = 2
     manifest.artifacts.android.measurementId = 5
     manifest.artifacts.android.measurementAttempt = 2
-    await writeJson(
-      path.join(fixture.artifact, 'raw/android/measurement.json'),
-      { buildArtifactId: 1, runAttempt: 2, pairCount: 4 }
-    )
+    await writeJson(path.join(fixture.artifact, 'raw/android/measurement.json'), { buildArtifactId: 1, runAttempt: 2, pairCount: 4 })
     for (let pair = 2; pair <= 4; pair++) {
       for (const revision of ['base', 'head'] as const) {
         const value = run('android', revision)
         value.configuration.runId = `android-${revision}-${pair}`
-        await writeJson(
-          path.join(fixture.artifact, `raw/android/${revision}-${pair}.json`),
-          value
-        )
+        await writeJson(path.join(fixture.artifact, `raw/android/${revision}-${pair}.json`), value)
       }
     }
     await writeJson(manifestFile, manifest)
     expect(await generate(fixture)).toEqual({ exitCode: 0, error: '' })
-    const markdown = await Bun.file(
-      path.join(fixture.output, 'performance-summary.md')
-    ).text()
+    const markdown = await Bun.file(path.join(fixture.output, 'performance-summary.md')).text()
     expect(markdown).toContain('Android: [measurements, attempt 2]')
     expect(markdown).toContain('iOS: [measurements, attempt 1]')
   } finally {
@@ -342,24 +295,15 @@ test('validates all four pairs and preserves their contribution to the report', 
           value.configuration.runId = `${platform}-${revision}-${pair}`
           // The first pair is an outlier. All four must contribute, instead of
           // accidentally reporting only base-1/head-1 from the earlier protocol.
-          value.metrics[0]!.samplesNsPerOp.fill(
-            revision === 'base' ? 100 : pair === 1 ? 200 : 110
-          )
-          await writeJson(
-            path.join(directory, `${revision}-${pair}.json`),
-            value
-          )
+          value.metrics[0]!.samplesNsPerOp.fill(revision === 'base' ? 100 : pair === 1 ? 200 : 110)
+          await writeJson(path.join(directory, `${revision}-${pair}.json`), value)
         }
       }
     }
     expect(await generate(fixture)).toEqual({ exitCode: 0, error: '' })
-    const bmf = await Bun.file(
-      path.join(fixture.output, 'bencher-ios.json')
-    ).json()
+    const bmf = await Bun.file(path.join(fixture.output, 'bencher-ios.json')).json()
     expect(bmf['nitro-cpp/primitive/add-numbers'].latency.value).toBe(110)
-    const markdown = await Bun.file(
-      path.join(fixture.output, 'performance-summary.md')
-    ).text()
+    const markdown = await Bun.file(path.join(fixture.output, 'performance-summary.md')).text()
     expect(markdown).toContain('🔴 +10% slower')
     expect(markdown).not.toContain('+100% slower')
 
@@ -367,28 +311,19 @@ test('validates all four pairs and preserves their contribution to the report', 
     const lastFile = path.join(directory, 'head-4.json')
     const last = await Bun.file(lastFile).json()
     await rm(lastFile)
-    expect((await generate(fixture)).error).toContain(
-      'Expected 4 ios head runs'
-    )
+    expect((await generate(fixture)).error).toContain('Expected 4 ios head runs')
     await writeJson(lastFile, last)
     // Duplicate data under the right filename must not impersonate pair four.
-    await writeJson(
-      lastFile,
-      await Bun.file(path.join(directory, 'head-1.json')).json()
-    )
+    await writeJson(lastFile, await Bun.file(path.join(directory, 'head-1.json')).json())
     expect((await generate(fixture)).error).toContain('run metadata is invalid')
     await writeJson(lastFile, last)
     await writeJson(path.join(directory, 'head-5.json'), last)
-    expect((await generate(fixture)).error).toContain(
-      'Expected 4 ios head runs'
-    )
+    expect((await generate(fixture)).error).toContain('Expected 4 ios head runs')
     await rm(path.join(directory, 'head-5.json'))
     const measurementFile = path.join(directory, 'measurement.json')
     const measurement = await Bun.file(measurementFile).json()
     await writeJson(measurementFile, { ...measurement, pairCount: 3 })
-    expect((await generate(fixture)).error).toContain(
-      'measurement pair count is invalid'
-    )
+    expect((await generate(fixture)).error).toContain('measurement pair count is invalid')
   } finally {
     await rm(root, { recursive: true, force: true })
   }

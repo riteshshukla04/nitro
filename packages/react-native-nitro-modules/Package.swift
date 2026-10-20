@@ -32,7 +32,7 @@ let package = Package(
         "NitroModulesSwiftBridge",
         "NitroModulesReactNative",
       ]
-    ),
+    )
   ],
   dependencies: [
     .package(name: "ReactNative", path: "../../../../xcframeworks"),
@@ -87,7 +87,7 @@ let package = Package(
       sources: ["src"],
       publicHeadersPath: "include",
       cxxSettings: cxxSettings + [
-        .unsafeFlags(["-I${GENERATED_MODULEMAP_DIR}", "-fno-modules"]),
+        .unsafeFlags(["-I${GENERATED_MODULEMAP_DIR}", "-fno-modules"])
       ]
     ),
     .target(
@@ -101,7 +101,7 @@ let package = Package(
       sources: ["apple/src", "cpp/src"],
       publicHeadersPath: "include",
       cxxSettings: cxxSettings + [
-        .define("RCT_NEW_ARCH_ENABLED", to: "1"),
+        .define("RCT_NEW_ARCH_ENABLED", to: "1")
       ]
     ),
   ],

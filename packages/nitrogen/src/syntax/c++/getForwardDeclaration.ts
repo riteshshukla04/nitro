@@ -1,10 +1,6 @@
 type DeclarationKind = 'class' | 'struct' | 'enum class'
 
-export function getForwardDeclaration(
-  kind: DeclarationKind,
-  className: string,
-  namespace?: string
-): string {
+export function getForwardDeclaration(kind: DeclarationKind, className: string, namespace?: string): string {
   if (namespace != null) {
     return `
 // Forward declaration of \`${className}\` to properly resolve imports.

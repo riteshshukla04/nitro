@@ -1,12 +1,5 @@
 import assert from 'node:assert/strict'
-import {
-  copyFileSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs'
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -18,11 +11,7 @@ function fixture(t) {
   const root = mkdtempSync(path.join(tmpdir(), 'nitro-release-version-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))
   const source = fileURLToPath(new URL('../../', import.meta.url))
-  for (const relative of [
-    'scripts/set-version.mjs',
-    'scripts/releases/lib.mjs',
-    'scripts/releases/packages.mjs',
-  ]) {
+  for (const relative of ['scripts/set-version.mjs', 'scripts/releases/lib.mjs', 'scripts/releases/packages.mjs']) {
     mkdirSync(path.dirname(path.join(root, relative)), { recursive: true })
     copyFileSync(path.join(source, relative), path.join(root, relative))
   }
@@ -32,10 +21,7 @@ function fixture(t) {
     writeFileSync(
       filename,
       JSON.stringify({
-        name:
-          relative === 'package.json'
-            ? 'nitro'
-            : path.basename(path.dirname(relative)),
+        name: relative === 'package.json' ? 'nitro' : path.basename(path.dirname(relative)),
         version: '0.37.1',
         dependencies: {
           'nitro-core': '0.37.1',
@@ -48,14 +34,8 @@ function fixture(t) {
     )
   }
   for (const [relative, content] of [
-    [
-      'packages/nitro-core/native/cpp/include/NitroModules/NitroDefines.hpp',
-      '#define NITRO_VERSION "0.37.1"\n',
-    ],
-    [
-      'packages/nitro-core/js/src/version.ts',
-      "export const version = '0.37.1'\n",
-    ],
+    ['packages/nitro-core/native/cpp/include/NitroModules/NitroDefines.hpp', '#define NITRO_VERSION "0.37.1"\n'],
+    ['packages/nitro-core/js/src/version.ts', "export const version = '0.37.1'\n"],
   ]) {
     mkdirSync(path.dirname(path.join(root, relative)), { recursive: true })
     writeFileSync(path.join(root, relative), content)
@@ -80,20 +60,14 @@ test('one version command updates public packages, private RN apps and exact too
     assert.equal(manifest.dependencies['nitro-core'], version)
     assert.equal(manifest.dependencies['react-native-nitro-modules'], version)
     assert.equal(manifest.devDependencies.nitrogen, version)
-    assert.equal(
-      manifest.dependencies['react-native-nitro-test'],
-      'workspace:*'
-    )
+    assert.equal(manifest.dependencies['react-native-nitro-test'], 'workspace:*')
     assert.equal(manifest.peerDependencies['react-native-nitro-modules'], '*')
   }
 })
 
 test('version checks reject drift in the RN package or private fixture tooling pins', (t) => {
   const root = fixture(t)
-  for (const relative of [
-    'packages/react-native-nitro-modules/package.json',
-    'tests/react-native/apps/example/package.json',
-  ]) {
+  for (const relative of ['packages/react-native-nitro-modules/package.json', 'tests/react-native/apps/example/package.json']) {
     const filename = path.join(root, relative)
     const manifest = JSON.parse(readFileSync(filename, 'utf8'))
     manifest.devDependencies.nitrogen = '^0.37.1'

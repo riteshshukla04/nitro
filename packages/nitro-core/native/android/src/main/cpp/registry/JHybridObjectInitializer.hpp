@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <NitroModules/HybridObject.hpp>
 #include "JHybridObject.hpp"
+#include <NitroModules/HybridObject.hpp>
 #include <fbjni/fbjni.h>
 
 namespace margelo::nitro {

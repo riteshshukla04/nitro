@@ -74,10 +74,7 @@ export function wrapSwiftType(type: Type): SwiftType {
 /** Types named by callback/promise aliases before the local generated Swift header. */
 export function wrapSwiftTypeForBridge(type: Type): SwiftType {
   const swiftType = wrapSwiftType(type)
-  if (
-    swiftType instanceof SwiftArrayType ||
-    swiftType instanceof SwiftOptionalType
-  ) {
+  if (swiftType instanceof SwiftArrayType || swiftType instanceof SwiftOptionalType) {
     return swiftType.getBridgeType()
   }
   return swiftType

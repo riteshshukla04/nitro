@@ -30,9 +30,7 @@ export class SwiftConstructor extends Constructor {
   constructor({ spec, constructor }: SwiftConstructorOptions) {
     const implementation = spec.implementation
     if (implementation == null) {
-      throw new Error(
-        `${spec.name}: Cannot generate a constructor without a Swift implementation.`
-      )
+      throw new Error(`${spec.name}: Cannot generate a constructor without a Swift implementation.`)
     }
     const returnType = new HybridObjectType(spec)
     const nativeFactory = constructor.toStaticMethod(returnType)
@@ -49,26 +47,17 @@ export class SwiftConstructor extends Constructor {
     this.callable = callable
   }
 
-  createBridge(
-    cppClassName: string,
-    swiftOptions: SwiftClassMethodOptions = {}
-  ): SwiftMethodBridge {
+  createBridge(cppClassName: string, swiftOptions: SwiftClassMethodOptions = {}): SwiftMethodBridge {
     // The C++ bridge calls static factories rather than C++ constructors.
     const nativeFactory = this.nativeFactory
-    const swiftFactory = new StaticMethod(
-      `${nativeFactory.name}_Swift`,
-      this.returnType,
-      this.parameters,
-      { generated: true }
-    )
+    const swiftFactory = new StaticMethod(`${nativeFactory.name}_Swift`, this.returnType, this.parameters, { generated: true })
     const cppForwarderBody = createCppForwarderBody({
       nativeMethod: nativeFactory,
       swiftMethod: swiftFactory,
     })
     const cppBridgeBody = createCppBridgeBody({
       callable: this.callable,
-      getCppInvocation: (args) =>
-        `${this.cppInvocationTarget}::${nativeFactory.name}(${args.join(', ')})`,
+      getCppInvocation: (args) => `${this.cppInvocationTarget}::${nativeFactory.name}(${args.join(', ')})`,
     })
     const endpoint = createSwiftEndpoint({
       callable: this.callable,
@@ -77,12 +66,12 @@ export class SwiftConstructor extends Constructor {
         return `try ${this.implementationClassName}(${argumentsList.join(', ')})`
       },
     })
-    const swiftMethod = new StaticMethod(
-      nativeFactory.name,
-      endpoint.returnType,
-      endpoint.parameters,
-      { ...swiftOptions, access: 'public', throwing: false, generated: true }
-    )
+    const swiftMethod = new StaticMethod(nativeFactory.name, endpoint.returnType, endpoint.parameters, {
+      ...swiftOptions,
+      access: 'public',
+      throwing: false,
+      generated: true,
+    })
     const cppRegistration = `
 clazz.registerHybridConstructor(&${cppClassName}::${swiftFactory.name});
 `.trim()

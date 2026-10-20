@@ -6,9 +6,7 @@ export function getAllTypes(spec: HybridObjectSpec): Type[] {
   const types: Type[] = []
 
   // 1. Properties
-  types.push(
-    ...[...spec.properties, ...spec.staticProperties].map((p) => p.type)
-  )
+  types.push(...[...spec.properties, ...spec.staticProperties].map((p) => p.type))
 
   const methods = [...spec.methods, ...spec.staticMethods]
 
@@ -20,9 +18,7 @@ export function getAllTypes(spec: HybridObjectSpec): Type[] {
 
   // 4. Constructor parameters
   if (spec.constructor != null) {
-    types.push(
-      ...spec.constructor.parameters.map((parameter) => parameter.type)
-    )
+    types.push(...spec.constructor.parameters.map((parameter) => parameter.type))
   }
 
   return types

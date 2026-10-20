@@ -8,34 +8,17 @@ import { NitroConfig } from '../../config/NitroConfig.js'
 /**
  * Creates a C++ enum that converts to a TypeScript union (aka just strings).
  */
-export function createCppUnion(
-  typename: string,
-  enumMembers: EnumMember[]
-): SourceFile {
+export function createCppUnion(typename: string, enumMembers: EnumMember[]): SourceFile {
   // Namespace typename
-  const fullyQualifiedTypename = NitroConfig.current.getCxxNamespace(
-    'c++',
-    typename
-  )
-  const cppEnumMembers = enumMembers
-    .map(
-      (m, i) => `${m.name}      SWIFT_NAME(${toLowerCamelCase(m.name)}) = ${i},`
-    )
-    .join('\n')
+  const fullyQualifiedTypename = NitroConfig.current.getCxxNamespace('c++', typename)
+  const cppEnumMembers = enumMembers.map((m, i) => `${m.name}      SWIFT_NAME(${toLowerCamelCase(m.name)}) = ${i},`).join('\n')
   const cppFromJsiHashCases = enumMembers
-    .map((v) =>
-      `case hashString("${v.stringValue}"): return ${fullyQualifiedTypename}::${v.name};`.trim()
-    )
+    .map((v) => `case hashString("${v.stringValue}"): return ${fullyQualifiedTypename}::${v.name};`.trim())
     .join('\n')
   const cppToJsiCases = enumMembers
-    .map(
-      (v) =>
-        `case ${fullyQualifiedTypename}::${v.name}: return JSIConverter<std::string>::toJSI(runtime, "${v.stringValue}");`
-    )
+    .map((v) => `case ${fullyQualifiedTypename}::${v.name}: return JSIConverter<std::string>::toJSI(runtime, "${v.stringValue}");`)
     .join('\n')
-  const cppCanConvertCases = enumMembers
-    .map((m) => `case hashString("${m.stringValue}"):`)
-    .join('\n')
+  const cppCanConvertCases = enumMembers.map((m) => `case hashString("${m.stringValue}"):`).join('\n')
   const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
   const imports: SourceImport[] = [
     {

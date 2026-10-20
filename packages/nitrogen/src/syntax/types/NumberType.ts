@@ -19,9 +19,7 @@ export class NumberType implements Type {
       case 'kotlin':
         return 'Double'
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for NumberType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for NumberType!`)
     }
   }
   getExtraFiles(): SourceFile[] {

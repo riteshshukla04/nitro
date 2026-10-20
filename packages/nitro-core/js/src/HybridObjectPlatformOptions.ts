@@ -128,9 +128,7 @@ interface HybridObjectLanguageOptions {
  * }
  * ```
  */
-export type HybridObjectPlatformOptions<
-  Language extends keyof HybridObjectImplementations,
-> = {
+export type HybridObjectPlatformOptions<Language extends keyof HybridObjectImplementations> = {
   [L in Language]: {
     /**
      * The native language used to implement this spec on the selected platform.

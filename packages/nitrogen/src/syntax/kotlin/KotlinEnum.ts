@@ -6,9 +6,7 @@ import type { KotlinEnumType } from './types/KotlinEnumType.js'
 import { getImportCode } from '../getImportCode.js'
 
 export function createKotlinEnum(enumType: KotlinEnumType): SourceFile[] {
-  const members = enumType.enumMembers.map(
-    (m) => `${m.name.toUpperCase()}(${m.value})`
-  )
+  const members = enumType.enumMembers.map((m) => `${m.name.toUpperCase()}(${m.value})`)
   const packageName = NitroConfig.current.getAndroidPackage('java/kotlin')
   const code = `
 ${createFileMetadataString(`${enumType.enumName}.kt`)}
@@ -31,16 +29,11 @@ enum class ${enumType.enumName}(@DoNotStrip @Keep val value: Int) {
   `.trim()
 
   const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
-  const jniClassDescriptor = NitroConfig.current.getAndroidPackage(
-    'c++/jni',
-    enumType.enumName
-  )
+  const jniClassDescriptor = NitroConfig.current.getAndroidPackage('c++/jni', enumType.enumName)
   const cppToJniConverterCode = getCppToJniConverterCode('value', enumType)
   const enumInclude = getImportCode({
     language: 'c++',
-    declaration: NitroConfig.current.getCxxHeader(
-      enumType.declarationFile.name
-    ),
+    declaration: NitroConfig.current.getCxxHeader(enumType.declarationFile.name),
   })
 
   const fbjniCode = `
@@ -106,10 +99,7 @@ namespace ${cxxNamespace} {
   return files
 }
 
-function getCppToJniConverterCode(
-  cppValueName: string,
-  enumType: KotlinEnumType
-): string {
+function getCppToJniConverterCode(cppValueName: string, enumType: KotlinEnumType): string {
   const jniEnumName = enumType.jniName
 
   const cases = enumType.enumMembers.map((m) => {

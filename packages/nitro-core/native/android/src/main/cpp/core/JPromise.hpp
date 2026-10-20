@@ -136,8 +136,7 @@ private:
   }
 
 private:
-  [[nodiscard]]
-  bool isPending() const noexcept {
+  [[nodiscard]] bool isPending() const noexcept {
     return std::holds_alternative<std::monostate>(_state);
   }
 

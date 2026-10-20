@@ -8,22 +8,23 @@
 
 <br />
 
-**Nitro Modules** are fast, type-safe native modules for React Native with statically compiled bindings to JSI.
-This repository contains:
+**Nitro Modules** are fast, type-safe native modules for React Native with statically compiled bindings to JSI. This repository contains:
 
 - [**nitro-core**](packages/nitro-core): Shared native runtime for C++, Swift and Kotlin, the JavaScript API, and TypeScript definitions
 - [**nitrogen**](packages/nitrogen): Code generator for C++, Swift, and Kotlin bindings
-- [**react-native-nitro-modules**](packages/react-native-nitro-modules): React Native installation, views, worklets, and native build integration
+- [**react-native-nitro-modules**](packages/react-native-nitro-modules): React Native installation, views, worklets, and native build
+  integration
 
 ## Example
 
 Declaration (TypeScript):
+
 ```ts
 import { iOS, type HybridObject } from 'nitro-core'
 
 @iOS({
   language: 'c++',
-  implementation: { className: 'HybridMath', include: '"HybridMath.hpp"' }
+  implementation: { className: 'HybridMath', include: '"HybridMath.hpp"' },
 })
 export declare class Math extends HybridObject {
   constructor()
@@ -33,6 +34,7 @@ export * from '#nitro/Math'
 ```
 
 Implementation (C++, Swift or Kotlin):
+
 ```cpp
 class HybridMath: public HybridMathSpec {
 public:
@@ -44,6 +46,7 @@ public:
 ```
 
 Usage (TypeScript):
+
 ```ts
 import { Math } from './Math.nitro'
 
@@ -59,7 +62,8 @@ Nitro V1 requires React Native 0.88 or newer with the New Architecture. Install 
 npm i react-native-nitro-modules@alpha
 ```
 
-For iOS, use Swift Package Manager and run `npx react-native spm` from the app directory. See the [installation guide](./packages/react-native-nitro-modules/README.md#installation) for existing CocoaPods projects.
+For iOS, use Swift Package Manager and run `npx react-native spm` from the app directory. See the
+[installation guide](./packages/react-native-nitro-modules/README.md#installation) for existing CocoaPods projects.
 
 ## Documentation
 
@@ -76,29 +80,31 @@ For iOS, use Swift Package Manager and run `npx react-native spm` from the app d
 
 ### Cross-platform
 
-Cross-platform native modules can be built with C++.
-Any custom C++ types can be used and bridged to JS with minimal overhead.
+Cross-platform native modules can be built with C++. Any custom C++ types can be used and bridged to JS with minimal overhead.
 
 JS <-> C++ type converters are statically generated ahead of time - no more dynamic lookups or runtime parser errors! 🥳
 
 ### iOS
 
-iOS native modules and view components can be written either in pure C++, or pure Swift.
-Thanks to Swift 5.9, Swift Nitro Modules [bridge directly to C++](https://www.swift.org/documentation/cxx-interop/) instead of going through Objective-C message sends. Woohoo, no more Objective-C, and **zero overhead** C++ -> Swift calls! 🥳
+iOS native modules and view components can be written either in pure C++, or pure Swift. Thanks to Swift 5.9, Swift Nitro Modules
+[bridge directly to C++](https://www.swift.org/documentation/cxx-interop/) instead of going through Objective-C message sends. Woohoo, no
+more Objective-C, and **zero overhead** C++ -> Swift calls! 🥳
 
 ### Android
 
-Android native modules and view components can be written either in pure C++, or pure Kotlin/Java.
-Thanks to fbjni, even complex types can be effortlessly bridged to Kotlin/Java with minimal overhead! 🔥
+Android native modules and view components can be written either in pure C++, or pure Kotlin/Java. Thanks to fbjni, even complex types can
+be effortlessly bridged to Kotlin/Java with minimal overhead! 🔥
 
 ## Margelo
 
-Nitro is built with ❤️ by Margelo.
-We build fast and beautiful apps. Contact us at [margelo.com](https://margelo.com) for consultancy services.
+Nitro is built with ❤️ by Margelo. We build fast and beautiful apps. Contact us at [margelo.com](https://margelo.com) for consultancy
+services.
 
 ## Contributing
 
-Read [CONTRIBUTING.md](./CONTRIBUTING.md) for the contribution flow (PR expectations, the required test-per-fix rule, and the nitrogen workflow). For environment setup and reproduction walkthroughs, see the [contributing guide](https://nitro.margelo.com/docs/resources/contributing) on the docs site.
+Read [CONTRIBUTING.md](./CONTRIBUTING.md) for the contribution flow (PR expectations, the required test-per-fix rule, and the nitrogen
+workflow). For environment setup and reproduction walkthroughs, see the
+[contributing guide](https://nitro.margelo.com/docs/resources/contributing) on the docs site.
 
 ## License
 

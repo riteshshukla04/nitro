@@ -4,11 +4,7 @@ import type { GetCodeOptions } from '../../types/Type.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import { EnumType } from '../../types/EnumType.js'
 import { createKotlinEnum } from '../KotlinEnum.js'
-import {
-  getJniReferenceCode,
-  type KotlinConversion,
-  type KotlinType,
-} from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinEnumType extends EnumType implements KotlinType {
   readonly jniValueKind = 'wrapper'
@@ -51,10 +47,7 @@ export class KotlinEnumType extends EnumType implements KotlinType {
       case 'c++':
         imports.push({
           language: language,
-          declaration: NitroConfig.current.getCxxHeader(
-            `${this.jniName}.hpp`,
-            'private'
-          ),
+          declaration: NitroConfig.current.getCxxHeader(`${this.jniName}.hpp`, 'private'),
         })
         break
     }

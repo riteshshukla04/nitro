@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 
 const BORDER_WIDTH = 5
 const BORDER_RADIUS = 17
@@ -19,44 +19,48 @@ function Header({ text }: HeaderProps): React.ReactElement {
   const SHADOW_STEPS = 15
   return (
     <div style={{ display: 'flex', flex: 1 }}>
-      <div style={{
-        display: 'flex',
-        position: 'relative',
-        flex: 1,
-      }}>
-        {Array(SHADOW_STEPS).fill(0).map((_, i) => {
-          const isLast = i === (SHADOW_STEPS - 1)
-          return (
-            <div
-              key={i}
-              style={{
-                // position in parent
-                position: 'absolute',
-                width: '100%',
-                // text layout
-                fontFamily: 'ClashDisplay',
-                fontSize: 120,
-                lineHeight: 1,
-                whiteSpace: 'normal',
-                overflowWrap: 'anywhere',
-                wordBreak: 'break-word',
-                hyphens: 'auto',
-                // truncation
-                maxLines: 3,
-                textOverflow: 'ellipsis',
-                // styling
-                color: isLast ? WHITE : BLACK,
-                WebkitTextStrokeColor: BLACK,
-                WebkitTextStrokeWidth: 15,
-                paintOrder: 'stroke',
-                transform: `translate(${i}px, -${i}px)`,
-                pointerEvents: 'none',  // layers don't catch events
-              }}
-            >
-              {text}
-            </div>
-          )
-        })}
+      <div
+        style={{
+          display: 'flex',
+          position: 'relative',
+          flex: 1,
+        }}
+      >
+        {Array(SHADOW_STEPS)
+          .fill(0)
+          .map((_, i) => {
+            const isLast = i === SHADOW_STEPS - 1
+            return (
+              <div
+                key={i}
+                style={{
+                  // position in parent
+                  position: 'absolute',
+                  width: '100%',
+                  // text layout
+                  fontFamily: 'ClashDisplay',
+                  fontSize: 120,
+                  lineHeight: 1,
+                  whiteSpace: 'normal',
+                  overflowWrap: 'anywhere',
+                  wordBreak: 'break-word',
+                  hyphens: 'auto',
+                  // truncation
+                  maxLines: 3,
+                  textOverflow: 'ellipsis',
+                  // styling
+                  color: isLast ? WHITE : BLACK,
+                  WebkitTextStrokeColor: BLACK,
+                  WebkitTextStrokeWidth: 15,
+                  paintOrder: 'stroke',
+                  transform: `translate(${i}px, -${i}px)`,
+                  pointerEvents: 'none', // layers don't catch events
+                }}
+              >
+                {text}
+              </div>
+            )
+          })}
       </div>
     </div>
   )
@@ -114,7 +118,7 @@ export function NitroOgCard({ title, subtitle, url }: NitroOgCardProps): React.R
             paddingLeft: '7%',
             paddingTop: '7%',
             paddingRight: '9%',
-            flexDirection: 'column'
+            flexDirection: 'column',
           }}
         >
           <Header text={title} />
@@ -127,7 +131,7 @@ export function NitroOgCard({ title, subtitle, url }: NitroOgCardProps): React.R
                 maxWidth: '70%',
                 fontFamily: 'Inter',
                 color: BLACK,
-                fontSize: 39
+                fontSize: 39,
               }}
             >
               {subtitle}
@@ -141,7 +145,7 @@ export function NitroOgCard({ title, subtitle, url }: NitroOgCardProps): React.R
                 paddingBottom: '3%',
                 fontFamily: 'Inter',
                 color: GRAY,
-                fontSize: 38
+                fontSize: 38,
               }}
             >
               {url}

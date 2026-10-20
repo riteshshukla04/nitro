@@ -10,10 +10,4 @@
  * @note It is recommended to always use typed `interface`s instead of `AnyJSON` for
  * both type safety, as well as better performance.
  */
-export type AnyJSON =
-  | string
-  | number
-  | boolean
-  | null
-  | AnyJSON[]
-  | { [key: string]: AnyJSON }
+export type AnyJSON = string | number | boolean | null | AnyJSON[] | { [key: string]: AnyJSON }

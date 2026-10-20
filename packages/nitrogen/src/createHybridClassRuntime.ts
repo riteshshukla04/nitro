@@ -34,12 +34,7 @@ interface LazyExportOptions {
 }
 
 /** Copies of the getter share its cache, including Babel's re-export getters. */
-function createLazyExport({
-  name,
-  cacheName,
-  setupCode,
-  initializer,
-}: LazyExportOptions): string {
+function createLazyExport({ name, cacheName, setupCode, initializer }: LazyExportOptions): string {
   const initializationCode: string[] = []
   if (setupCode != null) initializationCode.push(setupCode)
   initializationCode.push(`${cacheName} = ${initializer}`)
@@ -75,24 +70,16 @@ interface ViewDeclarationOptions {
   runtimeDirectory: string
 }
 
-function createViewDeclarations({
-  view,
-  runtimeDirectory,
-}: ViewDeclarationOptions): string {
+function createViewDeclarations({ view, runtimeDirectory }: ViewDeclarationOptions): string {
   const { name, propertyNames, sourceFilePath } = view
   // Use a JavaScript extension so this also resolves under NodeNext. TypeScript
   // resolves it to the source .ts (or .d.ts) without importing JavaScript.
   const specPath = getRealPath(sourceFilePath).replace(/(?:\.d)?\.tsx?$/, '.js')
   const relativeSpecPath = toUnixPath(path.relative(runtimeDirectory, specPath))
-  const specifier = relativeSpecPath.startsWith('.')
-    ? relativeSpecPath
-    : `./${relativeSpecPath}`
+  const specifier = relativeSpecPath.startsWith('.') ? relativeSpecPath : `./${relativeSpecPath}`
   const specifierCode = JSON.stringify(specifier)
-  const propertyNameCodes = propertyNames.map((propertyName) =>
-    JSON.stringify(propertyName)
-  )
-  const propertyNamesCode =
-    propertyNameCodes.length === 0 ? 'never' : propertyNameCodes.join(' | ')
+  const propertyNameCodes = propertyNames.map((propertyName) => JSON.stringify(propertyName))
+  const propertyNamesCode = propertyNameCodes.length === 0 ? 'never' : propertyNameCodes.join(' | ')
   return `
 import type { HostComponent, ViewProps } from 'react-native'
 import type { ${name} } from ${specifierCode} with { 'resolution-mode': 'import' }
@@ -110,9 +97,7 @@ export declare const ${name}Component: HostComponent<
 }
 
 /** Returns the directory of the generated JavaScript runtime modules. */
-export function getHybridClassRuntimeDirectory(
-  outputDirectory: string
-): string {
+export function getHybridClassRuntimeDirectory(outputDirectory: string): string {
   return path.join(outputDirectory, 'shared', 'javascript')
 }
 
@@ -125,14 +110,8 @@ export function getHybridClassOutputDirectory(runtimeFilePath: string): string {
 }
 
 /** Creates the `.cjs` runtime module and its `.d.cts` declaration for each class. */
-function createHybridClassRuntime({
-  classNames,
-  views = [],
-  outputDirectory,
-}: WriteHybridClassRuntimeOptions): HybridClassRuntimeFile[] {
-  const runtimeDirectory = getRealPath(
-    getHybridClassRuntimeDirectory(outputDirectory)
-  )
+function createHybridClassRuntime({ classNames, views = [], outputDirectory }: WriteHybridClassRuntimeOptions): HybridClassRuntimeFile[] {
+  const runtimeDirectory = getRealPath(getHybridClassRuntimeDirectory(outputDirectory))
   return classNames.flatMap((name) => {
     const registryName = NitroConfig.current.getHybridClassRegistryName(name)
     const view = views.find((candidate) => candidate.name === name)
@@ -148,14 +127,12 @@ function createHybridClassRuntime({
     let declarationsCode: string
     let cacheComment: string
     if (view != null) {
-      cacheComment =
-        "// Copies of these getters, e.g. from Babel's interop helpers, share the caches."
+      cacheComment = "// Copies of these getters, e.g. from Babel's interop helpers, share the caches."
       const componentInitializerCode = createComponentInitializer(view)
       const componentExportCode = createLazyExport({
         name: `${name}Component`,
         cacheName: 'hybridComponent',
-        setupCode:
-          "const { getHostComponent, NitroViewProp } = require('react-native-nitro-modules')",
+        setupCode: "const { getHostComponent, NitroViewProp } = require('react-native-nitro-modules')",
         initializer: componentInitializerCode,
       })
       exportsCode.push(componentExportCode)
@@ -165,8 +142,7 @@ function createHybridClassRuntime({
         runtimeDirectory: runtimeDirectory,
       })
     } else {
-      cacheComment =
-        "// Copies of this getter, e.g. from Babel's interop helpers, share the cached class."
+      cacheComment = "// Copies of this getter, e.g. from Babel's interop helpers, share the cached class."
       declarationsCode = `
 // The spec's \`export declare class ${name}\` types this runtime export.
 export {}
@@ -200,11 +176,7 @@ ${declarationsCode}
  * Writes the runtime modules for all classes and returns their paths.
  * Class names must be unique ignoring case, since each one names a file.
  */
-export async function writeHybridClassRuntime({
-  classNames,
-  views,
-  outputDirectory,
-}: WriteHybridClassRuntimeOptions): Promise<string[]> {
+export async function writeHybridClassRuntime({ classNames, views, outputDirectory }: WriteHybridClassRuntimeOptions): Promise<string[]> {
   const directory = getHybridClassRuntimeDirectory(outputDirectory)
   await mkdir(directory, { recursive: true })
   const existingFileNames = await readdir(directory)
@@ -216,10 +188,7 @@ export async function writeHybridClassRuntime({
   const filePaths: string[] = []
   for (const file of files) {
     const filePath = path.join(directory, file.name)
-    const differentlyCasedName = existingFileNames.find(
-      (name) =>
-        name !== file.name && name.toLowerCase() === file.name.toLowerCase()
-    )
+    const differentlyCasedName = existingFileNames.find((name) => name !== file.name && name.toLowerCase() === file.name.toLowerCase())
     if (differentlyCasedName != null) {
       // Adopt the class name's casing on case-insensitive file systems.
       await rm(path.join(directory, differentlyCasedName))

@@ -1,38 +1,45 @@
 ---
-description: Build a React Native Nitro Module from scratch with TypeScript specs, Nitrogen code generation, C++, Swift or Kotlin implementations, and package setup.
+description:
+  Build a React Native Nitro Module from scratch with TypeScript specs, Nitrogen code generation, C++, Swift or Kotlin implementations, and
+  package setup.
 toc_min_heading_level: 2
 toc_max_heading_level: 2
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # How to build a Nitro Module
 
-A [Nitro Module](../concepts/nitro-modules) is essentially just a react-native library that depends on react-native-nitro-modules and exposes one or more [Hybrid Objects](../concepts/hybrid-objects).
-It can either just use react-native-nitro-modules directly from C++, or use [Nitrogen](../concepts/nitrogen) to generate bindings from TypeScript to native - in this case you can even use Swift and Kotlin.
+A [Nitro Module](../concepts/nitro-modules) is essentially just a react-native library that depends on react-native-nitro-modules and
+exposes one or more [Hybrid Objects](../concepts/hybrid-objects). It can either just use react-native-nitro-modules directly from C++, or
+use [Nitrogen](../concepts/nitrogen) to generate bindings from TypeScript to native - in this case you can even use Swift and Kotlin.
 
 This is a quick guide to build a Nitro Module from start to finish:
 
 ## 1. Create a Nitro Module
 
-First, you need to create a [Nitro Module](../concepts/nitro-modules) - either by bootstrapping a template using [nitrogen](../concepts/nitrogen), [react-native-builder-bob](https://github.com/callstack/react-native-builder-bob) or [create-nitro-module](https://github.com/patrickkabwe/create-nitro-module) - or by manually adding Nitro to your existing library/app.
+First, you need to create a [Nitro Module](../concepts/nitro-modules) - either by bootstrapping a template using
+[nitrogen](../concepts/nitrogen), [react-native-builder-bob](https://github.com/callstack/react-native-builder-bob) or
+[create-nitro-module](https://github.com/patrickkabwe/create-nitro-module) - or by manually adding Nitro to your existing library/app.
 
 <Tabs groupId="template-bootstrap-cli">
   <TabItem value="nitrogen" label="nitrogen" default>
     ```sh
     npx nitrogen@latest init <name>
     ```
+
   </TabItem>
   <TabItem value="bob" label="react-native-builder-bob">
     ```sh
     npx create-react-native-library@latest
     ```
+
   </TabItem>
   <TabItem value="create-nitro-module" label="create-nitro-module">
     ```sh
     npx create-nitro-module@latest
     ```
+
   </TabItem>
   <TabItem value="manually" label="Manually">
 
@@ -64,7 +71,9 @@ First, you need to create a [Nitro Module](../concepts/nitro-modules) - either b
     ```
 
     :::warning
+
     The `optional` flag matters. Without it, package managers try to satisfy the peer range themselves - and since semver ranges never match pre-releases, `"*"` does **not** match a version like `0.37.0-beta.0`. A user testing a Nitro beta would then get a second, stable copy of `react-native-nitro-modules` installed next to yours, and Nitro throws [`Nitro was installed twice`](../guides/troubleshooting#nitro-was-installed-twice) at runtime. Marking the peer optional stops the package manager from installing Nitro on your behalf.
+
     :::
 
     Then, you need to decide if you want to use Nitro's C++ library directly, or use [nitrogen](../concepts/nitrogen) to generate specs:
@@ -81,19 +90,24 @@ First, you need to create a [Nitro Module](../concepts/nitro-modules) - either b
         Follow [Nitrogen's build setup](../concepts/nitrogen#3-add-generated-sources-to-your-library) to add the `#nitro/*` package imports mapping and configure Swift Package Manager with `addNitrogenTargets(to:)`. Include the generated files in your npm package.
 
         Write your specs in step 2 before running Nitrogen. The generator requires at least one Hybrid Object spec.
+
       </TabItem>
       <TabItem value="without-nitrogen-at-all" label="I will not use Nitrogen">
 
         If you don't plan on using Nitrogen at all - and instead write your [Hybrid Objects](../concepts/hybrid-objects) manually using C++, you do not need to set up any autolinking files since you will be responsible for exposing your Hybrid Objects to JS.
 
       </TabItem>
+
     </Tabs>
+
   </TabItem>
+
 </Tabs>
 
 ## 2. Create Hybrid Object specs
 
-To actually use Nitro, you need to create [Hybrid Objects](../concepts/hybrid-objects) - either by using Nitro's code-generator CLI “[Nitrogen](../concepts/nitrogen)”, or by just manually extending the `HybridObject` base class in C++.
+To actually use Nitro, you need to create [Hybrid Objects](../concepts/hybrid-objects) - either by using Nitro's code-generator CLI
+“[Nitrogen](../concepts/nitrogen)”, or by just manually extending the `HybridObject` base class in C++.
 
 <Tabs groupId="nitrogen-or-not">
   <TabItem value="nitrogen" label="With Nitrogen ✨" default>
@@ -116,6 +130,7 @@ To actually use Nitro, you need to create [Hybrid Objects](../concepts/hybrid-ob
       }
       export * from '#nitro/Math'
       ```
+
       </TabItem>
       <TabItem value="cpp" label="C++">
       ```ts title="Math.nitro.ts"
@@ -128,7 +143,9 @@ To actually use Nitro, you need to create [Hybrid Objects](../concepts/hybrid-ob
       }
       export * from '#nitro/Math'
       ```
+
       </TabItem>
+
     </Tabs>
 
     Right now `Math` is a class that doesn't have a native implementation yet.
@@ -159,6 +176,7 @@ To actually use Nitro, you need to create [Hybrid Objects](../concepts/hybrid-ob
       }
       export * from '#nitro/Math'
       ```
+
       </TabItem>
       <TabItem value="cpp" label="C++">
       ```ts title="Math.nitro.ts"
@@ -180,7 +198,9 @@ To actually use Nitro, you need to create [Hybrid Objects](../concepts/hybrid-ob
       }
       export * from '#nitro/Math'
       ```
+
       </TabItem>
+
     </Tabs>
 
     ### 2.2. Run nitrogen
@@ -263,9 +283,11 @@ To actually use Nitro, you need to create [Hybrid Objects](../concepts/hybrid-ob
         </div>
 
       </TabItem>
+
     </Tabs>
 
     Your class' name has to match the string passed to `implementation: ...` - here; `HybridMath`.
+
   </TabItem>
   <TabItem value="manually" label="Manually">
 
@@ -334,6 +356,7 @@ To actually use Nitro, you need to create [Hybrid Objects](../concepts/hybrid-ob
     ```
 
   </TabItem>
+
 </Tabs>
 
 ## 3. Use your Hybrid Objects in JS
@@ -366,20 +389,25 @@ To test the library you just created, you now need to set up an example app for 
     cd example
     npm install ../
     ```
+
   </TabItem>
   <TabItem value="bob" label="react-native-builder-bob">
     The [Builder Bob](https://github.com/callstack/react-native-builder-bob) template already includes an example app.
     Simply run the react-native app inside the `example/` folder.
+
   </TabItem>
   <TabItem value="create-nitro-module" label="create-nitro-module">
     The [create-nitro-module](https://github.com/patrickkabwe/create-nitro-module) template already includes an example app.
     Simply run the react-native app inside the `example/` folder.
+
   </TabItem>
+
 </Tabs>
 
 ## 5. Dive deeper
 
-Hybrid Objects can be instances with constructors, properties and instance methods - add a `constructor()` to be able to create instances of `Math`:
+Hybrid Objects can be instances with constructors, properties and instance methods - add a `constructor()` to be able to create instances of
+`Math`:
 
 ```ts title="Math.nitro.ts"
 import { iOS, Android, type HybridObject } from 'nitro-core'
@@ -407,7 +435,7 @@ Then, simply create instances via `new Math(...)`:
 import { Math } from './Math.nitro'
 
 const math = new Math({ decimalPlaces: 2 })
-math.add(1.234, 2.345)        // --> 3.58
+math.add(1.234, 2.345) // --> 3.58
 
 const preciseMath = new Math({ decimalPlaces: 4 })
 preciseMath.add(1.234, 2.345) // --> 3.579

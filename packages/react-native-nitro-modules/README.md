@@ -8,7 +8,8 @@
 
 <br />
 
-**react-native-nitro-modules** is the core React Native Nitro package for building fast, type-safe native modules with statically compiled JSI bindings.
+**react-native-nitro-modules** is the core React Native Nitro package for building fast, type-safe native modules with statically compiled
+JSI bindings.
 
 It uses JSI to generate C++ templates that can bridge virtually any JS type to a C++ type with minimal overhead.
 
@@ -24,13 +25,16 @@ Install the alpha package as a dependency in your React Native app:
 npm i react-native-nitro-modules@alpha
 ```
 
-For iOS, run `npx react-native spm` from the app directory, then open the app's `.xcodeproj` in Xcode. If the project already uses CocoaPods, convert it with `npx react-native spm add --deintegrate` first. That conversion requires CocoaPods to remove its existing integration. Subsequent builds use SwiftPM.
+For iOS, run `npx react-native spm` from the app directory, then open the app's `.xcodeproj` in Xcode. If the project already uses
+CocoaPods, convert it with `npx react-native spm add --deintegrate` first. That conversion requires CocoaPods to remove its existing
+integration. Subsequent builds use SwiftPM.
 
 The package re-exports the shared `nitro-core` API and installs it into the React Native runtime through React Native's JSI bindings hooks.
 
 ### Inside a nitro module library
 
-If you are building a Nitro module, declare `nitro-core` and `react-native-nitro-modules` as optional peer dependencies in your library's `package.json`:
+If you are building a Nitro module, declare `nitro-core` and `react-native-nitro-modules` as optional peer dependencies in your library's
+`package.json`:
 
 ```json
 {
@@ -49,24 +53,27 @@ If you are building a Nitro module, declare `nitro-core` and `react-native-nitro
 }
 ```
 
-Also install both packages and Nitrogen as dev dependencies, keeping them on the same Nitro release version. The [library setup guide](../../docs/docs/getting-started/how-to-build-a-nitro-module.md#11-install-nitro-and-nitrogen) explains the optional peer configuration.
+Also install both packages and Nitrogen as dev dependencies, keeping them on the same Nitro release version. The
+[library setup guide](../../docs/docs/getting-started/how-to-build-a-nitro-module.md#11-install-nitro-and-nitrogen) explains the optional
+peer configuration.
 
 Then install `react-native-nitro-modules` as a normal `dependency` in your library's `example/` app as seen above.
 
 ## Usage
 
-**react-native-nitro-modules** can either be used with-, or without nitrogen, or mixed (some objects are automatically generated, some manually).
+**react-native-nitro-modules** can either be used with-, or without nitrogen, or mixed (some objects are automatically generated, some
+manually).
 
 ### With Nitrogen
 
-Nitrogen generates the bindings and native specs. Implement the generated C++ abstract class, Swift protocol/base-class composition, or Kotlin abstract class in your codebase.
+Nitrogen generates the bindings and native specs. Implement the generated C++ abstract class, Swift protocol/base-class composition, or
+Kotlin abstract class in your codebase.
 
 ### Without Nitrogen
 
 All C++ bindings are bridged to JS using "Hybrid Objects".
 
-A Hybrid Object can have both methods and properties (get and set).
-Create a C++ Hybrid Object by inheriting from `HybridObject`:
+A Hybrid Object can have both methods and properties (get and set). Create a C++ Hybrid Object by inheriting from `HybridObject`:
 
 ```cpp
 #include <NitroModules/HybridObject.hpp>
@@ -107,7 +114,9 @@ const std::shared_ptr<const HybridClass>& MyHybridObject::Class::get() {
 }
 ```
 
-The `MyHybridObject` can then be registered in the [`HybridClassRegistry`](https://github.com/margelo/nitro/blob/v1/packages/nitro-core/native/cpp/include/NitroModules/HybridClassRegistry.hpp) at app startup:
+The `MyHybridObject` can then be registered in the
+[`HybridClassRegistry`](https://github.com/margelo/nitro/blob/v1/packages/nitro-core/native/cpp/include/NitroModules/HybridClassRegistry.hpp)
+at app startup:
 
 ```cpp
 #include <NitroModules/HybridClassRegistry.hpp>
@@ -118,7 +127,9 @@ void load() {
 }
 ```
 
-Inside your `MyHybridObject`, you can use standard C++ types which will automatically be converted to JS using Nitro's [`JSIConverter<T>`](https://github.com/margelo/nitro/blob/v1/packages/nitro-core/native/cpp/include/NitroModules/JSIConverter.hpp) interface.
+Inside your `MyHybridObject`, you can use standard C++ types which will automatically be converted to JS using Nitro's
+[`JSIConverter<T>`](https://github.com/margelo/nitro/blob/v1/packages/nitro-core/native/cpp/include/NitroModules/JSIConverter.hpp)
+interface.
 
 The following C++ / JS types are supported out of the box:
 
@@ -264,7 +275,6 @@ The following C++ / JS types are supported out of the box:
   </tr>
 </table>
 
-
 Since the `JSIConverter<T>` is just a template, you can extend it with any other custom types by overloading the interface.
 
 For example, to add support for an enum, overload `JSIConverter<MyEnum>`:
@@ -304,6 +314,8 @@ enum MyEnum {
 const value = myHybridObject.getEnumValue() // <-- typed as `MyEnum` instead of `number`
 ```
 
-Make sure to always include the header that defines the `JSIConverter<MyEnum>` overload inside the `MyHybridObject` file, as this is where the `JSIConverter<T>` overloads are accessed from.
+Make sure to always include the header that defines the `JSIConverter<MyEnum>` overload inside the `MyHybridObject` file, as this is where
+the `JSIConverter<T>` overloads are accessed from.
 
-[**Nitrogen**](https://github.com/margelo/nitro/tree/main/packages/nitrogen) can automatically generate such `JSIConverter<T>` extensions for enums, TypeScript unions, and even structs/objects - so it is generally recommended to use nitrogen.
+[**Nitrogen**](https://github.com/margelo/nitro/tree/main/packages/nitrogen) can automatically generate such `JSIConverter<T>` extensions
+for enums, TypeScript unions, and even structs/objects - so it is generally recommended to use nitrogen.

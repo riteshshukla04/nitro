@@ -1,14 +1,8 @@
 import type { ClassDeclaration, Type } from 'ts-morph'
 import { Node } from 'ts-morph'
 import { z } from 'zod'
-import {
-  getDirectBaseTypes,
-  getHybridObjectNitroModuleConfig,
-} from './utils.js'
-import {
-  getHybridObjectDecoratorOptions,
-  type DecoratorOptions,
-} from './getHybridObjectDecoratorOptions.js'
+import { getDirectBaseTypes, getHybridObjectNitroModuleConfig } from './utils.js'
+import { getHybridObjectDecoratorOptions, type DecoratorOptions } from './getHybridObjectDecoratorOptions.js'
 import { getHybridClassManifestOptions } from './hybridClassManifest.js'
 import { NitroConfig } from './config/NitroConfig.js'
 
@@ -27,10 +21,7 @@ interface DuplicateNameCheck {
 }
 
 /** Reports every array entry whose name an earlier entry already uses. */
-function addDuplicateNameIssues(
-  context: z.RefinementCtx,
-  { names, key, getMessage }: DuplicateNameCheck
-): void {
+function addDuplicateNameIssues(context: z.RefinementCtx, { names, key, getMessage }: DuplicateNameCheck): void {
   const seenNames = new Set<string>()
   for (const [index, name] of names.entries()) {
     if (seenNames.has(name)) {
@@ -57,8 +48,7 @@ const swiftProtocolConformancesSchema = z
     addDuplicateNameIssues(context, {
       names: conformances.map((conformance) => conformance.protocol),
       key: 'protocol',
-      getMessage: (protocol) =>
-        `Swift protocol "${protocol}" is listed more than once.`,
+      getMessage: (protocol) => `Swift protocol "${protocol}" is listed more than once.`,
     })
   })
   .default([])
@@ -78,12 +68,9 @@ const kotlinImplementedInterfacesSchema = z
   .array(kotlinImplementedInterfaceSchema)
   .superRefine((implementedInterfaces, context) => {
     addDuplicateNameIssues(context, {
-      names: implementedInterfaces.map(
-        (implementedInterface) => implementedInterface.interface
-      ),
+      names: implementedInterfaces.map((implementedInterface) => implementedInterface.interface),
       key: 'interface',
-      getMessage: (name) =>
-        `Kotlin interface "${name}" is listed more than once.`,
+      getMessage: (name) => `Kotlin interface "${name}" is listed more than once.`,
     })
   })
   .default([])
@@ -94,11 +81,7 @@ const cppIncludeSchema = z.string().refine((include) => {
   const isSystem = include.startsWith('<') && include.endsWith('>')
   const isLocal = include.startsWith('"') && include.endsWith('"')
   const name = include.slice(1, -1)
-  return (
-    (isSystem || isLocal) &&
-    name.length > 0 &&
-    !['<', '>', '"', '\r', '\n'].some((character) => name.includes(character))
-  )
+  return (isSystem || isLocal) && name.length > 0 && !['<', '>', '"', '\r', '\n'].some((character) => name.includes(character))
 }, 'Use a complete C++ include, such as <Library/HybridImage.hpp> or "HybridImage.hpp".')
 const cppImplementationSchema = z.strictObject({
   namespace: z.array(nativeNameSchema).default([]),
@@ -155,32 +138,21 @@ const platformOptionsSchema = z.union([
   }),
 ])
 export type HybridObjectPlatformOptions = z.infer<typeof platformOptionsSchema>
-export type HybridObjectPlatforms = Partial<
-  Record<Platform, HybridObjectPlatformOptions>
->
+export type HybridObjectPlatforms = Partial<Record<Platform, HybridObjectPlatformOptions>>
 
 const platformOptionsSchemas = {
-  ios: platformOptionsSchema.refine(
-    (options) => options.language !== 'kotlin',
-    {
-      path: ['language'],
-      message: 'iOS supports only Swift and C++ implementations.',
-    }
-  ),
-  android: platformOptionsSchema.refine(
-    (options) => options.language !== 'swift',
-    {
-      path: ['language'],
-      message: 'Android supports only Kotlin and C++ implementations.',
-    }
-  ),
+  ios: platformOptionsSchema.refine((options) => options.language !== 'kotlin', {
+    path: ['language'],
+    message: 'iOS supports only Swift and C++ implementations.',
+  }),
+  android: platformOptionsSchema.refine((options) => options.language !== 'swift', {
+    path: ['language'],
+    message: 'Android supports only Kotlin and C++ implementations.',
+  }),
 }
 
 /** Resolve native implementations within the project owning the spec. */
-function resolvePlatformImplementation(
-  options: HybridObjectPlatformOptions,
-  type: Type
-): HybridObjectPlatformOptions {
+function resolvePlatformImplementation(options: HybridObjectPlatformOptions, type: Type): HybridObjectPlatformOptions {
   if (options.implementation == null || options.language === 'swift') {
     return options
   }
@@ -192,9 +164,7 @@ function resolvePlatformImplementation(
         ...options,
         implementation: {
           ...options.implementation,
-          namespace: config
-            .getCxxNamespace('c++', ...options.implementation.namespace)
-            .split('::'),
+          namespace: config.getCxxNamespace('c++', ...options.implementation.namespace).split('::'),
         },
       }
     case 'kotlin':
@@ -202,9 +172,7 @@ function resolvePlatformImplementation(
         ...options,
         implementation: {
           ...options.implementation,
-          package: config.getAndroidPackageDirectory(
-            ...options.implementation.package
-          ),
+          package: config.getAndroidPackageDirectory(...options.implementation.package),
         },
       }
   }
@@ -218,9 +186,7 @@ export function isHybridObjectBaseClass(type: Type): boolean {
 
 /** Matches direct and indirect HybridObject descendants, excluding the root class. */
 export function isSomeHybridObject(type: Type): boolean {
-  return getDirectBaseTypes(type).some(
-    (base) => isHybridObjectBaseClass(base) || isSomeHybridObject(base)
-  )
+  return getDirectBaseTypes(type).some((base) => isHybridObjectBaseClass(base) || isSomeHybridObject(base))
 }
 
 export function isDirectlyAnyHybridObject(type: Type): boolean {
@@ -229,9 +195,7 @@ export function isDirectlyAnyHybridObject(type: Type): boolean {
 }
 
 export function isHybridView(type: Type): boolean {
-  return getDirectBaseTypes(type).some(
-    (base) => isHybridViewBaseClass(base) || isHybridView(base)
-  )
+  return getDirectBaseTypes(type).some((base) => isHybridViewBaseClass(base) || isHybridView(base))
 }
 
 /** The React Native marker is supplied by the runtime, not generated as a spec. */
@@ -241,9 +205,7 @@ export function isHybridViewBaseClass(type: Type): boolean {
 }
 
 /** Returns only the platforms explicitly configured on this class. */
-export function getHybridObjectPlatforms(
-  declaration: ClassDeclaration
-): HybridObjectPlatforms {
+export function getHybridObjectPlatforms(declaration: ClassDeclaration): HybridObjectPlatforms {
   const literalOptions = getHybridObjectLiteralOptions(declaration)
   return parseHybridObjectPlatforms({
     declaration: declaration,
@@ -255,9 +217,7 @@ export function getHybridObjectPlatforms(
  * Returns the platform options as written in the class's decorators, or in
  * its package's manifest when the class comes from tsc's `.nitro.d.ts` output.
  */
-export function getHybridObjectLiteralOptions(
-  declaration: ClassDeclaration
-): DecoratorOptions {
+export function getHybridObjectLiteralOptions(declaration: ClassDeclaration): DecoratorOptions {
   const name = declaration.getName()
   if (name == null) {
     throw new Error('HybridObject classes must have a name.')
@@ -271,9 +231,7 @@ export function getHybridObjectLiteralOptions(
   if (declaration.getSourceFile().getBaseName().endsWith('.nitro.d.ts')) {
     return getHybridClassManifestOptions(declaration, name)
   }
-  throw new Error(
-    `${name}: Declare \`@iOS(...)\` or \`@Android(...)\` on this class in its \`.nitro.ts\` spec.`
-  )
+  throw new Error(`${name}: Declare \`@iOS(...)\` or \`@Android(...)\` on this class in its \`.nitro.ts\` spec.`)
 }
 
 interface ParseHybridObjectPlatformsOptions {
@@ -282,36 +240,20 @@ interface ParseHybridObjectPlatformsOptions {
 }
 
 /** Validates a class's literal platform options and resolves their implementations. */
-export function parseHybridObjectPlatforms({
-  declaration,
-  literalOptions,
-}: ParseHybridObjectPlatformsOptions): HybridObjectPlatforms {
-  const platforms = platformSchema.options.filter(
-    (platform) => literalOptions[platform] != null
-  )
-  const entries = platforms.map(
-    (platform): [Platform, HybridObjectPlatformOptions] => {
-      const options = platformOptionsSchemas[platform].parse(
-        literalOptions[platform]
-      )
-      return [
-        platform,
-        resolvePlatformImplementation(options, declaration.getType()),
-      ]
-    }
-  )
+export function parseHybridObjectPlatforms({ declaration, literalOptions }: ParseHybridObjectPlatformsOptions): HybridObjectPlatforms {
+  const platforms = platformSchema.options.filter((platform) => literalOptions[platform] != null)
+  const entries = platforms.map((platform): [Platform, HybridObjectPlatformOptions] => {
+    const options = platformOptionsSchemas[platform].parse(literalOptions[platform])
+    return [platform, resolvePlatformImplementation(options, declaration.getType())]
+  })
   return Object.fromEntries(entries)
 }
 
-export function getHybridObjectPlatformsForType(
-  type: Type
-): HybridObjectPlatforms {
+export function getHybridObjectPlatformsForType(type: Type): HybridObjectPlatforms {
   const symbol = type.getSymbol()
   const declaration = symbol?.getDeclarations().find(Node.isClassDeclaration)
   if (declaration == null) {
-    throw new Error(
-      `Cannot find the HybridObject declaration for ${type.getText()}.`
-    )
+    throw new Error(`Cannot find the HybridObject declaration for ${type.getText()}.`)
   }
   return getHybridObjectPlatforms(declaration)
 }

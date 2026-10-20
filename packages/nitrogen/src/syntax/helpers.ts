@@ -7,10 +7,7 @@ import { ArrayType } from './types/ArrayType.js'
 
 type Comment = '///' | '#'
 
-export function createFileMetadataString(
-  filename: string,
-  comment: Comment = '///'
-): string {
+export function createFileMetadataString(filename: string, comment: Comment = '///'): string {
   return `
 ${comment}
 ${comment} ${filename}
@@ -151,15 +148,7 @@ export function isCppFile(file: SourceFile): boolean {
 }
 
 export function getRelativeDirectory(file: SourceFile): string {
-  return path.join(
-    '..',
-    'nitrogen',
-    'generated',
-    file.platform,
-    file.language,
-    ...file.subdirectory,
-    file.name
-  )
+  return path.join('..', 'nitrogen', 'generated', file.platform, file.language, ...file.subdirectory, file.name)
 }
 
 export function getRelativeDirectoryGenerated(...subpath: string[]): string {

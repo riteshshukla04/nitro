@@ -44,16 +44,9 @@ export class HybridObjectType implements Type {
       this.implementationLanguage = spec.language
       this.sourceConfig = spec.config
       this.baseTypes = spec.baseTypes.map((b) => new HybridObjectType(b))
-      this.swiftProtocolConformances =
-        spec.language === 'swift' ? spec.protocolConformances : []
+      this.swiftProtocolConformances = spec.language === 'swift' ? spec.protocolConformances : []
     } else {
-      const [
-        hybridObjectName,
-        implementationLanguage,
-        baseTypes,
-        sourceConfig,
-        swiftProtocolConformances = [],
-      ] = args
+      const [hybridObjectName, implementationLanguage, baseTypes, sourceConfig, swiftProtocolConformances = []] = args
 
       this.hybridObjectName = hybridObjectName
       this.implementationLanguage = implementationLanguage
@@ -63,9 +56,7 @@ export class HybridObjectType implements Type {
     }
 
     if (this.hybridObjectName.startsWith('__')) {
-      throw new Error(
-        `HybridObject name cannot start with two underscores (__)! (In ${this.hybridObjectName})`
-      )
+      throw new Error(`HybridObject name cannot start with two underscores (__)! (In ${this.hybridObjectName})`)
     }
   }
 
@@ -79,8 +70,7 @@ export class HybridObjectType implements Type {
   getCode(language: Language, options: GetHybridObjectCodeOptions): string {
     const name = getHybridObjectName(this.hybridObjectName)
     const mode = options.mode ?? 'strong'
-    const fullyQualified =
-      options.fullyQualified ?? this.sourceConfig.isExternalConfig
+    const fullyQualified = options.fullyQualified ?? this.sourceConfig.isExternalConfig
 
     switch (language) {
       case 'c++': {
@@ -98,19 +88,14 @@ export class HybridObjectType implements Type {
       case 'kotlin': {
         if (fullyQualified) {
           // full qualified name: "com.margelo.nitro.image.Image"
-          return this.sourceConfig.getAndroidPackage(
-            'java/kotlin',
-            name.HybridTSpec
-          )
+          return this.sourceConfig.getAndroidPackage('java/kotlin', name.HybridTSpec)
         } else {
           // "Image"
           return name.HybridTSpec
         }
       }
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for HybridObjectType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for HybridObjectType!`)
     }
   }
   getExtraFiles(): SourceFile[] {
@@ -136,11 +121,7 @@ export class HybridObjectType implements Type {
         imports.push({
           language,
           declaration: {
-            forwardDeclaration: getForwardDeclaration(
-              'class',
-              name.HybridTSpec,
-              cxxNamespace
-            ),
+            forwardDeclaration: getForwardDeclaration('class', name.HybridTSpec, cxxNamespace),
           },
           implementation: this.getCppHeader(),
         })
@@ -150,10 +131,7 @@ export class HybridObjectType implements Type {
         if (this.sourceConfig.isExternalConfig) {
           imports.push({
             language,
-            name: this.sourceConfig.getAndroidPackage(
-              'java/kotlin',
-              name.HybridTSpec
-            ),
+            name: this.sourceConfig.getAndroidPackage('java/kotlin', name.HybridTSpec),
           })
         }
         break

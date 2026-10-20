@@ -1,13 +1,12 @@
 ---
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Custom Types (manually written `T`)
 
-The `JSIConverter<T>` is Nitro's implementation for converting JS values to native values, and back.
-It's implemented as a C++ template, which allows it to be extended with any custom type.
+The `JSIConverter<T>` is Nitro's implementation for converting JS values to native values, and back. It's implemented as a C++ template,
+which allows it to be extended with any custom type.
 
 For example, wrap a numeric temperature in a C++ struct:
 
@@ -40,12 +39,13 @@ namespace margelo::nitro {
 }
 ```
 
-The specialization belongs in `margelo::nitro`, even if the type itself belongs to another namespace. Make the header visible to the compiler wherever methods using this type are registered.
-
+The specialization belongs in `margelo::nitro`, even if the type itself belongs to another namespace. Make the header visible to the
+compiler wherever methods using this type are registered.
 
 ## Foreign types (e.g. `react::ShadowNodeWrapper`)
 
-Since you have full control over the conversion part, you can even safely use foreign types like React Native's core types. For example, let's use `react::ShadowNodeWrapper`, which is stored as a `jsi::NativeState` on a `jsi::Object`:
+Since you have full control over the conversion part, you can even safely use foreign types like React Native's core types. For example,
+let's use `react::ShadowNodeWrapper`, which is stored as a `jsi::NativeState` on a `jsi::Object`:
 
 ```cpp title="JSIConverter+ShadowNode.hpp"
 #pragma once
@@ -114,7 +114,9 @@ Then just use the type in your methods:
     </div>
 
     :::info
+
     Make sure the `JSIConverter+ShadowNode.hpp` header is included in your project's user-search-path so it can be included.
+
     :::
 
   </TabItem>
@@ -141,13 +143,17 @@ Then just use the type in your methods:
     ```
 
     :::info
+
     Make sure the compiler knows about `JSIConverter<ShadowNode>` at the time when `MyHybrid` is declared, so import your `JSIConverter+ShadowNode.hpp` in your Hybrid Object's header file as well!
+
     :::
 
   </TabItem>
+
 </Tabs>
 
-And lastly you'd pass the JS value that maps to this native type - in our case, `react::ShadowNodeWrapper` is stored on a View ref's `state` property:
+And lastly you'd pass the JS value that maps to this native type - in our case, `react::ShadowNodeWrapper` is stored on a View ref's `state`
+property:
 
 ```tsx
 function App() {

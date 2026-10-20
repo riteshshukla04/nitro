@@ -29,7 +29,7 @@ public:
   using OnRejectedFunc = std::function<void(const TError&)>;
 
 private:
-  Promise(): _state(std::make_shared<State>()) { }
+  Promise() : _state(std::make_shared<State>()) {}
 
 public:
   static Promise<TResult> pending() SWIFT_PRIVATE;
@@ -124,22 +124,18 @@ public:
   }
 
 public:
-  [[nodiscard]]
-  bool isPending() const {
+  [[nodiscard]] bool isPending() const {
     std::unique_lock lock(_state->mutex);
     return std::holds_alternative<TPending>(_state->result);
   }
-  [[nodiscard]]
-  const TResult* getResultOrNull() const {
+  [[nodiscard]] const TResult* getResultOrNull() const {
     std::unique_lock lock(_state->mutex);
     return std::get_if<TResult>(&_state->result);
   }
-  [[nodiscard]]
-  const TError* getErrorOrNull() const {
+  [[nodiscard]] const TError* getErrorOrNull() const {
     std::unique_lock lock(_state->mutex);
     return std::get_if<TError>(&_state->result);
   }
-
 
 private:
   struct State {
@@ -147,7 +143,7 @@ private:
     std::variant<TPending, TResult, TError> result;
     std::vector<OnResolvedFunc> onResolvedListeners;
     std::vector<OnRejectedFunc> onRejectedListeners;
-    State(): mutex(), result(std::monostate()), onResolvedListeners(), onRejectedListeners() {}
+    State() : mutex(), result(std::monostate()), onResolvedListeners(), onRejectedListeners() {}
     ~State() {
       if (std::holds_alternative<TPending>(result)) {
         auto typeName = TypeInfo::getFriendlyTypename<Promise<TResult>>();
@@ -162,7 +158,6 @@ private:
   };
   std::shared_ptr<State> _state;
 };
-
 
 // Keep these definitions out of line so importing Promise<T> does not require
 // a complete T. Swift bridges call payload-dependent methods from C++ after
@@ -264,12 +259,9 @@ public:
   std::future<void> await() const;
 
 public:
-  [[nodiscard]]
-  bool isPending() const;
-  [[nodiscard]]
-  bool isResolved() const;
-  [[nodiscard]]
-  const TError* getErrorOrNull() const;
+  [[nodiscard]] bool isPending() const;
+  [[nodiscard]] bool isResolved() const;
+  [[nodiscard]] const TError* getErrorOrNull() const;
 
 private:
   struct State {
@@ -278,7 +270,7 @@ private:
     TError error;
     std::vector<OnResolvedFunc> onResolvedListeners;
     std::vector<OnRejectedFunc> onRejectedListeners;
-    State(): mutex(), isResolved(false), error(nullptr), onResolvedListeners(), onRejectedListeners() {}
+    State() : mutex(), isResolved(false), error(nullptr), onResolvedListeners(), onRejectedListeners() {}
     ~State();
   };
   std::shared_ptr<State> _state;

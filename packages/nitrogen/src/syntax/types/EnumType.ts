@@ -23,14 +23,7 @@ export class EnumType implements Type {
   constructor(enumName: string, enumDeclaration: EnumDeclaration)
   constructor(enumName: string, union: TSMorphType<ts.UnionType>)
   constructor(type: EnumType)
-  constructor(
-    ...args:
-      | [
-          enumName: string,
-          declaration: EnumDeclaration | TSMorphType<ts.UnionType>,
-        ]
-      | [type: EnumType]
-  ) {
+  constructor(...args: [enumName: string, declaration: EnumDeclaration | TSMorphType<ts.UnionType>] | [type: EnumType]) {
     if (args.length === 1) {
       const [type] = args
       this.enumName = type.enumName
@@ -69,18 +62,14 @@ export class EnumType implements Type {
             if (t.isStringLiteral()) {
               const literalValue = t.getLiteralValueOrThrow()
               if (typeof literalValue !== 'string')
-                throw new Error(
-                  `${enumName}: Value "${literalValue}" is not a string - it is ${typeof literalValue}!`
-                )
+                throw new Error(`${enumName}: Value "${literalValue}" is not a string - it is ${typeof literalValue}!`)
               return {
                 name: escapeCppName(literalValue).toUpperCase(),
                 value: i,
                 stringValue: literalValue,
               }
             } else {
-              throw new Error(
-                `${enumName}: Value "${t.getText()}" is not a string literal - it cannot be represented in a C++ enum!`
-              )
+              throw new Error(`${enumName}: Value "${t.getText()}" is not a string literal - it cannot be represented in a C++ enum!`)
             }
           })
         this.declarationFile = createCppUnion(enumName, this.enumMembers)
@@ -113,9 +102,7 @@ export class EnumType implements Type {
       case 'kotlin':
         return this.enumName
       default:
-        throw new Error(
-          `Language ${language} is not yet supported for NumberType!`
-        )
+        throw new Error(`Language ${language} is not yet supported for NumberType!`)
     }
   }
   getExtraFiles(): SourceFile[] {
@@ -127,9 +114,7 @@ export class EnumType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: NitroConfig.current.getCxxHeader(
-            this.declarationFile.name
-          ),
+          declaration: NitroConfig.current.getCxxHeader(this.declarationFile.name),
         })
         break
     }
