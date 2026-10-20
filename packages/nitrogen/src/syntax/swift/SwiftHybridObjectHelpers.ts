@@ -7,7 +7,9 @@ import { HybridObjectType } from '../types/HybridObjectType.js'
 import { SwiftRetainedPointerType } from './types/SwiftRetainedPointerType.js'
 
 export function getHybridObjectBridgeNames(type: HybridObjectType) {
-  const strongPointerAlias = escapeCppName(type.getCode('c++', { context: 'value' }))
+  const strongPointerAlias = escapeCppName(
+    type.getCode('c++', { context: 'value' })
+  )
   const weakPointerAlias = escapeCppName(
     type.getCode('c++', { context: 'value', mode: 'weak' })
   )
@@ -28,7 +30,10 @@ export function createSwiftHybridObjectConverter(
   const pointer = new SwiftRetainedPointerType(type)
   const getSwiftPartFunction = `${NitroConfig.current.getSwiftBridgeNamespace('c++')}::${getHybridObjectBridgeNames(hybridObjectType).get}`
   const cppHybridObjectConverter = `JSIConverter<${hybridObjectType.getCode('c++', { context: 'type-argument', fullyQualified: true })}>`
-  const jsToSwiftValue = pointer.take('c++', `${getSwiftPartFunction}(hybridSpec)`)
+  const jsToSwiftValue = pointer.take(
+    'c++',
+    `${getSwiftPartFunction}(hybridSpec)`
+  )
   const cppToSwiftValue = pointer.take('c++', `${getSwiftPartFunction}(value)`)
   const jsToSwiftConverterCode = `
 auto hybridSpec = ${cppHybridObjectConverter}::fromJSI(runtime, value);

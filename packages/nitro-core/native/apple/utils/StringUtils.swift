@@ -3,9 +3,8 @@
 //  NitroModules
 //
 
-public import NitroModulesAppleCxx
-
 internal import Foundation
+public import NitroModulesAppleCxx
 internal import SimdUTF
 
 @_expose(Cxx)

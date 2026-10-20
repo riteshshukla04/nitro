@@ -51,12 +51,9 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
   convert(value: string, { from, in: language }: KotlinConversion): string {
     switch (language) {
       case 'kotlin':
-        switch (from) {
-          case 'kotlin':
-            return `${this.specializationName}_java(${value})`
-          case 'c++':
-            return value
-        }
+        return from === 'kotlin'
+          ? `${this.specializationName}_java(${value})`
+          : value
       case 'c++':
         switch (from) {
           case 'c++':

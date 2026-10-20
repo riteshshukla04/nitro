@@ -87,13 +87,13 @@ export interface KotlinImplementedInterface {
 
 interface HybridObjectImplementations {
   'c++': CppHybridObjectImplementation
-  swift: SwiftHybridObjectImplementation
-  kotlin: KotlinHybridObjectImplementation
+  'swift': SwiftHybridObjectImplementation
+  'kotlin': KotlinHybridObjectImplementation
 }
 
 interface HybridObjectLanguageOptions {
   'c++': {}
-  swift: {
+  'swift': {
     /**
      * Extra Swift protocols the generated spec protocol inherits from, in this order.
      * Implementations must satisfy their requirements.
@@ -102,7 +102,7 @@ interface HybridObjectLanguageOptions {
      */
     protocolConformances?: SwiftProtocolConformance[]
   }
-  kotlin: {
+  'kotlin': {
     /**
      * Extra Kotlin interfaces the generated spec class implements, in this order.
      * Implementations must implement their abstract members.
@@ -137,42 +137,43 @@ export type HybridObjectPlatformOptions<
      * @example "swift"
      */
     language: L
-  } & HybridObjectLanguageOptions[L] & (
-    | {
-        /**
-         * The native class implementing every instance of this spec.
-         * @example { className: "HybridImage" }
-         */
-        implementation: HybridObjectImplementations[L]
-        /**
-         * Cannot be combined with a concrete implementation.
-         */
-        allowMultipleImplementations?: never
-        /**
-         * Specs with a concrete implementation cannot be extended.
-         * Omit this option or set it to false.
-         */
-        allowInheritance?: false
-      }
-    | {
-        /**
-         * Allows different native classes to implement this spec.
-         * @example true
-         */
-        allowMultipleImplementations: true
-        /**
-         * The native class that the public constructor creates and whose static methods
-         * JavaScript calls. Other native classes can still implement this spec.
-         * Requires a public constructor or static methods.
-         * @example { className: "HybridView" }
-         */
-        implementation?: HybridObjectImplementations[L]
-        /**
-         * Allows other HybridObject specs to extend this spec on this platform.
-         * Defaults to false.
-         * @example true
-         */
-        allowInheritance?: boolean
-      }
-  )
+  } & HybridObjectLanguageOptions[L] &
+    (
+      | {
+          /**
+           * The native class implementing every instance of this spec.
+           * @example { className: "HybridImage" }
+           */
+          implementation: HybridObjectImplementations[L]
+          /**
+           * Cannot be combined with a concrete implementation.
+           */
+          allowMultipleImplementations?: never
+          /**
+           * Specs with a concrete implementation cannot be extended.
+           * Omit this option or set it to false.
+           */
+          allowInheritance?: false
+        }
+      | {
+          /**
+           * Allows different native classes to implement this spec.
+           * @example true
+           */
+          allowMultipleImplementations: true
+          /**
+           * The native class that the public constructor creates and whose static methods
+           * JavaScript calls. Other native classes can still implement this spec.
+           * Requires a public constructor or static methods.
+           * @example { className: "HybridView" }
+           */
+          implementation?: HybridObjectImplementations[L]
+          /**
+           * Allows other HybridObject specs to extend this spec on this platform.
+           * Defaults to false.
+           * @example true
+           */
+          allowInheritance?: boolean
+        }
+    )
 }[Language]

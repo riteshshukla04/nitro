@@ -16,4 +16,4 @@ export type AnyJSON =
   | boolean
   | null
   | AnyJSON[]
-  | { [key: string]: AnyJSON };
+  | { [key: string]: AnyJSON }

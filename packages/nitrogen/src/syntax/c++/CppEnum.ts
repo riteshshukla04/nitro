@@ -32,13 +32,13 @@ export function createCppEnum(
     membersByValue.set(member.value, member)
   }
   const uniqueMembers = [...membersByValue.values()]
-  const fromJSICases = uniqueMembers.map(
-    (member) => `
+  const fromJSICases = uniqueMembers.map((member) =>
+    `
 case ${member.value}: return ${fullyQualifiedTypename}::${member.name};
     `.trim()
   )
-  const canConvertCases = uniqueMembers.map(
-    (member) => `
+  const canConvertCases = uniqueMembers.map((member) =>
+    `
 case ${member.value}: return true;
     `.trim()
   )

@@ -244,7 +244,8 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
   /** Arguments the C++ adapters pass on, after loading borrowed Swift values. */
   private get cppAdapterArguments(): string[] {
     return this.adapterParameters.map(({ name, type }) => {
-      if (type instanceof SwiftBorrowedPointerType) return type.load('c++', name)
+      if (type instanceof SwiftBorrowedPointerType)
+        return type.load('c++', name)
       return name
     })
   }

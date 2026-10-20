@@ -79,7 +79,8 @@ export class SwiftPromiseType extends PromiseType implements SwiftType {
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   get importedCxxRecord(): ImportedCxxRecord {
-    const resultingType = this.resultingType.getClangImporterName('type-argument')
+    const resultingType =
+      this.resultingType.getClangImporterName('type-argument')
     return {
       namespaces: ['margelo', 'nitro'],
       swiftName: `Promise<${resultingType}>`,
@@ -159,7 +160,9 @@ export class SwiftPromiseType extends PromiseType implements SwiftType {
     const rejectedSignature = `void listenRejected_${alias}(const ${alias}& promise, std::function<void(const std::exception_ptr&)> listener)`
     const resolveSignature = `void resolve_${alias}(const ${alias}& promise, ${pointerType} value)`
     const listenSignature = `void listen_${alias}(const ${alias}& promise, std::function<void(${pointerType})> listener)`
-    const payload = this.resultingType.getCode('c++', { context: 'type-argument' })
+    const payload = this.resultingType.getCode('c++', {
+      context: 'type-argument',
+    })
     const resolvedValue = resolvedType.load('c++', 'value')
     const listenerCode = resolvedType.borrow('c++', {
       value: 'value',

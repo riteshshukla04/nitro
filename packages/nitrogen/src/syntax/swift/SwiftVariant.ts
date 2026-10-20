@@ -127,22 +127,22 @@ public struct ${swiftEnumName}_cxx${conformancePrefix}${protocolNames.join(', ')
     context: 'value',
     fullyQualified: true,
   })
-  const swiftToCppCases = payloads.map(({ name, type }, index) => {
+  const swiftToCppCases = payloads.map(({ name, type: payloadType }, index) => {
     return `
 case ${index}: {
   auto payload = value.get${name}();
-  return ${cppVariantType}(std::in_place_index<${index}>, ${getSwiftConverter(type)}::fromSwift(payload));
+  return ${cppVariantType}(std::in_place_index<${index}>, ${getSwiftConverter(payloadType)}::fromSwift(payload));
 }
 `.trim()
   })
-  const cppToSwiftCases = payloads.map(({ name, type }, index) => {
+  const cppToSwiftCases = payloads.map(({ name, type: payloadType }, index) => {
     const swiftValue = storage.allocate('c++', {
       storage: 'result',
       body: (pointer) => `SwiftType::initialize${name}(payload, ${pointer});`,
     })
     return `
 case ${index}: {
-  auto payload = ${getSwiftConverter(type)}::toSwift(std::get<${index}>(value));
+  auto payload = ${getSwiftConverter(payloadType)}::toSwift(std::get<${index}>(value));
   return ${indent(swiftValue, '  ')};
 }
 `.trim()

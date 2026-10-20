@@ -24,9 +24,7 @@ export function getImportsCode(
     }
     imports.set(key, sourceImport)
   }
-  return [...imports.values()]
-    .map((i) => getImportCode(i, context))
-    .join('\n')
+  return [...imports.values()].map((i) => getImportCode(i, context)).join('\n')
 }
 
 export function getImportCode(
@@ -48,14 +46,20 @@ export function getImportCode(
       return ''
     }
     case 'swift':
-      if ('declaration' in sourceImport || 'forwardDeclaration' in sourceImport) {
+      if (
+        'declaration' in sourceImport ||
+        'forwardDeclaration' in sourceImport
+      ) {
         throw new Error(
           `Forward declarations are not supported in ${sourceImport.language}`
         )
       }
       return `${sourceImport.access} import ${sourceImport.name}`
     case 'kotlin':
-      if ('declaration' in sourceImport || 'forwardDeclaration' in sourceImport) {
+      if (
+        'declaration' in sourceImport ||
+        'forwardDeclaration' in sourceImport
+      ) {
         throw new Error(
           `Forward declarations are not supported in ${sourceImport.language}`
         )

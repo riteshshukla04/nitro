@@ -257,7 +257,8 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     }
   }
 
-  func awaitEnumArrayPromise(promise: any Promise<[Powertrain]>) throws -> any Promise<[Powertrain]> {
+  func awaitEnumArrayPromise(promise: any Promise<[Powertrain]>) throws -> any Promise<[Powertrain]>
+  {
     return .async {
       return try await promise.await()
     }

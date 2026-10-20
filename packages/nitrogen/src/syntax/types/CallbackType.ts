@@ -51,7 +51,9 @@ export class CallbackType implements Type {
    */
   protected isBorrowed(options: GetCodeOptions): boolean {
     if (!this.isInline) return false
-    return options.context === 'parameter' || options.context === 'parameter-type'
+    return (
+      options.context === 'parameter' || options.context === 'parameter-type'
+    )
   }
 
   getCode(language: Language, options: GetCallbackCodeOptions): string {

@@ -17,16 +17,22 @@ export function createSwiftStructBridge(
   const protocolNames = conformances.map((conformance) => conformance.name)
   const conformancePrefix = protocolNames.length > 0 ? ': ' : ''
   const swiftProperties = structType.properties.map(
-    (p) => `public let ${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`
+    (p) =>
+      `public let ${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`
   )
   const swiftInitializerParameters = structType.properties
-    .map((p) => `${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`)
+    .map(
+      (p) => `${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`
+    )
     .join(', ')
   const swiftPropertyInitializers = structType.properties.map(
     (p) => `self.${p.escapedName} = ${p.escapedName}`
   )
   const swiftBridgeInitializerParameters = swiftType.properties
-    .map((p) => `_ ${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`)
+    .map(
+      (p) =>
+        `_ ${p.escapedName}: ${p.getCode('swift', { context: 'property' })}`
+    )
     .join(', ')
   const swiftBridgeInitializerArguments = swiftType.properties
     .map((p) => `${p.escapedName}: ${p.toSwift(p.escapedName)}`)

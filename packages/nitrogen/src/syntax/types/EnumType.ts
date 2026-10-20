@@ -100,10 +100,7 @@ export class EnumType implements Type {
     return true
   }
 
-  getCode(
-    language: Language,
-    { fullyQualified }: GetCodeOptions
-  ): string {
+  getCode(language: Language, { fullyQualified }: GetCodeOptions): string {
     switch (language) {
       case 'c++':
         if (fullyQualified) {

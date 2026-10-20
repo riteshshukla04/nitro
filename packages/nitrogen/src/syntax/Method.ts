@@ -52,9 +52,9 @@ function freezeOptions<Options extends MethodOptions>(
 }
 
 /** Signature data and formatting shared by native callable declarations. */
-export abstract class Method<Options extends MethodOptions = MethodOptions>
-  implements CodeNode
-{
+export abstract class Method<
+  Options extends MethodOptions = MethodOptions,
+> implements CodeNode {
   readonly name: string
   readonly returnType: Type
   readonly parameters: Parameter[]

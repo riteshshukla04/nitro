@@ -60,9 +60,7 @@ export class VariantType implements Type {
 
   getCode(language: Language, options: GetCodeOptions): string {
     const types = this.variants
-      .map((v) =>
-        v.getCode(language, { ...options, context: 'type-argument' })
-      )
+      .map((v) => v.getCode(language, { ...options, context: 'type-argument' }))
       .filter(isNotDuplicate)
 
     switch (language) {

@@ -5,10 +5,9 @@
 //  Created by Marc Rousavy on 17.07.24.
 //
 
-internal import NitroModulesAppleCxx
-
 public import CxxStdlib
 public import Foundation
+internal import NitroModulesAppleCxx
 
 /// Represents an error that occurred at any point during the application's runtime.
 ///

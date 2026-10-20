@@ -16,7 +16,9 @@ export function createSwiftRecordBridge(type: SwiftRecordType): SourceFile[] {
   const conformancePrefix = protocolNames.length > 0 ? ': ' : ''
   const swiftKeyType = type.keyType
   const swiftValueType = type.valueType
-  const swiftDictionaryType = type.type.getCode('swift', { context: 'property' })
+  const swiftDictionaryType = type.type.getCode('swift', {
+    context: 'property',
+  })
   const swiftImports = getImportsCode([
     ...getProtocolConformanceImports(conformances),
     ...getSwiftImports([type.type, swiftKeyType, swiftValueType], 'public'),

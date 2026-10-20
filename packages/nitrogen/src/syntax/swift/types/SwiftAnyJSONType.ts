@@ -67,8 +67,7 @@ export class SwiftAnyJSONType extends AnyJSONType implements SwiftType {
         imports.push({
           language,
           declaration: {
-            forwardDeclaration:
-              'namespace NitroModules { class AnyJSON; }',
+            forwardDeclaration: 'namespace NitroModules { class AnyJSON; }',
           },
           implementation: {
             name: 'NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp',

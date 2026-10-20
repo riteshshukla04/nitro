@@ -87,7 +87,10 @@ export class SwiftVariantType extends VariantType implements SwiftType {
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   getClangImporterName(context: TypeContext): string {
-    return getClangImporterReferenceName(`${this.moduleName}.${this.name}_cxx`, context)
+    return getClangImporterReferenceName(
+      `${this.moduleName}.${this.name}_cxx`,
+      context
+    )
   }
 
   get requiredCppHelpers(): CppHelper[] {

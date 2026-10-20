@@ -37,7 +37,8 @@ function getSwiftCallArguments(
   swiftArguments: SwiftCallbackArgument[]
 ): string[] {
   return swiftArguments.map(({ parameter, argument }) => {
-    if (parameter.type instanceof SwiftBorrowedPointerType) return parameter.name
+    if (parameter.type instanceof SwiftBorrowedPointerType)
+      return parameter.name
     return argument
   })
 }
@@ -137,8 +138,12 @@ export function createSwiftCallbackBridge(
   const swiftParameterTypes = type.type.parameters.map((parameter) =>
     parameter.getCode('swift', { context: 'type-argument' })
   )
-  const swiftReturnType = type.type.returnType.getCode('swift', { context: 'return' })
-  const swiftAsyncResultType = type.asyncResult.getCode('swift', { context: 'return' })
+  const swiftReturnType = type.type.returnType.getCode('swift', {
+    context: 'return',
+  })
+  const swiftAsyncResultType = type.asyncResult.getCode('swift', {
+    context: 'return',
+  })
   const swiftResultType = `bridge.${type.syncResult.specializationName}`
   const isVoid = type.returnType.kind === 'void'
   const needsAdapter = type.needsAdapter
@@ -192,11 +197,11 @@ __callAndForget(${swiftCallArguments.join(', ')})
     adapterReturnType
   )
   const closureParameterDeclarations = closureParameters.map(
-    ({ name, type }) =>
-      `${name}: ${type.getCode('swift', { context: 'type-argument' })}`
+    ({ name, type: parameterType }) =>
+      `${name}: ${parameterType.getCode('swift', { context: 'type-argument' })}`
   )
-  const swiftClosureArguments = adapterParameters.map(({ name, type }) =>
-    type.toSwift(name)
+  const swiftClosureArguments = adapterParameters.map(
+    ({ name, type: parameterType }) => parameterType.toSwift(name)
   )
   const cppToSwiftClosureCode = createSwiftResultBody({
     invocation: `try closure(${swiftClosureArguments.join(', ')})`,
@@ -219,7 +224,9 @@ self = bridge.create_${swiftClassName}(.init { (${closureParameterDeclarations.j
   )
   const swiftClosureParameterDeclarations = type.type.parameters.map(
     (parameter, index) => {
-      const swiftParameterType = parameter.getCode('swift', { context: 'type-argument' })
+      const swiftParameterType = parameter.getCode('swift', {
+        context: 'type-argument',
+      })
       return `param${index}: ${swiftParameterType}`
     }
   )
@@ -302,7 +309,9 @@ export function createSwiftInlineCallbackBridge(
   const swiftParameterTypes = type.type.parameters.map((parameter) =>
     parameter.getCode('swift', { context: 'type-argument' })
   )
-  const swiftReturnType = type.type.returnType.getCode('swift', { context: 'return' })
+  const swiftReturnType = type.type.returnType.getCode('swift', {
+    context: 'return',
+  })
   const swiftToCppCallCode = createSwiftSyncCallCode({
     type: type,
     bridgeFunction: `call_${swiftStructName}`,

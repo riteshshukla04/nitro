@@ -1,4 +1,9 @@
-import { Node, SyntaxKind, type ClassDeclaration, type Decorator } from 'ts-morph'
+import {
+  Node,
+  SyntaxKind,
+  type ClassDeclaration,
+  type Decorator,
+} from 'ts-morph'
 import type { Platform } from './getPlatformSpecs.js'
 
 export type LiteralValue = string | boolean | LiteralValue[] | LiteralOptions
@@ -40,8 +45,9 @@ function getLiteralValue(node: Node, name: string): LiteralValue {
   }
   if (Node.isObjectLiteralExpression(node)) {
     const names = new Set<string>()
-    const entries = node.getProperties().map(
-      (property): [string, LiteralValue] => {
+    const entries = node
+      .getProperties()
+      .map((property): [string, LiteralValue] => {
         if (!Node.isPropertyAssignment(property)) {
           throw new Error(
             `${name}: Platform decorator options must use explicit property assignments. Spreads, shorthand properties, methods and accessors are not supported.`
@@ -72,8 +78,7 @@ function getLiteralValue(node: Node, name: string): LiteralValue {
             `${name}.${propertyName}`
           ),
         ]
-      }
-    )
+      })
     return Object.fromEntries(entries)
   }
   throw new Error(

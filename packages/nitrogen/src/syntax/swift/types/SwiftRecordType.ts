@@ -94,7 +94,10 @@ export class SwiftRecordType extends RecordType implements SwiftType {
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes
   // https://github.com/swiftlang/swift/pull/93293.
   getClangImporterName(context: TypeContext): string {
-    return getClangImporterReferenceName(`${this.moduleName}.${this.name}`, context)
+    return getClangImporterReferenceName(
+      `${this.moduleName}.${this.name}`,
+      context
+    )
   }
 
   get requiredCppHelpers(): CppHelper[] {

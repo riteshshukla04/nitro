@@ -1,7 +1,10 @@
 import type { ClassDeclaration, Type } from 'ts-morph'
 import { Node } from 'ts-morph'
 import { z } from 'zod'
-import { getDirectBaseTypes, getHybridObjectNitroModuleConfig } from './utils.js'
+import {
+  getDirectBaseTypes,
+  getHybridObjectNitroModuleConfig,
+} from './utils.js'
 import {
   getHybridObjectDecoratorOptions,
   type DecoratorOptions,
@@ -11,8 +14,7 @@ import { NitroConfig } from './config/NitroConfig.js'
 
 const platformSchema = z.enum(['ios', 'android'])
 export type Platform = z.infer<typeof platformSchema>
-const languageSchema = z.enum(['c++', 'swift', 'kotlin'])
-export type Language = z.infer<typeof languageSchema>
+export type Language = 'c++' | 'swift' | 'kotlin'
 
 const nativeNameSchema = z.string().min(1)
 
@@ -88,19 +90,16 @@ const kotlinImplementedInterfacesSchema = z
 const kotlinOptions = {
   implementedInterfaces: kotlinImplementedInterfacesSchema,
 }
-const cppIncludeSchema = z.string().refine(
-  (include) => {
-    const isSystem = include.startsWith('<') && include.endsWith('>')
-    const isLocal = include.startsWith('"') && include.endsWith('"')
-    const name = include.slice(1, -1)
-    return (
-      (isSystem || isLocal) &&
-      name.length > 0 &&
-      !['<', '>', '"', '\r', '\n'].some((character) => name.includes(character))
-    )
-  },
-  'Use a complete C++ include, such as <Library/HybridImage.hpp> or "HybridImage.hpp".'
-)
+const cppIncludeSchema = z.string().refine((include) => {
+  const isSystem = include.startsWith('<') && include.endsWith('>')
+  const isLocal = include.startsWith('"') && include.endsWith('"')
+  const name = include.slice(1, -1)
+  return (
+    (isSystem || isLocal) &&
+    name.length > 0 &&
+    !['<', '>', '"', '\r', '\n'].some((character) => name.includes(character))
+  )
+}, 'Use a complete C++ include, such as <Library/HybridImage.hpp> or "HybridImage.hpp".')
 const cppImplementationSchema = z.strictObject({
   namespace: z.array(nativeNameSchema).default([]),
   include: cppIncludeSchema,
@@ -161,14 +160,20 @@ export type HybridObjectPlatforms = Partial<
 >
 
 const platformOptionsSchemas = {
-  ios: platformOptionsSchema.refine((options) => options.language !== 'kotlin', {
-    path: ['language'],
-    message: 'iOS supports only Swift and C++ implementations.',
-  }),
-  android: platformOptionsSchema.refine((options) => options.language !== 'swift', {
-    path: ['language'],
-    message: 'Android supports only Kotlin and C++ implementations.',
-  }),
+  ios: platformOptionsSchema.refine(
+    (options) => options.language !== 'kotlin',
+    {
+      path: ['language'],
+      message: 'iOS supports only Swift and C++ implementations.',
+    }
+  ),
+  android: platformOptionsSchema.refine(
+    (options) => options.language !== 'swift',
+    {
+      path: ['language'],
+      message: 'Android supports only Kotlin and C++ implementations.',
+    }
+  ),
 }
 
 /** Resolve native implementations within the project owning the spec. */

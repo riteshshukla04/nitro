@@ -79,5 +79,4 @@ export class SwiftErrorType extends ErrorType implements SwiftType {
   get requiredCppHelpers(): CppHelper[] {
     return []
   }
-
 }

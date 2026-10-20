@@ -14,7 +14,9 @@ export class RecordType implements Type {
 
   get specializationName(): string {
     const keyType = this.keyType.getCode('c++', { context: 'type-argument' })
-    const valueType = this.valueType.getCode('c++', { context: 'type-argument' })
+    const valueType = this.valueType.getCode('c++', {
+      context: 'type-argument',
+    })
     const keyName = escapeCppName(keyType)
     const valueName = escapeCppName(valueType)
     return `Record_${keyName}_${valueName}`

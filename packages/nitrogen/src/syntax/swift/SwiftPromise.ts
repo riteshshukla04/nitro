@@ -6,9 +6,7 @@ import type { SwiftPromiseType } from './types/SwiftPromiseType.js'
 import { getImportsCode } from '../getImportCode.js'
 import { SwiftBorrowedPointerType } from './types/SwiftBorrowedPointerType.js'
 
-export function createSwiftPromiseBridge(
-  type: SwiftPromiseType
-): SourceFile[] {
+export function createSwiftPromiseBridge(type: SwiftPromiseType): SourceFile[] {
   const promiseType = type.type
   const swiftClassName = type.specializationName
   const bridgeNamespace = NitroConfig.current.getSwiftBridgeNamespace('swift')
@@ -25,7 +23,9 @@ export function createSwiftPromiseBridge(
     ...promiseType.getRequiredImports('swift'),
   ])
 
-  const swiftResultType = promiseType.resultingType.getCode('swift', { context: 'type-argument' })
+  const swiftResultType = promiseType.resultingType.getCode('swift', {
+    context: 'type-argument',
+  })
   const resolvedType = type.adapterResultingType
   const needsAdapter = resolvedType instanceof SwiftBorrowedPointerType
   const pendingCall = needsAdapter
@@ -62,7 +62,9 @@ addOnResolvedListener(.init { () -> Void in
     } else {
       resolveBody = `resolve(consuming: ${resolvedValue})`
     }
-    const listenerType = resolvedType.getCode('swift', { context: 'type-argument' })
+    const listenerType = resolvedType.getCode('swift', {
+      context: 'type-argument',
+    })
     addOnResolvedListenerBody = `
 ${resolvedListenerCall}.init { (value: ${listenerType}) -> Void in
   listener(${resolvedType.toSwift('value')})

@@ -5,24 +5,23 @@
 //  Created by Marc Rousavy on 17.07.24.
 //
 
-public import NitroModulesAppleCxx
-
 internal import CxxStdlib
 public import Foundation
+public import NitroModulesAppleCxx
 
 public typealias ArrayBuffer = margelo.nitro.ArrayBuffer
 
 // Use the C++ operator to compare backing handles without accessing their bytes.
 extension ArrayBuffer: @retroactive Equatable {}
 
-public extension ArrayBuffer {
-  var size: Int {
+extension ArrayBuffer {
+  public var size: Int {
     return self.__size()
   }
-  var data: UnsafeMutablePointer<UInt8>? {
+  public var data: UnsafeMutablePointer<UInt8>? {
     return self.__dataUnsafe()
   }
-  var isOwner: Bool {
+  public var isOwner: Bool {
     return self.__isOwner()
   }
 }
@@ -47,7 +46,9 @@ extension ArrayBuffer {
   /// JS-backed buffers must be accessed synchronously on the JS Runtime Thread, and their
   /// storage must remain valid throughout `body`. Call `asOwning()` on that thread before
   /// accessing the bytes elsewhere.
-  public func withUnsafeMutableBytes<R>(_ body: (UnsafeMutableRawBufferPointer) throws -> R) rethrows -> R {
+  public func withUnsafeMutableBytes<R>(_ body: (UnsafeMutableRawBufferPointer) throws -> R)
+    rethrows -> R
+  {
     return try withExtendedLifetime(self) {
       try body(UnsafeMutableRawBufferPointer(start: self.data, count: self.size))
     }
@@ -70,9 +71,11 @@ extension ArrayBuffer {
     onDelete delete: @escaping () -> Void
   ) -> ArrayBuffer {
     precondition(size >= 0, "ArrayBuffer size must not be negative.")
-    return ArrayBuffer.wrap(data, size, consuming: .init({
-      delete()
-    }))
+    return ArrayBuffer.wrap(
+      data, size,
+      consuming: .init({
+        delete()
+      }))
   }
 
   /**
@@ -137,7 +140,7 @@ extension ArrayBuffer {
     return Data(
       bytesNoCopy: data, count: size,
       deallocator: .custom({ buffer, size in
-        withExtendedLifetime(self) { }
+        withExtendedLifetime(self) {}
       }))
   }
 }

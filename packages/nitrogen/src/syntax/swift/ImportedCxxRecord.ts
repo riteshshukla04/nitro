@@ -36,7 +36,9 @@ export function getClangImporterReferenceName(
  * e.g. `$sSo7margeloO5nitroO11ArrayBufferVMa` for `margelo::nitro::ArrayBuffer`.
  * Swift mangles namespaces as enums (`O`) and records as structs (`V`) in the clang module (`So`).
  */
-export function getSwiftMetadataAccessorName(record: ImportedCxxRecord): string {
+export function getSwiftMetadataAccessorName(
+  record: ImportedCxxRecord
+): string {
   const context = record.namespaces
     .map((namespace) => `${mangleIdentifier(namespace)}O`)
     .join('')
@@ -102,7 +104,11 @@ function encodePunycode(identifier: string): string {
         q = Math.floor((q - t) / (PUNYCODE_BASE - t))
       }
       output += getPunycodeDigit(q)
-      bias = adaptPunycodeBias(delta, handled + 1, handled === basicCodePoints.length)
+      bias = adaptPunycodeBias(
+        delta,
+        handled + 1,
+        handled === basicCodePoints.length
+      )
       delta = 0
       handled++
     }
@@ -135,6 +141,8 @@ function adaptPunycodeBias(
   const skew = 38
   return (
     k +
-    Math.floor(((PUNYCODE_BASE - PUNYCODE_T_MIN + 1) * adapted) / (adapted + skew))
+    Math.floor(
+      ((PUNYCODE_BASE - PUNYCODE_T_MIN + 1) * adapted) / (adapted + skew)
+    )
   )
 }

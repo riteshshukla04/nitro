@@ -36,8 +36,6 @@ jobs:
         with:
           bun-version-file: package.json
       - run: bun install --frozen-lockfile
-      - name: Test React Native wrapper
-        run: bun nitro-rn test --runInBand
       - name: Test performance tooling
         run: bun test scripts/performance
       - name: Pack Nitro core

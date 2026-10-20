@@ -76,10 +76,7 @@ export class HybridObjectType implements Type {
     return true
   }
 
-  getCode(
-    language: Language,
-    options: GetHybridObjectCodeOptions
-  ): string {
+  getCode(language: Language, options: GetHybridObjectCodeOptions): string {
     const name = getHybridObjectName(this.hybridObjectName)
     const mode = options.mode ?? 'strong'
     const fullyQualified =
@@ -87,14 +84,10 @@ export class HybridObjectType implements Type {
 
     switch (language) {
       case 'c++': {
-        const ptrType =
-          mode === 'strong' ? 'std::shared_ptr' : 'std::weak_ptr'
+        const ptrType = mode === 'strong' ? 'std::shared_ptr' : 'std::weak_ptr'
         let typeName = name.HybridTSpec
         if (fullyQualified) {
-          typeName = this.sourceConfig.getCxxNamespace(
-            'c++',
-            name.HybridTSpec
-          )
+          typeName = this.sourceConfig.getCxxNamespace('c++', name.HybridTSpec)
         }
         const type = `${ptrType}<${typeName}>`
         return options.context === 'parameter' ? `const ${type}&` : type
