@@ -31,6 +31,18 @@ size_t HybridTestObjectCpp::getExternalMemorySize() noexcept {
   return _string.size();
 }
 
+double HybridTestObjectCpp::getReadonlyNumber() {
+  return 42.0;
+}
+
+double HybridTestObjectCpp::getSharedNumber() {
+  return _sharedNumber.load(std::memory_order_relaxed);
+}
+
+void HybridTestObjectCpp::setSharedNumber(double value) {
+  _sharedNumber.store(value, std::memory_order_relaxed);
+}
+
 // Properties
 double HybridTestObjectCpp::getNumberValue() {
   return _number;

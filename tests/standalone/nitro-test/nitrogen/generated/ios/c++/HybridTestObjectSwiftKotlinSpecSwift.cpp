@@ -1997,6 +1997,34 @@ namespace margelo::nitro::test {
     return NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::fromUnsafe(__result.value());
   }
 
+  // Static properties
+
+  double HybridTestObjectSwiftKotlinSpecSwift::getReadonlyNumber() {
+    auto __result = getReadonlyNumber_Swift();
+    return SwiftConverter<double, double>::fromSwift(__result);
+  }
+
+  double HybridTestObjectSwiftKotlinSpecSwift::getReadonlyNumber_Swift() {
+    return NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::getReadonlyNumber_NitroTest_TestObjectSwiftKotlin();
+  }
+
+  double HybridTestObjectSwiftKotlinSpecSwift::getSharedNumber() {
+    auto __result = getSharedNumber_Swift();
+    return SwiftConverter<double, double>::fromSwift(__result);
+  }
+
+  double HybridTestObjectSwiftKotlinSpecSwift::getSharedNumber_Swift() {
+    return NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::getSharedNumber_NitroTest_TestObjectSwiftKotlin();
+  }
+
+  void HybridTestObjectSwiftKotlinSpecSwift::setSharedNumber(double sharedNumber) {
+    setSharedNumber_Swift(SwiftConverter<double, double>::toSwift(sharedNumber));
+  }
+
+  void HybridTestObjectSwiftKotlinSpecSwift::setSharedNumber_Swift(double sharedNumber) {
+    return NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::setSharedNumber_NitroTest_TestObjectSwiftKotlin(sharedNumber);
+  }
+
   const std::shared_ptr<const HybridClass>& HybridTestObjectSwiftKotlinSpecSwift::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
       clazz.registerHybridProperty("numberValue", &HybridTestObjectSwiftKotlinSpecSwift::getNumberValue_Swift, &HybridTestObjectSwiftKotlinSpecSwift::setNumberValue_Swift);
@@ -2022,6 +2050,8 @@ namespace margelo::nitro::test {
       clazz.registerHybridProperty("someVariant", &HybridTestObjectSwiftKotlinSpecSwift::getSomeVariant_Swift, &HybridTestObjectSwiftKotlinSpecSwift::setSomeVariant_Swift);
       clazz.registerHybridProperty("thisObject", &HybridTestObjectSwiftKotlinSpecSwift::getThisObject_Swift);
       clazz.registerHybridProperty("optionalHybrid", &HybridTestObjectSwiftKotlinSpecSwift::getOptionalHybrid_Swift, &HybridTestObjectSwiftKotlinSpecSwift::setOptionalHybrid_Swift);
+      clazz.registerStaticHybridProperty("readonlyNumber", &HybridTestObjectSwiftKotlinSpecSwift::getReadonlyNumber_Swift);
+      clazz.registerStaticHybridProperty("sharedNumber", &HybridTestObjectSwiftKotlinSpecSwift::getSharedNumber_Swift, &HybridTestObjectSwiftKotlinSpecSwift::setSharedNumber_Swift);
       clazz.registerHybridMethod("simpleFunc", &HybridTestObjectSwiftKotlinSpecSwift::simpleFunc_Swift);
       clazz.registerHybridMethod("addNumbers", &HybridTestObjectSwiftKotlinSpecSwift::addNumbers_Swift);
       clazz.registerHybridMethod("addStrings", &HybridTestObjectSwiftKotlinSpecSwift::addStrings_Swift);

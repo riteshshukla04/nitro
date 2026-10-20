@@ -55,6 +55,18 @@ namespace margelo::nitro::test {
                       "TestObjectCpp: ::margelo::nitro::test::HybridTestObjectCpp must implement the declared public constructor.");
         return std::make_shared<::margelo::nitro::test::HybridTestObjectCpp>();
       }
+
+      static double getReadonlyNumber() {
+        return ::margelo::nitro::test::HybridTestObjectCpp::getReadonlyNumber();
+      }
+
+      static double getSharedNumber() {
+        return ::margelo::nitro::test::HybridTestObjectCpp::getSharedNumber();
+      }
+
+      static void setSharedNumber(double sharedNumber) {
+        return ::margelo::nitro::test::HybridTestObjectCpp::setSharedNumber(std::forward<decltype(sharedNumber)>(sharedNumber));
+      }
     };
   }
 
@@ -213,6 +225,8 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("bounceAnyHybrid", &HybridTestObjectCppSpec::bounceAnyHybrid);
       clazz.registerHybridMethod("bounceCustomType", &HybridTestObjectCppSpec::bounceCustomType);
       clazz.registerHybridConstructor(&HybridTestObjectCppSpecBindings::constructor);
+      clazz.registerStaticHybridProperty("readonlyNumber", &HybridTestObjectCppSpecBindings::getReadonlyNumber);
+      clazz.registerStaticHybridProperty("sharedNumber", &HybridTestObjectCppSpecBindings::getSharedNumber, &HybridTestObjectCppSpecBindings::setSharedNumber);
     });
     return hybridClass;
   }

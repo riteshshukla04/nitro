@@ -382,6 +382,13 @@ namespace margelo::nitro::test {
     // Constructor
     static std::shared_ptr<HybridTestObjectSwiftKotlinSpec> constructor();
     static NitroTest::HybridTestObjectSwiftKotlinSpec_cxx constructor_Swift();
+    // Static properties
+    static double getReadonlyNumber();
+    static double getReadonlyNumber_Swift();
+    static double getSharedNumber();
+    static double getSharedNumber_Swift();
+    static void setSharedNumber(double sharedNumber);
+    static void setSharedNumber_Swift(double sharedNumber);
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {

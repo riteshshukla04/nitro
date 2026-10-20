@@ -150,6 +150,9 @@ export type HardwareBufferFormat =
 export declare class TestObjectCpp extends HybridObject {
   constructor();
 
+  static readonly readonlyNumber: number;
+  static sharedNumber: number;
+
   // Test Primitives
   numberValue: number;
   boolValue: boolean;
@@ -434,6 +437,9 @@ export declare class TestObjectCpp extends HybridObject {
 })
 export declare class TestObjectSwiftKotlin extends HybridObject {
   constructor();
+
+  static readonly readonlyNumber: number;
+  static sharedNumber: number;
 
   // Test Primitives
   numberValue: number;

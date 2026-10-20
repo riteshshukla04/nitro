@@ -1437,4 +1437,20 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
       return bridge.Result_void_.withError(error.toCpp())
     }
   }
+
+  // Static properties
+
+  public class func getReadonlyNumber_NitroTest_TestObjectSwiftKotlin() -> Double {
+    let value = HybridTestObjectSwift.readonlyNumber
+    return value
+  }
+
+  public class func getSharedNumber_NitroTest_TestObjectSwiftKotlin() -> Double {
+    let value = HybridTestObjectSwift.sharedNumber
+    return value
+  }
+
+  public class func setSharedNumber_NitroTest_TestObjectSwiftKotlin(sharedNumber: Double) -> Void {
+    HybridTestObjectSwift.sharedNumber = sharedNumber
+  }
 }

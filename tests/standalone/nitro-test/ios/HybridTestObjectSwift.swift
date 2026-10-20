@@ -10,8 +10,16 @@ import Foundation
 import NitroModules
 import NitroModulesCxx
 import NitroTestExternal
+import os
 
 class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
+  static let readonlyNumber: Double = 42.0
+  private static let sharedNumberStorage = OSAllocatedUnfairLock(initialState: 0.0)
+  static var sharedNumber: Double {
+    get { sharedNumberStorage.withLock { $0 } }
+    set { sharedNumberStorage.withLock { $0 = newValue } }
+  }
+
   private var pendingPromise: (any Promise<Double>)?
 
   var optionalArray: [String]? = []

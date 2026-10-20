@@ -8,6 +8,7 @@
 #pragma once
 
 #include <NitroTest/HybridTestObjectCppSpec.hpp>
+#include <atomic>
 #include <jsi/jsi.h>
 
 namespace margelo::nitro::test {
@@ -28,10 +29,15 @@ public:
 
   HybridTestObjectCpp() = default;
 
+  static double getReadonlyNumber();
+  static double getSharedNumber();
+  static void setSharedNumber(double value);
+
 protected:
   size_t getExternalMemorySize() noexcept override;
 
 private:
+  static inline std::atomic<double> _sharedNumber{0.0};
   double _number = 0.0;
   bool _bool = false;
   std::string _string;

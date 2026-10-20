@@ -22,8 +22,11 @@ import java.math.BigDecimal
 class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
   private var pendingPromise: Promise<Double>? = null
 
-  private companion object {
-    val promiseScope = CoroutineScope(Dispatchers.Default)
+  companion object {
+    val readonlyNumber: Double = 42.0
+
+    @Volatile var sharedNumber: Double = 0.0
+    private val promiseScope = CoroutineScope(Dispatchers.Default)
   }
 
   override var numberValue: Double = 0.0
