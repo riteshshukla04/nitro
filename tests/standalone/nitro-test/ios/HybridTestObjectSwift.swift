@@ -142,7 +142,7 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
   {
     var result = 0.0
     return .async {
-      for _ in 1...Int(n) {
+      for _ in 0..<max(0, Int(n)) {
         let current = try await callback().await()
         result += current
       }

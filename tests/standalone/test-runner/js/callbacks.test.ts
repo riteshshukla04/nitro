@@ -363,8 +363,6 @@ export const cases = {
         ).to.throw(exactly("Callback expected 1 arguments, but received 2!"));
       },
 
-    // TODO: Fix HybridTestObjectSwift.callSumUpNTimes - its `1...Int(n)` range traps for n < 1, so callSumUpNTimes(callback, 0) crashes the app (SIGTRAP); C++ and Kotlin resolve to 0
-
     "callSumUpNTimes(..., 0) resolves to 0 without calling back": async (
       testObject,
     ) => {
@@ -514,8 +512,6 @@ export const cases = {
           .that.include("Error: rejected in an async callback");
       },
 
-    // TODO: Fix HybridTestObjectCpp.callCallbackThatReturnsPromiseVoid - it calls `future.wait()` but never `future.get()`, so it resolves to undefined when the callback's Promise rejects; Swift and Kotlin reject
-
     "callCallbackThatReturnsPromiseVoid(...) rejects when the returned Promise rejects":
       async (testObject) => {
         const callback = () =>
@@ -605,8 +601,6 @@ export const cases = {
       ).to.equal(true);
     },
 
-    // TODO: Fix in Nitro - callbackSync(...) with a throwing JS callback crashes the app on Swift (SIGABRT: the JS error escapes the `noexcept` bridge::swift::Func_double_Wrapper::call() -> std::terminate); C++ rethrows it
-
     "callbackSync(...) rethrows the JS error with the method name": (
       testObject,
     ) => {
@@ -649,20 +643,3 @@ export const cases = {
     },
   }),
 };
-
-export const skips = {
-  "Callbacks / TestObjectSwiftKotlin / callSumUpNTimes(..., 0) resolves to 0 without calling back":
-    {
-      ios: "Fix HybridTestObjectSwift.callSumUpNTimes - its `1...Int(n)` range traps for n < 1, so callSumUpNTimes(callback, 0) crashes the app (SIGTRAP); C++ and Kotlin resolve to 0",
-    },
-  "Callbacks / TestObjectCpp / callCallbackThatReturnsPromiseVoid(...) rejects when the returned Promise rejects":
-    {
-      ios: "Fix HybridTestObjectCpp.callCallbackThatReturnsPromiseVoid - it calls `future.wait()` but never `future.get()`, so it resolves to undefined when the callback's Promise rejects; Swift and Kotlin reject",
-      android:
-        "Fix HybridTestObjectCpp.callCallbackThatReturnsPromiseVoid - it calls `future.wait()` but never `future.get()`, so it resolves to undefined when the callback's Promise rejects; Swift and Kotlin reject",
-    },
-  "Sync callbacks / TestObjectSwiftKotlin / callbackSync(...) rethrows the JS error with the method name":
-    {
-      ios: "Fix in Nitro - callbackSync(...) with a throwing JS callback crashes the app on Swift (SIGABRT: the JS error escapes the `noexcept` bridge::swift::Func_double_Wrapper::call() -> std::terminate); C++ rethrows it",
-    },
-} as const;

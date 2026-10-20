@@ -444,7 +444,7 @@ Promise<void> HybridTestObjectCpp::callCallbackThatReturnsPromiseVoid(const Call
     std::future<Promise<void>> callFuture = callPromise.await();
     Promise<void> resultPromise = callFuture.get();
     std::future<void> future = resultPromise.await();
-    future.wait();
+    future.get();
   });
 }
 
