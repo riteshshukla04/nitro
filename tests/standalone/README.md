@@ -144,8 +144,9 @@ runtime see each other's module-level state, so do not mutate shared fixtures.
 On iOS, each group gets a fresh Hermes runtime with Nitro installed and the bundle loaded, then calls `runNitroTest(name)` for each of its
 cases. After a passing case, the runner also runs any native callbacks and microtasks the case already queued, so their errors are reported
 for that case instead of a later one. On Android, every case still creates its own runtime. The runner eagerly compiles the bundle once and
-caches its bytecode by source contents. Each runtime evaluates that bytecode with fresh globals and native objects. Compilation happens
-before the JS deadlines; Hermes' watchdog cannot interrupt the native compiler.
+caches its bytecode by source contents. Each runtime evaluates that bytecode with fresh globals and native objects. Test modules initialize
+lazily, so a runtime only evaluates the test files whose cases it runs, plus their imports. Compilation happens before the JS deadlines;
+Hermes' watchdog cannot interrupt the native compiler.
 
 The thread that creates a runtime owns it and pumps its dispatcher. On iOS, `TestScheduler` runs one group per CPU core at once, each on its
 own worker thread with an 8 MiB stack, while every Swift case awaits its own result. Swift Testing requests cases in no particular order, so
