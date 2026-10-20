@@ -17,6 +17,7 @@ export class AnyJSONType implements Type {
         return options.context === 'parameter' ? `const ${type}&` : type
       }
       case 'swift':
+      case 'kotlin':
         return 'AnyJSON'
       default:
         throw new Error(`Language ${language} is not yet supported for AnyJSONType!`)

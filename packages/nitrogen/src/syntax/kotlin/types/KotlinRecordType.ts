@@ -32,9 +32,12 @@ export class KotlinRecordType extends RecordType implements KotlinType {
 
   convert(value: string, conversion: KotlinConversion): string {
     switch (conversion.in) {
-      case 'kotlin':
-        // Kotlin passes its public Map through JNI without converting entries.
-        return value
+      case 'kotlin': {
+        if (!this.needsKotlinConversion) return value
+        const key = this.keyType.convert('__key', conversion)
+        const item = this.valueType.convert('__value', conversion)
+        return `${value}.map { (__key, __value) -> ${key} to ${item} }.toMap()`
+      }
       case 'c++':
         switch (conversion.from) {
           case 'c++':
@@ -56,13 +59,13 @@ export class KotlinRecordType extends RecordType implements KotlinType {
     const javaMapType = `jni::JMap<${this.jniKeyType}, ${this.jniValueType}>`
     const javaHashMapType = `jni::JHashMap<${this.jniKeyType}, ${this.jniValueType}>`
     return `
-[&]() -> jni::local_ref<${javaMapType}> {
-  auto __map = ${javaHashMapType}::create(${value}.size());
-  for (const auto& __entry : ${value}) {
+[&](const auto& __input) -> jni::local_ref<${javaMapType}> {
+  auto __map = ${javaHashMapType}::create(__input.size());
+  for (const auto& __entry : __input) {
     __map->put(${indent(jniKey, '    ')}, ${indent(jniValue, '    ')});
   }
   return __map;
-}()
+}(${value})
 `.trim()
   }
 
@@ -76,14 +79,14 @@ export class KotlinRecordType extends RecordType implements KotlinType {
     const cppValue = this.valueType.convert('__entry.second', conversion)
     const cxxType = this.type.getCode('c++', { context: 'value' })
     return `
-[&]() {
+[&](const auto& __input) {
   ${cxxType} __map;
-  __map.reserve(${value}->size());
-  for (const auto& __entry : *${value}) {
+  __map.reserve(__input->size());
+  for (const auto& __entry : *__input) {
     __map.emplace(${indent(cppKey, '    ')}, ${indent(cppValue, '    ')});
   }
   return __map;
-}()
+}(${value})
 `.trim()
   }
 
@@ -94,8 +97,7 @@ export class KotlinRecordType extends RecordType implements KotlinType {
         return getJniReferenceCode(mapType, options.context)
       }
       case 'kotlin':
-        // Kotlin passes its public Map through JNI without converting entries.
-        return this.type.getCode(language, options)
+        return super.getCode(language, options)
       default:
         return super.getCode(language, options)
     }

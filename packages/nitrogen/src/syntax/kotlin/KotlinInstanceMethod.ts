@@ -78,7 +78,6 @@ export class KotlinInstanceMethod extends InstanceMethod {
   createBridge(): KotlinMethodBridge {
     const nativeMethod = this.nativeMethod
     const cppMethod = new InstanceMethod(nativeMethod.name, nativeMethod.returnType, nativeMethod.parameters, {
-      override: true,
       generated: true,
     })
     const cppBody = createCppJniCallBody({

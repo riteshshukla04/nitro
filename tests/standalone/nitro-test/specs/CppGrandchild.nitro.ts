@@ -1,9 +1,16 @@
-import { iOS } from 'nitro-core'
+import { Android, iOS } from 'nitro-core'
 import type { CppChild } from './CppChild.nitro'
 
 export * from '#nitro/CppGrandchild'
 
 @iOS({
+  language: 'c++',
+  implementation: {
+    className: 'HybridCppGrandchild',
+    include: '"HybridCppGrandchild.hpp"',
+  },
+})
+@Android({
   language: 'c++',
   implementation: {
     className: 'HybridCppGrandchild',

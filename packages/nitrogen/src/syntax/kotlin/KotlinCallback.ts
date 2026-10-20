@@ -2,7 +2,6 @@ import { NitroConfig } from '../../config/NitroConfig.js'
 import { indent } from '../../utils.js'
 import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
-import { addJNINativeRegistration } from './JNINativeRegistrations.js'
 import type { KotlinCallbackType } from './types/KotlinCallbackType.js'
 import { getImportCode, getImportsCode } from '../getImportCode.js'
 import { CallbackType } from '../types/CallbackType.js'
@@ -22,6 +21,40 @@ export function createKotlinCallback(callbackType: KotlinCallbackType): SourceFi
   const kotlinParamTypes = publicType.parameters.map((p) => p.getCode('kotlin', { context: 'parameter' }))
   const kotlinParamsForward = publicType.parameters.map((p) => p.escapedName)
   const lambdaSignature = `(${kotlinParamTypes.join(', ')}) -> ${kotlinReturnType}`
+
+  const bridgeReturnType = callbackType.returnType.getCode('kotlin', {
+    context: 'return',
+  })
+  const bridgeParams = callbackType.parameters.map((p) => `${p.escapedName}: ${p.getCode('kotlin', { context: 'parameter' })}`)
+  const toBridgeArguments = callbackType.parameters.map((p) => p.convert(p.escapedName, { from: 'kotlin', to: 'c++', in: 'kotlin' }))
+  const fromBridgeArguments = callbackType.parameters.map((p) => p.convert(p.escapedName, { from: 'c++', to: 'kotlin', in: 'kotlin' }))
+  const invokeNative = `invoke_cxx(${toBridgeArguments.join(', ')})`
+  const invokeKotlin = `invoke(${fromBridgeArguments.join(', ')})`
+  const nativeResult = callbackType.returnType.convert('__result', {
+    from: 'c++',
+    to: 'kotlin',
+    in: 'kotlin',
+  })
+  const kotlinResult = callbackType.returnType.convert('__result', {
+    from: 'kotlin',
+    to: 'c++',
+    in: 'kotlin',
+  })
+  let kotlinToCppBody: string
+  let cppToKotlinBody: string
+  if (publicType.returnType.kind === 'void') {
+    kotlinToCppBody = invokeNative
+    cppToKotlinBody = invokeKotlin
+  } else {
+    kotlinToCppBody = `
+val __result = ${invokeNative}
+return ${nativeResult}
+`.trim()
+    cppToKotlinBody = `
+val __result = ${invokeKotlin}
+return ${kotlinResult}
+`.trim()
+  }
 
   const extraImports = publicType
     .getRequiredImports('kotlin')
@@ -54,6 +87,13 @@ fun interface ${name}: ${lambdaSignature} {
   @DoNotStrip
   @Keep
   override fun invoke(${kotlinParams.join(', ')}): ${kotlinReturnType}
+
+  // JNI uses this signature to avoid erased FunctionN and unsigned value types.
+  @DoNotStrip
+  @Keep
+  fun invoke_jni(${bridgeParams.join(', ')}): ${bridgeReturnType} {
+    ${indent(cppToKotlinBody, '    ')}
+  }
 }
 
 /**
@@ -81,10 +121,13 @@ class ${name}_cxx: ${name} {
 
   @DoNotStrip
   @Keep
-  override fun invoke(${kotlinParams.join(', ')}): ${kotlinReturnType}
-    = invoke_cxx(${kotlinParamsForward.join(',')})
+  override fun invoke(${kotlinParams.join(', ')}): ${kotlinReturnType} {
+    ${indent(kotlinToCppBody, '    ')}
+  }
 
-  private external fun invoke_cxx(${kotlinParams.join(', ')}): ${kotlinReturnType}
+  @DoNotStrip
+  @Keep
+  private external fun invoke_cxx(${bridgeParams.join(', ')}): ${bridgeReturnType}
 }
 
 /**
@@ -132,9 +175,7 @@ class ${name}_java(private val callback: ${lambdaSignature}): ${name} {
     'self()',
     ...callbackType.parameters.map((p) => p.convert(p.escapedName, { from: 'c++', to: 'kotlin', in: 'c++' })),
   ]
-  // `invoke` overrides `FunctionN.invoke`, so primitive returns need boxing.
-  // Its parameters can remain primitive, and `Unit` returns remain `void`.
-  const jniReturnType = callbackType.boxedReturnType.getCode('c++', {
+  const jniReturnType = returnType.getCode('c++', {
     context: 'return',
   })
   const jniParamTypes = callbackType.parameters.map((p) => {
@@ -147,9 +188,15 @@ class ${name}_java(private val callback: ${lambdaSignature}): ${name} {
   let jniCallBody: string
   if (returnType.kind === 'void') {
     // It returns void
-    cppCallBody = `_callback.callAndForget(${paramsForward.join(', ')});`
+    cppCallBody = `
+if (_isInline) {
+  _callback.callSync(${paramsForward.join(', ')});
+} else {
+  _callback.callAndForget(${paramsForward.join(', ')});
+}
+`.trim()
     jniCallBody = `
-static const auto __method = javaClassStatic()->getMethod<${jniSignature}>("invoke");
+static const auto __method = javaClassStatic()->getMethod<${jniSignature}>("invoke_jni");
 __method(${jniParamsForward.join(', ')});
     `.trim()
   } else {
@@ -162,7 +209,7 @@ __method(${jniParamsForward.join(', ')});
       to: 'kotlin',
       in: 'c++',
     })
-    const cppResult = callbackType.boxedReturnType.convert('__result', {
+    const cppResult = returnType.convert('__result', {
       from: 'kotlin',
       to: 'c++',
       in: 'c++',
@@ -172,7 +219,7 @@ ${cppResultType} __result = _callback.callSync(${paramsForward.join(', ')});
 return ${jniResult};
 `.trim()
     jniCallBody = `
-static const auto __method = javaClassStatic()->getMethod<${jniSignature}>("invoke");
+static const auto __method = javaClassStatic()->getMethod<${jniSignature}>("invoke_jni");
 auto __result = __method(${jniParamsForward.join(', ')});
 return ${cppResult};
     `.trim()
@@ -213,7 +260,7 @@ ${declarationIncludes.join('\n')}
 
 namespace ${cxxNamespace} {
 
-  using namespace facebook;
+  namespace jni = facebook::jni;
 
   /**
    * Represents the Java/Kotlin callback \`${kotlinCallbackType}\`.
@@ -255,11 +302,12 @@ namespace ${cxxNamespace} {
     static void registerNatives();
 
   private:
-    explicit ${jniName}_cxx(const ${typename}& callback);
+    explicit ${jniName}_cxx(const ${typename}& callback, bool isInline);
 
   private:
     friend HybridBase;
     ${typename} _callback;
+    bool _isInline;
   };
 
 } // namespace ${cxxNamespace}
@@ -277,11 +325,11 @@ namespace ${cxxNamespace} {
   }
 
   jni::local_ref<${jniName}::javaobject> ${jniName}_cxx::fromCpp(const ${typename}& callback) {
-    return newObjectCxxArgs(callback);
+    return newObjectCxxArgs(callback, false);
   }
 
   jni::local_ref<${jniName}::javaobject> ${jniName}_cxx::fromCpp(${inlineParameterType} callback) {
-    return fromCpp(callback.escape());
+    return newObjectCxxArgs(callback.escape(), true);
   }
 
   ${fbjniReturnType} ${jniName}_cxx::invoke_cxx(${cppParams.join(', ')}) {
@@ -292,20 +340,10 @@ namespace ${cxxNamespace} {
     registerHybrid({makeNativeMethod("invoke_cxx", ${jniName}_cxx::invoke_cxx)});
   }
 
-  ${jniName}_cxx::${jniName}_cxx(const ${typename}& callback): _callback(callback) { }
+  ${jniName}_cxx::${jniName}_cxx(const ${typename}& callback, bool isInline): _callback(callback), _isInline(isInline) { }
 
 } // namespace ${cxxNamespace}
   `.trim()
-
-  // Make sure we register all native JNI methods on app startup
-  addJNINativeRegistration({
-    namespace: cxxNamespace,
-    className: `${jniName}_cxx`,
-    import: {
-      language: 'c++',
-      declaration: NitroConfig.current.getCxxHeader(`${jniName}.hpp`, 'private'),
-    },
-  })
 
   const files: SourceFile[] = []
   files.push({
@@ -324,6 +362,16 @@ namespace ${cxxNamespace} {
   })
   files.push({
     content: fbjniImplementationCode,
+    jniNativeRegistrations: [
+      {
+        namespace: cxxNamespace.split('::'),
+        className: `${jniName}_cxx`,
+        import: {
+          language: 'c++',
+          declaration: NitroConfig.current.getCxxHeader(`${jniName}.hpp`, 'private'),
+        },
+      },
+    ],
     language: 'c++',
     name: `${jniName}.cpp`,
     subdirectory: [],

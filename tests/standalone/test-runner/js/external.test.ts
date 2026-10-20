@@ -4,7 +4,7 @@ import { casesForTestObjects, namedCases, recordCallback } from './utils/cases'
 import { NitroModules } from 'nitro-core'
 import { Base, SizeUnit, TestObjectSwiftKotlin, type Size } from 'nitro-test'
 import { Base as ExternalBase, CppOnlyValueKind, SizeUnit as ExternalSizeUnit, type Size as ExternalSize } from 'nitro-test-external'
-import { HybridSomeExternalObject, isSwift } from './utils/testObjects'
+import { HybridSomeExternalObject, isKotlin, isSwift } from './utils/testObjects'
 
 import { debugOnly } from './utils/helpers'
 
@@ -276,6 +276,8 @@ export const cases = {
       let nativeObjectType: string
       if (isSwift(testObject)) {
         nativeObjectType = 'std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>'
+      } else if (isKotlin(testObject)) {
+        nativeObjectType = 'std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>'
       } else {
         nativeObjectType = 'margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx'
       }

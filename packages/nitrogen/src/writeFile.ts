@@ -9,14 +9,14 @@ import { NitroConfig } from './config/NitroConfig.js'
 /**
  * Writes the given file to disk and returns its actual path.
  */
-export async function writeFile(basePath: string, file: SourceFile): Promise<string> {
+export async function writeFile(basePath: string, file: Omit<SourceFile, 'language'> & { language?: string }): Promise<string> {
   let directory = file.subdirectory
   if (file.language === 'c++' && file.name.endsWith('.hpp')) {
     const visibility = file.headerVisibility ?? (file.platform === 'shared' ? 'public' : 'private')
     directory = [...directory, ...NitroConfig.current.getCxxHeaderDirectory(visibility)]
   }
   const filepath = path.join(basePath, ...directory, file.name)
-  const language = capitalizeName(file.language)
+  const language = capitalizeName(file.language ?? 'config')
   Logger.debug(`          ${chalk.dim(language)}: Creating ${file.name}...`)
 
   const dir = path.dirname(filepath)

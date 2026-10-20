@@ -43,8 +43,13 @@ export class KotlinArrayType extends ArrayType implements KotlinType {
     switch (conversion.in) {
       case 'kotlin': {
         if (!this.needsKotlinConversion) return value
-        const item = this.itemType.convert(`${value}[i]`, conversion)
-        return `Array(${value}.size) { i -> ${item} }`
+        const item = this.itemType.convert('__item', conversion)
+        const resultType = conversion.from === 'c++' ? this.type.itemType : this.itemType
+        const resultCode = resultType.getCode('kotlin', {
+          context: 'type-argument',
+        })
+        const toArray = this.itemType.kind === 'uint64' && conversion.from === 'kotlin' ? 'toLongArray()' : `toTypedArray<${resultCode}>()`
+        return `${value}.map { __item -> ${item} }.${toArray}`
       }
       case 'c++':
         switch (conversion.from) {
@@ -60,6 +65,23 @@ export class KotlinArrayType extends ArrayType implements KotlinType {
     const arrayType = this.jniArrayType
     const arrayReference = this.getCode('c++', { context: 'value' })
     if (this.jniPrimitiveArrayType != null) {
+      if (this.itemType.kind === 'boolean' || this.itemType.kind === 'uint64') {
+        // vector<bool> is packed, and uint64_t is not JNI's signed jlong.
+        const primitive = this.itemType.kind === 'boolean' ? 'jboolean' : 'jlong'
+        return `
+[&](const auto& __input) {
+  size_t __size = __input.size();
+  std::vector<${primitive}> __elements;
+  __elements.reserve(__size);
+  for (auto __element : __input) {
+    __elements.push_back(static_cast<${primitive}>(__element));
+  }
+  ${arrayReference} __array = ${arrayType}::newArray(__size);
+  __array->setRegion(0, __size, __elements.data());
+  return __array;
+}(${value})
+`.trim()
+      }
       // primitive arrays can be constructed more efficiently with region/batch access.
       // no need to iterate through the entire array.
       return `
@@ -112,6 +134,22 @@ export class KotlinArrayType extends ArrayType implements KotlinType {
       context: 'type-argument',
     })
     if (this.jniPrimitiveArrayType != null) {
+      if (this.itemType.kind === 'boolean' || this.itemType.kind === 'uint64') {
+        const primitive = this.itemType.kind === 'boolean' ? 'jboolean' : 'jlong'
+        return `
+[&]() {
+  size_t __size = ${value}->size();
+  std::vector<${primitive}> __elements(__size);
+  ${value}->getRegion(0, __size, __elements.data());
+  std::vector<${itemType}> __vector;
+  __vector.reserve(__size);
+  for (auto __element : __elements) {
+    __vector.push_back(static_cast<${itemType}>(__element));
+  }
+  return __vector;
+}()
+`.trim()
+      }
       // primitive arrays can use region/batch access,
       // which we can use to construct the vector directly instead of looping through it.
       return `
@@ -154,6 +192,9 @@ export class KotlinArrayType extends ArrayType implements KotlinType {
     switch (language) {
       case 'c++':
         return getJniReferenceCode(this.jniArrayType, options.context)
+      case 'kotlin':
+        if (this.itemType.kind === 'uint64') return 'LongArray'
+        return super.getCode(language, options)
       default:
         return super.getCode(language, options)
     }

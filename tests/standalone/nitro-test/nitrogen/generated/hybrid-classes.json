@@ -2,6 +2,14 @@
   "version": 1,
   "classes": {
     "Base": {
+      "android": {
+        "allowInheritance": true,
+        "allowMultipleImplementations": true,
+        "implementation": {
+          "className": "HybridBase"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "allowInheritance": true,
         "allowMultipleImplementations": true,
@@ -12,6 +20,14 @@
       }
     },
     "Child": {
+      "android": {
+        "allowInheritance": true,
+        "allowMultipleImplementations": true,
+        "implementation": {
+          "className": "HybridChild"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "allowInheritance": true,
         "allowMultipleImplementations": true,
@@ -22,6 +38,15 @@
       }
     },
     "CppBase": {
+      "android": {
+        "allowInheritance": true,
+        "allowMultipleImplementations": true,
+        "implementation": {
+          "className": "HybridCppBase",
+          "include": "\"HybridCppBase.hpp\""
+        },
+        "language": "c++"
+      },
       "ios": {
         "allowInheritance": true,
         "allowMultipleImplementations": true,
@@ -33,6 +58,15 @@
       }
     },
     "CppChild": {
+      "android": {
+        "allowInheritance": true,
+        "allowMultipleImplementations": true,
+        "implementation": {
+          "className": "HybridCppChild",
+          "include": "\"HybridCppChild.hpp\""
+        },
+        "language": "c++"
+      },
       "ios": {
         "allowInheritance": true,
         "allowMultipleImplementations": true,
@@ -44,6 +78,13 @@
       }
     },
     "CppGrandchild": {
+      "android": {
+        "implementation": {
+          "className": "HybridCppGrandchild",
+          "include": "\"HybridCppGrandchild.hpp\""
+        },
+        "language": "c++"
+      },
       "ios": {
         "implementation": {
           "className": "HybridCppGrandchild",
@@ -53,6 +94,12 @@
       }
     },
     "Grandchild": {
+      "android": {
+        "implementation": {
+          "className": "HybridGrandchild"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "implementation": {
           "className": "HybridGrandchild"
@@ -61,6 +108,12 @@
       }
     },
     "PlatformObject": {
+      "android": {
+        "implementation": {
+          "className": "HybridPlatformObject"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "implementation": {
           "className": "HybridPlatformObject"
@@ -69,6 +122,13 @@
       }
     },
     "TestObjectCpp": {
+      "android": {
+        "implementation": {
+          "className": "HybridTestObjectCpp",
+          "include": "\"HybridTestObjectCpp.hpp\""
+        },
+        "language": "c++"
+      },
       "ios": {
         "implementation": {
           "className": "HybridTestObjectCpp",
@@ -78,6 +138,12 @@
       }
     },
     "TestObjectSwiftKotlin": {
+      "android": {
+        "implementation": {
+          "className": "HybridTestObjectKotlin"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "implementation": {
           "className": "HybridTestObjectSwift"

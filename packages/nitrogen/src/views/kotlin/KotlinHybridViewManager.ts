@@ -8,7 +8,6 @@ import {
 } from '../CppHybridViewComponent.js'
 import { createFileMetadataString, escapeCppName } from '../../syntax/helpers.js'
 import { getHybridObjectName } from '../../syntax/getHybridObjectName.js'
-import { addJNINativeRegistration } from '../../syntax/kotlin/JNINativeRegistrations.js'
 import { indent } from '../../utils.js'
 import { getImportsCode, getImportCode } from '../../syntax/getImportCode.js'
 import { getKotlinImplementation } from '../../syntax/kotlin/KotlinMethodHelpers.js'
@@ -287,15 +286,6 @@ void J${stateUpdaterName}::updateViewProps(jni::alias_ref<jni::JClass> /* class 
 } // namespace ${cxxNamespace}
 `.trim()
 
-  addJNINativeRegistration({
-    namespace: cxxNamespace,
-    className: `J${stateUpdaterName}`,
-    import: {
-      language: 'c++',
-      declaration: updaterHeader,
-    },
-  })
-
   return [
     ...cppFiles,
     {
@@ -325,6 +315,16 @@ void J${stateUpdaterName}::updateViewProps(jni::alias_ref<jni::JClass> /* class 
       name: `J${stateUpdaterName}.cpp`,
       platform: 'android',
       subdirectory: ['views'],
+      jniNativeRegistrations: [
+        {
+          namespace: cxxNamespace.split('::'),
+          className: `J${stateUpdaterName}`,
+          import: {
+            language: 'c++',
+            declaration: updaterHeader,
+          },
+        },
+      ],
     },
   ]
 }

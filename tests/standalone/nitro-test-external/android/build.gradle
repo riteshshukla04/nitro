@@ -8,6 +8,7 @@ def prefabHeaders = layout.buildDirectory.dir('generated/prefab-headers')
 def prepareHeaders = tasks.register('prepareHeaders', Sync) {
   from(new File(generatedRoot, 'shared/c++/include')) { include '**/*.hpp' }
   from(new File(generatedRoot, 'android/c++/include')) { include '**/*.hpp' }
+  from(new File(generatedRoot, 'android/include')) { include '**/*.hpp' }
   includeEmptyDirs = false
   duplicatesStrategy = DuplicatesStrategy.FAIL
   into prefabHeaders
@@ -42,13 +43,14 @@ android {
       version providers.gradleProperty('nitroTestCmakeVersion').get()
     }
   }
-  sourceSets.main.java.srcDirs += [new File(generatedRoot, 'android/kotlin')]
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_17
     targetCompatibility JavaVersion.VERSION_17
   }
   kotlinOptions { jvmTarget = '17' }
 }
+
+apply from: '../nitrogen/generated/android/NitroTestExternal+autolinking.gradle'
 
 dependencies {
   api project(':nitro-core')

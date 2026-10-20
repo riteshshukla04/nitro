@@ -1,10 +1,19 @@
-import { iOS } from 'nitro-core'
+import { Android, iOS } from 'nitro-core'
 import type { HybridObject } from 'nitro-core'
 import type { Size, SizeUnit } from './Base.nitro'
 
 export * from '#nitro/CppBase'
 
 @iOS({
+  language: 'c++',
+  implementation: {
+    className: 'HybridCppBase',
+    include: '"HybridCppBase.hpp"',
+  },
+  allowMultipleImplementations: true,
+  allowInheritance: true,
+})
+@Android({
   language: 'c++',
   implementation: {
     className: 'HybridCppBase',

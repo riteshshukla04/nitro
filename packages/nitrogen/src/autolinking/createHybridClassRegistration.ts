@@ -1,8 +1,8 @@
-import type { HybridObjectSpec } from '../../syntax/HybridObjectSpec.js'
-import type { SourceImport } from '../../syntax/SourceFile.js'
-import { getHybridObjectName } from '../../syntax/getHybridObjectName.js'
-import { HybridObjectType } from '../../syntax/types/HybridObjectType.js'
-import { SwiftHybridObjectType } from '../../syntax/swift/types/SwiftHybridObjectType.js'
+import type { HybridObjectSpec } from '../syntax/HybridObjectSpec.js'
+import type { SourceImport } from '../syntax/SourceFile.js'
+import { getHybridObjectName } from '../syntax/getHybridObjectName.js'
+import { HybridObjectType } from '../syntax/types/HybridObjectType.js'
+import { SwiftHybridObjectType } from '../syntax/swift/types/SwiftHybridObjectType.js'
 
 interface HybridClassRegistration {
   imports: SourceImport[]
@@ -24,7 +24,9 @@ export function createHybridClassRegistration(spec: HybridObjectSpec): HybridCla
       header = spec.config.getCxxHeader(`${names.HybridTSpec}.hpp`)
       break
     case 'kotlin':
-      throw new Error('Kotlin class registration is not implemented yet.')
+      className = names.JHybridTSpec
+      header = spec.config.getCxxHeader(`${names.JHybridTSpec}.hpp`, 'private')
+      break
   }
   const registration = `
 HybridClassRegistry::registerHybridClass("${registryName}", ${className}::Class::get());

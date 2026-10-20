@@ -1,9 +1,9 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
 import { capitalizeName, indent } from '../../utils.js'
-import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
+import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { KotlinStructType } from './types/KotlinStructType.js'
-import { getImportCode } from '../getImportCode.js'
+import { getImportCode, getImportsCode } from '../getImportCode.js'
 
 export function createKotlinStruct(structType: KotlinStructType): SourceFile[] {
   const publicType = structType.type
@@ -28,10 +28,8 @@ val ${p.escapedName}: ${type}
     .join(', ')
   const cxxCreateFunctionForward = structType.properties.map((p) => p.escapedName).join(', ')
 
-  const extraImports = publicType.properties
-    .flatMap((t) => t.getRequiredImports('kotlin'))
-    .map((i) => getImportCode(i))
-    .filter(isNotDuplicate)
+  const kotlinPropertyImports = publicType.properties.flatMap((type) => type.getRequiredImports('kotlin'))
+  const extraImports = getImportsCode(kotlinPropertyImports)
 
   const secondaryConstructor = createKotlinConstructor(structType)
 
@@ -46,7 +44,7 @@ package ${packageName}
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
 import java.util.Objects
-${extraImports.join('\n')}
+${extraImports}
 
 /**
  * Represents the JavaScript object/struct "${structType.structName}".
@@ -88,16 +86,13 @@ data class ${structType.structName}(
   const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
   const jniClassDescriptor = NitroConfig.current.getAndroidPackage('c++/jni', structType.structName)
   const jniStructInitializerBody = createJNIStructInitializer(structType)
-  const cppStructInitializerBody = createCppStructInitializer('value', structType)
-  const imports = structType.properties.flatMap((p) => p.getRequiredImports('c++'))
-  const implementationIncludes = imports
-    .map((i) => getImportCode(i, 'implementation'))
-    .filter(isNotDuplicate)
-    .sort()
-  const publicTypeInclude = getImportCode({
-    language: 'c++',
-    declaration: NitroConfig.current.getCxxHeader(publicType.declarationFile.name),
-  })
+  const cppStructInitializerBody = createCppStructInitializer({ cppValueName: 'value', structType: structType })
+  const cppReturnType = publicType.getCode('c++', { context: 'return' })
+  const cppParameterType = publicType.getCode('c++', { context: 'parameter' })
+  const nativeImports = publicType.getRequiredImports('c++')
+  const propertyImports = structType.properties.flatMap((property) => property.getRequiredImports('c++'))
+  const implementationIncludes = getImportsCode([...nativeImports, ...propertyImports], 'implementation')
+  const publicTypeInclude = getImportsCode(nativeImports, 'declaration')
   const jniTypeInclude = getImportCode({
     language: 'c++',
     declaration: NitroConfig.current.getCxxHeader(`${structType.jniName}.hpp`, 'private'),
@@ -113,7 +108,7 @@ ${publicTypeInclude}
 
 namespace ${cxxNamespace} {
 
-  using namespace facebook;
+  namespace jni = facebook::jni;
 
   /**
    * The C++ JNI bridge between the C++ struct "${structType.structName}" and the Kotlin data class "${structType.structName}".
@@ -128,14 +123,14 @@ namespace ${cxxNamespace} {
      */
     [[maybe_unused]]
     [[nodiscard]]
-    ${structType.structName} toCpp() const;
+    ${cppReturnType} toCpp() const;
 
   public:
     /**
      * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
      */
     [[maybe_unused]]
-    static jni::local_ref<${structType.jniName}::javaobject> fromCpp(const ${structType.structName}& value);
+    static jni::local_ref<${structType.jniName}::javaobject> fromCpp(${cppParameterType} value);
   };
 
 } // namespace ${cxxNamespace}
@@ -146,15 +141,15 @@ ${createFileMetadataString(`${structType.jniName}.cpp`)}
 
 ${jniTypeInclude}
 
-${implementationIncludes.join('\n')}
+${implementationIncludes}
 
 namespace ${cxxNamespace} {
 
-  ${structType.structName} ${structType.jniName}::toCpp() const {
+  ${cppReturnType} ${structType.jniName}::toCpp() const {
     ${indent(jniStructInitializerBody, '    ')}
   }
 
-  jni::local_ref<${structType.jniName}::javaobject> ${structType.jniName}::fromCpp(const ${structType.structName}& value) {
+  jni::local_ref<${structType.jniName}::javaobject> ${structType.jniName}::fromCpp(${cppParameterType} value) {
     ${indent(cppStructInitializerBody, '    ')}
   }
 
@@ -217,13 +212,19 @@ function createJNIStructInitializer(structType: KotlinStructType): string {
   }
 
   const propsForward = structType.properties.map((p) => p.convert(p.escapedName, { from: 'kotlin', to: 'c++', in: 'c++' }))
-  lines.push(`return ${structType.structName}(`)
+  const cppType = structType.type.getCode('c++', { context: 'value' })
+  lines.push(`return ${cppType}(`)
   lines.push(`  ${indent(propsForward.join(',\n'), '  ')}`)
   lines.push(`);`)
   return lines.join('\n')
 }
 
-function createCppStructInitializer(cppValueName: string, structType: KotlinStructType): string {
+interface CppStructInitializerOptions {
+  cppValueName: string
+  structType: KotlinStructType
+}
+
+function createCppStructInitializer({ cppValueName, structType }: CppStructInitializerOptions): string {
   const jniTypes = structType.properties.map((p) => p.getCode('c++', { context: 'parameter' })).join(', ')
   const params = structType.properties
     .map((p) =>

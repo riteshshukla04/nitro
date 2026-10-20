@@ -6,7 +6,7 @@ import { getHybridObjectName } from '../getHybridObjectName.js'
 import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
 import { InstanceMethod } from '../InstanceMethod.js'
-import type { Property } from '../Property.js'
+import { Property } from '../Property.js'
 import type { SourceFile, SourceImport } from '../SourceFile.js'
 import { HybridObjectType } from '../types/HybridObjectType.js'
 import { createFbjniHybridObject } from './FbjniHybridObject.js'
@@ -18,8 +18,17 @@ import type { KotlinStaticMethod } from './KotlinStaticMethod.js'
 import type { KotlinStaticProperty } from './KotlinStaticProperty.js'
 import { wrapKotlinType } from './wrapKotlinType.js'
 import { getImportCode } from '../getImportCode.js'
+import { getKotlinNativeType } from './getKotlinNativeType.js'
 
-export function createKotlinHybridObject(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {
+export function createKotlinHybridObject(publicSpec: HybridObjectSpec<'kotlin'>): SourceFile[] {
+  const nativeProperties = publicSpec.properties.map((property) => {
+    const nativeType = getKotlinNativeType(property.type, publicSpec.config)
+    return new Property(property.name, nativeType, property.isReadonly)
+  })
+  const spec: HybridObjectSpec<'kotlin'> = {
+    ...publicSpec,
+    properties: nativeProperties,
+  }
   const name = getHybridObjectName(spec.name)
   const properties = spec.properties.map(getKotlinPropertyCode).join('\n\n')
   const methods = spec.methods.map(getKotlinMethodCode).join('\n\n')
@@ -45,7 +54,10 @@ export function createKotlinHybridObject(spec: HybridObjectSpec<'kotlin'>): Sour
     if (spec.baseTypes.length > 1) {
       throw new Error(`${name.T}: Inheriting from multiple HybridObject bases is not yet supported in Kotlin!`)
     }
-    const base = spec.baseTypes[0]!
+    const base = spec.baseTypes[0]
+    if (base == null) {
+      throw new Error(`${name.T}: Expected a Kotlin base class.`)
+    }
     const baseHybrid = new HybridObjectType(base)
     kotlinBase = baseHybrid.getCode('kotlin', { context: 'value' })
     cxxPartBase = `${kotlinBase}.CxxPart`
@@ -123,9 +135,9 @@ abstract class ${name.HybridTSpec}: ${supertypes} {
   const cppFiles = createFbjniHybridObject(spec)
 
   // 3. Create enums or structs in Kotlin
-  const extraFiles = getAllTypes(spec)
-    .map((type) => wrapKotlinType(type))
-    .flatMap((t) => t.getExtraFiles())
+  const nativeTypes = getAllTypes(spec)
+  const kotlinTypes = nativeTypes.map((type) => wrapKotlinType(type))
+  const extraFiles = [...nativeTypes.flatMap((type) => type.getExtraFiles()), ...kotlinTypes.flatMap((type) => type.getExtraFiles())]
 
   const files: SourceFile[] = []
   files.push({
@@ -138,7 +150,7 @@ abstract class ${name.HybridTSpec}: ${supertypes} {
   files.push(...cppFiles)
   files.push(...extraFiles)
   if (spec.isHybridView) {
-    files.push(...createKotlinHybridViewManager(spec))
+    files.push(...createKotlinHybridViewManager(publicSpec))
   }
 
   return files
@@ -157,7 +169,7 @@ interface KotlinCompanionGroup {
 /**
  * The companion object holds the forwarders JNI calls to construct the class or call its static methods.
  * They let Kotlin check the implementation at compile time, keep it from being stripped by R8,
- * and call companion statics without `@JvmStatic`.
+ * and expose actual JVM static methods through `@JvmStatic`.
  * TODO: Remove the Kotlin-side conversions (`convert(..., { in: 'kotlin' })`, for `UInt64`
  * and callback lambdas) once those types cross JNI unchanged.
  */

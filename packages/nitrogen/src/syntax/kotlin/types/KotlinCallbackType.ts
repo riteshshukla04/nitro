@@ -13,8 +13,6 @@ import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './K
  */
 export class KotlinCallbackType extends CallbackType implements KotlinType {
   override readonly returnType: KotlinType
-  /** The result `invoke()` returns through JNI. It overrides `FunctionN.invoke`, so primitives are boxed. */
-  readonly boxedReturnType: KotlinType
   override readonly parameters: KotlinNamedType[]
   readonly jniValueKind = 'pointer'
   readonly needsKotlinConversion = true
@@ -24,7 +22,6 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     const parameters = type.parameters.map((p) => new KotlinNamedType(p.name, wrapKotlinType(p)))
     super(returnType, parameters, type.isInline)
     this.returnType = returnType
-    this.boxedReturnType = wrapKotlinType(type.returnType, { boxed: true })
     this.parameters = parameters
   }
 
@@ -42,7 +39,10 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
   convert(value: string, { from, in: language }: KotlinConversion): string {
     switch (language) {
       case 'kotlin':
-        return from === 'kotlin' ? `${this.specializationName}_java(${value})` : value
+        if (from === 'kotlin') {
+          return `${value}.let { if (it is ${this.specializationName}) it else ${this.specializationName}_java(it) }`
+        }
+        return value
       case 'c++':
         switch (from) {
           case 'c++':

@@ -15,7 +15,7 @@ export class KotlinStructType extends StructType implements KotlinType {
 
   constructor(readonly type: StructType) {
     const properties = type.properties.map((p) => new KotlinNamedType(p.name, wrapKotlinType(p)))
-    super(type.structName, properties)
+    super(type.structName, properties, type.sourceConfig)
     this.properties = properties
   }
 

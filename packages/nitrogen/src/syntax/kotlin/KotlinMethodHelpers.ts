@@ -4,6 +4,7 @@ import { Parameter } from '../Parameter.js'
 import type { SourceImport } from '../SourceFile.js'
 import { wrapKotlinType } from './wrapKotlinType.js'
 import type { KotlinType } from './types/KotlinType.js'
+import { indent } from '../../utils.js'
 
 export interface KotlinMethodDefinition {
   method: Method
@@ -94,6 +95,7 @@ interface CppJniCallBodyOptions {
 
 /**
  * Calls Kotlin through a cached fbjni method, converting values between C++ and JNI.
+ * The caller must already be attached to the JVM.
  * Generated locals use the reserved `__` prefix, so they cannot shadow parameters.
  */
 export function createCppJniCallBody({ callable, jvmName, jniMethodLookup, jniReceiver }: CppJniCallBodyOptions): string {
@@ -129,7 +131,7 @@ __method(${jniArguments.join(', ')});
   return `
 static const auto __method = ${jniMethodLookup}<${jniSignature}>("${jvmName}");
 auto __result = __method(${jniArguments.join(', ')});
-return ${cppResult};
+return ${indent(cppResult, '')};
 `.trim()
 }
 

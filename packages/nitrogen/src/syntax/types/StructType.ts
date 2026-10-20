@@ -1,22 +1,34 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
-import type { Language } from '../../getPlatformSpecs.js'
+import type { Language, Platform } from '../../getPlatformSpecs.js'
 import { getForwardDeclaration } from '../c++/getForwardDeclaration.js'
 import { createCppStruct } from '../c++/CppStruct.js'
-import { type FileWithReferencedTypes, type SourceFile, type SourceImport } from '../SourceFile.js'
+import { type CxxHeaderVisibility, type FileWithReferencedTypes, type SourceFile, type SourceImport } from '../SourceFile.js'
 import type { GetCodeOptions, NamedType, Type, TypeKind } from './Type.js'
 
 export class StructType implements Type {
   readonly structName: string
+  readonly cppName: string
   readonly properties: NamedType[]
   readonly declarationFile: FileWithReferencedTypes
   readonly implementationFile: SourceFile
   readonly sourceConfig: NitroConfig
 
-  constructor(structName: string, properties: NamedType[], sourceConfig: NitroConfig = NitroConfig.current) {
+  constructor(
+    structName: string,
+    properties: NamedType[],
+    sourceConfig: NitroConfig = NitroConfig.current,
+    projection: { readonly cppName?: string; readonly platform?: Platform | 'shared'; readonly headerVisibility?: CxxHeaderVisibility } = {}
+  ) {
     this.structName = structName
+    this.cppName = projection.cppName ?? structName
     this.properties = properties
     this.sourceConfig = sourceConfig
-    const [declarationFile, implementationFile] = createCppStruct(structName, properties)
+    const [declarationFile, implementationFile] = createCppStruct({
+      typename: this.cppName,
+      properties: properties,
+      platform: projection.platform,
+      headerVisibility: projection.headerVisibility,
+    })
     this.declarationFile = declarationFile
     this.implementationFile = implementationFile
 
@@ -38,9 +50,9 @@ export class StructType implements Type {
   getCode(language: Language, { fullyQualified, context }: GetCodeOptions): string {
     switch (language) {
       case 'c++': {
-        let type = this.structName
+        let type = this.cppName
         if (fullyQualified) {
-          type = NitroConfig.current.getCxxNamespace('c++', this.structName)
+          type = NitroConfig.current.getCxxNamespace('c++', this.cppName)
         }
         return context === 'parameter' ? `const ${type}&` : type
       }
@@ -63,8 +75,8 @@ export class StructType implements Type {
         imports.push({
           language,
           declaration: {
-            ...NitroConfig.current.getCxxHeader(this.declarationFile.name),
-            forwardDeclaration: getForwardDeclaration('struct', this.structName, NitroConfig.current.getCxxNamespace('c++')),
+            ...NitroConfig.current.getCxxHeader(this.declarationFile.name, this.declarationFile.headerVisibility),
+            forwardDeclaration: getForwardDeclaration('struct', this.cppName, NitroConfig.current.getCxxNamespace('c++')),
           },
         })
         break

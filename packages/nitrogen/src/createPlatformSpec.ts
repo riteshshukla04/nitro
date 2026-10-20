@@ -14,6 +14,7 @@ import { Property } from './syntax/Property.js'
 import { StaticProperty } from './syntax/StaticProperty.js'
 import { InstanceMethod } from './syntax/InstanceMethod.js'
 import { HybridObjectType } from './syntax/types/HybridObjectType.js'
+import { KotlinNativeHybridObjectType } from './syntax/kotlin/types/KotlinNativeHybridObjectType.js'
 import { getHybridObjectName } from './syntax/getHybridObjectName.js'
 import { StaticMethod } from './syntax/StaticMethod.js'
 import { Constructor } from './syntax/Constructor.js'
@@ -205,12 +206,13 @@ export function getHybridObjectSpec(
 
   let constructor: Constructor | undefined
   if (constructorParameters != null) {
-    const constructedType = new HybridObjectType(
+    let constructedType = new HybridObjectType(
       name,
       platforms,
       bases.map((base) => new HybridObjectType(base)),
       config
     )
+    if (target.language === 'kotlin') constructedType = new KotlinNativeHybridObjectType(constructedType)
     constructor = new Constructor(getHybridObjectName(name).HybridTSpec, constructedType, constructorParameters)
   }
 
@@ -340,9 +342,5 @@ function generateSwiftFiles(spec: HybridObjectSpec<'swift'>): SourceFile[] {
 }
 
 function generateKotlinFiles(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {
-  // 1. Always generate a C++ spec for the shared layer and type declarations (enums, interfaces, ...)
-  const cppFiles = generateCppFiles(spec, 'android')
-  // 2. Generate Kotlin specific files and potentially a C++ binding layer
-  const kotlinFiles = createKotlinHybridObject(spec)
-  return [...cppFiles, ...kotlinFiles]
+  return createKotlinHybridObject(spec)
 }

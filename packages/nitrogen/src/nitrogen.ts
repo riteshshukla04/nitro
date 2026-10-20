@@ -16,6 +16,7 @@ import chalk from 'chalk'
 import { groupByPlatform, type SourceFile } from './syntax/SourceFile.js'
 import { Logger } from './Logger.js'
 import { NitroConfig } from './config/NitroConfig.js'
+import { createAndroidAutolinking } from './autolinking/createAndroidAutolinking.js'
 import { createIOSAutolinking } from './autolinking/createIOSAutolinking.js'
 import { updateSwiftPackageManifest } from './autolinking/ios/updateSwiftPackageManifest.js'
 import { getImportsCode } from './syntax/getImportCode.js'
@@ -215,8 +216,8 @@ export async function runNitrogen({ baseDirectory, outputDirectory }: NitrogenOp
         // Group the files by platform ({ ios: [], android: [], shared: [] })
         const filesPerPlatform = groupByPlatform(allFiles)
         // Loop through each platform one by one so that it has some kind of order (per-platform)
-        for (const [p, files] of Object.entries(filesPerPlatform)) {
-          const platform = p as SourceFile['platform']
+        for (const platform of ['shared', 'ios', 'android'] as const) {
+          const files = filesPerPlatform[platform]
           let language: Language | undefined
           if (platform === 'shared') {
             language = 'c++'
@@ -340,14 +341,14 @@ ${imports}
     autolinkingFiles.push(createIOSAutolinking(specsByPlatform.ios))
   }
   if (usedPlatforms.includes('android')) {
-    throw new Error('Android is not implemented yet! Remove it from platforms')
+    autolinkingFiles.push(createAndroidAutolinking(specsByPlatform.android, generatedSources))
   }
 
   for (const autolinking of autolinkingFiles) {
     Logger.info(`    Creating autolinking build setup for ${chalk.dim(autolinking.platform)}...`)
     for (const file of autolinking.sourceFiles) {
       const basePath = path.join(outputDirectory, file.platform)
-      const actualPath = await writeFile(basePath, file as unknown as SourceFile)
+      const actualPath = await writeFile(basePath, file)
       filesAfter.push(actualPath)
     }
   }

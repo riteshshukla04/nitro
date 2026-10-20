@@ -38,8 +38,7 @@ export class ArrayType implements Type {
           case 'int64':
             return 'LongArray'
           case 'uint64':
-            // ULong is just interpret as LongArray in Java.
-            return 'LongArray'
+            return 'Array<ULong>'
           default:
             return `Array<${itemCode}>`
         }

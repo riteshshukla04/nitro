@@ -78,9 +78,6 @@ export class ForeignHybridObjectType extends HybridObjectType {
   override getExtraFiles(): SourceFile[] {
     const spec = this.definition
     if (spec == null) return []
-    if (spec.language !== 'swift' && spec.language !== 'c++') {
-      throw new Error(`${spec.name}: A C++ adapter for ${spec.language} on ${this.platform} is not implemented yet.`)
-    }
     return [
       ...createCppHybridObjectAdapter(spec, this.platform),
       ...spec.baseTypes.flatMap((base) => new ForeignHybridObjectType(new HybridObjectType(base), this.platform, base).getExtraFiles()),

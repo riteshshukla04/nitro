@@ -74,18 +74,23 @@ is ${innerName} -> (${publicValue}) as? T
     `.trim()
   })
 
-  const createFunctions = variant.kotlinCases.map(({ label, type }) => {
+  const createFunctions = variant.kotlinCases.map(({ label, publicType, type }, i) => {
     const innerName = capitalizeName(label)
-    const valueType = type.getCode('kotlin', { context: 'parameter' })
-    const publicValue = type.convert('value', {
-      from: 'c++',
-      to: 'kotlin',
+    const valueType = publicType.getCode('kotlin', { context: 'parameter' })
+    const bridgeType = type.getCode('kotlin', { context: 'parameter' })
+    const bridgeValue = type.convert('value', {
+      from: 'kotlin',
+      to: 'c++',
       in: 'kotlin',
     })
     return `
 @JvmStatic
 @DoNotStrip
-fun create(value: ${valueType}): ${kotlinName} = ${innerName}(${publicValue})
+fun create(value: ${valueType}): ${kotlinName} = ${innerName}(${bridgeValue})
+
+@JvmStatic
+@DoNotStrip
+private fun fromCpp_${i}(value: ${bridgeType}): ${kotlinName} = ${innerName}(value)
 `.trim()
   })
 
@@ -144,7 +149,7 @@ sealed class ${kotlinName} {
     const jniType = type.getCode('c++', { context: 'parameter' })
     return `
 jni::local_ref<${jniName}> ${jniName}::create_${i}(${jniType} value) {
-  static const auto method = javaClassStatic()->getStaticMethod<${jniName}(${jniType})>("create");
+  static const auto method = javaClassStatic()->getStaticMethod<${jniName}(${jniType})>("fromCpp_${i}");
   return method(javaClassStatic(), value);
 }
     `.trim()
@@ -229,7 +234,7 @@ ${declarationIncludes.join('\n')}
 
 namespace ${cxxNamespace} {
 
-  using namespace facebook;
+  namespace jni = facebook::jni;
 
   /**
    * The C++ JNI bridge between the C++ std::variant and the Java class "${kotlinName}".

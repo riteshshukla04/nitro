@@ -21,6 +21,9 @@ export class KotlinOptionalType extends OptionalType implements KotlinType {
   get needsKotlinConversion(): boolean {
     return this.wrappingType.needsKotlinConversion
   }
+  get fromCppReturnType(): string | undefined {
+    return this.wrappingType.fromCppReturnType
+  }
   /** Callbacks cross JNI as named interfaces, which need no braces. */
   override get needsBraces(): boolean {
     return false

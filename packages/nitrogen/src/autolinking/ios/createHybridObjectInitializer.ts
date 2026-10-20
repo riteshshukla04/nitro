@@ -4,7 +4,7 @@ import { createFileMetadataString } from '../../syntax/helpers.js'
 import type { SourceFile, SourceImport } from '../../syntax/SourceFile.js'
 import { indent } from '../../utils.js'
 import type { HybridObjectSpec } from '../../syntax/HybridObjectSpec.js'
-import { createHybridClassRegistration } from './createHybridClassRegistration.js'
+import { createHybridClassRegistration } from '../createHybridClassRegistration.js'
 
 export function createHybridObjectInitializer(specs: HybridObjectSpec[]): SourceFile[] {
   const autolinkingClassName = `${NitroConfig.current.getIosModuleName()}Autolinking`

@@ -38,6 +38,8 @@ class SWIFT_NONCOPYABLE SWIFT_NONESCAPABLE InlineCallback<R(Args...)> final {
   friend JSIConverter<InlineCallback>;
   template <typename, typename>
   friend struct SwiftCallbackConverter;
+  template <typename, typename>
+  friend struct JNICallbackConverter;
 
   struct JSCallback;
   using NativeCallback = std::function<R(Args...)>;
@@ -111,6 +113,8 @@ private:
     friend JSIConverter<InlineCallback>;
     template <typename, typename>
     friend struct SwiftCallbackConverter;
+    template <typename, typename>
+    friend struct JNICallbackConverter;
 
   public:
     JSCallback(jsi::Runtime& runtime, jsi::Function&& function) : _runtime(runtime), _function(std::move(function)) {}

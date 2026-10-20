@@ -46,7 +46,7 @@ ${enumInclude}
 
 namespace ${cxxNamespace} {
 
-  using namespace facebook;
+  namespace jni = facebook::jni;
 
   /**
    * The C++ JNI bridge between the C++ enum "${enumType.enumName}" and the Kotlin enum "${enumType.enumName}".

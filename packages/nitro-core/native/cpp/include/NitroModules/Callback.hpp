@@ -51,6 +51,8 @@ class Callback<R(Args...)> final {
   friend JSIConverter<Callback>;
   template <typename, typename>
   friend struct SwiftCallbackConverter;
+  template <typename, typename>
+  friend struct JNICallbackConverter;
 
   struct JSCallback;
   using NativeCallback = std::function<R(Args...)>;
@@ -137,6 +139,8 @@ private:
     friend JSIConverter<Callback>;
     template <typename, typename>
     friend struct SwiftCallbackConverter;
+    template <typename, typename>
+    friend struct JNICallbackConverter;
 
   public:
     JSCallback(jsi::Runtime& runtime, BorrowingReference<jsi::Function>&& function, const std::weak_ptr<Dispatcher>& dispatcher)

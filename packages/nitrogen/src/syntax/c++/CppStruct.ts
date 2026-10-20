@@ -1,12 +1,25 @@
-import type { FileWithReferencedTypes, SourceFile, SourceImport } from '../SourceFile.js'
+import type { CxxHeaderVisibility, FileWithReferencedTypes, SourceFile, SourceImport } from '../SourceFile.js'
 import { indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { NamedType } from '../types/Type.js'
 import { NitroConfig } from '../../config/NitroConfig.js'
+import type { Platform } from '../../getPlatformSpecs.js'
 import type { GetCallbackCodeOptions } from '../types/CallbackType.js'
 import { getImportsCode } from '../getImportCode.js'
 
-export function createCppStruct(typename: string, properties: NamedType[]): [header: FileWithReferencedTypes, implementation: SourceFile] {
+interface CppStructOptions {
+  typename: string
+  properties: NamedType[]
+  platform?: Platform | 'shared'
+  headerVisibility?: CxxHeaderVisibility
+}
+
+export function createCppStruct({
+  typename,
+  properties,
+  platform = 'shared',
+  headerVisibility = 'public',
+}: CppStructOptions): [header: FileWithReferencedTypes, implementation: SourceFile] {
   // Namespace typename
   const fullyQualifiedTypename = NitroConfig.current.getCxxNamespace('c++', typename)
   // Get C++ code for all struct members
@@ -90,7 +103,7 @@ export function createCppStruct(typename: string, properties: NamedType[]): [hea
   const implementationImports: SourceImport[] = [
     {
       language: 'c++',
-      declaration: NitroConfig.current.getCxxHeader(`${typename}.hpp`),
+      declaration: NitroConfig.current.getCxxHeader(`${typename}.hpp`, headerVisibility),
     },
     {
       language: 'c++',
@@ -149,7 +162,7 @@ namespace margelo::nitro {
   };
 
 } // namespace margelo::nitro
-  `
+  `.trim()
   const cppImplementationCode = `
 ${createFileMetadataString(`${typename}.cpp`)}
 
@@ -183,7 +196,7 @@ namespace margelo::nitro {
   }
 
 } // namespace margelo::nitro
-  `
+  `.trim()
   return [
     {
       content: cppCode,
@@ -191,14 +204,15 @@ namespace margelo::nitro {
       subdirectory: [],
       language: 'c++',
       referencedTypes: properties,
-      platform: 'shared',
+      headerVisibility: headerVisibility,
+      platform: platform,
     },
     {
       content: cppImplementationCode,
       name: `${typename}.cpp`,
       subdirectory: [],
       language: 'c++',
-      platform: 'shared',
+      platform: platform,
     },
   ]
 }

@@ -1,4 +1,4 @@
-#include "NitroTestOnLoad.hpp"
+#include <NitroTest/private/NitroTestOnLoad.hpp>
 #include <fbjni/fbjni.h>
 #include <jni.h>
 

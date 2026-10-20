@@ -2,6 +2,12 @@
   "version": 1,
   "classes": {
     "Base": {
+      "android": {
+        "implementation": {
+          "className": "HybridBase"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "implementation": {
           "className": "HybridBase"
@@ -10,12 +16,23 @@
       }
     },
     "CppValueSource": {
+      "android": {
+        "allowMultipleImplementations": true,
+        "language": "c++"
+      },
       "ios": {
         "allowMultipleImplementations": true,
         "language": "c++"
       }
     },
     "SomeExternalObject": {
+      "android": {
+        "allowMultipleImplementations": true,
+        "implementation": {
+          "className": "HybridSomeExternalObject"
+        },
+        "language": "kotlin"
+      },
       "ios": {
         "allowMultipleImplementations": true,
         "implementation": {

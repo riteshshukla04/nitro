@@ -14,13 +14,14 @@ import { HybridObjectType } from '../types/HybridObjectType.js'
 import { getCppHybridObjectAdapterNames } from './CppHybridObjectAdapterNames.js'
 import { ForeignHybridObjectType } from './ForeignHybridObjectType.js'
 import { wrapSwiftType } from '../swift/wrapSwiftType.js'
+import { createKotlinNativeConverters, getKotlinNativeConverter } from '../kotlin/KotlinNativeConverter.js'
 
 /**
  * Expose a callable C++ value handle for a foreign HybridObject.
  * The handle owns the existing object. Its JS identity and prototype remain
- * those of the Swift bridge, even after a derived handle is copied as its base.
+ * those of its native bridge, even after a derived handle is copied as its base.
  */
-export function createCppHybridObjectAdapter(spec: HybridObjectSpec<'swift' | 'c++'>, platform: Platform = 'ios'): SourceFile[] {
+export function createCppHybridObjectAdapter(spec: HybridObjectSpec, platform: Platform = 'ios'): SourceFile[] {
   const hierarchy = [spec, ...getAncestors(spec)]
   const reserved = ['fromNative', 'getNativeObject']
   if (hierarchy.some((current) => current.constructor != null)) reserved.push('create')
@@ -49,7 +50,18 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec<'swift' | 'c
     baseNames = undefined
   }
   const bridgeNames = getHybridObjectName(spec.name)
-  const bridgeName = spec.language === 'swift' ? bridgeNames.HybridTSpecSwift : bridgeNames.HybridTSpec
+  let bridgeName: string
+  switch (spec.language) {
+    case 'swift':
+      bridgeName = bridgeNames.HybridTSpecSwift
+      break
+    case 'kotlin':
+      bridgeName = bridgeNames.JHybridTSpec
+      break
+    case 'c++':
+      bridgeName = bridgeNames.HybridTSpec
+      break
+  }
   const bridge = spec.config.getCxxNamespace('c++', bridgeName)
   let staticTarget: string
   if (spec.language === 'c++' && spec.implementation != null) {
@@ -96,7 +108,7 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec<'swift' | 'c
     },
     {
       language: 'c++',
-      declaration: spec.config.getCxxHeader(`${bridgeName}.hpp`, spec.language === 'swift' ? 'private' : 'public'),
+      declaration: spec.config.getCxxHeader(`${bridgeName}.hpp`, spec.language === 'c++' ? 'public' : 'private'),
     },
     {
       language: 'c++',
@@ -105,30 +117,42 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec<'swift' | 'c
     ...memberImports,
   ]
   const conversionFiles: SourceFile[] = []
-  if (spec.language === 'swift') {
-    for (const nativeType of [type, ...getAllTypes(spec)]) {
-      const swiftType = wrapSwiftType(nativeType, spec.config)
-      const converter = swiftType.getCppConverter?.(nativeType)
-      if (converter != null) {
+  switch (spec.language) {
+    case 'swift': {
+      for (const nativeType of [type, ...getAllTypes(spec)]) {
+        const swiftType = wrapSwiftType(nativeType, spec.config)
+        const converter = swiftType.getCppConverter?.(nativeType)
+        if (converter != null) {
+          conversionFiles.push(...converter.files)
+          implementationImports.push(...converter.imports)
+        }
+      }
+      implementationImports.push(
+        {
+          language: 'c++',
+          declaration: NitroConfig.current.getCxxHeader(getUmbrellaHeaderName(), 'private'),
+        },
+        {
+          language: 'c++',
+          declaration: {
+            header: 'NitroModules/SwiftConverter.hpp',
+            space: 'system',
+          },
+        }
+      )
+      break
+    }
+    case 'kotlin': {
+      for (const cppType of [type, ...getAllTypes(spec)]) {
+        const converter = createKotlinNativeConverters(cppType, spec.config)
         conversionFiles.push(...converter.files)
         implementationImports.push(...converter.imports)
       }
+      break
     }
-    implementationImports.push(
-      {
-        language: 'c++',
-        declaration: NitroConfig.current.getCxxHeader(getUmbrellaHeaderName(), 'private'),
-      },
-      {
-        language: 'c++',
-        declaration: {
-          header: 'NitroModules/SwiftConverter.hpp',
-          space: 'system',
-        },
-      }
-    )
-  } else if (spec.implementation != null) {
-    implementationImports.push(spec.implementation.include)
+    case 'c++':
+      if (spec.implementation != null) implementationImports.push(spec.implementation.include)
+      break
   }
 
   function getParameters(method: Method): string {
@@ -147,12 +171,19 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec<'swift' | 'c
   }
   function getArguments(method: Method): string[] {
     return method.parameters.map((parameter) => {
-      if (spec.language === 'swift') {
-        const swiftType = wrapSwiftType(parameter.type, spec.config)
-        const converter = getSwiftConverter({ cppType: parameter.type, context: 'parameter-type', swiftType: swiftType })
-        return `${converter}::toSwift(${parameter.type.escapedName})`
+      switch (spec.language) {
+        case 'swift': {
+          const swiftType = wrapSwiftType(parameter.type, spec.config)
+          const converter = getSwiftConverter({ cppType: parameter.type, context: 'parameter-type', swiftType: swiftType })
+          return `${converter}::toSwift(${parameter.type.escapedName})`
+        }
+        case 'kotlin': {
+          const converter = getKotlinNativeConverter({ cppType: parameter.type, context: 'parameter-type', nativeConfig: spec.config })
+          return `${converter}::toKotlin(${parameter.type.escapedName})`
+        }
+        case 'c++':
+          return `std::forward<decltype(${parameter.type.escapedName})>(${parameter.type.escapedName})`
       }
-      return `std::forward<decltype(${parameter.type.escapedName})>(${parameter.type.escapedName})`
     })
   }
   function getForwarder(method: Method, invocation: string): string {
@@ -163,17 +194,27 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec<'swift' | 'c
 ${call};
 `.trim()
     }
-    if (spec.language === 'c++') {
-      return `
+    switch (spec.language) {
+      case 'c++':
+        return `
 return ${call};
 `.trim()
-    }
-    const swiftType = wrapSwiftType(method.returnType, spec.config)
-    const converter = getSwiftConverter({ cppType: method.returnType, swiftType: swiftType })
-    return `
+      case 'swift': {
+        const swiftType = wrapSwiftType(method.returnType, spec.config)
+        const converter = getSwiftConverter({ cppType: method.returnType, swiftType: swiftType })
+        return `
 auto __result = ${call};
 return ${converter}::fromSwift(__result);
 `.trim()
+      }
+      case 'kotlin': {
+        const converter = getKotlinNativeConverter({ cppType: method.returnType, nativeConfig: spec.config })
+        return `
+auto __result = ${call};
+return ${converter}::fromKotlin(__result);
+`.trim()
+      }
+    }
   }
 
   const declarations = [
@@ -209,16 +250,25 @@ ${signature} {
     declarations.unshift(`static ${names.className} create(${parameters});`)
     const argumentsList = getArguments(spec.constructor).join(', ')
     let body: string
-    if (spec.language === 'swift') {
-      const converter = getSwiftConverter({ cppType: type, swiftType: wrapSwiftType(type, spec.config) })
-      body = `
+    switch (spec.language) {
+      case 'swift': {
+        const converter = getSwiftConverter({ cppType: type, swiftType: wrapSwiftType(type, spec.config) })
+        body = `
 auto __result = ${bridge}::constructor(${argumentsList});
 return ${converter}::fromSwift(__result);
 `.trim()
-    } else {
-      body = `
+        break
+      }
+      case 'kotlin':
+        body = `
+return fromNative(${bridge}::constructor(${argumentsList}));
+`.trim()
+        break
+      case 'c++':
+        body = `
 return fromNative(std::make_shared<${staticTarget}>(${argumentsList}));
 `.trim()
+        break
     }
     definitions.unshift(
       `

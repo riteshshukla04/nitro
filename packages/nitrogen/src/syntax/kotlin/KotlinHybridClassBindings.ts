@@ -1,4 +1,3 @@
-import { indent } from '../../utils.js'
 import type { HybridClassBindings } from '../c++/CppHybridClassBindings.js'
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
 import type { SourceImport } from '../SourceFile.js'
@@ -31,9 +30,14 @@ export function getKotlinClassMembers(spec: HybridObjectSpec<'kotlin'>): KotlinC
   }
 }
 
-/** Bind Kotlin class calls through JNI inside the platform's `Class::get()`. */
-export function createKotlinHybridClassBindings(spec: HybridObjectSpec<'kotlin'>): HybridClassBindings {
+interface KotlinHybridClassBindings extends HybridClassBindings {
+  declarations: string[]
+}
+
+/** Bind Kotlin class calls through JNI on the private native bridge. */
+export function createKotlinHybridClassBindings(spec: HybridObjectSpec<'kotlin'>): KotlinHybridClassBindings {
   const imports: SourceImport[] = []
+  const declarations: string[] = []
   const definitions: string[] = []
   const registrations: string[] = []
   const { constructor, staticMethods, staticProperties } = getKotlinClassMembers(spec)
@@ -43,34 +47,31 @@ export function createKotlinHybridClassBindings(spec: HybridObjectSpec<'kotlin'>
   if (callables.length === 0) {
     return {
       imports: imports,
+      declarations: declarations,
       definitions: definitions,
       registrations: registrations,
     }
   }
 
   const { JHybridTSpec } = getHybridObjectName(spec.name)
-  const helper = `${JHybridTSpec}Bindings`
-  const adapters: string[] = []
   imports.push({
     language: 'c++',
     declaration: spec.config.getCxxHeader(`${JHybridTSpec}.hpp`, 'private'),
   })
   for (const callable of callables) {
     const { cppMethods } = callable.createBridge()
-    adapters.push(...cppMethods.map(({ method, body }) => method.getDefinition('c++', { placement: 'in-class', body: body })))
-    registrations.push(callable.getCppRegistration(helper))
+    declarations.push(...cppMethods.map(({ method }) => method.getDeclaration('c++')))
+    definitions.push(
+      ...cppMethods.map(({ method, body }) =>
+        method.getDefinition('c++', { placement: 'out-of-class', className: JHybridTSpec, body: body })
+      )
+    )
+    registrations.push(callable.getCppRegistration(JHybridTSpec))
     imports.push(...callable.getRequiredImports('c++'))
   }
-  const helperDefinition = `
-namespace {
-  struct ${helper} final {
-    ${indent(adapters.join('\n\n'), '    ')}
-  };
-}
-`.trim()
-  definitions.push(helperDefinition)
   return {
     imports: imports,
+    declarations: declarations,
     definitions: definitions,
     registrations: registrations,
   }

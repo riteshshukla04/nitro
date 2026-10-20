@@ -9,7 +9,7 @@ export class KotlinHybridObjectType extends HybridObjectType implements KotlinTy
   readonly jniValueKind = 'wrapper'
   readonly needsKotlinConversion = false
 
-  constructor(type: HybridObjectType) {
+  constructor(readonly type: HybridObjectType) {
     super(type.hybridObjectName, type.platforms, type.baseTypes, type.sourceConfig)
   }
 
@@ -54,7 +54,7 @@ export class KotlinHybridObjectType extends HybridObjectType implements KotlinTy
       case 'c++':
         switch (from) {
           case 'c++':
-            return `std::dynamic_pointer_cast<${this.jniName}>(${value})->getJavaPart()`
+            return `${value}->getJavaPart()`
           case 'kotlin': {
             const name = getHybridObjectName(this.hybridObjectName)
             return `${value}->get${name.JHybridTSpec}()`
@@ -64,7 +64,7 @@ export class KotlinHybridObjectType extends HybridObjectType implements KotlinTy
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
-    const imports = super.getRequiredImports(language)
+    const imports = this.type.getRequiredImports(language)
     switch (language) {
       case 'c++': {
         const name = getHybridObjectName(this.hybridObjectName)

@@ -3,6 +3,12 @@ import type { Type } from './types/Type.js'
 
 export type CxxHeaderVisibility = 'public' | 'private'
 
+export interface JNINativeRegistration {
+  readonly namespace: readonly string[]
+  readonly className: string
+  readonly import: SourceImport<'c++'>
+}
+
 /**
  * Represents a file with source code, in a specific programming language.
  */
@@ -32,6 +38,8 @@ export interface SourceFile {
    * platform bridge headers default to private.
    */
   headerVisibility?: CxxHeaderVisibility
+  /** Native methods defined by this generated file, registered by its module. */
+  jniNativeRegistrations?: readonly JNINativeRegistration[]
 }
 
 /**

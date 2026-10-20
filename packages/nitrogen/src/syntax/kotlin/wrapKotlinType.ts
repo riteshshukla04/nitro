@@ -12,6 +12,7 @@ import { TupleType } from '../types/TupleType.js'
 import type { Type } from '../types/Type.js'
 import { VariantType } from '../types/VariantType.js'
 import { KotlinArrayBufferType } from './types/KotlinArrayBufferType.js'
+import { KotlinAnyJSONType } from './types/KotlinAnyJSONType.js'
 import { KotlinArrayType } from './types/KotlinArrayType.js'
 import { KotlinBooleanType } from './types/KotlinBooleanType.js'
 import { KotlinCallbackType } from './types/KotlinCallbackType.js'
@@ -81,6 +82,7 @@ export function wrapKotlinType(type: Type, options: KotlinTypeOptions = {}): Kot
       )
     }
     case 'any-json':
+      return new KotlinAnyJSONType()
     case 'custom-type':
     case 'hybrid-object-base':
       return new KotlinUnsupportedType(type, [])

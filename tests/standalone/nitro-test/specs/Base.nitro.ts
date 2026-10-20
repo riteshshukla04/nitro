@@ -1,4 +1,4 @@
-import { iOS } from 'nitro-core'
+import { Android, iOS } from 'nitro-core'
 import type { HybridObject } from 'nitro-core'
 import type { SomeExternalObject } from 'nitro-test-external'
 
@@ -17,6 +17,12 @@ export interface Size {
 
 @iOS({
   language: 'swift',
+  implementation: { className: 'HybridBase' },
+  allowMultipleImplementations: true,
+  allowInheritance: true,
+})
+@Android({
+  language: 'kotlin',
   implementation: { className: 'HybridBase' },
   allowMultipleImplementations: true,
   allowInheritance: true,

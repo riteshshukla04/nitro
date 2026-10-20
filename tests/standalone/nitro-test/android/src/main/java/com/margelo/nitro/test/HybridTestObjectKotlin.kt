@@ -4,8 +4,7 @@ import android.hardware.HardwareBuffer
 import android.util.Log
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
-import com.margelo.nitro.core.AnyMap
-import com.margelo.nitro.core.AnyValue
+import com.margelo.nitro.core.AnyJSON
 import com.margelo.nitro.core.ArrayBuffer
 import com.margelo.nitro.core.NullType
 import com.margelo.nitro.core.Promise
@@ -15,6 +14,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 import java.math.BigDecimal
 
 @Keep
@@ -140,10 +141,11 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     return { array -> array }
   }
 
-  override fun callEnumArrayPromiseCallback(callback: () -> Promise<Promise<Array<Powertrain>>>): Promise<Array<Powertrain>> {
-    return Promise.async {
-      val promise = callback().await()
-      return@async promise.await()
+  override fun callEnumArrayPromiseCallback(callback: () -> Promise<Array<Powertrain>>): Promise<Array<Powertrain>> {
+    return try {
+      callback()
+    } catch (error: Throwable) {
+      Promise.rejected(error)
     }
   }
 
@@ -168,7 +170,7 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     return functions
   }
 
-  override fun bounceMaps(maps: Array<AnyMap>): Array<AnyMap> {
+  override fun bounceMaps(maps: Array<AnyJSON>): Array<AnyJSON> {
     return maps
   }
 
@@ -195,56 +197,51 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     return strings
   }
 
-  override fun createMap(): AnyMap {
-    val map = AnyMap()
-    map.setDouble("number", numberValue)
-    map.setBoolean("bool", boolValue)
-    map.setString("string", stringValue)
-    map.setInt64("int64", int64Value)
-    map.setNull("null")
-    val array = arrayOf(AnyValue(numberValue), AnyValue(boolValue), AnyValue(stringValue), AnyValue(int64Value))
-    map.setAnyArray("array", array)
-    map.setAnyObject(
-      "object",
-      mapOf(
-        "number" to AnyValue(numberValue),
-        "bool" to AnyValue(boolValue),
-        "string" to AnyValue(stringValue),
-        "int64" to AnyValue(int64Value),
-        "null" to AnyValue(),
-        "array" to
-          AnyValue(
-            arrayOf(
-              AnyValue(numberValue),
-              AnyValue(boolValue),
-              AnyValue(stringValue),
-              AnyValue(int64Value),
-              AnyValue(array),
-            ),
-          ),
-      ),
-    )
-    return map
+  override fun createMap(): AnyJSON {
+    val values = listOf(numberValue, boolValue, stringValue, int64Value)
+    val objectValue =
+      JSONObject()
+        .put("number", numberValue)
+        .put("bool", boolValue)
+        .put("string", stringValue)
+        .put("int64", int64Value)
+        .put("null", JSONObject.NULL)
+        .put("array", JSONArray(values + listOf(JSONArray(values))))
+    val map =
+      JSONObject()
+        .put("number", numberValue)
+        .put("bool", boolValue)
+        .put("string", stringValue)
+        .put("int64", int64Value)
+        .put("null", JSONObject.NULL)
+        .put("array", JSONArray(values))
+        .put("object", objectValue)
+    return AnyJSON(map.toString())
   }
 
-  override fun getMapKeys(map: AnyMap): Array<String> {
-    return map.getAllKeys()
+  override fun getMapKeys(map: AnyJSON): Array<String> {
+    return JSONObject(map.stringRepresentation)
+      .keys()
+      .asSequence()
+      .toList()
+      .toTypedArray()
   }
 
   override fun mergeMaps(
-    a: AnyMap,
-    b: AnyMap,
-  ): AnyMap {
-    a.merge(b)
-    return a
+    a: AnyJSON,
+    b: AnyJSON,
+  ): AnyJSON {
+    val result = JSONObject(a.stringRepresentation)
+    val additions = JSONObject(b.stringRepresentation)
+    additions.keys().forEach { key -> result.put(key, additions.get(key)) }
+    return AnyJSON(result.toString())
   }
 
-  override fun copyAnyMap(map: AnyMap): AnyMap {
-    val copy = map.toHashMap()
-    return AnyMap.fromMap(copy, false)
+  override fun copyAnyMap(map: AnyJSON): AnyJSON {
+    return AnyJSON(map.stringRepresentation)
   }
 
-  override fun mapRoundtrip(map: AnyMap): AnyMap {
+  override fun mapRoundtrip(map: AnyJSON): AnyJSON {
     return map
   }
 
@@ -416,11 +413,11 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     return callback(value)
   }
 
-  override fun callCallbackThatReturnsPromiseVoid(callback: () -> Promise<Promise<Unit>>): Promise<Unit> {
-    return Promise.async {
-      val callPromise = callback()
-      val resultPromise = callPromise.await()
-      resultPromise.await()
+  override fun callCallbackThatReturnsPromiseVoid(callback: () -> Promise<Unit>): Promise<Unit> {
+    return try {
+      callback()
+    } catch (error: Throwable) {
+      Promise.rejected(error)
     }
   }
 
@@ -437,21 +434,15 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     callback(value)
   }
 
-  override fun getValueFromJSCallbackAndWait(getValue: (() -> Promise<Double>)): Promise<Double> {
-    return Promise.async {
-      val jsResult = getValue().await()
-      return@async jsResult
-    }
+  override fun getValueFromJSCallbackAndWait(getValue: () -> Double): Promise<Double> {
+    return asPromise { getValue() }
   }
 
   override fun getValueFromJsCallback(
-    callback: (() -> Promise<String>),
+    callback: () -> String,
     andThenCall: ((valueFromJs: String) -> Unit),
   ): Promise<Unit> {
-    return Promise.async {
-      val jsResult = callback().await()
-      andThenCall(jsResult)
-    }
+    return asPromise { andThenCall(callback()) }
   }
 
   override fun callAll(
@@ -465,32 +456,29 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
   }
 
   override fun callSumUpNTimes(
-    callback: () -> Promise<Double>,
+    callback: () -> Double,
     n: Double,
   ): Promise<Double> {
-    var result = 0.0
-    return Promise.async {
-      for (i in 1..n.toInt()) {
-        val current = callback().await()
-        result += current
-      }
-      return@async result
+    return asPromise {
+      var result = 0.0
+      repeat(n.toInt()) { result += callback() }
+      result
     }
   }
 
-  override fun callbackAsyncPromise(callback: () -> Promise<Promise<Double>>): Promise<Double> {
-    return Promise.async {
-      val promise = callback().await()
-      val result = promise.await()
-      return@async result
+  override fun callbackAsyncPromise(callback: () -> Promise<Double>): Promise<Double> {
+    return try {
+      callback()
+    } catch (error: Throwable) {
+      Promise.rejected(error)
     }
   }
 
-  override fun callbackAsyncPromiseBuffer(callback: () -> Promise<Promise<ArrayBuffer>>): Promise<ArrayBuffer> {
-    return Promise.async {
-      val promise = callback().await()
-      val result = promise.await()
-      return@async result
+  override fun callbackAsyncPromiseBuffer(callback: () -> Promise<ArrayBuffer>): Promise<ArrayBuffer> {
+    return try {
+      callback()
+    } catch (error: Throwable) {
+      Promise.rejected(error)
     }
   }
 
@@ -700,6 +688,14 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     return HybridChild()
   }
 
+  override fun createGrandchild(): HybridGrandchildSpec = HybridGrandchild()
+
+  override fun createChildActualGrandchild(): HybridChildSpec = HybridGrandchild()
+
+  override fun createBaseActualGrandchild(): HybridBaseSpec = HybridGrandchild()
+
+  override fun bounceGrandchild(grandchild: HybridGrandchildSpec): HybridGrandchildSpec = grandchild
+
   override fun bounceChild(child: HybridChildSpec): HybridChildSpec {
     return child
   }
@@ -750,6 +746,8 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     return externalStruct
   }
 
+  override fun bounceCppOnlyValue(value: CppOnlyValue): CppOnlyValue = value
+
   override fun bounceExternalVariant(variant: StringOrExternal): StringOrExternal {
     return variant
   }
@@ -767,6 +765,14 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     super.dispose()
     this.optionalCallback?.let { callback ->
       callback(13.0)
+    }
+  }
+
+  private inline fun <T> asPromise(action: () -> T): Promise<T> {
+    return try {
+      Promise.resolved(action())
+    } catch (error: Throwable) {
+      Promise.rejected(error)
     }
   }
 

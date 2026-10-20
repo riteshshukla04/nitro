@@ -9,7 +9,9 @@ import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './K
 export class KotlinPromiseType extends PromiseType implements KotlinType {
   override readonly resultingType: KotlinType
   readonly jniValueKind = 'pointer'
-  readonly needsKotlinConversion = false
+  get needsKotlinConversion(): boolean {
+    return this.resultingType.needsKotlinConversion
+  }
 
   constructor(readonly type: PromiseType) {
     // JNI resolves promises with objects, so primitive results are boxed.
@@ -20,9 +22,15 @@ export class KotlinPromiseType extends PromiseType implements KotlinType {
 
   convert(value: string, conversion: KotlinConversion): string {
     switch (conversion.in) {
-      case 'kotlin':
-        // Kotlin passes its public Promise through JNI without converting its result.
-        return value
+      case 'kotlin': {
+        if (!this.needsKotlinConversion) return value
+        const resultingType = conversion.from === 'c++' ? this.type.resultingType : this.resultingType
+        const resultType = resultingType.getCode('kotlin', {
+          context: 'type-argument',
+        })
+        const result = this.resultingType.convert('__result', conversion)
+        return `${value}.let { __source -> Promise<${resultType}>().also { __promise -> __source.then { __result -> __promise.resolve(${result}) }.catch { __promise.reject(it) } } }`
+      }
       case 'c++':
         switch (conversion.from) {
           case 'c++':
@@ -38,8 +46,10 @@ export class KotlinPromiseType extends PromiseType implements KotlinType {
     if (this.resultingType.kind === 'void') {
       // void: resolve()
       resolveListenerCode = `
-${value}->addOnResolvedListener([=]() {
-  __promise->cthis()->resolve(JUnit::instance());
+${value}.addOnResolvedListener([=]() {
+  jni::ThreadScope::WithClassLoader([&] {
+    __promise->resolve(JUnit::instance());
+  });
 });
 `.trim()
     } else {
@@ -52,20 +62,31 @@ ${value}->addOnResolvedListener([=]() {
         to: 'kotlin',
         in: 'c++',
       })
+      const jniResultType = this.resultingType.fromCppReturnType ?? this.resultingType.getCode('c++', { context: 'return' })
       resolveListenerCode = `
-${value}->addOnResolvedListener([=](const ${resolvingType}& __result) {
-  __promise->cthis()->resolve(${indent(jniResult, '  ')});
+${value}.addOnResolvedListener([=](const ${resolvingType}& __result) {
+  jni::ThreadScope::WithClassLoader([&] {
+    std::optional<${jniResultType}> __converted;
+    try {
+      __converted.emplace(${indent(jniResult, '      ')});
+    } catch (...) {
+      __promise->reject(std::current_exception());
+      return;
+    }
+    __promise->resolve(*__converted);
+  });
 });
 `.trim()
     }
     return `
 [&]() {
   jni::local_ref<JPromise::javaobject> __localPromise = JPromise::create();
-  jni::global_ref<JPromise::javaobject> __promise = jni::make_global(__localPromise);
+  auto __promise = JNISharedPtr::make_shared_from_jni<JPromise>(jni::make_global(__localPromise));
   ${indent(resolveListenerCode, '  ')}
-  ${value}->addOnRejectedListener([=](const std::exception_ptr& __error) {
-    auto __jniError = jni::getJavaExceptionForCppException(__error);
-    __promise->cthis()->reject(__jniError);
+  ${value}.addOnRejectedListener([=](const std::exception_ptr& __error) {
+    jni::ThreadScope::WithClassLoader([&] {
+      __promise->reject(__error);
+    });
   });
   return __localPromise;
 }()
@@ -80,7 +101,7 @@ ${value}->addOnResolvedListener([=](const ${resolvingType}& __result) {
       // it's a Promise<void>
       resolveListenerCode = `
 ${value}->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& /* unit */) {
-  __promise->resolve();
+  __promise.resolve();
 });
 `.trim()
     } else {
@@ -95,18 +116,25 @@ ${value}->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>&
       })
       resolveListenerCode = `
 ${value}->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
-  auto __result = jni::static_ref_cast<${jniResultType}>(__boxedResult);
-  __promise->resolve(${indent(cppResult, '  ')});
+  std::optional<${actualCppType}> __converted;
+  try {
+    auto __result = jni::static_ref_cast<${jniResultType}>(__boxedResult);
+    __converted.emplace(${indent(cppResult, '    ')});
+  } catch (...) {
+    __promise.reject(std::current_exception());
+    return;
+  }
+  __promise.resolve(std::move(*__converted));
 });
 `.trim()
     }
     return `
 [&]() {
-  auto __promise = Promise<${actualCppType}>::create();
+  auto __promise = Promise<${actualCppType}>::pending();
   ${indent(resolveListenerCode, '  ')}
   ${value}->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
     jni::JniException __jniError(__throwable);
-    __promise->reject(std::make_exception_ptr(__jniError));
+    __promise.reject(std::make_exception_ptr(__jniError));
   });
   return __promise;
 }()
@@ -117,8 +145,7 @@ ${value}->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>&
       case 'c++':
         return getJniReferenceCode('JPromise::javaobject', options.context)
       case 'kotlin':
-        // Kotlin passes its public Promise through JNI without converting its result.
-        return this.type.getCode(language, options)
+        return super.getCode(language, options)
       default:
         return super.getCode(language, options)
     }
@@ -128,10 +155,20 @@ ${value}->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>&
     const imports = this.type.getRequiredImports(language)
     switch (language) {
       case 'c++':
-        imports.push({
-          language: language,
-          declaration: { header: 'NitroModules/JPromise.hpp', space: 'system' },
-        })
+        imports.push(
+          { language: language, declaration: { header: 'optional', space: 'system' } },
+          {
+            language: language,
+            declaration: { header: 'NitroModules/JPromise.hpp', space: 'system' },
+          },
+          {
+            language: language,
+            declaration: {
+              header: 'NitroModules/JNISharedPtr.hpp',
+              space: 'system',
+            },
+          }
+        )
         if (this.resultingType.kind === 'void') {
           // Promise<void> resolves with JUnit
           imports.push({

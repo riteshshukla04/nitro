@@ -1,4 +1,4 @@
-import { iOS } from 'nitro-core'
+import { Android, iOS } from 'nitro-core'
 import type { Base } from './Base.nitro'
 import type { NamedVariant } from './TestObject.nitro'
 
@@ -9,6 +9,12 @@ export * from '#nitro/Child'
 // The native `Child` Swift/Kotlin class will inherit from the `Base` Swift/Kotlin class.
 @iOS({
   language: 'swift',
+  implementation: { className: 'HybridChild' },
+  allowMultipleImplementations: true,
+  allowInheritance: true,
+})
+@Android({
+  language: 'kotlin',
   implementation: { className: 'HybridChild' },
   allowMultipleImplementations: true,
   allowInheritance: true,

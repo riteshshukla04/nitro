@@ -1,4 +1,4 @@
-import { iOS } from 'nitro-core'
+import { Android, iOS } from 'nitro-core'
 import type { HybridObject, Int64, UInt64 } from 'nitro-core'
 
 export * from '#nitro/SomeExternalObject'
@@ -17,6 +17,11 @@ export interface OptionalPrimitivesHolder {
  */
 @iOS({
   language: 'swift',
+  allowMultipleImplementations: true,
+  implementation: { className: 'HybridSomeExternalObject' },
+})
+@Android({
+  language: 'kotlin',
   allowMultipleImplementations: true,
   implementation: { className: 'HybridSomeExternalObject' },
 })
