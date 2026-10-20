@@ -256,6 +256,10 @@ public:
   std::shared_ptr<HybridBaseSpec> createBase() override;
   std::shared_ptr<HybridChildSpec> createChild() override;
   std::shared_ptr<HybridBaseSpec> createBaseActualChild() override;
+  std::shared_ptr<HybridGrandchildSpec> createGrandchild() override;
+  std::shared_ptr<HybridChildSpec> createChildActualGrandchild() override;
+  std::shared_ptr<HybridBaseSpec> createBaseActualGrandchild() override;
+  std::shared_ptr<HybridGrandchildSpec> bounceGrandchild(const std::shared_ptr<HybridGrandchildSpec>& grandchild) override;
   std::shared_ptr<HybridChildSpec> bounceChild(const std::shared_ptr<HybridChildSpec>& child) override;
   std::shared_ptr<HybridBaseSpec> bounceBase(const std::shared_ptr<HybridBaseSpec>& base) override;
   std::shared_ptr<HybridBaseSpec> bounceChildBase(const std::shared_ptr<HybridChildSpec>& child) override;

@@ -43,6 +43,8 @@ namespace margelo::nitro::test { class HybridChildSpec; }
 #include <NitroTest/WeirdNumbersEnum.hpp>
 // Forward declaration of `HybridBaseSpec` to properly resolve imports.
 namespace margelo::nitro::test { class HybridBaseSpec; }
+// Forward declaration of `HybridGrandchildSpec` to properly resolve imports.
+namespace margelo::nitro::test { class HybridGrandchildSpec; }
 // Forward declaration of `HybridSomeExternalObjectSpec` to properly resolve imports.
 namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpec; }
 #include <NitroTest/ExternalObjectStruct.hpp>
@@ -228,6 +230,10 @@ namespace margelo::nitro::test {
       virtual std::shared_ptr<HybridChildSpec> createChild() = 0;
       virtual std::shared_ptr<HybridBaseSpec> createBase() = 0;
       virtual std::shared_ptr<HybridBaseSpec> createBaseActualChild() = 0;
+      virtual std::shared_ptr<HybridGrandchildSpec> createGrandchild() = 0;
+      virtual std::shared_ptr<HybridChildSpec> createChildActualGrandchild() = 0;
+      virtual std::shared_ptr<HybridBaseSpec> createBaseActualGrandchild() = 0;
+      virtual std::shared_ptr<HybridGrandchildSpec> bounceGrandchild(const std::shared_ptr<HybridGrandchildSpec>& grandchild) = 0;
       virtual std::shared_ptr<HybridChildSpec> bounceChild(const std::shared_ptr<HybridChildSpec>& child) = 0;
       virtual std::shared_ptr<HybridBaseSpec> bounceBase(const std::shared_ptr<HybridBaseSpec>& base) = 0;
       virtual std::shared_ptr<HybridBaseSpec> bounceChildBase(const std::shared_ptr<HybridChildSpec>& child) = 0;

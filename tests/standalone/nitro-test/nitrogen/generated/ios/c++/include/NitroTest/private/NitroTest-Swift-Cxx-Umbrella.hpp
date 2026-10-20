@@ -57,6 +57,8 @@
 #include <NitroTest/private/NamedVariant-Swift.hpp>
 #include <NitroTest/HybridChildSpec.hpp>
 #include <NitroTest/private/HybridChildSpec_cxx-Swift.hpp>
+#include <NitroTest/HybridGrandchildSpec.hpp>
+#include <NitroTest/private/HybridGrandchildSpec_cxx-Swift.hpp>
 #include <NitroTest/HybridPlatformObjectSpec.hpp>
 #include <NitroTest/private/HybridPlatformObjectSpec_cxx-Swift.hpp>
 #include <NitroModules/Null.hpp>

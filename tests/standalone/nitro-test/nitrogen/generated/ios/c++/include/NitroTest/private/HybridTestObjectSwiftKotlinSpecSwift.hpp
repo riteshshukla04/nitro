@@ -349,6 +349,14 @@ namespace margelo::nitro::test {
     NitroTest::HybridBaseSpec_cxx createBase_Swift();
     std::shared_ptr<HybridBaseSpec> createBaseActualChild() override;
     NitroTest::HybridBaseSpec_cxx createBaseActualChild_Swift();
+    std::shared_ptr<HybridGrandchildSpec> createGrandchild() override;
+    NitroTest::HybridGrandchildSpec_cxx createGrandchild_Swift();
+    std::shared_ptr<HybridChildSpec> createChildActualGrandchild() override;
+    NitroTest::HybridChildSpec_cxx createChildActualGrandchild_Swift();
+    std::shared_ptr<HybridBaseSpec> createBaseActualGrandchild() override;
+    NitroTest::HybridBaseSpec_cxx createBaseActualGrandchild_Swift();
+    std::shared_ptr<HybridGrandchildSpec> bounceGrandchild(const std::shared_ptr<HybridGrandchildSpec>& grandchild) override;
+    NitroTest::HybridGrandchildSpec_cxx bounceGrandchild_Swift(const NitroTest::HybridGrandchildSpec_cxx& grandchild);
     std::shared_ptr<HybridChildSpec> bounceChild(const std::shared_ptr<HybridChildSpec>& child) override;
     NitroTest::HybridChildSpec_cxx bounceChild_Swift(const NitroTest::HybridChildSpec_cxx& child);
     std::shared_ptr<HybridBaseSpec> bounceBase(const std::shared_ptr<HybridBaseSpec>& base) override;

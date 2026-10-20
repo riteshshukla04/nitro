@@ -688,6 +688,22 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     return HybridChild()
   }
 
+  func createGrandchild() throws -> (any HybridGrandchildSpec) {
+    return HybridGrandchild()
+  }
+
+  func createChildActualGrandchild() throws -> (any HybridChildSpec) {
+    return HybridGrandchild()
+  }
+
+  func createBaseActualGrandchild() throws -> (any HybridBaseSpec) {
+    return HybridGrandchild()
+  }
+
+  func bounceGrandchild(grandchild: (any HybridGrandchildSpec)) throws -> (any HybridGrandchildSpec) {
+    return grandchild
+  }
+
   func bounceChild(child: (any HybridChildSpec)) throws -> (any HybridChildSpec) {
     return child
   }

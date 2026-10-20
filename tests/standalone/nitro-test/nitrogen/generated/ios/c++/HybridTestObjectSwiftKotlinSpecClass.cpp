@@ -36,6 +36,7 @@
 #include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroTest/WeirdNumbersEnum.hpp>
 #include <NitroTest/HybridBaseSpec.hpp>
+#include <NitroTest/HybridGrandchildSpec.hpp>
 #include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
 #include <NitroTest/ExternalObjectStruct.hpp>
 
@@ -171,6 +172,10 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("createChild", &HybridTestObjectSwiftKotlinSpec::createChild);
       clazz.registerHybridMethod("createBase", &HybridTestObjectSwiftKotlinSpec::createBase);
       clazz.registerHybridMethod("createBaseActualChild", &HybridTestObjectSwiftKotlinSpec::createBaseActualChild);
+      clazz.registerHybridMethod("createGrandchild", &HybridTestObjectSwiftKotlinSpec::createGrandchild);
+      clazz.registerHybridMethod("createChildActualGrandchild", &HybridTestObjectSwiftKotlinSpec::createChildActualGrandchild);
+      clazz.registerHybridMethod("createBaseActualGrandchild", &HybridTestObjectSwiftKotlinSpec::createBaseActualGrandchild);
+      clazz.registerHybridMethod("bounceGrandchild", &HybridTestObjectSwiftKotlinSpec::bounceGrandchild);
       clazz.registerHybridMethod("bounceChild", &HybridTestObjectSwiftKotlinSpec::bounceChild);
       clazz.registerHybridMethod("bounceBase", &HybridTestObjectSwiftKotlinSpec::bounceBase);
       clazz.registerHybridMethod("bounceChildBase", &HybridTestObjectSwiftKotlinSpec::bounceChildBase);

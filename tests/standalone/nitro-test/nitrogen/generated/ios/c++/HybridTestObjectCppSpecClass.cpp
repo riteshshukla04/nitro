@@ -37,6 +37,7 @@
 #include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroTest/WeirdNumbersEnum.hpp>
 #include <NitroTest/HybridBaseSpec.hpp>
+#include <NitroTest/HybridGrandchildSpec.hpp>
 #include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
 #include <NitroTest/ExternalObjectStruct.hpp>
 #include <NitroModules/HybridObject.hpp>
@@ -203,6 +204,10 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("createChild", &HybridTestObjectCppSpec::createChild);
       clazz.registerHybridMethod("createBase", &HybridTestObjectCppSpec::createBase);
       clazz.registerHybridMethod("createBaseActualChild", &HybridTestObjectCppSpec::createBaseActualChild);
+      clazz.registerHybridMethod("createGrandchild", &HybridTestObjectCppSpec::createGrandchild);
+      clazz.registerHybridMethod("createChildActualGrandchild", &HybridTestObjectCppSpec::createChildActualGrandchild);
+      clazz.registerHybridMethod("createBaseActualGrandchild", &HybridTestObjectCppSpec::createBaseActualGrandchild);
+      clazz.registerHybridMethod("bounceGrandchild", &HybridTestObjectCppSpec::bounceGrandchild);
       clazz.registerHybridMethod("bounceChild", &HybridTestObjectCppSpec::bounceChild);
       clazz.registerHybridMethod("bounceBase", &HybridTestObjectCppSpec::bounceBase);
       clazz.registerHybridMethod("bounceChildBase", &HybridTestObjectCppSpec::bounceChildBase);

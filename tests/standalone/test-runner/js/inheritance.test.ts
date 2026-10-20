@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import { casesForTestObjects } from './utils/cases'
 
 import { NitroModules } from 'nitro-core'
+import { Base, Child, Grandchild, SizeUnit, TestObjectSwiftKotlin } from 'nitro-test'
 import { HybridChild } from './utils/testObjects'
 
 const CHILD_TO_STRING = 'HybridChild custom toString() :)'
@@ -42,6 +43,32 @@ export const cases = {
       expect(Object.is(NitroModules.isHybridObject(child), true)).to.equal(true)
       expect(child).to.have.property('childValue', 30)
       expect(child).to.have.property('baseValue', 20)
+    },
+
+    'createGrandchild() returns a Grandchild with Child and Base members': (testObject) => {
+      const grandchild = testObject.createGrandchild()
+      expect(NitroModules.isHybridObject(grandchild)).to.equal(true)
+      expect(grandchild.constructor.name).to.equal('Grandchild')
+      expect(grandchild.grandchildValue).to.equal(40)
+      expect(grandchild.childValue).to.equal(30)
+      expect(grandchild.baseValue).to.equal(20)
+    },
+
+    'createChildActualGrandchild() preserves the Grandchild type': (testObject) => {
+      const child = testObject.createChildActualGrandchild()
+      expect(child.constructor.name).to.equal('Grandchild')
+      expect(child).to.have.property('grandchildValue', 40)
+      // @ts-expect-error - typed as a Child, but it is actually a Grandchild
+      expect(Object.is(testObject.bounceGrandchild(child), child)).to.equal(true)
+    },
+
+    'createBaseActualGrandchild() preserves the Grandchild type': (testObject) => {
+      const base = testObject.createBaseActualGrandchild()
+      expect(base.constructor.name).to.equal('Grandchild')
+      expect(base).to.have.property('grandchildValue', 40)
+      expect(base).to.have.property('childValue', 30)
+      // @ts-expect-error - typed as a Base, but it is actually a Grandchild
+      expect(Object.is(testObject.bounceGrandchild(base), base)).to.equal(true)
     },
 
     'createBase() has name "Base"': (testObject) => {
@@ -90,6 +117,15 @@ export const cases = {
     'bounceBase(Child) returns the same Child': (testObject) => {
       const child = testObject.createChild()
       expect(Object.is(testObject.bounceBase(child), child)).to.equal(true)
+    },
+
+    'Grandchild roundtrips through Grandchild, Child and Base': (testObject) => {
+      const grandchild = testObject.createGrandchild()
+      expect(Object.is(testObject.bounceGrandchild(grandchild), grandchild)).to.equal(true)
+      expect(Object.is(testObject.bounceChild(grandchild), grandchild)).to.equal(true)
+      expect(Object.is(testObject.bounceBase(grandchild), grandchild)).to.equal(true)
+      expect(Object.is(testObject.bounceChildBase(grandchild), grandchild)).to.equal(true)
+      expect(Object.is(testObject.castBase(grandchild), grandchild)).to.equal(true)
     },
 
     // In release, the downcast check is optimized away and this would crash.
@@ -162,8 +198,43 @@ export const cases = {
     'createChild() is not equal to another Child': (testObject) => {
       expect(Object.is(testObject.createChild().equals(testObject.createChild()), false)).to.equal(true)
     },
+
+    'createGrandchild() inherits Child and Base methods': async (testObject) => {
+      const grandchild = testObject.createGrandchild()
+      const size = { width: 12, height: 34, unit: SizeUnit.Points }
+      expect(grandchild.toString()).to.equal(CHILD_TO_STRING)
+      expect(grandchild.bounceVariant('grandchild')).to.equal('grandchild')
+      expect(grandchild.bounceSize(size)).to.deep.equal(size)
+      expect(grandchild.bounceSizeUnit(SizeUnit.Pixels)).to.equal(SizeUnit.Pixels)
+      expect(await grandchild.mapSize(size, (value) => ({ ...value, width: value.width * 2 }))).to.deep.equal({
+        ...size,
+        width: 24,
+      })
+    },
+
+    'Base and Child do not have Grandchild members': (testObject) => {
+      expect(testObject.createBase()).not.to.have.property('grandchildValue')
+      expect(testObject.createChild()).not.to.have.property('grandchildValue')
+    },
   }),
   ...casesForTestObjects('Inheritance prototypes', {
+    'createGrandchild() prototype extends Child and Base': (testObject) => {
+      const grandchild = testObject.createGrandchild()
+      const child = testObject.createChild()
+      const base = testObject.createBase()
+      const grandchildPrototype = Object.getPrototypeOf(grandchild)
+      const childPrototype = Object.getPrototypeOf(child)
+      const basePrototype = Object.getPrototypeOf(base)
+      expect(isSamePrototype(Object.getPrototypeOf(grandchildPrototype), childPrototype)).to.equal(true)
+      expect(isSamePrototype(Object.getPrototypeOf(childPrototype), basePrototype)).to.equal(true)
+      expect(grandchild).to.be.instanceOf(grandchild.constructor)
+      expect(grandchild).to.be.instanceOf(child.constructor)
+      expect(grandchild).to.be.instanceOf(base.constructor)
+      expect(isSamePrototype(grandchildPrototype, Object.getPrototypeOf(testObject.createGrandchild()))).to.equal(true)
+      expect(isSamePrototype(grandchildPrototype, Object.getPrototypeOf(testObject.createChildActualGrandchild()))).to.equal(true)
+      expect(isSamePrototype(grandchildPrototype, Object.getPrototypeOf(testObject.createBaseActualGrandchild()))).to.equal(true)
+    },
+
     'createChild() prototype extends the createBase() prototype': (testObject) => {
       const childPrototype = Object.getPrototypeOf(testObject.createChild())
       const basePrototype = Object.getPrototypeOf(testObject.createBase())
@@ -208,6 +279,17 @@ export const cases = {
       expect(getPrototypeTypes(testObject.createBase())).to.deep.equal(['Prototype<Base>', 'Prototype<HybridObject>'])
     },
   }),
+}
+
+export function registeredGrandchildConstructor(): void {
+  const grandchild = new Grandchild()
+  const testObject = new TestObjectSwiftKotlin()
+  expect(grandchild.grandchildValue).to.equal(40)
+  expect(grandchild).to.be.instanceOf(Grandchild)
+  expect(grandchild).to.be.instanceOf(Child)
+  expect(grandchild).to.be.instanceOf(Base)
+  expect(isSamePrototype(Object.getPrototypeOf(grandchild), Object.getPrototypeOf(testObject.createGrandchild()))).to.equal(true)
+  expect(Object.is(testObject.bounceGrandchild(grandchild), grandchild)).to.equal(true)
 }
 
 export const skips = {

@@ -1289,6 +1289,42 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
+  public final func createGrandchild() -> bridge.Result_void_ {
+    do {
+      let value = try __implementation.createGrandchild()
+      return bridge.Result_void_.withValue(value.getCxxWrapper().toUnsafe())
+    } catch {
+      return bridge.Result_void_.withError(error.toCpp())
+    }
+  }
+
+  public final func createChildActualGrandchild() -> bridge.Result_void_ {
+    do {
+      let value = try __implementation.createChildActualGrandchild()
+      return bridge.Result_void_.withValue(value.getCxxWrapper().toUnsafe())
+    } catch {
+      return bridge.Result_void_.withError(error.toCpp())
+    }
+  }
+
+  public final func createBaseActualGrandchild() -> bridge.Result_void_ {
+    do {
+      let value = try __implementation.createBaseActualGrandchild()
+      return bridge.Result_void_.withValue(value.getCxxWrapper().toUnsafe())
+    } catch {
+      return bridge.Result_void_.withError(error.toCpp())
+    }
+  }
+
+  public final func bounceGrandchild(grandchild: HybridGrandchildSpec_cxx) -> bridge.Result_void_ {
+    do {
+      let value = try __implementation.bounceGrandchild(grandchild: grandchild.getHybridGrandchildSpec())
+      return bridge.Result_void_.withValue(value.getCxxWrapper().toUnsafe())
+    } catch {
+      return bridge.Result_void_.withError(error.toCpp())
+    }
+  }
+
   public final func bounceChild(child: HybridChildSpec_cxx) -> bridge.Result_void_ {
     do {
       let value = try __implementation.bounceChild(child: child.getHybridChildSpec())

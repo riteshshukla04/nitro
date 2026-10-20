@@ -38,6 +38,8 @@ namespace NitroTest { class Car; }
 namespace NitroTest { class NamedVariant_cxx; }
 // Forward declaration of `HybridChildSpec_cxx` to properly resolve imports.
 namespace NitroTest { class HybridChildSpec_cxx; }
+// Forward declaration of `HybridGrandchildSpec_cxx` to properly resolve imports.
+namespace NitroTest { class HybridGrandchildSpec_cxx; }
 // Forward declaration of `HybridPlatformObjectSpec_cxx` to properly resolve imports.
 namespace NitroTest { class HybridPlatformObjectSpec_cxx; }
 #include <NitroModules/Null.hpp>
@@ -121,6 +123,8 @@ namespace margelo::nitro::test { class HybridBaseSpec; }
 #include <NitroModules/NitroDefines.hpp>
 // Forward declaration of `HybridChildSpec` to properly resolve imports.
 namespace margelo::nitro::test { class HybridChildSpec; }
+// Forward declaration of `HybridGrandchildSpec` to properly resolve imports.
+namespace margelo::nitro::test { class HybridGrandchildSpec; }
 // Forward declaration of `HybridPlatformObjectSpec` to properly resolve imports.
 namespace margelo::nitro::test { class HybridPlatformObjectSpec; }
 // Forward declaration of `HybridSomeExternalObjectSpec` to properly resolve imports.
@@ -156,6 +160,12 @@ namespace margelo::nitro::test::swift_bridge {
   std__shared_ptr_HybridChildSpec_ create_std__shared_ptr_HybridChildSpec_(void* NON_NULL pointer);
   void* NON_NULL get_std__shared_ptr_HybridChildSpec_(const std__shared_ptr_HybridChildSpec_& value);
   std::shared_ptr<HybridBaseSpec> upcast_Child_to_Base(const std__shared_ptr_HybridChildSpec_& value);
+  using std__shared_ptr_HybridGrandchildSpec_ = std::shared_ptr<HybridGrandchildSpec>;
+  using std__weak_ptr_HybridGrandchildSpec_ = std::weak_ptr<HybridGrandchildSpec>;
+  inline std__weak_ptr_HybridGrandchildSpec_ weakify_std__shared_ptr_HybridGrandchildSpec_(const std__shared_ptr_HybridGrandchildSpec_& value) { return value; }
+  std__shared_ptr_HybridGrandchildSpec_ create_std__shared_ptr_HybridGrandchildSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_HybridGrandchildSpec_(const std__shared_ptr_HybridGrandchildSpec_& value);
+  std::shared_ptr<HybridChildSpec> upcast_Grandchild_to_Child(const std__shared_ptr_HybridGrandchildSpec_& value);
   using std__shared_ptr_HybridPlatformObjectSpec_ = std::shared_ptr<HybridPlatformObjectSpec>;
   using std__weak_ptr_HybridPlatformObjectSpec_ = std::weak_ptr<HybridPlatformObjectSpec>;
   inline std__weak_ptr_HybridPlatformObjectSpec_ weakify_std__shared_ptr_HybridPlatformObjectSpec_(const std__shared_ptr_HybridPlatformObjectSpec_& value) { return value; }

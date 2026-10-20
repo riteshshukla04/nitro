@@ -27,7 +27,7 @@ public extension HybridChildSpec_protocol {
 open class HybridChildSpec_base: HybridBaseSpec_base {
   private weak var cxxWrapper: HybridChildSpec_cxx? = nil
   public override init() { super.init() }
-  public final override func getCxxWrapper() -> HybridChildSpec_cxx {
+  open override func getCxxWrapper() -> HybridChildSpec_cxx {
   #if DEBUG
     guard self is any HybridChildSpec else {
       fatalError("`self` is not a `HybridChildSpec`! Did you accidentally inherit from `HybridChildSpec_base` instead of `HybridChildSpec`?")

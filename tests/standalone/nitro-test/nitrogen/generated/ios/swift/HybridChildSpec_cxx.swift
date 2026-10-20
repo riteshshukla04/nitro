@@ -13,7 +13,7 @@ public import NitroTestAppleCxx
  * In C++, we cannot use Swift protocols - so we need to wrap it in a class to make it strongly defined.
  */
 @_expose(Cxx)
-public final class HybridChildSpec_cxx: HybridBaseSpec_cxx {
+open class HybridChildSpec_cxx: HybridBaseSpec_cxx {
   /**
    * The Swift <> C++ bridge's namespace (`margelo::nitro::test::swift_bridge`)
    * from `NitroTestAppleCxx/NitroTestAppleCxx.h`.
@@ -24,7 +24,7 @@ public final class HybridChildSpec_cxx: HybridBaseSpec_cxx {
   /**
    * Holds the Swift implementation of `HybridChildSpec`.
    */
-  private let __implementation: HybridChild
+  private let __implementation: any HybridChildSpec
 
   /**
    * Holds a weak pointer to the C++ class that wraps the Swift class.
@@ -35,9 +35,6 @@ public final class HybridChildSpec_cxx: HybridBaseSpec_cxx {
    * Create a new `HybridChildSpec_cxx` that wraps the given `HybridChildSpec`.
    */
   public init(_ implementation: any HybridChildSpec) {
-    guard let implementation = implementation as? HybridChild else {
-      preconditionFailure("Child selects HybridChild as its Swift implementation. Every instance must inherit HybridChild.")
-    }
     self.__implementation = implementation
     super.init(implementation)
   }
@@ -54,7 +51,7 @@ public final class HybridChildSpec_cxx: HybridBaseSpec_cxx {
    * Casts this instance to a retained unsafe raw pointer.
    * This acquires one additional strong reference on the object!
    */
-  public override func toUnsafe() -> UnsafeMutableRawPointer {
+  open override func toUnsafe() -> UnsafeMutableRawPointer {
     return Unmanaged.passRetained(self).toOpaque()
   }
 
@@ -63,7 +60,7 @@ public final class HybridChildSpec_cxx: HybridBaseSpec_cxx {
    * The pointer has to be a retained opaque `Unmanaged<HybridChildSpec_cxx>`.
    * This removes one strong reference from the object!
    */
-  public override class func fromUnsafe(pointer: UnsafeMutableRawPointer) -> HybridChildSpec_cxx {
+  open override class func fromUnsafe(pointer: UnsafeMutableRawPointer) -> HybridChildSpec_cxx {
     return Unmanaged<HybridChildSpec_cxx>.fromOpaque(pointer).takeRetainedValue()
   }
 
@@ -71,7 +68,7 @@ public final class HybridChildSpec_cxx: HybridBaseSpec_cxx {
    * Gets (or creates) the C++ part of this Hybrid Object.
    * The C++ part is a `std::shared_ptr<HybridChildSpec>`.
    */
-  public func getCxxPart() -> bridge.std__shared_ptr_HybridChildSpec_ {
+  open func getCxxPart() -> bridge.std__shared_ptr_HybridChildSpec_ {
     let cached = __cxxPart.lock()
     if cached.use_count() > 0 {
       return cached
@@ -83,7 +80,7 @@ public final class HybridChildSpec_cxx: HybridBaseSpec_cxx {
   // C++ uses the accessor for this spec. Keep base upcasts in Swift to avoid
   // exporting the same imported pointer metadata from two Swift modules.
   @_expose(!Cxx)
-  public override func getCxxPart() -> bridge.std__shared_ptr_HybridBaseSpec_ {
+  open override func getCxxPart() -> bridge.std__shared_ptr_HybridBaseSpec_ {
     let own: bridge.std__shared_ptr_HybridChildSpec_ = getCxxPart()
     return bridge.upcast_Child_to_Base(own)
   }
@@ -101,7 +98,7 @@ public final class HybridChildSpec_cxx: HybridBaseSpec_cxx {
    * so the JS VM can properly track it and garbage-collect the JS object if needed.
    */
   @inline(__always)
-  public override var memorySize: Int {
+  open override var memorySize: Int {
     return MemoryHelper.getSizeOf(__implementation) + __implementation.memorySize
   }
 
@@ -118,7 +115,7 @@ public final class HybridChildSpec_cxx: HybridBaseSpec_cxx {
    * This _may_ be called manually from JS.
    */
   @inline(__always)
-  public override func dispose() {
+  open override func dispose() {
     __implementation.dispose()
   }
 
@@ -126,7 +123,7 @@ public final class HybridChildSpec_cxx: HybridBaseSpec_cxx {
    * Call toString() on the Swift class.
    */
   @inline(__always)
-  public override func toString() -> String {
+  open override func toString() -> String {
     return __implementation.toString()
   }
 

@@ -25,7 +25,7 @@ namespace margelo::nitro::test {
    * Once Swift can inherit from C++ classes, the Swift implementation could
    * inherit HybridChildSpec directly to simplify this structure.
    */
-  class HybridChildSpecSwift final : public virtual HybridChildSpec, public virtual HybridBaseSpecSwift {
+  class HybridChildSpecSwift : public virtual HybridChildSpec, public virtual HybridBaseSpecSwift {
   public:
     struct Class {
       using Base = HybridBaseSpecSwift::Class;

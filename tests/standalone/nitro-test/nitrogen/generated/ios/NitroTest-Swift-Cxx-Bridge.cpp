@@ -17,6 +17,8 @@
 #include <NitroTest/HybridChildSpec.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroTest/HybridBaseSpec.hpp>
+#include <NitroTest/private/HybridGrandchildSpecSwift.hpp>
+#include <NitroTest/HybridGrandchildSpec.hpp>
 #include <NitroTest/private/HybridPlatformObjectSpecSwift.hpp>
 #include <NitroTest/private/Powertrain-Swift.hpp>
 #include <NitroModules/JSIConverter+SwiftArray.hpp>
@@ -108,6 +110,18 @@ namespace margelo::nitro::test::swift_bridge {
   }
 
   std::shared_ptr<HybridBaseSpec> upcast_Child_to_Base(const std__shared_ptr_HybridChildSpec_& value) { return value; }
+
+  std__shared_ptr_HybridGrandchildSpec_ create_std__shared_ptr_HybridGrandchildSpec_(void* NON_NULL pointer) {
+    return std::make_shared<margelo::nitro::test::HybridGrandchildSpecSwift>(NitroTest::HybridGrandchildSpec_cxx::fromUnsafe(pointer));
+  }
+
+  void* NON_NULL get_std__shared_ptr_HybridGrandchildSpec_(const std__shared_ptr_HybridGrandchildSpec_& value) {
+    auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::HybridGrandchildSpecSwift>(value);
+    if (!wrapper) throw std::runtime_error("HybridGrandchildSpec is not implemented in Swift");
+    return wrapper->getSwiftPart().toUnsafe();
+  }
+
+  std::shared_ptr<HybridChildSpec> upcast_Grandchild_to_Child(const std__shared_ptr_HybridGrandchildSpec_& value) { return value; }
 
   std__shared_ptr_HybridPlatformObjectSpec_ create_std__shared_ptr_HybridPlatformObjectSpec_(void* NON_NULL pointer) {
     return std::make_shared<margelo::nitro::test::HybridPlatformObjectSpecSwift>(NitroTest::HybridPlatformObjectSpec_cxx::fromUnsafe(pointer));

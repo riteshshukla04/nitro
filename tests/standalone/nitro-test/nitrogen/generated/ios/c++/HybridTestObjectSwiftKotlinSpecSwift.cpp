@@ -1781,6 +1781,58 @@ namespace margelo::nitro::test {
     return NitroTest::HybridBaseSpec_cxx::fromUnsafe(__result.value());
   }
 
+  std::shared_ptr<HybridGrandchildSpec> HybridTestObjectSwiftKotlinSpecSwift::createGrandchild() {
+    auto __result = createGrandchild_Swift();
+    return SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridGrandchildSpec>, NitroTest::HybridGrandchildSpec_cxx>::fromSwift(__result);
+  }
+
+  NitroTest::HybridGrandchildSpec_cxx HybridTestObjectSwiftKotlinSpecSwift::createGrandchild_Swift() {
+    auto __result = _swiftPart.createGrandchild();
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return NitroTest::HybridGrandchildSpec_cxx::fromUnsafe(__result.value());
+  }
+
+  std::shared_ptr<HybridChildSpec> HybridTestObjectSwiftKotlinSpecSwift::createChildActualGrandchild() {
+    auto __result = createChildActualGrandchild_Swift();
+    return SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridChildSpec>, NitroTest::HybridChildSpec_cxx>::fromSwift(__result);
+  }
+
+  NitroTest::HybridChildSpec_cxx HybridTestObjectSwiftKotlinSpecSwift::createChildActualGrandchild_Swift() {
+    auto __result = _swiftPart.createChildActualGrandchild();
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return NitroTest::HybridChildSpec_cxx::fromUnsafe(__result.value());
+  }
+
+  std::shared_ptr<HybridBaseSpec> HybridTestObjectSwiftKotlinSpecSwift::createBaseActualGrandchild() {
+    auto __result = createBaseActualGrandchild_Swift();
+    return SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, NitroTest::HybridBaseSpec_cxx>::fromSwift(__result);
+  }
+
+  NitroTest::HybridBaseSpec_cxx HybridTestObjectSwiftKotlinSpecSwift::createBaseActualGrandchild_Swift() {
+    auto __result = _swiftPart.createBaseActualGrandchild();
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return NitroTest::HybridBaseSpec_cxx::fromUnsafe(__result.value());
+  }
+
+  std::shared_ptr<HybridGrandchildSpec> HybridTestObjectSwiftKotlinSpecSwift::bounceGrandchild(const std::shared_ptr<HybridGrandchildSpec>& grandchild) {
+    auto __result = bounceGrandchild_Swift(SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridGrandchildSpec>, NitroTest::HybridGrandchildSpec_cxx>::toSwift(grandchild));
+    return SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridGrandchildSpec>, NitroTest::HybridGrandchildSpec_cxx>::fromSwift(__result);
+  }
+
+  NitroTest::HybridGrandchildSpec_cxx HybridTestObjectSwiftKotlinSpecSwift::bounceGrandchild_Swift(const NitroTest::HybridGrandchildSpec_cxx& grandchild) {
+    auto __result = _swiftPart.bounceGrandchild(grandchild);
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return NitroTest::HybridGrandchildSpec_cxx::fromUnsafe(__result.value());
+  }
+
   std::shared_ptr<HybridChildSpec> HybridTestObjectSwiftKotlinSpecSwift::bounceChild(const std::shared_ptr<HybridChildSpec>& child) {
     auto __result = bounceChild_Swift(SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridChildSpec>, NitroTest::HybridChildSpec_cxx>::toSwift(child));
     return SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridChildSpec>, NitroTest::HybridChildSpec_cxx>::fromSwift(__result);
@@ -2154,6 +2206,10 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("createChild", &HybridTestObjectSwiftKotlinSpecSwift::createChild_Swift);
       clazz.registerHybridMethod("createBase", &HybridTestObjectSwiftKotlinSpecSwift::createBase_Swift);
       clazz.registerHybridMethod("createBaseActualChild", &HybridTestObjectSwiftKotlinSpecSwift::createBaseActualChild_Swift);
+      clazz.registerHybridMethod("createGrandchild", &HybridTestObjectSwiftKotlinSpecSwift::createGrandchild_Swift);
+      clazz.registerHybridMethod("createChildActualGrandchild", &HybridTestObjectSwiftKotlinSpecSwift::createChildActualGrandchild_Swift);
+      clazz.registerHybridMethod("createBaseActualGrandchild", &HybridTestObjectSwiftKotlinSpecSwift::createBaseActualGrandchild_Swift);
+      clazz.registerHybridMethod("bounceGrandchild", &HybridTestObjectSwiftKotlinSpecSwift::bounceGrandchild_Swift);
       clazz.registerHybridMethod("bounceChild", &HybridTestObjectSwiftKotlinSpecSwift::bounceChild_Swift);
       clazz.registerHybridMethod("bounceBase", &HybridTestObjectSwiftKotlinSpecSwift::bounceBase_Swift);
       clazz.registerHybridMethod("bounceChildBase", &HybridTestObjectSwiftKotlinSpecSwift::bounceChildBase_Swift);

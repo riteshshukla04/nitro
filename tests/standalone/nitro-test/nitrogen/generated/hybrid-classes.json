@@ -13,8 +13,18 @@
     },
     "Child": {
       "ios": {
+        "allowInheritance": true,
+        "allowMultipleImplementations": true,
         "implementation": {
           "className": "HybridChild"
+        },
+        "language": "swift"
+      }
+    },
+    "Grandchild": {
+      "ios": {
+        "implementation": {
+          "className": "HybridGrandchild"
         },
         "language": "swift"
       }

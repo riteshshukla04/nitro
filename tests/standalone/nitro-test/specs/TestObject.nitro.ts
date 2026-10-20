@@ -2,6 +2,7 @@ import { iOS } from 'nitro-core'
 import { type HybridObject, type AnyJSON, type CustomType, type AnyHybridObject, type UInt64, type Int64, type Inline } from 'nitro-core'
 import type { SomeExternalObject } from 'nitro-test-external'
 import type { Child } from './Child.nitro'
+import type { Grandchild } from './Grandchild.nitro'
 import type { Base } from './Base.nitro'
 
 export * from '#nitro/TestObjectCpp'
@@ -306,6 +307,10 @@ export declare class TestObjectCpp extends HybridObject {
   createChild(): Child
   createBase(): Base
   createBaseActualChild(): Base
+  createGrandchild(): Grandchild
+  createChildActualGrandchild(): Child
+  createBaseActualGrandchild(): Base
+  bounceGrandchild(grandchild: Grandchild): Grandchild
   bounceChild(child: Child): Child
   bounceBase(base: Base): Base
   bounceChildBase(child: Child): Base
@@ -528,6 +533,10 @@ export declare class TestObjectSwiftKotlin extends HybridObject {
   createChild(): Child
   createBase(): Base
   createBaseActualChild(): Base
+  createGrandchild(): Grandchild
+  createChildActualGrandchild(): Child
+  createBaseActualGrandchild(): Base
+  bounceGrandchild(grandchild: Grandchild): Grandchild
   bounceChild(child: Child): Child
   bounceBase(base: Base): Base
   bounceChildBase(child: Child): Base

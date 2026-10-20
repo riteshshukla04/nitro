@@ -16,6 +16,7 @@
 
 #include "HybridBase.hpp"
 #include "HybridChild.hpp"
+#include "HybridGrandchild.hpp"
 #include "HybridSomeInternalObject.hpp"
 
 namespace margelo::nitro::test {
@@ -905,6 +906,22 @@ std::shared_ptr<HybridChildSpec> HybridTestObjectCpp::createChild() {
 
 std::shared_ptr<HybridBaseSpec> HybridTestObjectCpp::createBaseActualChild() {
   return std::make_shared<HybridChild>();
+}
+
+std::shared_ptr<HybridGrandchildSpec> HybridTestObjectCpp::createGrandchild() {
+  return std::make_shared<HybridGrandchild>();
+}
+
+std::shared_ptr<HybridChildSpec> HybridTestObjectCpp::createChildActualGrandchild() {
+  return std::make_shared<HybridGrandchild>();
+}
+
+std::shared_ptr<HybridBaseSpec> HybridTestObjectCpp::createBaseActualGrandchild() {
+  return std::make_shared<HybridGrandchild>();
+}
+
+std::shared_ptr<HybridGrandchildSpec> HybridTestObjectCpp::bounceGrandchild(const std::shared_ptr<HybridGrandchildSpec>& grandchild) {
+  return grandchild;
 }
 
 std::shared_ptr<HybridChildSpec> HybridTestObjectCpp::bounceChild(const std::shared_ptr<HybridChildSpec>& child) {
