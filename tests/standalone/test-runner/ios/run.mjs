@@ -16,6 +16,7 @@ const { values } = parseArgs({
     },
     'destination': { type: 'string', default: process.env.NITRO_IOS_DESTINATION },
     'sanitizer': { type: 'string', default: 'none' },
+    'workers': { type: 'string', default: process.env.NITRO_TEST_WORKERS ?? 'auto' },
     'skip-hermes-build': { type: 'boolean', default: false },
     'help': { type: 'boolean', short: 'h' },
   },
@@ -30,10 +31,11 @@ Defaults live in tests/standalone/test-runner/ios/config.json.
   --jobs N              Parallel build jobs (default: ${defaults.jobs})
   --destination VALUE   Explicit xcodebuild destination, overriding OS/device selection
   --sanitizer MODE      none, address or thread (default: none)
+  --workers N           Runtime groups that run at once, or auto for one per CPU core but one, at least two (default: auto)
   --skip-hermes-build    Reuse an XCFramework already built for this architecture/toolchain
   -h, --help            Show this help
 
-DEVELOPER_DIR selects Xcode. NITRO_IOS_DESTINATION and NITRO_TEST_JOBS remain supported.`)
+DEVELOPER_DIR selects Xcode. NITRO_IOS_DESTINATION, NITRO_TEST_JOBS and NITRO_TEST_WORKERS remain supported.`)
   process.exit(0)
 }
 if (!/^\d+(\.\d+){0,2}$/.test(values.os)) {
@@ -49,6 +51,9 @@ const architecture = values.arch === 'auto' ? { arm64: 'arm64', x64: 'x86_64' }[
 if (!architecture) throw new Error(`Unsupported host architecture: ${process.arch}`)
 const jobs = Number(values.jobs)
 if (!Number.isSafeInteger(jobs) || jobs < 1) throw new Error('--jobs must be a positive integer')
+if (values.workers !== 'auto' && !(Number.isSafeInteger(Number(values.workers)) && Number(values.workers) >= 1)) {
+  throw new Error('--workers must be auto or a positive integer')
+}
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..')
 const environment = { ...process.env }
@@ -116,6 +121,7 @@ mkdirSync(results, { recursive: true })
 // The tests append one JSON line per runtime group to this file.
 const groupReport = path.join(results, 'runtime-groups.jsonl')
 environment.TEST_RUNNER_NITRO_TEST_REPORT = groupReport
+if (values.workers !== 'auto') environment.TEST_RUNNER_NITRO_TEST_WORKERS = values.workers
 if (values.sanitizer !== 'none') {
   const option = values.sanitizer === 'address' ? 'ASAN_OPTIONS' : 'TSAN_OPTIONS'
   // xcodebuild forwards TEST_RUNNER_ variables to every test process. Preserve
@@ -143,7 +149,7 @@ const argumentsForTests = [
   '-parallel-testing-enabled',
   'YES',
   // Swift Testing runs cases concurrently inside this one test process.
-  // RuntimeTests.swift bounds native execution to two workers.
+  // RuntimeTests.swift runs one runtime group per CPU core but one (see --workers).
   '-parallel-testing-worker-count',
   '1',
   'CODE_SIGNING_ALLOWED=NO',
@@ -189,8 +195,11 @@ if (existsSync(groupReport)) {
     .map((line) => JSON.parse(line))
   const total = (key) => groups.reduce((sum, group) => sum + group[key], 0)
   const seconds = (ms) => `${(ms / 1000).toFixed(1)} s`
+  const workers = Math.max(...groups.map((group) => group.workers ?? 0))
   console.log(
-    `Runtime groups: ${groups.length} groups, ${total('runtimes')} Hermes runtimes, ${total('cases')} cases, ${total('failures')} failed`
+    `Runtime groups: ${groups.length} groups, ${total('runtimes')} Hermes runtimes, ${total('cases')} cases, ${total('failures')} failed${
+      workers > 0 ? `, ${workers} workers` : ''
+    }`
   )
   console.log(
     `  summed over workers: setup ${seconds(total('setupMs'))}, cases ${seconds(total('casesMs'))}, teardown ${seconds(total('teardownMs'))}`

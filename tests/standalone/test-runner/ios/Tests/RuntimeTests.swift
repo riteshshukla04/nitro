@@ -16,8 +16,13 @@ private struct JavaScriptFailure: Error, CustomStringConvertible {
   let description: String
 }
 
-/// Groups that run at the same time, each with its own Hermes runtime.
-private let workerCount = 2
+/// Groups that run at the same time, each with its own Hermes runtime: one per
+/// CPU core but one, at least two, unless `NITRO_TEST_WORKERS` (`run.mjs
+/// --workers`) says otherwise. The spare core keeps Swift concurrency, which
+/// HybridObject Promises complete on, responsive on 3-core CI machines.
+private let workerCount =
+  ProcessInfo.processInfo.environment["NITRO_TEST_WORKERS"].flatMap { Int($0) }.flatMap { $0 > 0 ? $0 : nil }
+  ?? max(2, ProcessInfo.processInfo.activeProcessorCount - 1)
 private let defaultTimeoutMs: UInt32 = 10_000
 
 extension NitroTestScheduler {
