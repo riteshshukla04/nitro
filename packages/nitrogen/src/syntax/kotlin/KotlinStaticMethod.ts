@@ -72,7 +72,7 @@ export class KotlinStaticMethod extends StaticMethod {
   getCppRegistration(cppClassName: string): string {
     const name = this.nativeMethod.name
     return `
-clazz.registerHybridStaticMethod("${name}", &${cppClassName}::${name});
+clazz.registerStaticHybridMethod("${name}", &${cppClassName}::${name});
 `.trim()
   }
 }

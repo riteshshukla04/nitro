@@ -291,7 +291,7 @@ To actually use Nitro, you need to create [Hybrid Objects](../concepts/hybrid-ob
           static constexpr const char* name = "Math";
           static const std::shared_ptr<const HybridClass>& get() {
             static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-              clazz.registerHybridStaticMethod("add", &HybridMath::add);
+              clazz.registerStaticHybridMethod("add", &HybridMath::add);
             });
             return hybridClass;
           }

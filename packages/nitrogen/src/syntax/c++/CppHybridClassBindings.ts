@@ -91,7 +91,7 @@ return ${implementation}::${method.name}(${argumentsCode.join(', ')});
       })
     )
     const staticMethodRegistration = `
-clazz.registerHybridStaticMethod("${method.name}", &${helper}::${method.name});
+clazz.registerStaticHybridMethod("${method.name}", &${helper}::${method.name});
 `.trim()
     registrations.push(staticMethodRegistration)
   }

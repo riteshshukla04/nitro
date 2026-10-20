@@ -20,7 +20,9 @@ namespace margelo::nitro {
 
 using namespace facebook;
 
-/** The type of a HybridObject's nested `Class`. Identifies its HybridClass and keys the per-Runtime cache. */
+/**
+ * The type of a HybridObject's nested `Class`. Identifies its HybridClass and keys the per-Runtime cache.
+ */
 using HybridClassId = std::type_index;
 
 /**
@@ -54,7 +56,9 @@ private:
   }
 
 public:
-  // Descriptors own potentially large member maps. Share their immutable pointer instead.
+  /**
+   * Descriptors own potentially large member maps. Share their immutable pointer instead.
+   */
   HybridClass(const HybridClass&) = delete;
   HybridClass(HybridClass&&) = delete;
   HybridClass& operator=(const HybridClass&) = delete;
@@ -106,15 +110,27 @@ public:
   }
 
 public:
-  /** Register the native factory used by JavaScript's new operator. */
+  /**
+   * Registers the given C++ factory for calls to JavaScript's `new` operator.
+   * Example:
+   * ```cpp
+   * registerHybridConstructor(&MyObject::create);
+   * ```
+   */
   template <typename ReturnType, typename... Args>
   void registerHybridConstructor(ReturnType (*NON_NULL constructor)(Args...)) {
     _constructor = HybridFunction::createStaticHybridFunction(_name, constructor);
   }
 
-  /** Register a native function on this type's JavaScript constructor. */
+  /**
+   * Registers the given C++ function as a static Hybrid Method on this type's JavaScript constructor.
+   * Example:
+   * ```cpp
+   * registerStaticHybridMethod("add", &MyObject::add);
+   * ```
+   */
   template <typename ReturnType, typename... Args>
-  void registerHybridStaticMethod(std::string name, ReturnType (*NON_NULL method)(Args...)) {
+  void registerStaticHybridMethod(std::string name, ReturnType (*NON_NULL method)(Args...)) {
     _staticMethods.emplace(name, HybridFunction::createStaticHybridFunction(name, method));
   }
 
@@ -182,7 +198,7 @@ public:
    * Registers the given raw JSI C++ method as a Hybrid Method that can be called from JS, through the object's prototype.
    * Example:
    * ```cpp
-   * registerRawHybridMethod("sayHello", &MyObject::sayHello);
+   * registerRawHybridMethod("sayHello", 0, &MyObject::sayHello);
    * ```
    */
   template <typename Derived>

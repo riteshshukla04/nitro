@@ -79,7 +79,7 @@ export class SwiftStaticMethod extends StaticMethod {
       { ...swiftOptions, access: 'public', throwing: false, generated: true }
     )
     const cppRegistration = `
-clazz.registerHybridStaticMethod("${nativeMethod.name}", &${cppClassName}::${this.name});
+clazz.registerStaticHybridMethod("${nativeMethod.name}", &${cppClassName}::${this.name});
 `.trim()
     return {
       cppMethods: [

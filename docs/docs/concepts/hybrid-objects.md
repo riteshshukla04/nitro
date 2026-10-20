@@ -216,7 +216,7 @@ Hybrid Objects can be implemented in C++, Swift or Kotlin:
       ```cpp title="HybridMath.cpp"
       const std::shared_ptr<const HybridClass>& HybridMath::Class::get() {
         static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-          clazz.registerHybridStaticMethod("add", &HybridMath::add);
+          clazz.registerStaticHybridMethod("add", &HybridMath::add);
         });
         return hybridClass;
       }
