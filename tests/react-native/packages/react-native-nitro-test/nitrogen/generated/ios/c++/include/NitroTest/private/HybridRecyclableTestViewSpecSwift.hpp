@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <NitroTest/HybridRecyclableTestViewSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 
 
@@ -20,12 +20,9 @@ namespace margelo::nitro::test {
    * The C++ part of HybridRecyclableTestViewSpec_cxx.swift.
    *
    * HybridRecyclableTestViewSpecSwift accesses the concrete Swift wrapper and registers
-   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
-   *
-   * Once Swift can inherit from C++ classes, the Swift implementation could
-   * inherit HybridRecyclableTestViewSpec directly to simplify this structure.
+   * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridRecyclableTestViewSpecSwift final : public virtual HybridRecyclableTestViewSpec {
+  class HybridRecyclableTestViewSpecSwift final : public virtual HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -35,12 +32,12 @@ namespace margelo::nitro::test {
 
   public:
     // Constructor from a Swift instance
-    explicit HybridRecyclableTestViewSpecSwift(const NitroTest::HybridRecyclableTestViewSpec_cxx& swiftPart):
+    explicit HybridRecyclableTestViewSpecSwift(const ::NitroTest::HybridRecyclableTestViewSpec_cxx& swiftPart):
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    NitroTest::HybridRecyclableTestViewSpec_cxx& getSwiftPart() noexcept {
+    ::NitroTest::HybridRecyclableTestViewSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -58,22 +55,14 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
-    bool getIsBlue() override;
     bool getIsBlue_Swift();
-    void setIsBlue(bool isBlue) override;
     void setIsBlue_Swift(bool isBlue);
-    std::optional<double> getNativeDefaultValue() override;
     swift::Optional<double> getNativeDefaultValue_Swift();
-    void setNativeDefaultValue(const std::optional<double>& nativeDefaultValue) override;
     void setNativeDefaultValue_Swift(const swift::Optional<double>& nativeDefaultValue);
     // Methods
-    double getInvalidLifecycleOrderCount() override;
     double getInvalidLifecycleOrderCount_Swift();
-    double getOnDropViewCount() override;
     double getOnDropViewCount_Swift();
-    double getPrepareForRecycleCount() override;
     double getPrepareForRecycleCount_Swift();
-    double getNativeDefaultValueSetterCallCount() override;
     double getNativeDefaultValueSetterCallCount_Swift();
 
   protected:
@@ -82,7 +71,7 @@ namespace margelo::nitro::test {
     }
 
   private:
-    NitroTest::HybridRecyclableTestViewSpec_cxx _swiftPart;
+    ::NitroTest::HybridRecyclableTestViewSpec_cxx _swiftPart;
   };
 
 } // namespace margelo::nitro::test

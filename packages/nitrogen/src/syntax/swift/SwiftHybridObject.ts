@@ -132,7 +132,7 @@ public typealias ${protocolName} = ${protocolName}_protocol & ${protocolName}_ba
     files.push(...createSwiftHybridViewManager(spec))
   }
   const types = [...getAllTypes(spec), hybridObjectType]
-  const swiftTypes = types.map(wrapSwiftType)
+  const swiftTypes = types.map((type) => wrapSwiftType(type, spec.config))
   files.push(...swiftTypes.flatMap((type) => type.getExtraFiles()))
 
   return files

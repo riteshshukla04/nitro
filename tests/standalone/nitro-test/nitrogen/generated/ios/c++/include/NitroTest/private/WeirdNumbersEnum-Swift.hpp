@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/WeirdNumbersEnum.hpp>
 // Forward declaration of `WeirdNumbersEnum` to properly resolve imports.
 namespace NitroTest { class WeirdNumbersEnum; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::WeirdNumbersEnum> final {
-    using SwiftType = NitroTest::WeirdNumbersEnum;
-
-    static margelo::nitro::test::WeirdNumbersEnum fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::WeirdNumbersEnum& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::WeirdNumbersEnum> {
-    static NitroTest::WeirdNumbersEnum fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::WeirdNumbersEnum& value);
+  struct JSIConverter<::NitroTest::WeirdNumbersEnum> {
+    static ::NitroTest::WeirdNumbersEnum fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::WeirdNumbersEnum& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

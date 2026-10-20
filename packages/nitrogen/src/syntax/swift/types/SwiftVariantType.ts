@@ -1,8 +1,8 @@
-import type { GetCodeOptions, TypeContext } from '../../types/Type.js'
+import type { Type, GetCodeOptions, TypeContext } from '../../types/Type.js'
 import type { CppHelper } from '../../c++/CppHelper.js'
 import type { SourceFile } from '../../SourceFile.js'
 import { VariantType } from '../../types/VariantType.js'
-import { createSwiftVariant } from '../SwiftVariant.js'
+import { createSwiftVariant, createSwiftVariantCppConverter } from '../SwiftVariant.js'
 import { wrapSwiftType } from '../wrapSwiftType.js'
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
@@ -11,20 +11,29 @@ import type { SourceImport } from '../../SourceFile.js'
 import { getClangImporterReferenceName } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
+import type { SwiftCppConverter } from '../SwiftConverter.js'
 
 export class SwiftVariantType extends VariantType implements SwiftType {
   override readonly variants: SwiftType[]
 
-  constructor(readonly type: VariantType) {
-    const variants = type.variants.map(wrapSwiftType)
+  constructor(
+    readonly type: VariantType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
+    const variants = type.variants.map((variant) => wrapSwiftType(variant, config))
     super(variants, type.aliasName)
     this.variants = variants
+  }
+
+  getCppConverter(cppType: Type): SwiftCppConverter {
+    return createSwiftVariantCppConverter({ type: this, cppType: cppType })
   }
 
   get name(): string {
     return this.type.getAliasName('swift')
   }
   override getExtraFiles(): SourceFile[] {
+    if (this.config.isExternalConfig) return []
     return [...this.variants.flatMap((v) => v.getExtraFiles()), ...createSwiftVariant(this)]
   }
 
@@ -63,7 +72,7 @@ export class SwiftVariantType extends VariantType implements SwiftType {
   }
 
   get moduleName(): string {
-    return NitroConfig.current.getIosModuleName()
+    return this.config.getIosModuleName()
   }
   get forwardDeclaration(): string {
     return getForwardDeclaration('class', `${this.name}_cxx`, this.moduleName)
@@ -72,7 +81,7 @@ export class SwiftVariantType extends VariantType implements SwiftType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++': {
-        const type = `${this.moduleName}::${this.name}_cxx`
+        const type = `::${this.moduleName}::${this.name}_cxx`
         return options.context === 'parameter' ? `const ${type}&` : type
       }
       case 'swift':
@@ -102,7 +111,7 @@ export class SwiftVariantType extends VariantType implements SwiftType {
         if (context === 'implementation') {
           imports.push({
             language: language,
-            declaration: NitroConfig.current.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
+            declaration: this.config.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
           })
         }
         break

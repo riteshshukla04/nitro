@@ -24,38 +24,42 @@ namespace swift { template <class T> class Optional; }
 #endif
 // Forward declaration of `OptionalPrimitivesHolder` to properly resolve imports.
 namespace NitroTestExternal { class OptionalPrimitivesHolder; }
-#include <memory>
-// Forward declaration of `HybridBaseSpec` to properly resolve imports.
-namespace margelo::nitro::test::external { class HybridBaseSpec; }
+#include <NitroModules/HybridObject.hpp>
+// Forward declaration of `HybridBaseSpecSwift` to properly resolve imports.
+namespace margelo::nitro::test::external { class HybridBaseSpecSwift; }
 #include <NitroModules/NitroDefines.hpp>
-// Forward declaration of `HybridSomeExternalObjectSpec` to properly resolve imports.
-namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpec; }
+// Forward declaration of `HybridSomeExternalObjectSpecSwift` to properly resolve imports.
+namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpecSwift; }
 
 namespace margelo::nitro::test::external::swift_bridge {
-  using std__shared_ptr_HybridBaseSpec_ = std::shared_ptr<HybridBaseSpec>;
-  using std__weak_ptr_HybridBaseSpec_ = std::weak_ptr<HybridBaseSpec>;
-  inline std__weak_ptr_HybridBaseSpec_ weakify_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value) { return value; }
-  std__shared_ptr_HybridBaseSpec_ create_std__shared_ptr_HybridBaseSpec_(void* NON_NULL pointer);
-  void* NON_NULL get_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value);
-  using Promise_NitroTestExternal__Size = Promise<NitroTestExternal::Size>;
-  Promise_NitroTestExternal__Size create_Promise_NitroTestExternal__Size();
-  void reject_Promise_NitroTestExternal__Size(const Promise_NitroTestExternal__Size& promise, std::exception_ptr error);
-  void listenRejected_Promise_NitroTestExternal__Size(const Promise_NitroTestExternal__Size& promise, std::function<void(const std::exception_ptr&)> listener);
-  void resolve_Promise_NitroTestExternal__Size(const Promise_NitroTestExternal__Size& promise, const void* NON_NULL value);
-  void listen_Promise_NitroTestExternal__Size(const Promise_NitroTestExternal__Size& promise, std::function<void(const void* NON_NULL)> listener);
+  using std__shared_ptr_margelo__nitro__test__external__HybridBaseSpec_ = std::shared_ptr<margelo::nitro::test::external::HybridBaseSpecSwift>;
+  using std__weak_ptr_margelo__nitro__test__external__HybridBaseSpec_ = std::weak_ptr<margelo::nitro::test::external::HybridBaseSpecSwift>;
+  inline std__weak_ptr_margelo__nitro__test__external__HybridBaseSpec_ weakify_std__shared_ptr_margelo__nitro__test__external__HybridBaseSpec_(const std__shared_ptr_margelo__nitro__test__external__HybridBaseSpec_& value) {
+    return value;
+  }
+  std__shared_ptr_margelo__nitro__test__external__HybridBaseSpec_ create_std__shared_ptr_margelo__nitro__test__external__HybridBaseSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__external__HybridBaseSpec_(const std::shared_ptr<HybridObject>& value);
+  using Promise___NitroTestExternal__Size = Promise<::NitroTestExternal::Size>;
+  Promise___NitroTestExternal__Size create_Promise___NitroTestExternal__Size();
+  void reject_Promise___NitroTestExternal__Size(const Promise___NitroTestExternal__Size& promise, std::exception_ptr error);
+  void listenRejected_Promise___NitroTestExternal__Size(const Promise___NitroTestExternal__Size& promise, std::function<void(const std::exception_ptr&)> listener);
+  void resolve_Promise___NitroTestExternal__Size(const Promise___NitroTestExternal__Size& promise, const void* NON_NULL value);
+  void listen_Promise___NitroTestExternal__Size(const Promise___NitroTestExternal__Size& promise, std::function<void(const void* NON_NULL)> listener);
   // Distinct specializations prevent duplicate Swift metadata across module headers.
   struct ResultTag {};
   using Result_void = Result<void, margelo::nitro::test::external::swift_bridge::ResultTag>;
-  using Callback_NitroTestExternal__Size_NitroTestExternal__Size = Callback<NitroTestExternal::Size(const NitroTestExternal::Size&)>;
-  Result<void, margelo::nitro::test::external::swift_bridge::ResultTag> callSync_Callback_NitroTestExternal__Size_NitroTestExternal__Size(const Callback_NitroTestExternal__Size_NitroTestExternal__Size& callback, const void* NON_NULL param0, void* NON_NULL __outResult) noexcept;
-  Promise<NitroTestExternal::Size> callAsync_Callback_NitroTestExternal__Size_NitroTestExternal__Size(const Callback_NitroTestExternal__Size_NitroTestExternal__Size& callback, const void* NON_NULL param0);
-  void callAndForget_Callback_NitroTestExternal__Size_NitroTestExternal__Size(const Callback_NitroTestExternal__Size_NitroTestExternal__Size& callback, const void* NON_NULL param0);
-  Callback_NitroTestExternal__Size_NitroTestExternal__Size create_Callback_NitroTestExternal__Size_NitroTestExternal__Size(std::function<Result<void, margelo::nitro::test::external::swift_bridge::ResultTag>(const void* NON_NULL param0, void* NON_NULL __outResult)> closure);
-  using Result_Promise_NitroTestExternal__Size_ = Result<Promise<NitroTestExternal::Size>, margelo::nitro::test::external::swift_bridge::ResultTag>;
+  using Callback___NitroTestExternal__Size___NitroTestExternal__Size = Callback<::NitroTestExternal::Size(const ::NitroTestExternal::Size&)>;
+  Result<void, margelo::nitro::test::external::swift_bridge::ResultTag> callSync_Callback___NitroTestExternal__Size___NitroTestExternal__Size(const Callback___NitroTestExternal__Size___NitroTestExternal__Size& callback, const void* NON_NULL param0, void* NON_NULL __outResult) noexcept;
+  Promise<::NitroTestExternal::Size> callAsync_Callback___NitroTestExternal__Size___NitroTestExternal__Size(const Callback___NitroTestExternal__Size___NitroTestExternal__Size& callback, const void* NON_NULL param0);
+  void callAndForget_Callback___NitroTestExternal__Size___NitroTestExternal__Size(const Callback___NitroTestExternal__Size___NitroTestExternal__Size& callback, const void* NON_NULL param0);
+  Callback___NitroTestExternal__Size___NitroTestExternal__Size create_Callback___NitroTestExternal__Size___NitroTestExternal__Size(std::function<Result<void, margelo::nitro::test::external::swift_bridge::ResultTag>(const void* NON_NULL param0, void* NON_NULL __outResult)> closure);
+  using Result_Promise___NitroTestExternal__Size_ = Result<Promise<::NitroTestExternal::Size>, margelo::nitro::test::external::swift_bridge::ResultTag>;
   using Result_void_ = Result<void*, margelo::nitro::test::external::swift_bridge::ResultTag>;
-  using std__shared_ptr_HybridSomeExternalObjectSpec_ = std::shared_ptr<HybridSomeExternalObjectSpec>;
-  using std__weak_ptr_HybridSomeExternalObjectSpec_ = std::weak_ptr<HybridSomeExternalObjectSpec>;
-  inline std__weak_ptr_HybridSomeExternalObjectSpec_ weakify_std__shared_ptr_HybridSomeExternalObjectSpec_(const std__shared_ptr_HybridSomeExternalObjectSpec_& value) { return value; }
-  std__shared_ptr_HybridSomeExternalObjectSpec_ create_std__shared_ptr_HybridSomeExternalObjectSpec_(void* NON_NULL pointer);
-  void* NON_NULL get_std__shared_ptr_HybridSomeExternalObjectSpec_(const std__shared_ptr_HybridSomeExternalObjectSpec_& value);
+  using std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ = std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpecSwift>;
+  using std__weak_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ = std::weak_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpecSwift>;
+  inline std__weak_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ weakify_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(const std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_& value) {
+    return value;
+  }
+  std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ create_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(const std::shared_ptr<HybridObject>& value);
 } // namespace margelo::nitro::test::external::swift_bridge

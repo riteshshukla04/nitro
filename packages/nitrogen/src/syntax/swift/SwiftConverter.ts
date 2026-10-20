@@ -8,21 +8,30 @@ import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile, SourceImport } from '../SourceFile.js'
 import type { SwiftType } from './types/SwiftType.js'
 
-export function getSwiftConverter(
-  type: Type,
-  context: 'value' | 'parameter-type' = 'value',
-  swiftRepresentation: SwiftType = wrapSwiftType(type)
-): string {
+interface GetSwiftConverterOptions {
+  cppType: Type
+  context?: 'value' | 'parameter-type'
+  swiftType?: SwiftType
+}
+
+export function getSwiftConverter({
+  cppType: type,
+  context = 'value',
+  swiftType: swiftRepresentation = wrapSwiftType(type),
+}: GetSwiftConverterOptions): string {
   const cppType = type.getCode('c++', {
     fullyQualified: true,
-    context,
+    context: context,
   })
-  // Inline parameters keep their borrowed representation on both sides.
   const swiftContext = context === 'parameter-type' ? 'parameter-type' : 'type-argument'
-  const swiftType = swiftRepresentation.getCode('c++', {
-    context: swiftContext,
-  })
+  const swiftType = swiftRepresentation.getCode('c++', { context: swiftContext })
   return `SwiftConverter<${cppType}, ${swiftType}>`
+}
+
+/** Native converter files and imports explicitly requested by a C++ consumer. */
+export interface SwiftCppConverter {
+  imports: SourceImport<'c++'>[]
+  files: SourceFile[]
 }
 
 interface SwiftConverterImplementation {
@@ -32,13 +41,11 @@ interface SwiftConverterImplementation {
   forwardDeclaration: string
   fromSwift: string
   toSwift: string
-  fromJSI: string
-  toJSI: string
-  canConvert: string
   imports?: SourceImport[]
+  dependencies?: SwiftCppConverter[]
 }
 
-/** Emit both native and JSI converters for a generated Swift type. */
+/** Native C++ conversion is separate from a Swift API's JSI bindings. */
 export function createSwiftConverter({
   name,
   cppType: type,
@@ -46,64 +53,51 @@ export function createSwiftConverter({
   forwardDeclaration,
   fromSwift,
   toSwift,
-  fromJSI,
-  toJSI,
-  canConvert,
   imports = [],
-}: SwiftConverterImplementation): SourceFile[] {
-  const converterName = `${name}-Swift`
-  const cppType = type.getCode('c++', {
-    context: 'type-argument',
-    fullyQualified: true,
-  })
+  dependencies = [],
+}: SwiftConverterImplementation): SwiftCppConverter {
+  const converterName = `${name}-SwiftConverter`
+  const cppType = type.getCode('c++', { context: 'type-argument', fullyQualified: true })
   const cppSwiftType = swiftType.getCode('c++', { context: 'value' })
   let specialization: string
   if (swiftType.requiresExplicitSwiftTarget) {
-    specialization = `SwiftConverter<${cppType}, ${swiftType.getCode('c++', { context: 'type-argument' })}>`
+    const swiftTarget = swiftType.getCode('c++', { context: 'type-argument' })
+    specialization = `SwiftConverter<${cppType}, ${swiftTarget}>`
   } else {
     specialization = `SwiftConverter<${cppType}>`
   }
-  const cppImports = type.getRequiredImports('c++')
+  const header: SourceImport<'c++'> = {
+    language: 'c++',
+    declaration: NitroConfig.current.getCxxHeader(`${converterName}.hpp`, 'private'),
+  }
   const declarationImports: SourceImport[] = [
     {
       language: 'c++',
-      declaration: {
-        name: 'NitroModules/SwiftConverter_fwd.hpp',
-        space: 'system',
-      },
+      declaration: { name: 'NitroModules/SwiftConverter_fwd.hpp', space: 'system' },
     },
-    {
-      language: 'c++',
-      declaration: { name: 'NitroModules/JSIConverter.hpp', space: 'system' },
-    },
-    ...cppImports,
+    ...type.getRequiredImports('c++'),
     {
       language: 'c++',
       declaration: { forwardDeclaration: forwardDeclaration },
     },
   ]
   const declarationIncludes = getImportsCode(declarationImports, 'declaration')
+  const dependencyImports = dependencies.flatMap((dependency) => dependency.imports)
   const implementationImports: SourceImport[] = [
-    {
-      language: 'c++',
-      declaration: NitroConfig.current.getCxxHeader(`${converterName}.hpp`, 'private'),
-    },
+    header,
     {
       language: 'c++',
       declaration: NitroConfig.current.getCxxHeader(getUmbrellaHeaderName(), 'private'),
     },
     {
       language: 'c++',
-      declaration: {
-        name: 'NitroModules/SwiftConverter.hpp',
-        space: 'system',
-      },
+      declaration: { name: 'NitroModules/SwiftConverter.hpp', space: 'system' },
     },
-    ...cppImports,
+    ...type.getRequiredImports('c++'),
+    ...dependencyImports,
     ...imports,
   ]
   const implementationIncludes = getImportsCode(implementationImports, 'implementation')
-
   const cppHeaderCode = `
 ${createFileMetadataString(`${converterName}.hpp`)}
 
@@ -119,13 +113,6 @@ namespace margelo::nitro {
 
     static ${cppType} fromSwift(const SwiftType& value);
     static SwiftType toSwift(const ${cppType}& value);
-  };
-
-  template <>
-  struct JSIConverter<${cppSwiftType}> {
-    static ${cppSwiftType} fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const ${cppSwiftType}& value);
-    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 
 } // namespace margelo::nitro
@@ -145,34 +132,36 @@ namespace margelo::nitro {
     ${indent(toSwift, '    ')}
   }
 
-  ${cppSwiftType} JSIConverter<${cppSwiftType}>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    ${indent(fromJSI, '    ')}
-  }
-
-  jsi::Value JSIConverter<${cppSwiftType}>::toJSI(jsi::Runtime& runtime, const ${cppSwiftType}& value) {
-    ${indent(toJSI, '    ')}
-  }
-
-  bool JSIConverter<${cppSwiftType}>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    ${indent(canConvert, '    ')}
-  }
-
 } // namespace margelo::nitro
 `.trim()
-  return [
-    {
-      name: `${converterName}.hpp`,
-      language: 'c++',
-      platform: 'ios',
-      subdirectory: [],
-      content: cppHeaderCode,
-    },
-    {
-      name: `${converterName}.cpp`,
-      language: 'c++',
-      platform: 'ios',
-      subdirectory: [],
-      content: cppImplementationCode,
-    },
-  ]
+  const dependencyFiles = dependencies.flatMap((dependency) => dependency.files)
+  return {
+    imports: [header, ...dependencyImports],
+    files: [
+      ...dependencyFiles,
+      {
+        name: `${converterName}.hpp`,
+        language: 'c++',
+        platform: 'ios',
+        subdirectory: [],
+        content: cppHeaderCode,
+      },
+      {
+        name: `${converterName}.cpp`,
+        language: 'c++',
+        platform: 'ios',
+        subdirectory: [],
+        content: cppImplementationCode,
+      },
+    ],
+  }
+}
+
+/** Generic runtime conversions only need their generated payload converters. */
+export function combineSwiftCppConverters(converters: (SwiftCppConverter | undefined)[]): SwiftCppConverter {
+  const required = converters.filter((converter) => converter != null)
+  return {
+    imports: required.flatMap((converter) => converter.imports),
+    files: required.flatMap((converter) => converter.files),
+  }
 }

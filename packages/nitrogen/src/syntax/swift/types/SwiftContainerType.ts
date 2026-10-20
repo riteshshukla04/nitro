@@ -1,12 +1,12 @@
-import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import { getForwardDeclaration } from '../../c++/getForwardDeclaration.js'
 import { createFileMetadataString, escapeCppName } from '../../helpers.js'
 import { getImportsCode } from '../../getImportCode.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
-import type { GetCodeOptions, TypeContext } from '../../types/Type.js'
+import type { Type, GetCodeOptions, TypeContext } from '../../types/Type.js'
 import { getClangImporterReferenceName } from '../ImportedCxxRecord.js'
-import { createSwiftConverter, getSwiftConverter } from '../SwiftConverter.js'
+import { createSwiftConverter, getSwiftConverter, type SwiftCppConverter } from '../SwiftConverter.js'
+import { createSwiftJSIConverter } from '../SwiftJSIConverter.js'
 import { getSwiftImports } from '../getSwiftImports.js'
 import type { SwiftArrayType } from './SwiftArrayType.js'
 import { SwiftNamedType } from './SwiftNamedType.js'
@@ -21,6 +21,26 @@ export class SwiftContainerType extends SwiftNamedType {
   constructor(readonly container: SwiftArrayType | SwiftOptionalType) {
     const nativeName = container.getCode('c++', { context: 'type-argument' })
     super(`SwiftContainer_${escapeCppName(nativeName)}`, container)
+  }
+
+  override getCppConverter(cppType: Type): SwiftCppConverter {
+    const converter = getSwiftConverter({ cppType: cppType, swiftType: this.container })
+    const swiftToCppConverterCode = `
+return ${converter}::fromSwift(value.getValue());
+`.trim()
+    const cppToSwiftConverterCode = `
+return SwiftType::init(${converter}::toSwift(value));
+`.trim()
+    return createSwiftConverter({
+      name: `${this.name}+${this.moduleName}`,
+      cppType: cppType,
+      swiftType: this,
+      forwardDeclaration: this.forwardDeclaration,
+      fromSwift: swiftToCppConverterCode,
+      toSwift: cppToSwiftConverterCode,
+      dependencies: [this.container.getCppConverter(cppType)],
+      imports: this.container.getRequiredImports('c++', 'implementation'),
+    })
   }
 
   override get canImportFromCpp(): boolean {
@@ -43,7 +63,7 @@ export class SwiftContainerType extends SwiftNamedType {
   }
 
   private get moduleName(): string {
-    return NitroConfig.current.getIosModuleName()
+    return this.container.config.getIosModuleName()
   }
   private get forwardDeclaration(): string {
     return getForwardDeclaration('class', this.name, this.moduleName)
@@ -52,7 +72,7 @@ export class SwiftContainerType extends SwiftNamedType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++': {
-        const type = `${this.moduleName}::${this.name}`
+        const type = `::${this.moduleName}::${this.name}`
         return options.context === 'parameter' ? `const ${type}&` : type
       }
       case 'swift':
@@ -77,7 +97,7 @@ export class SwiftContainerType extends SwiftNamedType {
         if (context === 'implementation') {
           imports.push(...this.container.getRequiredImports(language, context), {
             language: language,
-            declaration: NitroConfig.current.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
+            declaration: this.container.config.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
           })
         }
         return imports
@@ -88,6 +108,7 @@ export class SwiftContainerType extends SwiftNamedType {
   }
 
   override getExtraFiles(): SourceFile[] {
+    if (this.container.config.isExternalConfig) return []
     const swiftType = this.container.getCode('swift', {
       context: 'type-argument',
     })
@@ -121,13 +142,6 @@ return JSIConverter<${cppType}>::toJSI(runtime, value.getValue());
     const jsCanConvertCode = `
 return JSIConverter<${cppType}>::canConvert(runtime, value);
 `.trim()
-    const converter = getSwiftConverter(this.container.type, 'value', this.container)
-    const swiftToCppConverterCode = `
-return ${converter}::fromSwift(value.getValue());
-`.trim()
-    const cppToSwiftConverterCode = `
-return SwiftType::init(${converter}::toSwift(value));
-`.trim()
     return [
       ...this.container.getExtraFiles(),
       {
@@ -137,14 +151,11 @@ return SwiftType::init(${converter}::toSwift(value));
         subdirectory: [],
         content: swiftCode,
       },
-      ...createSwiftConverter({
+      ...createSwiftJSIConverter({
         name: this.name,
-        cppType: this.container.type,
         swiftType: this,
         forwardDeclaration: this.forwardDeclaration,
         imports: this.container.getRequiredImports('c++', 'implementation'),
-        fromSwift: swiftToCppConverterCode,
-        toSwift: cppToSwiftConverterCode,
         fromJSI: jsToSwiftConverterCode,
         toJSI: swiftToJSConverterCode,
         canConvert: jsCanConvertCode,

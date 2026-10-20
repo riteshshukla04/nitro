@@ -15,6 +15,7 @@ import { getAllReferencedTypes } from '../syntax/getAllTypes.js'
 import { HybridObjectType } from '../syntax/types/HybridObjectType.js'
 import { prepareSwiftMethod } from '../syntax/swift/SwiftMethodHelpers.js'
 import type { SwiftType } from '../syntax/swift/types/SwiftType.js'
+import { ForeignHybridObjectType } from '../syntax/c++/ForeignHybridObjectType.js'
 
 interface IOSAutolinking extends Autolinking {}
 
@@ -26,20 +27,20 @@ function getSwiftTypes(specs: HybridObjectSpec[]): SwiftType[] {
     const baseTypes = getSwiftTypes(spec.baseTypes)
     const hybridObject = new HybridObjectType(spec)
     const referencedTypes = getAllReferencedTypes(spec)
-    const swiftTypes = referencedTypes.map(wrapSwiftType)
+    const swiftTypes = referencedTypes.map((type) => wrapSwiftType(type, spec.config))
     const methods = [...spec.methods, ...spec.staticMethods]
     if (spec.constructor != null) methods.push(spec.constructor.toStaticMethod(hybridObject))
-    const resultTypes = methods.map((method) => prepareSwiftMethod(method, true).resultType)
-    return [...baseTypes, wrapSwiftType(hybridObject), ...swiftTypes, ...resultTypes]
+    const resultTypes = methods.map((method) => prepareSwiftMethod(method, true, spec.config).resultType)
+    return [...baseTypes, wrapSwiftType(hybridObject, spec.config), ...swiftTypes, ...resultTypes]
   })
 }
 
 export function createIOSAutolinking(specs: HybridObjectSpec[]): IOSAutolinking {
-  const swiftTypes = getSwiftTypes(specs)
-  const moduleDependencies = getModuleDependencies(
-    specs.filter((spec) => spec.language === 'swift'),
-    NitroConfig.current
-  )
+  const foreignSwiftTypes = specs
+    .flatMap(getAllReferencedTypes)
+    .flatMap((type) => (type instanceof ForeignHybridObjectType ? type.getSwiftTypes() : []))
+  const swiftTypes = [...getSwiftTypes(specs), ...foreignSwiftTypes]
+  const moduleDependencies = getModuleDependencies(specs, NitroConfig.current)
   const swiftCxxBridge = createSwiftCxxBridge(swiftTypes)
   const swiftUmbrellaHeader = createSwiftUmbrellaHeader(swiftTypes, moduleDependencies)
   // TODO: Remove with ImportedCxxRecord.ts once our minimum Xcode includes

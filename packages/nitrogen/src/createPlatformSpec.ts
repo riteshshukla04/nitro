@@ -19,7 +19,7 @@ import { StaticMethod } from './syntax/StaticMethod.js'
 import { Constructor } from './syntax/Constructor.js'
 import { createSwiftHybridObject } from './syntax/swift/SwiftHybridObject.js'
 import { createKotlinHybridObject } from './syntax/kotlin/KotlinHybridObject.js'
-import { createType } from './syntax/createType.js'
+import { createType, type TypeParsingTarget } from './syntax/createType.js'
 import { Parameter } from './syntax/Parameter.js'
 import { getDirectBaseTypes, getHybridObjectNitroModuleConfig } from './utils.js'
 import { NitroConfig } from './config/NitroConfig.js'
@@ -33,11 +33,6 @@ export function generatePlatformFiles(
   const spec = getHybridObjectSpec(hybridType, platform, options)
   const language = options.language
 
-  // TODO: We currently just call this so the HybridObject itself is a "known type".
-  // This causes the Swift Umbrella header to properly forward-declare it.
-  // Without this, only Hybrid Objects that are actually used in public APIs will be forward-declared.
-  createType(language, hybridType, false)
-
   switch (spec.language) {
     case 'c++':
       return { spec: spec, files: generateCppFiles(spec, platform) }
@@ -50,7 +45,12 @@ export function generatePlatformFiles(
   }
 }
 
-export function getHybridObjectSpec(type: Type, platform: Platform, options: HybridObjectPlatformOptions): HybridObjectSpec {
+export function getHybridObjectSpec(
+  type: Type,
+  platform: Platform,
+  options: HybridObjectPlatformOptions,
+  target: TypeParsingTarget = { language: options.language, platform: platform }
+): HybridObjectSpec {
   const language = options.language
   const platforms = getHybridObjectPlatformsForType(type)
   const config = getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
@@ -107,7 +107,7 @@ export function getHybridObjectSpec(type: Type, platform: Platform, options: Hyb
     if (declaration.isAbstract()) {
       throw new Error(`${name}: Abstract HybridObject classes cannot be constructed from JavaScript. Use a protected constructor.`)
     }
-    const parameters = constructorDeclaration.getParameters().map((parameter) => new Parameter(parameter, language))
+    const parameters = constructorDeclaration.getParameters().map((parameter) => new Parameter(parameter, target))
     constructorParameters = parameters
   }
   const staticMethods: StaticMethod[] = []
@@ -127,11 +127,11 @@ export function getHybridObjectSpec(type: Type, platform: Platform, options: Hyb
       )
     }
     if (Node.isMethodDeclaration(member)) {
-      staticMethods.push(new StaticMethod(member, language))
+      staticMethods.push(new StaticMethod(member, target))
     } else if (Node.isPropertyDeclaration(member)) {
       const memberType = member.getType()
       const isOptional = member.getSymbolOrThrow().isOptional() || memberType.getUnionTypes().some((unionType) => unionType.isUndefined())
-      const propType = createType(language, memberType, isOptional, member.getTypeNode())
+      const propType = createType(target, memberType, isOptional, member.getTypeNode())
       staticProperties.push(new StaticProperty(member.getSymbolOrThrow().getName(), propType, member.isReadonly()))
     }
   }
@@ -162,10 +162,17 @@ export function getHybridObjectSpec(type: Type, platform: Platform, options: Hyb
     if (Node.isPropertyDeclaration(member)) {
       const memberType = member.getType()
       const isOptional = memberSymbol.isOptional() || memberType.getUnionTypes().some((unionType) => unionType.isUndefined())
-      const propType = createType(language, memberType, isOptional, member.getTypeNode())
+      // Mutable view properties are also stored by the C++ Fabric component.
+      let propertyTarget: TypeParsingTarget
+      if (view && !member.isReadonly()) {
+        propertyTarget = { ...target, language: 'c++' }
+      } else {
+        propertyTarget = target
+      }
+      const propType = createType(propertyTarget, memberType, isOptional, member.getTypeNode())
       properties.push(new Property(memberName, propType, member.isReadonly()))
     } else if (Node.isMethodDeclaration(member)) {
-      methods.push(new InstanceMethod(member, language))
+      methods.push(new InstanceMethod(member, target))
     } else {
       throw new Error(`${name}: Property "${memberName}" is neither a property, nor a method!`)
     }
@@ -178,7 +185,7 @@ export function getHybridObjectSpec(type: Type, platform: Platform, options: Hyb
       if (baseOptions == null) {
         throw new Error(`${name}: Base ${baseType.getText()} does not support ${platform}.`)
       }
-      const base = getHybridObjectSpec(baseType, platform, baseOptions)
+      const base = getHybridObjectSpec(baseType, platform, baseOptions, target)
       if (!base.allowInheritance) {
         throw new Error(
           `${name}: Cannot extend ${base.name} on ${platform}. Use \`allowMultipleImplementations: true\` and \`allowInheritance: true\` on the base class to make it inheritable.`
@@ -340,11 +347,9 @@ function generateCppFiles(spec: HybridObjectSpec, platform: Platform): SourceFil
 }
 
 function generateSwiftFiles(spec: HybridObjectSpec<'swift'>): SourceFile[] {
-  // 1. Always generate a C++ spec for the shared layer and type declarations (enums, interfaces, ...)
-  const cppFiles = generateCppFiles(spec, 'ios')
-  // 2. Generate Swift specific files and potentially a C++ binding layer
+  // Swift owns its spec and the private C++ bridge that registers Swift signatures.
   const swiftFiles = createSwiftHybridObject(spec)
-  return [...cppFiles, ...swiftFiles]
+  return swiftFiles
 }
 
 function generateKotlinFiles(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {

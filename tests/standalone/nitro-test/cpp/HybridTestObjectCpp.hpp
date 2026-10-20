@@ -17,7 +17,7 @@ using namespace facebook;
 
 using ComplexVariant = std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON>;
 
-using StringOrExternal = std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>;
+using StringOrExternal = std::variant<adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::string>;
 
 class HybridTestObjectCpp : public HybridTestObjectCppSpec {
 public:
@@ -50,6 +50,7 @@ private:
   std::tuple<double, std::string> _tuple;
   std::optional<std::vector<std::string>> _optionalArray;
   std::optional<std::shared_ptr<HybridTestObjectCppSpec>> _optionalHybrid;
+  std::optional<HybridBaseSpecCxx> _retainedBase;
   std::optional<Powertrain> _optionalEnum;
   std::optional<OldEnum> _optionalOldEnum;
   std::optional<TruckPowertrain> _optionalEnumPlusOne;
@@ -96,8 +97,8 @@ public:
   std::variant<double, std::string> getSomeVariant() override;
   void setSomeVariant(const std::variant<double, std::string>& someVariant) override;
   std::variant<std::string, Car> passNamedVariant(const std::variant<std::string, Car>& variant) override;
-  std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>
-  passAllEmptyObjectVariant(const std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>& variant) override;
+  std::variant<HybridBaseSpecCxx, OptionalWrapper>
+  passAllEmptyObjectVariant(const std::variant<HybridBaseSpecCxx, OptionalWrapper>& variant) override;
   std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON> bounceComplexVariant(
       const std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON>& variant) override;
   std::tuple<double, std::string> getSomeTuple() override;
@@ -168,7 +169,7 @@ public:
       const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>&)>& callback)
       override;
 
-  std::vector<std::shared_ptr<HybridChildSpec>> bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) override;
+  std::vector<HybridChildSpecCxx> bounceHybridObjects(const std::vector<HybridChildSpecCxx>& array) override;
   std::vector<Callback<void()>> bounceFunctions(const std::vector<Callback<void()>>& functions) override;
   std::vector<AnyJSON> bounceMaps(const std::vector<AnyJSON>& maps) override;
   std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map) override;
@@ -253,28 +254,48 @@ public:
   ArrayBuffer createHardwareBuffer(double width, double height, double layers, HardwareBufferFormat format) override;
   std::shared_ptr<HybridTestObjectCppSpec> newTestObject() override;
   Promise<std::shared_ptr<HybridTestObjectCppSpec>> newTestObjectAsync() override;
-  std::shared_ptr<HybridBaseSpec> createBase() override;
-  std::shared_ptr<HybridChildSpec> createChild() override;
-  std::shared_ptr<HybridBaseSpec> createBaseActualChild() override;
-  std::shared_ptr<HybridGrandchildSpec> createGrandchild() override;
-  std::shared_ptr<HybridChildSpec> createChildActualGrandchild() override;
-  std::shared_ptr<HybridBaseSpec> createBaseActualGrandchild() override;
-  std::shared_ptr<HybridGrandchildSpec> bounceGrandchild(const std::shared_ptr<HybridGrandchildSpec>& grandchild) override;
-  std::shared_ptr<HybridChildSpec> bounceChild(const std::shared_ptr<HybridChildSpec>& child) override;
-  std::shared_ptr<HybridBaseSpec> bounceBase(const std::shared_ptr<HybridBaseSpec>& base) override;
-  std::shared_ptr<HybridBaseSpec> bounceChildBase(const std::shared_ptr<HybridChildSpec>& child) override;
-  std::shared_ptr<HybridChildSpec> castBase(const std::shared_ptr<HybridBaseSpec>& base) override;
+  HybridBaseSpecCxx createBase() override;
+  HybridChildSpecCxx createChild() override;
+  HybridBaseSpecCxx createBaseActualChild() override;
+  HybridGrandchildSpecCxx createGrandchild() override;
+  HybridChildSpecCxx createChildActualGrandchild() override;
+  HybridBaseSpecCxx createBaseActualGrandchild() override;
+  HybridGrandchildSpecCxx bounceGrandchild(const HybridGrandchildSpecCxx& grandchild) override;
+  HybridChildSpecCxx bounceChild(const HybridChildSpecCxx& child) override;
+  HybridBaseSpecCxx bounceBase(const HybridBaseSpecCxx& base) override;
+  HybridBaseSpecCxx bounceChildBase(const HybridChildSpecCxx& child) override;
+  HybridChildSpecCxx castBase(const HybridBaseSpecCxx& base) override;
+  std::optional<HybridBaseSpecCxx> getRetainedBase() override;
+  void setRetainedBase(const std::optional<HybridBaseSpecCxx>& base) override;
+  double readBaseValue(const HybridBaseSpecCxx& base) override;
+  double readChildBaseValue(const HybridChildSpecCxx& child) override;
+  Size bounceSizeThroughBase(const HybridBaseSpecCxx& base, const Size& size) override;
+  Promise<Size> mapSizeThroughBase(const HybridBaseSpecCxx& base, const Size& size, const Callback<Size(const Size&)>& callback) override;
+  std::variant<std::string, Car> bounceVariantThroughChild(const HybridChildSpecCxx& child,
+                                                           const std::variant<std::string, Car>& variant) override;
+  std::string readExternalValue(const adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& externalObject) override;
+  OptionalPrimitivesHolder
+  createExternalOptionalPrimitives(const adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& externalObject,
+                                   const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean,
+                                   const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64) override;
+  HybridBaseSpecCxx createAlternativeBase() override;
+  std::shared_ptr<HybridCppBaseSpec> createCppBase() override;
+  std::shared_ptr<HybridCppChildSpec> createCppChild() override;
+  std::shared_ptr<HybridCppGrandchildSpec> createCppGrandchild() override;
+  std::shared_ptr<HybridCppBaseSpec> createCppBaseActualChild() override;
+  std::shared_ptr<HybridCppBaseSpec> bounceCppBase(const std::shared_ptr<HybridCppBaseSpec>& base) override;
+  std::shared_ptr<HybridCppChildSpec> castCppBase(const std::shared_ptr<HybridCppBaseSpec>& base) override;
   double callbackSync(const Callback<double()>& callback) override;
   Callback<double()> getSyncNumberCallback() override;
   Callback<int64_t(int64_t /* value */)> bounceSyncInt64Callback(const Callback<int64_t(int64_t /* value */)>& callback) override;
-  std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>
-  bounceExternalHybrid(const std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>& externalObject) override;
-  std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> createInternalObject() override;
+  adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx
+  bounceExternalHybrid(const adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& externalObject) override;
+  adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx createInternalObject() override;
   ExternalObjectStruct bounceExternalStruct(const ExternalObjectStruct& externalStruct) override;
-  std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string> bounceExternalVariant(
-      const std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>& variant) override;
-  std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> createExternalVariantFromFunc(
-      const Callback<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>()>& factory) override;
+  std::variant<adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::string>
+  bounceExternalVariant(const std::variant<adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::string>& variant) override;
+  adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx
+  createExternalVariantFromFunc(const Callback<adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx()>& factory) override;
 
   jsi::Value rawJsiFunc(jsi::Runtime& runtime, const jsi::Value& thisValue, const jsi::Value* args, size_t count);
   void dispose() override;

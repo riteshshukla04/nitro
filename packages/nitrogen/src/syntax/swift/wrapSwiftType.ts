@@ -1,5 +1,4 @@
-import { SwiftPointerType } from './types/SwiftPointerType.js'
-import { SwiftResultType } from './types/SwiftResultType.js'
+import { NitroConfig } from '../../config/NitroConfig.js'
 import { ArrayType } from '../types/ArrayType.js'
 import { CallbackType } from '../types/CallbackType.js'
 import { EnumType } from '../types/EnumType.js'
@@ -28,10 +27,13 @@ import { SwiftDirectType } from './types/SwiftDirectType.js'
 import { SwiftVoidType } from './types/SwiftVoidType.js'
 import type { SwiftType } from './types/SwiftType.js'
 
-export function wrapSwiftType(type: Type): SwiftType {
-  if (type instanceof SwiftResultType) return type
-  if (type instanceof SwiftPointerType) return type
-  if (type instanceof NamedWrappingType) return wrapSwiftType(type.type)
+function isSwiftType(type: Type): type is SwiftType {
+  return 'getProtocolConformances' in type
+}
+
+export function wrapSwiftType(type: Type, config: NitroConfig = NitroConfig.current): SwiftType {
+  if (isSwiftType(type)) return type
+  if (type instanceof NamedWrappingType) return wrapSwiftType(type.type, config)
   switch (type.kind) {
     case 'number':
     case 'boolean':
@@ -43,19 +45,19 @@ export function wrapSwiftType(type: Type): SwiftType {
     case 'void':
       return new SwiftVoidType()
     case 'enum':
-      return new SwiftEnumType(getTypeAs(type, EnumType))
+      return new SwiftEnumType(getTypeAs(type, EnumType), config)
     case 'callback':
-      return new SwiftCallbackType(getTypeAs(type, CallbackType))
+      return new SwiftCallbackType(getTypeAs(type, CallbackType), config)
     case 'promise':
-      return new SwiftPromiseType(getTypeAs(type, PromiseType))
+      return new SwiftPromiseType(getTypeAs(type, PromiseType), config)
     case 'record':
-      return new SwiftRecordType(getTypeAs(type, RecordType))
+      return new SwiftRecordType(getTypeAs(type, RecordType), config)
     case 'string':
       return new SwiftStringType()
     case 'array':
-      return new SwiftArrayType(getTypeAs(type, ArrayType))
+      return new SwiftArrayType(getTypeAs(type, ArrayType), config)
     case 'optional':
-      return new SwiftOptionalType(getTypeAs(type, OptionalType))
+      return new SwiftOptionalType(getTypeAs(type, OptionalType), config)
     case 'any-json':
       return new SwiftAnyJSONType()
     case 'error':
@@ -63,17 +65,17 @@ export function wrapSwiftType(type: Type): SwiftType {
     case 'hybrid-object':
       return new SwiftHybridObjectType(getTypeAs(type, HybridObjectType))
     case 'struct':
-      return new SwiftStructType(getTypeAs(type, StructType))
+      return new SwiftStructType(getTypeAs(type, StructType), config)
     case 'variant':
-      return new SwiftVariantType(getTypeAs(type, VariantType))
+      return new SwiftVariantType(getTypeAs(type, VariantType), config)
     default:
       throw new Error(`Swift interop for ${type.kind} is not yet implemented`)
   }
 }
 
 /** Types named by callback/promise aliases before the local generated Swift header. */
-export function wrapSwiftTypeForBridge(type: Type): SwiftType {
-  const swiftType = wrapSwiftType(type)
+export function wrapSwiftTypeForBridge(type: Type, config: NitroConfig = NitroConfig.current): SwiftType {
+  const swiftType = wrapSwiftType(type, config)
   if (swiftType instanceof SwiftArrayType || swiftType instanceof SwiftOptionalType) {
     return swiftType.getBridgeType()
   }

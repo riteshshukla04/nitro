@@ -6,6 +6,7 @@
 ///
 
 public import NitroModules
+public import NitroTestExternal
 
 /// See ``HybridBaseSpec``
 public protocol HybridBaseSpec_protocol: HybridObject {

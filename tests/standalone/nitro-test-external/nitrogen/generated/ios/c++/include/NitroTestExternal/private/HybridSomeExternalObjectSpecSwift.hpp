@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 
 
@@ -20,12 +20,9 @@ namespace margelo::nitro::test::external {
    * The C++ part of HybridSomeExternalObjectSpec_cxx.swift.
    *
    * HybridSomeExternalObjectSpecSwift accesses the concrete Swift wrapper and registers
-   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
-   *
-   * Once Swift can inherit from C++ classes, the Swift implementation could
-   * inherit HybridSomeExternalObjectSpec directly to simplify this structure.
+   * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridSomeExternalObjectSpecSwift final : public virtual HybridSomeExternalObjectSpec {
+  class HybridSomeExternalObjectSpecSwift final : public virtual HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -35,12 +32,12 @@ namespace margelo::nitro::test::external {
 
   public:
     // Constructor from a Swift instance
-    explicit HybridSomeExternalObjectSpecSwift(const NitroTestExternal::HybridSomeExternalObjectSpec_cxx& swiftPart):
+    explicit HybridSomeExternalObjectSpecSwift(const ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx& swiftPart):
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    NitroTestExternal::HybridSomeExternalObjectSpec_cxx& getSwiftPart() noexcept {
+    ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -59,13 +56,10 @@ namespace margelo::nitro::test::external {
 
     // Properties
     // Methods
-    std::string getValue() override;
     swift::String getValue_Swift();
-    OptionalPrimitivesHolder createOptionalPrimitivesHolder(const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64) override;
-    NitroTestExternal::OptionalPrimitivesHolder createOptionalPrimitivesHolder_Swift(const swift::Optional<double>& optionalNumber, const swift::Optional<bool>& optionalBoolean, const swift::Optional<uint64_t>& optionalUInt64, const swift::Optional<int64_t>& optionalInt64);
+    ::NitroTestExternal::OptionalPrimitivesHolder createOptionalPrimitivesHolder_Swift(const swift::Optional<double>& optionalNumber, const swift::Optional<bool>& optionalBoolean, const swift::Optional<uint64_t>& optionalUInt64, const swift::Optional<int64_t>& optionalInt64);
     // Constructor
-    static std::shared_ptr<HybridSomeExternalObjectSpec> constructor();
-    static NitroTestExternal::HybridSomeExternalObjectSpec_cxx constructor_Swift();
+    static ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx constructor_Swift();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {
@@ -73,7 +67,7 @@ namespace margelo::nitro::test::external {
     }
 
   private:
-    NitroTestExternal::HybridSomeExternalObjectSpec_cxx _swiftPart;
+    ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx _swiftPart;
   };
 
 } // namespace margelo::nitro::test::external

@@ -1,7 +1,7 @@
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
 import type { SourceImport } from '../SourceFile.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
-import { HybridObjectType } from '../types/HybridObjectType.js'
+import { CustomType } from '../types/CustomType.js'
 import { indent } from '../../utils.js'
 
 /** Code that binds a spec's constructor and static members in its `Class::get()`. */
@@ -33,7 +33,12 @@ export function createCppHybridClassBindings(spec: HybridObjectSpec<'c++'>): Hyb
   const adapters: string[] = []
   imports.push({ language: 'c++', declaration: { name: 'utility', space: 'system' } }, spec.implementation.include)
   if (spec.constructor != null) {
-    const method = spec.constructor.toStaticMethod(new HybridObjectType(spec))
+    // JS construction returns the native object even when its public C++ API
+    // uses a facade to keep signatures consistent with another platform.
+    const nativeType = new CustomType(`std::shared_ptr<${HybridTSpec}>`, {
+      include: spec.config.getCxxHeader(`${HybridTSpec}.hpp`).name,
+    })
+    const method = spec.constructor.toStaticMethod(nativeType)
     const argumentTypes = method.parameters.map((parameter) => `decltype(${parameter.type.escapedName})`)
     const argumentsCode = method.parameters.map(
       (parameter) => `std::forward<decltype(${parameter.type.escapedName})>(${parameter.type.escapedName})`

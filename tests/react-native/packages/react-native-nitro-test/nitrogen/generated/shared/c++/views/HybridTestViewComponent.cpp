@@ -28,7 +28,7 @@ namespace margelo::nitro::test::views {
     colorScheme(nitro::ReactProp<ColorScheme>::fromRawValue("TestView", "colorScheme", rawProps, sourceProps.colorScheme)),
     someCallback(nitro::ReactProp<Callback<void()>>::fromRawValue("TestView", "someCallback", rawProps, sourceProps.someCallback)),
     nativeDefaultValue(nitro::ReactProp<std::optional<double>>::fromRawValue("TestView", "nativeDefaultValue", rawProps, sourceProps.nativeDefaultValue)),
-    hybridRef(nitro::ReactProp<std::optional<Callback<void(const std::shared_ptr<HybridTestViewSpec>& /* ref */)>>>::fromRawValue("TestView", "hybridRef", rawProps, sourceProps.hybridRef)) {
+    hybridRef(nitro::ReactProp<std::optional<Callback<void(const std::shared_ptr<HybridObject>& /* ref */)>>>::fromRawValue("TestView", "hybridRef", rawProps, sourceProps.hybridRef)) {
 #ifdef ANDROID
     nitro::RawPropsCompat::initializeDynamicProps(*this, sourceProps, rawProps, filterObjectKeys);
 #endif

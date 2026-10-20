@@ -18,34 +18,16 @@ namespace margelo::nitro::test::external {
 
   // Properties
 
-  bool HybridTestViewSpecSwift::getIsBlue() {
-    auto __result = getIsBlue_Swift();
-    return SwiftConverter<bool, bool>::fromSwift(__result);
-  }
-
   bool HybridTestViewSpecSwift::getIsBlue_Swift() {
     return _swiftPart.getIsBlue();
-  }
-
-  void HybridTestViewSpecSwift::setIsBlue(bool isBlue) {
-    setIsBlue_Swift(SwiftConverter<bool, bool>::toSwift(isBlue));
   }
 
   void HybridTestViewSpecSwift::setIsBlue_Swift(bool isBlue) {
     return _swiftPart.setIsBlue(isBlue);
   }
 
-  Callback<void()> HybridTestViewSpecSwift::getSomeCallback() {
-    auto __result = getSomeCallback_Swift();
-    return SwiftConverter<Callback<void()>, Callback<void()>>::fromSwift(__result);
-  }
-
   Callback<void()> HybridTestViewSpecSwift::getSomeCallback_Swift() {
     return _swiftPart.getSomeCallback();
-  }
-
-  void HybridTestViewSpecSwift::setSomeCallback(const Callback<void()>& someCallback) {
-    setSomeCallback_Swift(SwiftConverter<Callback<void()>, Callback<void()>>::toSwift(someCallback));
   }
 
   void HybridTestViewSpecSwift::setSomeCallback_Swift(const Callback<void()>& someCallback) {
@@ -54,20 +36,11 @@ namespace margelo::nitro::test::external {
 
   // Methods
 
-  void HybridTestViewSpecSwift::someMethod() {
-    someMethod_Swift();
-  }
-
   void HybridTestViewSpecSwift::someMethod_Swift() {
     auto __result = _swiftPart.someMethod();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
     }
-  }
-
-  std::string HybridTestViewSpecSwift::getModuleName() {
-    auto __result = getModuleName_Swift();
-    return SwiftConverter<std::string, swift::String>::fromSwift(__result);
   }
 
   swift::String HybridTestViewSpecSwift::getModuleName_Swift() {

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <NitroTestExternal/HybridBaseSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 
 
@@ -20,12 +20,9 @@ namespace margelo::nitro::test::external {
    * The C++ part of HybridBaseSpec_cxx.swift.
    *
    * HybridBaseSpecSwift accesses the concrete Swift wrapper and registers
-   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
-   *
-   * Once Swift can inherit from C++ classes, the Swift implementation could
-   * inherit HybridBaseSpec directly to simplify this structure.
+   * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridBaseSpecSwift final : public virtual HybridBaseSpec {
+  class HybridBaseSpecSwift final : public virtual HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -35,12 +32,12 @@ namespace margelo::nitro::test::external {
 
   public:
     // Constructor from a Swift instance
-    explicit HybridBaseSpecSwift(const NitroTestExternal::HybridBaseSpec_cxx& swiftPart):
+    explicit HybridBaseSpecSwift(const ::NitroTestExternal::HybridBaseSpec_cxx& swiftPart):
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    NitroTestExternal::HybridBaseSpec_cxx& getSwiftPart() noexcept {
+    ::NitroTestExternal::HybridBaseSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -58,18 +55,13 @@ namespace margelo::nitro::test::external {
     std::string toString() override;
 
     // Properties
-    double getBaseValue() override;
     double getBaseValue_Swift();
     // Methods
-    Size bounceSize(const Size& size) override;
-    NitroTestExternal::Size bounceSize_Swift(const NitroTestExternal::Size& size);
-    SizeUnit bounceSizeUnit(SizeUnit unit) override;
-    NitroTestExternal::SizeUnit bounceSizeUnit_Swift(NitroTestExternal::SizeUnit unit);
-    Promise<Size> mapSize(const Size& size, const Callback<Size(const Size& /* size */)>& callback) override;
-    Promise<NitroTestExternal::Size> mapSize_Swift(const NitroTestExternal::Size& size, const Callback<NitroTestExternal::Size(const NitroTestExternal::Size&)>& callback);
+    ::NitroTestExternal::Size bounceSize_Swift(const ::NitroTestExternal::Size& size);
+    ::NitroTestExternal::SizeUnit bounceSizeUnit_Swift(::NitroTestExternal::SizeUnit unit);
+    Promise<::NitroTestExternal::Size> mapSize_Swift(const ::NitroTestExternal::Size& size, const Callback<::NitroTestExternal::Size(const ::NitroTestExternal::Size&)>& callback);
     // Constructor
-    static std::shared_ptr<HybridBaseSpec> constructor();
-    static NitroTestExternal::HybridBaseSpec_cxx constructor_Swift();
+    static ::NitroTestExternal::HybridBaseSpec_cxx constructor_Swift();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {
@@ -77,7 +69,7 @@ namespace margelo::nitro::test::external {
     }
 
   private:
-    NitroTestExternal::HybridBaseSpec_cxx _swiftPart;
+    ::NitroTestExternal::HybridBaseSpec_cxx _swiftPart;
   };
 
 } // namespace margelo::nitro::test::external

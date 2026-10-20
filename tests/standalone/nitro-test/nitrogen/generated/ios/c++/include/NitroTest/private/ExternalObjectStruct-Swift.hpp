@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/ExternalObjectStruct.hpp>
 // Forward declaration of `ExternalObjectStruct` to properly resolve imports.
 namespace NitroTest { class ExternalObjectStruct; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::ExternalObjectStruct> final {
-    using SwiftType = NitroTest::ExternalObjectStruct;
-
-    static margelo::nitro::test::ExternalObjectStruct fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::ExternalObjectStruct& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::ExternalObjectStruct> {
-    static NitroTest::ExternalObjectStruct fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::ExternalObjectStruct& value);
+  struct JSIConverter<::NitroTest::ExternalObjectStruct> {
+    static ::NitroTest::ExternalObjectStruct fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::ExternalObjectStruct& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

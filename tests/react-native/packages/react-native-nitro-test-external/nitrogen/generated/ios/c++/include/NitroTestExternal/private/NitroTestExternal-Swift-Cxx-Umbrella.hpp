@@ -27,8 +27,6 @@
 #endif
 
 
-#include <memory>
-#include <NitroTestExternal/HybridTestViewSpec.hpp>
 #include <NitroTestExternal/private/HybridTestViewSpec_cxx-Swift.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp>

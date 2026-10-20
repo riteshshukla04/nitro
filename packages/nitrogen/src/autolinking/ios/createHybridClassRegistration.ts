@@ -21,7 +21,7 @@ export function createHybridClassRegistration(spec: HybridObjectSpec): HybridCla
       break
     case 'c++':
       className = names.HybridTSpec
-      header = new HybridObjectType(spec).getCppHeader()
+      header = spec.config.getCxxHeader(`${names.HybridTSpec}.hpp`)
       break
     case 'kotlin':
       throw new Error('Kotlin class registration is not implemented yet.')

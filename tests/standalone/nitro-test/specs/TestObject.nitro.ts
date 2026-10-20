@@ -1,9 +1,12 @@
 import { iOS } from 'nitro-core'
 import { type HybridObject, type AnyJSON, type CustomType, type AnyHybridObject, type UInt64, type Int64, type Inline } from 'nitro-core'
-import type { SomeExternalObject } from 'nitro-test-external'
+import type { SomeExternalObject, OptionalPrimitivesHolder, CppOnlyValue } from 'nitro-test-external'
 import type { Child } from './Child.nitro'
 import type { Grandchild } from './Grandchild.nitro'
-import type { Base } from './Base.nitro'
+import type { Base, Size } from './Base.nitro'
+import type { CppBase } from './CppBase.nitro'
+import type { CppChild } from './CppChild.nitro'
+import type { CppGrandchild } from './CppGrandchild.nitro'
 
 export * from '#nitro/TestObjectCpp'
 export * from '#nitro/TestObjectSwiftKotlin'
@@ -316,6 +319,31 @@ export declare class TestObjectCpp extends HybridObject {
   bounceChildBase(child: Child): Base
   castBase(base: Base): Child
 
+  // C++ calls the declared Swift implementation through its adapter.
+  retainedBase?: Base
+  readBaseValue(base: Base): number
+  readChildBaseValue(child: Child): number
+  bounceSizeThroughBase(base: Base, size: Size): Size
+  mapSizeThroughBase(base: Base, size: Size, callback: (size: Size) => Size): Promise<Size>
+  bounceVariantThroughChild(child: Child, variant: NamedVariant): NamedVariant
+  readExternalValue(externalObject: SomeExternalObject): string
+  createExternalOptionalPrimitives(
+    externalObject: SomeExternalObject,
+    optionalNumber?: number,
+    optionalBoolean?: boolean,
+    optionalUInt64?: UInt64,
+    optionalInt64?: Int64
+  ): OptionalPrimitivesHolder
+  createAlternativeBase(): Base
+
+  // A separate hierarchy keeps coverage of native C++ inheritance.
+  createCppBase(): CppBase
+  createCppChild(): CppChild
+  createCppGrandchild(): CppGrandchild
+  createCppBaseActualChild(): CppBase
+  bounceCppBase(base: CppBase): CppBase
+  castCppBase(base: CppBase): CppChild
+
   // Sync funcs
   callbackSync(callback: () => number): number
   getSyncNumberCallback(): () => number
@@ -556,6 +584,7 @@ export declare class TestObjectSwiftKotlin extends HybridObject {
 
   // Type-specifics
   readonly thisObject: TestObjectSwiftKotlin
+  bounceCppOnlyValue(value: CppOnlyValue): CppOnlyValue
   newTestObject(): TestObjectSwiftKotlin
   newTestObjectAsync(): Promise<TestObjectSwiftKotlin>
   optionalHybrid?: TestObjectSwiftKotlin

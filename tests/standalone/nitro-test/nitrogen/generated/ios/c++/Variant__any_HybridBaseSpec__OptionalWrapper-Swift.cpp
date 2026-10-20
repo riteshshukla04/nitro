@@ -7,56 +7,35 @@
 
 #include <NitroTest/private/Variant__any_HybridBaseSpec__OptionalWrapper-Swift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <memory>
-#include <NitroTest/HybridBaseSpec.hpp>
-#include <NitroTest/OptionalWrapper.hpp>
-#include <variant>
 
 namespace margelo::nitro {
 
-  std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper> SwiftConverter<std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>, NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::fromSwift(const SwiftType& value) {
+  ::NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx JSIConverter<::NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (JSIConverter<::NitroTest::HybridBaseSpec_cxx>::canConvert(runtime, value)) {
+      auto payload = JSIConverter<::NitroTest::HybridBaseSpec_cxx>::fromJSI(runtime, value);
+      return NitroModules::makeSwiftValue<::NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>([&](void* result) {
+        ::NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx::initializeFirst(payload, result);
+      });
+    }
+    if (JSIConverter<::NitroTest::OptionalWrapper>::canConvert(runtime, value)) {
+      auto payload = JSIConverter<::NitroTest::OptionalWrapper>::fromJSI(runtime, value);
+      return NitroModules::makeSwiftValue<::NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>([&](void* result) {
+        ::NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx::initializeSecond(payload, result);
+      });
+    }
+    throw std::runtime_error("Cannot convert \"" + value.toString(runtime).utf8(runtime) + "\" to any type in variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>!");
+  }
+
+  jsi::Value JSIConverter<::NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::toJSI(jsi::Runtime& runtime, const ::NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx& value) {
     switch (value.getIndex()) {
-      case 0: {
-        auto payload = value.getFirst();
-        return std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>(std::in_place_index<0>, SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, NitroTest::HybridBaseSpec_cxx>::fromSwift(payload));
-      }
-      case 1: {
-        auto payload = value.getSecond();
-        return std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>(std::in_place_index<1>, SwiftConverter<margelo::nitro::test::OptionalWrapper, NitroTest::OptionalWrapper>::fromSwift(payload));
-      }
+      case 0: return JSIConverter<::NitroTest::HybridBaseSpec_cxx>::toJSI(runtime, value.getFirst());
+      case 1: return JSIConverter<::NitroTest::OptionalWrapper>::toJSI(runtime, value.getSecond());
       default: throw std::invalid_argument("Invalid variant index");
     }
   }
 
-  SwiftConverter<std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>, NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::SwiftType SwiftConverter<std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>, NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::toSwift(const std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>& value) {
-    switch (value.index()) {
-      case 0: {
-        auto payload = SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, NitroTest::HybridBaseSpec_cxx>::toSwift(std::get<0>(value));
-        return NitroModules::makeSwiftValue<NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>([&](void* result) {
-          SwiftType::initializeFirst(payload, result);
-        });
-      }
-      case 1: {
-        auto payload = SwiftConverter<margelo::nitro::test::OptionalWrapper, NitroTest::OptionalWrapper>::toSwift(std::get<1>(value));
-        return NitroModules::makeSwiftValue<NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>([&](void* result) {
-          SwiftType::initializeSecond(payload, result);
-        });
-      }
-      default: throw std::bad_variant_access();
-    }
-  }
-
-  NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx JSIConverter<NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    return SwiftConverter<std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>, NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::toSwift(JSIConverter<std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>>::fromJSI(runtime, value));
-  }
-
-  jsi::Value JSIConverter<NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::toJSI(jsi::Runtime& runtime, const NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx& value) {
-    return JSIConverter<std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>>::toJSI(runtime, SwiftConverter<std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>, NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::fromSwift(value));
-  }
-
-  bool JSIConverter<NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    return JSIConverter<std::variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>>::canConvert(runtime, value);
+  bool JSIConverter<::NitroTest::Variant__any_HybridBaseSpec__OptionalWrapper_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    return JSIConverter<::NitroTest::HybridBaseSpec_cxx>::canConvert(runtime, value) || JSIConverter<::NitroTest::OptionalWrapper>::canConvert(runtime, value);
   }
 
 } // namespace margelo::nitro

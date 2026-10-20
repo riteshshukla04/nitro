@@ -9,11 +9,11 @@
 #include <NitroModules/Callback.hpp>
 
 namespace margelo::nitro::test::external::swift_bridge {
-  std__shared_ptr_HybridTestViewSpec_ create_std__shared_ptr_HybridTestViewSpec_(void* NON_NULL pointer) {
-    return std::make_shared<margelo::nitro::test::external::HybridTestViewSpecSwift>(NitroTestExternal::HybridTestViewSpec_cxx::fromUnsafe(pointer));
+  std__shared_ptr_margelo__nitro__test__external__HybridTestViewSpec_ create_std__shared_ptr_margelo__nitro__test__external__HybridTestViewSpec_(void* NON_NULL pointer) {
+    return std::make_shared<margelo::nitro::test::external::HybridTestViewSpecSwift>(::NitroTestExternal::HybridTestViewSpec_cxx::fromUnsafe(pointer));
   }
 
-  void* NON_NULL get_std__shared_ptr_HybridTestViewSpec_(const std__shared_ptr_HybridTestViewSpec_& value) {
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__external__HybridTestViewSpec_(const std::shared_ptr<HybridObject>& value) {
     auto wrapper = std::dynamic_pointer_cast<margelo::nitro::test::external::HybridTestViewSpecSwift>(value);
     if (!wrapper) throw std::runtime_error("HybridTestViewSpec is not implemented in Swift");
     return wrapper->getSwiftPart().toUnsafe();

@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/ColorScheme.hpp>
 // Forward declaration of `ColorScheme` to properly resolve imports.
 namespace NitroTest { class ColorScheme; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::ColorScheme> final {
-    using SwiftType = NitroTest::ColorScheme;
-
-    static margelo::nitro::test::ColorScheme fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::ColorScheme& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::ColorScheme> {
-    static NitroTest::ColorScheme fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::ColorScheme& value);
+  struct JSIConverter<::NitroTest::ColorScheme> {
+    static ::NitroTest::ColorScheme fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::ColorScheme& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

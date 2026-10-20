@@ -2,12 +2,17 @@ import type { Language } from '../../../getPlatformSpecs.js'
 import type { CppHelper } from '../../c++/CppHelper.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { NamedWrappingType } from '../../types/NamedWrappingType.js'
-import type { TypeContext } from '../../types/Type.js'
+import type { Type, TypeContext } from '../../types/Type.js'
 import type { ImportedCxxRecord } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
+import { combineSwiftCppConverters, type SwiftCppConverter } from '../SwiftConverter.js'
 
 export class SwiftNamedType extends NamedWrappingType<SwiftType> implements SwiftType {
+  getCppConverter(cppType: Type): SwiftCppConverter {
+    return combineSwiftCppConverters([this.type.getCppConverter?.(cppType)])
+  }
+
   get isHashable(): boolean {
     return this.type.isHashable
   }

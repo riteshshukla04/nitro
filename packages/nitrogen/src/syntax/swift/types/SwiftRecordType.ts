@@ -1,8 +1,8 @@
-import type { GetCodeOptions, TypeContext } from '../../types/Type.js'
+import type { Type, GetCodeOptions, TypeContext } from '../../types/Type.js'
 import type { CppHelper } from '../../c++/CppHelper.js'
 import type { SourceFile } from '../../SourceFile.js'
 import { RecordType } from '../../types/RecordType.js'
-import { createSwiftRecordBridge } from '../SwiftRecord.js'
+import { createSwiftRecordBridge, createSwiftRecordCppConverter } from '../SwiftRecord.js'
 import { wrapSwiftType } from '../wrapSwiftType.js'
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
@@ -11,17 +11,25 @@ import type { SourceImport } from '../../SourceFile.js'
 import { getClangImporterReferenceName } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
+import type { SwiftCppConverter } from '../SwiftConverter.js'
 
 export class SwiftRecordType extends RecordType implements SwiftType {
   override readonly keyType: SwiftType
   override readonly valueType: SwiftType
 
-  constructor(readonly type: RecordType) {
-    const keyType = wrapSwiftType(type.keyType)
-    const valueType = wrapSwiftType(type.valueType)
+  constructor(
+    readonly type: RecordType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
+    const keyType = wrapSwiftType(type.keyType, config)
+    const valueType = wrapSwiftType(type.valueType, config)
     super(keyType, valueType)
     this.keyType = keyType
     this.valueType = valueType
+  }
+
+  getCppConverter(cppType: Type): SwiftCppConverter {
+    return createSwiftRecordCppConverter({ type: this, cppType: cppType })
   }
 
   get name(): string {
@@ -40,6 +48,7 @@ export class SwiftRecordType extends RecordType implements SwiftType {
   }
 
   override getExtraFiles(): SourceFile[] {
+    if (this.config.isExternalConfig) return []
     return [...this.keyType.getExtraFiles(), ...this.valueType.getExtraFiles(), ...createSwiftRecordBridge(this)]
   }
 
@@ -69,7 +78,7 @@ export class SwiftRecordType extends RecordType implements SwiftType {
 
   readonly canImportFromCpp = false
   get moduleName(): string {
-    return NitroConfig.current.getIosModuleName()
+    return this.config.getIosModuleName()
   }
   get forwardDeclaration(): string {
     return getForwardDeclaration('class', this.name, this.moduleName)
@@ -78,7 +87,7 @@ export class SwiftRecordType extends RecordType implements SwiftType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++': {
-        const type = `${this.moduleName}::${this.name}`
+        const type = `::${this.moduleName}::${this.name}`
         return options.context === 'parameter' ? `const ${type}&` : type
       }
       case 'swift':
@@ -108,7 +117,7 @@ export class SwiftRecordType extends RecordType implements SwiftType {
         if (context === 'implementation') {
           imports.push({
             language: language,
-            declaration: NitroConfig.current.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
+            declaration: this.config.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
           })
         }
         break

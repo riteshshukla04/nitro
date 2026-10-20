@@ -1,4 +1,8 @@
-import { createSwiftConverter } from './SwiftConverter.js'
+import { createSwiftConverter, type SwiftCppConverter } from './SwiftConverter.js'
+import { createSwiftJSIConverter } from './SwiftJSIConverter.js'
+import { RecordType } from '../types/RecordType.js'
+import { getTypeAs } from '../types/getTypeAs.js'
+import type { Type } from '../types/Type.js'
 import { indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
@@ -76,33 +80,16 @@ public struct ${swiftStructName}${conformancePrefix}${protocolNames.join(', ')} 
 `.trim(),
   }
   const jsiDictionaryConverter = `SwiftDictionaryJSIConverter<${type.getCode('c++', { context: 'type-argument' })}, ${swiftKeyType.getCode('c++', { context: 'type-argument' })}, ${swiftValueType.getCode('c++', { context: 'type-argument' })}>`
-  const cppDictionaryType = type.type.getCode('c++', {
-    context: 'type-argument',
-    fullyQualified: true,
-  })
-  const nativeDictionaryConverter = `SwiftDictionaryConverter<${cppDictionaryType}, SwiftType, ${swiftKeyType.getCode('c++', { context: 'type-argument' })}, ${swiftValueType.getCode('c++', { context: 'type-argument' })}>`
-  const swiftToCppConverterCode = `return ${nativeDictionaryConverter}::fromSwift(value);`
-  const cppToSwiftConverterCode = `return ${nativeDictionaryConverter}::toSwift(value);`
   const jsToSwiftConverterCode = `return ${jsiDictionaryConverter}::fromJSI(runtime, value);`
   const swiftToJSConverterCode = `return ${jsiDictionaryConverter}::toJSI(runtime, value);`
   const jsCanConvertCode = `return ${jsiDictionaryConverter}::canConvert(runtime, value);`
   return [
     swiftFile,
-    ...createSwiftConverter({
+    ...createSwiftJSIConverter({
       name: type.name,
-      cppType: type.type,
       swiftType: type,
       forwardDeclaration: type.forwardDeclaration,
-      fromSwift: swiftToCppConverterCode,
-      toSwift: cppToSwiftConverterCode,
       imports: [
-        {
-          language: 'c++',
-          declaration: {
-            name: 'NitroModules/SwiftConverter+Dictionary.hpp',
-            space: 'system',
-          },
-        },
         {
           language: 'c++',
           declaration: {
@@ -116,4 +103,36 @@ public struct ${swiftStructName}${conformancePrefix}${protocolNames.join(', ')} 
       canConvert: jsCanConvertCode,
     }),
   ]
+}
+
+interface SwiftRecordCppConverterOptions {
+  type: SwiftRecordType
+  cppType: Type
+}
+
+export function createSwiftRecordCppConverter({ type, cppType }: SwiftRecordCppConverterOptions): SwiftCppConverter {
+  const recordType = getTypeAs(cppType, RecordType)
+  const cppDictionaryType = recordType.getCode('c++', { context: 'type-argument', fullyQualified: true })
+  const swiftKeyType = type.keyType.getCode('c++', { context: 'type-argument' })
+  const swiftValueType = type.valueType.getCode('c++', { context: 'type-argument' })
+  const converter = `SwiftDictionaryConverter<${cppDictionaryType}, SwiftType, ${swiftKeyType}, ${swiftValueType}>`
+  const swiftToCppConverterCode = `
+return ${converter}::fromSwift(value);
+`.trim()
+  const cppToSwiftConverterCode = `
+return ${converter}::toSwift(value);
+`.trim()
+  const dependencies = [type.keyType.getCppConverter?.(recordType.keyType), type.valueType.getCppConverter?.(recordType.valueType)].filter(
+    (dependency) => dependency != null
+  )
+  return createSwiftConverter({
+    name: `${type.name}+${type.moduleName}`,
+    cppType: cppType,
+    swiftType: type,
+    forwardDeclaration: type.forwardDeclaration,
+    fromSwift: swiftToCppConverterCode,
+    toSwift: cppToSwiftConverterCode,
+    dependencies: dependencies,
+    imports: [{ language: 'c++', declaration: { name: 'NitroModules/SwiftConverter+Dictionary.hpp', space: 'system' } }],
+  })
 }

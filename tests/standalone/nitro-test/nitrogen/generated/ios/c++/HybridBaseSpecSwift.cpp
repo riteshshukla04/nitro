@@ -18,24 +18,14 @@ namespace margelo::nitro::test {
 
   // Properties
 
-  double HybridBaseSpecSwift::getBaseValue() {
-    auto __result = getBaseValue_Swift();
-    return SwiftConverter<double, double>::fromSwift(__result);
-  }
-
   double HybridBaseSpecSwift::getBaseValue_Swift() {
     return _swiftPart.getBaseValue();
   }
 
   // Methods
 
-  Size HybridBaseSpecSwift::bounceSize(const Size& size) {
-    auto __result = bounceSize_Swift(SwiftConverter<margelo::nitro::test::Size, NitroTest::Size>::toSwift(size));
-    return SwiftConverter<margelo::nitro::test::Size, NitroTest::Size>::fromSwift(__result);
-  }
-
-  NitroTest::Size HybridBaseSpecSwift::bounceSize_Swift(const NitroTest::Size& size) {
-    auto __result = withSwiftResult<NitroTest::Size>([&](void* __outResult) {
+  ::NitroTest::Size HybridBaseSpecSwift::bounceSize_Swift(const ::NitroTest::Size& size) {
+    auto __result = withSwiftResult<::NitroTest::Size>([&](void* __outResult) {
       return _swiftPart.bounceSize(size, __outResult);
     });
     if (__result.hasError()) [[unlikely]] {
@@ -44,13 +34,8 @@ namespace margelo::nitro::test {
     return std::move(__result.value());
   }
 
-  SizeUnit HybridBaseSpecSwift::bounceSizeUnit(SizeUnit unit) {
-    auto __result = bounceSizeUnit_Swift(SwiftConverter<margelo::nitro::test::SizeUnit, NitroTest::SizeUnit>::toSwift(unit));
-    return SwiftConverter<margelo::nitro::test::SizeUnit, NitroTest::SizeUnit>::fromSwift(__result);
-  }
-
-  NitroTest::SizeUnit HybridBaseSpecSwift::bounceSizeUnit_Swift(NitroTest::SizeUnit unit) {
-    auto __result = withSwiftResult<NitroTest::SizeUnit>([&](void* __outResult) {
+  ::NitroTest::SizeUnit HybridBaseSpecSwift::bounceSizeUnit_Swift(::NitroTest::SizeUnit unit) {
+    auto __result = withSwiftResult<::NitroTest::SizeUnit>([&](void* __outResult) {
       return _swiftPart.bounceSizeUnit(unit, __outResult);
     });
     if (__result.hasError()) [[unlikely]] {
@@ -59,12 +44,7 @@ namespace margelo::nitro::test {
     return std::move(__result.value());
   }
 
-  Promise<Size> HybridBaseSpecSwift::mapSize(const Size& size, const Callback<Size(const Size& /* size */)>& callback) {
-    auto __result = mapSize_Swift(SwiftConverter<margelo::nitro::test::Size, NitroTest::Size>::toSwift(size), SwiftConverter<Callback<margelo::nitro::test::Size(const margelo::nitro::test::Size& /* size */)>, Callback<NitroTest::Size(const NitroTest::Size&)>>::toSwift(callback));
-    return SwiftConverter<Promise<margelo::nitro::test::Size>, Promise<NitroTest::Size>>::fromSwift(__result);
-  }
-
-  Promise<NitroTest::Size> HybridBaseSpecSwift::mapSize_Swift(const NitroTest::Size& size, const Callback<NitroTest::Size(const NitroTest::Size&)>& callback) {
+  Promise<::NitroTest::Size> HybridBaseSpecSwift::mapSize_Swift(const ::NitroTest::Size& size, const Callback<::NitroTest::Size(const ::NitroTest::Size&)>& callback) {
     auto __result = _swiftPart.mapSize(size, callback);
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
@@ -74,17 +54,30 @@ namespace margelo::nitro::test {
 
   // Constructor
 
-  std::shared_ptr<HybridBaseSpec> HybridBaseSpecSwift::constructor() {
-    auto __result = constructor_Swift();
-    return SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, NitroTest::HybridBaseSpec_cxx>::fromSwift(__result);
-  }
-
-  NitroTest::HybridBaseSpec_cxx HybridBaseSpecSwift::constructor_Swift() {
-    auto __result = NitroTest::HybridBaseSpec_cxx::constructor();
+  ::NitroTest::HybridBaseSpec_cxx HybridBaseSpecSwift::constructor_Swift() {
+    auto __result = ::NitroTest::HybridBaseSpec_cxx::constructor();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
     }
-    return NitroTest::HybridBaseSpec_cxx::fromUnsafe(__result.value());
+    return ::NitroTest::HybridBaseSpec_cxx::fromUnsafe(__result.value());
+  }
+
+  // Static methods
+
+  ::NitroTest::HybridBaseSpec_cxx HybridBaseSpecSwift::createAlternativeBase_Swift() {
+    auto __result = ::NitroTest::HybridBaseSpec_cxx::createAlternativeBase();
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return ::NitroTest::HybridBaseSpec_cxx::fromUnsafe(__result.value());
+  }
+
+  ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx HybridBaseSpecSwift::createInternalExternalObject_Swift() {
+    auto __result = ::NitroTest::HybridBaseSpec_cxx::createInternalExternalObject();
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx::fromUnsafe(__result.value());
   }
 
   const std::shared_ptr<const HybridClass>& HybridBaseSpecSwift::Class::get() {
@@ -94,6 +87,8 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("bounceSizeUnit", &HybridBaseSpecSwift::bounceSizeUnit_Swift);
       clazz.registerHybridMethod("mapSize", &HybridBaseSpecSwift::mapSize_Swift);
       clazz.registerHybridConstructor(&HybridBaseSpecSwift::constructor_Swift);
+      clazz.registerStaticHybridMethod("createAlternativeBase", &HybridBaseSpecSwift::createAlternativeBase_Swift);
+      clazz.registerStaticHybridMethod("createInternalExternalObject", &HybridBaseSpecSwift::createInternalExternalObject_Swift);
     });
     return hybridClass;
   }

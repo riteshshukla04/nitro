@@ -1,6 +1,7 @@
 import { ArrayType } from './types/ArrayType.js'
 import { CallbackType } from './types/CallbackType.js'
 import { getTypeAs } from './types/getTypeAs.js'
+import { NamedWrappingType } from './types/NamedWrappingType.js'
 import { OptionalType } from './types/OptionalType.js'
 import { PromiseType } from './types/PromiseType.js'
 import { RecordType } from './types/RecordType.js'
@@ -10,6 +11,7 @@ import type { Type } from './types/Type.js'
 import { VariantType } from './types/VariantType.js'
 
 export function getReferencedTypes(type: Type): Type[] {
+  if (type instanceof NamedWrappingType) return getReferencedTypes(type.type)
   switch (type.kind) {
     case 'array':
       const array = getTypeAs(type, ArrayType)

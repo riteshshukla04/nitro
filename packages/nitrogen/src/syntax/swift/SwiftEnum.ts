@@ -1,4 +1,8 @@
-import { createSwiftConverter } from './SwiftConverter.js'
+import { createSwiftConverter, type SwiftCppConverter } from './SwiftConverter.js'
+import { createSwiftJSIConverter } from './SwiftJSIConverter.js'
+import { EnumType } from '../types/EnumType.js'
+import { getTypeAs } from '../types/getTypeAs.js'
+import type { Type } from '../types/Type.js'
 import { indent, toLowerCamelCase } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
@@ -159,28 +163,12 @@ ${canConvertIntegerChecks}
 ${canConvertIntegerBody}
 `.trim()
   }
-  const swiftToCppConverterCode = `
-return static_cast<${enumType.getCode('c++', { context: 'value', fullyQualified: true })}>(value.getRawValue());
-`.trim()
-  const enumMemberComparisons = enumValues.map((value) => `rawValue != ${value}`)
-  const cppToSwiftConverterCode = `
-const auto rawValue = static_cast<int32_t>(value);
-#ifdef NITRO_DEBUG
-if (${enumMemberComparisons.join(' && ')}) {
-  throw std::invalid_argument("Invalid value for ${enumType.enumName}");
-}
-#endif
-return SwiftType::fromRawValue(rawValue);
-`.trim()
   return [
     swiftFile,
-    ...createSwiftConverter({
+    ...createSwiftJSIConverter({
       name: type.name,
-      cppType: enumType,
       swiftType: type,
       forwardDeclaration: type.forwardDeclaration,
-      fromSwift: swiftToCppConverterCode,
-      toSwift: cppToSwiftConverterCode,
       imports: [
         {
           language: 'c++',
@@ -216,4 +204,38 @@ return SwiftType::fromRawValue(rawValue);
       canConvert: jsCanConvertCode,
     }),
   ]
+}
+
+interface SwiftEnumCppConverterOptions {
+  type: SwiftEnumType
+  cppType: Type
+}
+
+export function createSwiftEnumCppConverter({ type, cppType }: SwiftEnumCppConverterOptions): SwiftCppConverter {
+  const enumType = getTypeAs(cppType, EnumType)
+  const nativeEnumType = enumType.getCode('c++', { context: 'value', fullyQualified: true })
+  const swiftToCppConverterCode = `
+return static_cast<${nativeEnumType}>(value.getRawValue());
+`.trim()
+  const enumValues = [...new Set(enumType.enumMembers.map((member) => member.value))]
+  const enumMemberComparisons = enumValues.map((value) => `rawValue != ${value}`)
+  const cppToSwiftConverterCode = `
+const auto rawValue = static_cast<int32_t>(value);
+#ifdef NITRO_DEBUG
+if (${enumMemberComparisons.join(' && ')}) {
+  throw std::invalid_argument("Invalid value for ${enumType.enumName}");
+}
+#endif
+return SwiftType::fromRawValue(rawValue);
+`.trim()
+  const name = `${type.name}+${type.moduleName}`
+  return createSwiftConverter({
+    name: name,
+    cppType: cppType,
+    swiftType: type,
+    forwardDeclaration: type.forwardDeclaration,
+    fromSwift: swiftToCppConverterCode,
+    toSwift: cppToSwiftConverterCode,
+    imports: [{ language: 'c++', declaration: { name: 'NitroModules/NitroDefines.hpp', space: 'system' } }],
+  })
 }

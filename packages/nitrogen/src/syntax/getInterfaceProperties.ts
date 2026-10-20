@@ -1,9 +1,8 @@
 import { Node, type ts, type Type } from 'ts-morph'
 import type { NamedType } from './types/Type.js'
-import { createNamedType } from './createType.js'
-import type { Language } from '../getPlatformSpecs.js'
+import { createNamedType, type TypeParsingTarget } from './createType.js'
 
-export function getInterfaceProperties(language: Language, interfaceType: Type<ts.ObjectType>): NamedType[] {
+export function getInterfaceProperties(target: TypeParsingTarget, interfaceType: Type<ts.ObjectType>): NamedType[] {
   const symbol = interfaceType.getAliasSymbol() ?? interfaceType.getSymbol()
   if (symbol == null) throw new Error(`Interface "${interfaceType.getText()}" does not have a Symbol!`)
   return interfaceType.getProperties().map((prop) => {
@@ -21,7 +20,7 @@ export function getInterfaceProperties(language: Language, interfaceType: Type<t
     }
 
     const refType = createNamedType(
-      language,
+      target,
       prop.getName(),
       propType,
       prop.isOptional() || propType.isNullable(),

@@ -20,11 +20,6 @@ namespace margelo::nitro::test {
 
   // Methods
 
-  std::string HybridPlatformObjectSpecSwift::getOSVersion() {
-    auto __result = getOSVersion_Swift();
-    return SwiftConverter<std::string, swift::String>::fromSwift(__result);
-  }
-
   swift::String HybridPlatformObjectSpecSwift::getOSVersion_Swift() {
     auto __result = withSwiftResult<swift::String>([&](void* __outResult) {
       return _swiftPart.getOSVersion(__outResult);
@@ -37,17 +32,12 @@ namespace margelo::nitro::test {
 
   // Constructor
 
-  std::shared_ptr<HybridPlatformObjectSpec> HybridPlatformObjectSpecSwift::constructor() {
-    auto __result = constructor_Swift();
-    return SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpec>, NitroTest::HybridPlatformObjectSpec_cxx>::fromSwift(__result);
-  }
-
-  NitroTest::HybridPlatformObjectSpec_cxx HybridPlatformObjectSpecSwift::constructor_Swift() {
-    auto __result = NitroTest::HybridPlatformObjectSpec_cxx::constructor();
+  ::NitroTest::HybridPlatformObjectSpec_cxx HybridPlatformObjectSpecSwift::constructor_Swift() {
+    auto __result = ::NitroTest::HybridPlatformObjectSpec_cxx::constructor();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
     }
-    return NitroTest::HybridPlatformObjectSpec_cxx::fromUnsafe(__result.value());
+    return ::NitroTest::HybridPlatformObjectSpec_cxx::fromUnsafe(__result.value());
   }
 
   const std::shared_ptr<const HybridClass>& HybridPlatformObjectSpecSwift::Class::get() {

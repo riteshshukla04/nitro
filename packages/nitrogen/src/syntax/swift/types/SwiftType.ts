@@ -4,6 +4,7 @@ import type { CppHelper } from '../../c++/CppHelper.js'
 import type { Type, TypeContext } from '../../types/Type.js'
 import type { ImportedCxxRecord } from '../ImportedCxxRecord.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
+import type { SwiftCppConverter } from '../SwiftConverter.js'
 
 /** A concrete Swift representation used by C++ JSI converters. */
 export interface SwiftType extends Type {
@@ -20,6 +21,8 @@ export interface SwiftType extends Type {
    */
   getProtocolConformances(): ProtocolConformance[]
   readonly requiredCppHelpers: CppHelper[]
+  /** Native converters requested by a C++ API consuming this Swift representation. */
+  getCppConverter?(cppType: Type): SwiftCppConverter
   /** Header imports may forward-declare types; implementations need their definitions. */
   getRequiredImports(language: Language, context?: 'declaration' | 'implementation'): SourceImport[]
   /** Whether Swift can import this C++ representation directly. */

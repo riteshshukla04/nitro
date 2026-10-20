@@ -19,7 +19,7 @@
 
 #include <optional>
 #include <memory>
-#include <NitroTest/HybridRecyclableTestViewSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 
@@ -46,7 +46,7 @@ namespace margelo::nitro::test::views {
   public:
     nitro::ReactProp<bool> isBlue;
     nitro::ReactProp<std::optional<double>> nativeDefaultValue;
-    nitro::ReactProp<std::optional<Callback<void(const std::shared_ptr<HybridRecyclableTestViewSpec>& /* ref */)>>> hybridRef;
+    nitro::ReactProp<std::optional<Callback<void(const std::shared_ptr<HybridObject>& /* ref */)>>> hybridRef;
 
     [[nodiscard]]
     bool hasSameProps(const HybridRecyclableTestViewProps& other) const noexcept {

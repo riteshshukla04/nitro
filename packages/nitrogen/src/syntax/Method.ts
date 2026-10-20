@@ -2,7 +2,7 @@ import type { MethodDeclaration } from 'ts-morph'
 import type { Language } from '../getPlatformSpecs.js'
 import { indent } from '../utils.js'
 import type { CodeNode } from './CodeNode.js'
-import { createType } from './createType.js'
+import { createType, type TypeParsingTarget } from './createType.js'
 import { Parameter } from './Parameter.js'
 import type { SourceFile, SourceImport } from './SourceFile.js'
 import type { Type } from './types/Type.js'
@@ -21,7 +21,7 @@ export interface MethodOptions {
 
 export type MethodArguments<Options extends MethodOptions = MethodOptions> =
   | [name: string, returnType: Type, parameters: Parameter[], options?: Options]
-  | [declaration: MethodDeclaration, language: Language, options?: Options]
+  | [declaration: MethodDeclaration, target: TypeParsingTarget, options?: Options]
 
 export interface MethodDefinitionOptions {
   body: MethodBody
@@ -43,6 +43,12 @@ export interface MethodSignatureOptions {
   className?: string
 }
 
+function isDeclarationArguments<Options extends MethodOptions>(
+  args: MethodArguments<Options>
+): args is [declaration: MethodDeclaration, target: TypeParsingTarget, options?: Options] {
+  return typeof args[0] !== 'string'
+}
+
 /** Copies and freezes the options, which are all optional. */
 function freezeOptions<Options extends MethodOptions>(options: Options | undefined): Readonly<Partial<Options>> {
   if (options == null) return Object.freeze({})
@@ -57,14 +63,14 @@ export abstract class Method<Options extends MethodOptions = MethodOptions> impl
   readonly options: Readonly<Partial<Options>>
 
   constructor(...args: MethodArguments<Options>) {
-    if (typeof args[0] === 'string' && typeof args[1] === 'object') {
+    if (!isDeclarationArguments(args)) {
       const [name, returnType, parameters, options] = args
       this.name = name
       this.returnType = returnType
       this.parameters = parameters
       this.options = freezeOptions(options)
-    } else if (typeof args[0] === 'object' && typeof args[1] === 'string') {
-      const [declaration, language, options] = args
+    } else {
+      const [declaration, target, options] = args
       const name = declaration.getSymbolOrThrow().getName()
       if (declaration.getOverloads().length > 1) {
         throw new Error(`Function overloading is not supported, but \`${name}(...)\` is declared multiple times!`)
@@ -72,11 +78,9 @@ export abstract class Method<Options extends MethodOptions = MethodOptions> impl
       const returnType = declaration.getReturnType()
       const isOptional = returnType.getUnionTypes().some((type) => type.isUndefined())
       this.name = name
-      this.returnType = createType(language, returnType, isOptional, declaration.getReturnTypeNode())
-      this.parameters = declaration.getParameters().map((parameter) => new Parameter(parameter, language))
+      this.returnType = createType(target, returnType, isOptional, declaration.getReturnTypeNode())
+      this.parameters = declaration.getParameters().map((parameter) => new Parameter(parameter, target))
       this.options = freezeOptions(options)
-    } else {
-      throw new Error('Invalid method constructor arguments.')
     }
     if (!this.options.generated && this.name.startsWith('__')) {
       throw new Error(`Method names are not allowed to start with two underscores (__)! (In ${this.jsSignature})`)

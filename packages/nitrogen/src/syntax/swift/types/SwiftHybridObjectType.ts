@@ -1,11 +1,14 @@
-import type { GetCodeOptions, TypeContext } from '../../types/Type.js'
-import { NitroConfig } from '../../../config/NitroConfig.js'
+import type { Type, GetCodeOptions, TypeContext } from '../../types/Type.js'
 import { indent } from '../../../utils.js'
 import type { CppHelper } from '../../c++/CppHelper.js'
 import type { SourceFile } from '../../SourceFile.js'
 import { getHybridObjectName } from '../../getHybridObjectName.js'
 import { HybridObjectType } from '../../types/HybridObjectType.js'
-import { createSwiftHybridObjectConverter, getHybridObjectBridgeNames } from '../SwiftHybridObjectHelpers.js'
+import {
+  createSwiftHybridObjectConverter,
+  createSwiftHybridObjectCppConverter,
+  getHybridObjectBridgeNames,
+} from '../SwiftHybridObjectHelpers.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import { getForwardDeclaration } from '../../c++/getForwardDeclaration.js'
 import type { SourceImport } from '../../SourceFile.js'
@@ -13,6 +16,7 @@ import { getClangImporterReferenceName } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
 import { SwiftRetainedPointerType } from './SwiftRetainedPointerType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
+import type { SwiftCppConverter } from '../SwiftConverter.js'
 
 export class SwiftHybridObjectType extends HybridObjectType implements SwiftType {
   override readonly baseTypes: SwiftHybridObjectType[]
@@ -21,6 +25,10 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
     const baseTypes = type.baseTypes.map((base) => new SwiftHybridObjectType(base))
     super(type.hybridObjectName, type.platforms, baseTypes, type.sourceConfig)
     this.baseTypes = baseTypes
+  }
+
+  getCppConverter(cppType: Type): SwiftCppConverter {
+    return createSwiftHybridObjectCppConverter({ type: this, cppType: cppType })
   }
 
   getProtocolConformances(): ProtocolConformance[] {
@@ -133,7 +141,7 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
 
     switch (language) {
       case 'c++': {
-        const type = `${this.moduleName}::${this.name}`
+        const type = `::${this.moduleName}::${this.name}`
         return options.context === 'parameter' ? `const ${type}&` : type
       }
       case 'swift':
@@ -157,17 +165,14 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
     switch (language) {
       case 'c++':
         imports.push({
-          language,
+          language: language,
           declaration: { forwardDeclaration: this.forwardDeclaration },
         })
         if (context === 'implementation') {
-          imports.push(...this.type.getRequiredImports(language))
-          if (!this.sourceConfig.isExternalConfig) {
-            imports.push({
-              language: language,
-              declaration: this.sourceConfig.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
-            })
-          }
+          imports.push({
+            language: language,
+            declaration: this.sourceConfig.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
+          })
         }
         break
       case 'swift':
@@ -182,7 +187,16 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
     const bridge = getHybridObjectBridgeNames(type)
     const names = getHybridObjectName(type.hybridObjectName)
     const headerImports: SourceImport[] = [
-      ...type.getRequiredImports('c++'),
+      {
+        language: 'c++',
+        declaration: { name: 'NitroModules/HybridObject.hpp', space: 'system' },
+      },
+      {
+        language: 'c++',
+        declaration: {
+          forwardDeclaration: getForwardDeclaration('class', names.HybridTSpecSwift, type.sourceConfig.getCxxNamespace('c++')),
+        },
+      },
       {
         language: 'c++',
         declaration: {
@@ -197,15 +211,19 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
     })
     const pointerReturnType = pointer.getCode('c++', { context: 'return' })
     const createSignature = `${bridge.strong} ${bridge.create}(${pointerParameterType} pointer)`
-    const getSignature = `${pointerReturnType} ${bridge.get}(const ${bridge.strong}& value)`
+    const getSignature = `${pointerReturnType} ${bridge.get}(const std::shared_ptr<HybridObject>& value)`
     let createBody: string
     let getBody: string
     let implementationImports: SourceImport[]
     if (type.sourceConfig.isExternalConfig) {
       const namespace = type.sourceConfig.getSwiftBridgeNamespace('c++')
-      const localNames = getHybridObjectBridgeNames(new HybridObjectType(type.hybridObjectName, type.platforms, [], NitroConfig.current))
-      createBody = `return ${namespace}::${localNames.create}(pointer);`
-      getBody = `return ${namespace}::${localNames.get}(value);`
+      const localNames = getHybridObjectBridgeNames(type)
+      createBody = `
+return ${namespace}::${localNames.create}(pointer);
+`.trim()
+      getBody = `
+return ${namespace}::${localNames.get}(value);
+`.trim()
       implementationImports = [
         {
           language: 'c++',
@@ -216,56 +234,88 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
       const implementation = type.sourceConfig.getCxxNamespace('c++', names.HybridTSpecSwift)
       const swiftPart = pointer.take('c++', 'pointer')
       const swiftPartPointer = pointer.retain('c++', 'wrapper->getSwiftPart()')
-      createBody = `return std::make_shared<${implementation}>(${swiftPart});`
-      getBody = `auto wrapper = std::dynamic_pointer_cast<${implementation}>(value);
+      createBody = `
+return std::make_shared<${implementation}>(${swiftPart});
+`.trim()
+      getBody = `
+auto wrapper = std::dynamic_pointer_cast<${implementation}>(value);
 if (!wrapper) throw std::runtime_error("${names.HybridTSpec} is not implemented in Swift");
-return ${swiftPartPointer};`
+return ${swiftPartPointer};
+`.trim()
       implementationImports = [{ language: 'c++', declaration: this.getCxxPartHeader() }]
     }
+    const createImplementation = `
+${createSignature} {
+  ${indent(createBody, '  ')}
+}
+`.trim()
+    const getImplementation = `
+${getSignature} {
+  ${indent(getBody, '  ')}
+}
+`.trim()
+    const weakifyImplementation = `
+inline ${bridge.weak} ${bridge.weakify}(const ${bridge.strong}& value) {
+  return value;
+}
+`.trim()
     return [
       {
         header: {
-          code: `using ${bridge.strong} = ${type.getCode('c++', { context: 'value' })};`,
+          code: `using ${bridge.strong} = std::shared_ptr<${type.sourceConfig.getCxxNamespace('c++', names.HybridTSpecSwift)}>;`,
           requiredImports: headerImports,
         },
       },
       {
         header: {
-          code: `using ${bridge.weak} = ${type.getCode('c++', { context: 'value', mode: 'weak' })};`,
+          code: `using ${bridge.weak} = std::weak_ptr<${type.sourceConfig.getCxxNamespace('c++', names.HybridTSpecSwift)}>;`,
           requiredImports: headerImports,
         },
       },
       {
         header: {
-          code: `inline ${bridge.weak} ${bridge.weakify}(const ${bridge.strong}& value) { return value; }`,
+          code: weakifyImplementation,
           requiredImports: [],
         },
       },
       {
         header: { code: `${createSignature};`, requiredImports: [] },
         implementation: {
-          code: `${createSignature} {\n  ${indent(createBody, '  ')}\n}`,
+          code: createImplementation,
           requiredImports: implementationImports,
         },
       },
       {
         header: { code: `${getSignature};`, requiredImports: [] },
         implementation: {
-          code: `${getSignature} {\n  ${indent(getBody, '  ')}\n}`,
+          code: getImplementation,
           requiredImports: implementationImports,
         },
       },
+
       ...type.baseTypes.map((base): CppHelper => {
-        const signature = `${base.getCode('c++', { context: 'value' })} upcast_${type.hybridObjectName}_to_${base.hybridObjectName}(const ${bridge.strong}& value)`
-        const imports = [...headerImports, ...base.getRequiredImports('c++')]
+        const baseNames = getHybridObjectName(base.hybridObjectName)
+        const baseType = `std::shared_ptr<${base.sourceConfig.getCxxNamespace('c++', baseNames.HybridTSpecSwift)}>`
+        const signature = `${baseType} upcast_${type.hybridObjectName}_to_${base.hybridObjectName}(const ${bridge.strong}& value)`
+        const implementation = `
+${signature} {
+  return value;
+}
+`.trim()
+        const baseImport: SourceImport = {
+          language: 'c++',
+          declaration: {
+            forwardDeclaration: getForwardDeclaration('class', baseNames.HybridTSpecSwift, base.sourceConfig.getCxxNamespace('c++')),
+          },
+        }
         return {
           header: {
             code: `${signature};`,
-            requiredImports: imports,
+            requiredImports: [...headerImports, baseImport],
           },
           implementation: {
-            code: `${signature} { return value; }`,
-            requiredImports: imports,
+            code: implementation,
+            requiredImports: [{ language: 'c++', declaration: this.getCxxPartHeader() }],
           },
         }
       }),

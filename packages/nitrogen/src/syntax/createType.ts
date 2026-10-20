@@ -36,6 +36,9 @@ import { getCustomTypeConfig } from './getCustomTypeConfig.js'
 import { compareLooselyness } from './helpers.js'
 import { NullType } from './types/NullType.js'
 import { UInt64Type } from './types/UInt64Type.js'
+import { ForeignHybridObjectType } from './c++/ForeignHybridObjectType.js'
+import { getHybridObjectSpec } from '../createPlatformSpec.js'
+import type { Platform } from '../getPlatformSpecs.js'
 
 function getHybridObjectName(type: TSMorphType): string {
   const symbol = type.getSymbol()
@@ -43,6 +46,19 @@ function getHybridObjectName(type: TSMorphType): string {
     throw new Error(`Cannot get name of \`${type.getText()}\` - symbol not found!`)
   }
   return symbol.getEscapedName()
+}
+
+/** Declaration metadata does not parse member APIs or request adapters. */
+function getHybridObjectReference(type: TSMorphType): HybridObjectType {
+  const bases = getDirectBaseTypes(type)
+    .filter((base) => isSomeHybridObject(base) && !isHybridViewBaseClass(base))
+    .map(getHybridObjectReference)
+  return new HybridObjectType(
+    getHybridObjectName(type),
+    getHybridObjectPlatformsForType(type),
+    bases,
+    getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
+  )
 }
 
 function getCallbackCallSignature(callback: TSMorphType): Signature {
@@ -136,8 +152,15 @@ export interface CreateTypeOptions {
   isParameter?: boolean
 }
 
+export interface TypeParsingTarget {
+  readonly language: Language
+  readonly platform: Platform
+  /** Definitions already being parsed; their recursive references need no files. */
+  readonly foreignAncestors?: readonly HybridObjectType[]
+}
+
 export function createNamedType(
-  language: Language,
+  target: TypeParsingTarget,
   name: string,
   type: TSMorphType,
   isOptional: boolean,
@@ -147,7 +170,7 @@ export function createNamedType(
   if (name.startsWith('__')) {
     throw new Error(`Name cannot start with two underscores (__) as this is reserved syntax for Nitrogen! (In ${type.getText()})`)
   }
-  return new NamedWrappingType(name, createType(language, type, isOptional, typeNode, options))
+  return new NamedWrappingType(name, createType(target, type, isOptional, typeNode, options))
 }
 
 export function createVoidType(): Type {
@@ -189,7 +212,7 @@ function getTypeId(type: TSMorphType, isOptional: boolean): string {
  * Create a new type (or return it from cache if it is already known)
  */
 export function createType(
-  language: Language,
+  target: TypeParsingTarget,
   type: TSMorphType,
   isOptional: boolean,
   typeNode?: TypeNode,
@@ -200,8 +223,12 @@ export function createType(
     const typeName = type.getText(undefined, ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope)
     throw new Error(`Inline callbacks (${typeName}) can only be the type of a required method, static method or constructor parameter!`)
   }
-  const cache = getTypeCache(type, language)
-  const key = getTypeId(type, isOptional)
+  const { language, platform, foreignAncestors = [] } = target
+  // An ancestor reference has no definition files, so it must not enter the
+  // cache used by complete references outside this declaration.
+  let cache: Map<string, Type> | undefined
+  if (foreignAncestors.length === 0) cache = getTypeCache(type, language)
+  const key = `${platform}:${getTypeId(type, isOptional)}`
   const known = cache?.get(key)
   if (known != null) {
     if (isOptional === known instanceof OptionalType) {
@@ -211,7 +238,7 @@ export function createType(
 
   const get = () => {
     if (isOptional) {
-      const wrapping = createType(language, type, false, typeNode)
+      const wrapping = createType(target, type, false, typeNode)
       return new OptionalType(wrapping)
     }
 
@@ -231,7 +258,7 @@ export function createType(
           )
         }
         // Call createType(...) now with the enum type.
-        return createType(language, baseType, isOptional)
+        return createType(target, baseType, isOptional, typeNode)
       }
       return new NumberType()
     } else if (type.isString()) {
@@ -244,33 +271,33 @@ export function createType(
       return new VoidType()
     } else if (type.isArray()) {
       const arrayElementType = type.getArrayElementTypeOrThrow()
-      const elementType = createType(language, arrayElementType, isOptionalType(arrayElementType))
+      const elementType = createType(target, arrayElementType, isOptionalType(arrayElementType), undefined)
       return new ArrayType(elementType)
     } else if (type.isTuple()) {
-      const itemTypes = type.getTupleElements().map((t) => createType(language, t, isOptionalType(t)))
+      const itemTypes = type.getTupleElements().map((t) => createType(target, t, isOptionalType(t), undefined))
       return new TupleType(itemTypes)
     } else if (type.getCallSignatures().length > 0) {
       // It's a callback!
       const callSignature = getCallbackCallSignature(type)
       const callbackReturnType = callSignature.getReturnType()
-      const returnType = createType(language, callbackReturnType, isOptionalType(callbackReturnType))
+      const returnType = createType(target, callbackReturnType, isOptionalType(callbackReturnType), undefined)
       const parameters = callSignature.getParameters().map((p) => {
         const declaration = p.getValueDeclarationOrThrow()
         const parameterType = p.getTypeAtLocation(declaration)
         const isParameterOptional = isOptionalType(parameterType) || p.isOptional()
-        return createNamedType(language, p.getName(), parameterType, isParameterOptional)
+        return createNamedType(target, p.getName(), parameterType, isParameterOptional, undefined)
       })
       return new CallbackType(returnType, parameters, isInlineCallback(type))
     } else if (isPromise(type)) {
       // It's a Promise!
       const [promiseResolvingType] = getArguments(type, 'Promise', 1)
-      const resolvingType = createType(language, promiseResolvingType, isOptionalType(promiseResolvingType))
+      const resolvingType = createType(target, promiseResolvingType, isOptionalType(promiseResolvingType), undefined)
       return new PromiseType(resolvingType)
     } else if (isRecord(type)) {
       // Record<K, V> -> unordered_map<K, V>
       const [keyTypeT, valueTypeT] = getArguments(type, 'Record', 2)
-      const keyType = createType(language, keyTypeT, false)
-      const valueType = createType(language, valueTypeT, isOptionalType(valueTypeT))
+      const keyType = createType(target, keyTypeT, false, undefined)
+      const valueType = createType(target, valueTypeT, isOptionalType(valueTypeT), undefined)
       return new RecordType(keyType, valueType)
     } else if (isArrayBuffer(type)) {
       // ArrayBuffer
@@ -290,7 +317,7 @@ export function createType(
       const typename = type.getSymbolOrThrow().getEscapedName()
       const declaration = type.getSymbolOrThrow().getValueDeclarationOrThrow()
       const enumDeclaration = declaration.asKindOrThrow(ts.SyntaxKind.EnumDeclaration)
-      return new EnumType(typename, enumDeclaration)
+      return new EnumType(typename, enumDeclaration, getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current)
     } else if (type.isUnion()) {
       // It is some kind of union;
       // - of string literals (then it's an enum)
@@ -309,14 +336,14 @@ export function createType(
           )
         }
         const typename = symbol.getEscapedName()
-        return new EnumType(typename, type)
+        return new EnumType(typename, type, getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current)
       } else {
         // It consists of different types - that means it's a variant!
         const unionConstituents = getUnionConstituents(type, typeNode)
         let variants = unionConstituents
           // Filter out any undefineds/voids, as those are already treated as `isOptional`.
           .filter(({ type: t }) => !t.isUndefined() && !t.isVoid())
-          .map(({ type: t, typeNode: node }) => createType(language, t, false, node))
+          .map(({ type: t, typeNode: node }) => createType(target, t, false, node))
           .toSorted(compareLooselyness)
         variants = removeDuplicates(variants)
 
@@ -333,21 +360,35 @@ export function createType(
       return new AnyHybridObjectType()
     } else if (isSomeHybridObject(type)) {
       // It is another HybridObject being referenced!
-      const typename = getHybridObjectName(type)
-      const baseTypes = getDirectBaseTypes(type)
-        .filter((t) => isSomeHybridObject(t) && !isHybridViewBaseClass(t))
-        .map((b) => createType(language, b, false))
-      const baseHybrids = baseTypes.filter((b) => b instanceof HybridObjectType)
-      const sourceConfig = getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
-      const platforms = getHybridObjectPlatformsForType(type)
-      return new HybridObjectType(typename, platforms, baseHybrids, sourceConfig)
+      const reference = getHybridObjectReference(type)
+      const { hybridObjectName: typename, platforms, sourceConfig } = reference
+      if (language !== 'c++') return reference
+      const options = platforms[platform]
+      if (options == null) {
+        throw new Error(
+          `HybridObject "${typename}" is not implemented on ${platform} and cannot be referenced from a C++ API on that platform.`
+        )
+      }
+      if (!ForeignHybridObjectType.isRequiredFor(reference)) return reference
+      const ancestor = foreignAncestors.find(
+        (candidate) =>
+          candidate.hybridObjectName === typename && candidate.sourceConfig.getCxxNamespace('c++') === sourceConfig.getCxxNamespace('c++')
+      )
+      if (ancestor != null) return new ForeignHybridObjectType(reference, platform)
+      const nestedTarget: TypeParsingTarget = {
+        language: language,
+        platform: platform,
+        foreignAncestors: [...foreignAncestors, reference],
+      }
+      const spec = getHybridObjectSpec(type, platform, options, nestedTarget)
+      return new ForeignHybridObjectType(reference, platform, spec)
     } else if (type.isInterface()) {
       // It is an `interface T { ... }`, which is a `struct`
       const symbol = type.getAliasSymbol() ?? type.getSymbol()
       if (symbol == null) throw new Error(`Interface "${type.getText()}" does not have a Symbol!`)
       const typename = symbol.getName()
-      const properties = getInterfaceProperties(language, type)
-      return new StructType(typename, properties)
+      const properties = getInterfaceProperties(target, type)
+      return new StructType(typename, properties, getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current)
     } else if (type.isObject()) {
       // It is an object. If it has a symbol/name, it is a `type T = ...` declaration, so a `struct`.
       // Otherwise, it is an anonymous/inline object, which cannot be represented in native.
@@ -355,8 +396,8 @@ export function createType(
       if (symbol != null) {
         // it has a `type T = ...` declaration
         const typename = symbol.getName()
-        const properties = getInterfaceProperties(language, type)
-        return new StructType(typename, properties)
+        const properties = getInterfaceProperties(target, type)
+        return new StructType(typename, properties, getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current)
       } else {
         // It's an anonymous object (`{ ... }`)
         throw new Error(

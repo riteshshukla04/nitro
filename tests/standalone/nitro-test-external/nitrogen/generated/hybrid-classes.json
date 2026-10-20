@@ -9,6 +9,12 @@
         "language": "swift"
       }
     },
+    "CppValueSource": {
+      "ios": {
+        "allowMultipleImplementations": true,
+        "language": "c++"
+      }
+    },
     "SomeExternalObject": {
       "ios": {
         "allowMultipleImplementations": true,

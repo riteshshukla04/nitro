@@ -8,6 +8,7 @@
 #include <NitroTest/private/views/HybridRecyclableTestViewComponent.hpp>
 #include <NitroTest/private/HybridRecyclableTestViewSpecSwift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
+#include <NitroModules/SwiftConverter.hpp>
 #import <memory>
 #import <react/renderer/componentregistry/ComponentDescriptorProvider.h>
 #import <React/RCTViewComponentView.h>
@@ -103,13 +104,13 @@ using namespace margelo::nitro::test::views;
     if (oldViewProps == nullptr
           ? newViewProps.isBlue.isProvided()
           : !newViewProps.isBlue.hasSameValue(oldViewProps->isBlue)) {
-      _hybridView->setIsBlue(newViewProps.isBlue.get());
+      _hybridView->setIsBlue_Swift(nitro::SwiftConverter<bool, bool>::toSwift(newViewProps.isBlue.get()));
     }
     // nativeDefaultValue: optional
     if (oldViewProps == nullptr
           ? newViewProps.nativeDefaultValue.isProvided()
           : !newViewProps.nativeDefaultValue.hasSameValue(oldViewProps->nativeDefaultValue)) {
-      _hybridView->setNativeDefaultValue(newViewProps.nativeDefaultValue.get());
+      _hybridView->setNativeDefaultValue_Swift(nitro::SwiftConverter<std::optional<double>, swift::Optional<double>>::toSwift(newViewProps.nativeDefaultValue.get()));
     }
 
     // Update hybridRef if it changed

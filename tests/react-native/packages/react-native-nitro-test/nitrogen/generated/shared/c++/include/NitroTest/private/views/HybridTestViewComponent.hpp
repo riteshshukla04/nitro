@@ -22,7 +22,7 @@
 #include <functional>
 #include <optional>
 #include <memory>
-#include <NitroTest/HybridTestViewSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 
 namespace margelo::nitro::test::views {
 
@@ -51,7 +51,7 @@ namespace margelo::nitro::test::views {
     nitro::ReactProp<ColorScheme> colorScheme;
     nitro::ReactProp<Callback<void()>> someCallback;
     nitro::ReactProp<std::optional<double>> nativeDefaultValue;
-    nitro::ReactProp<std::optional<Callback<void(const std::shared_ptr<HybridTestViewSpec>& /* ref */)>>> hybridRef;
+    nitro::ReactProp<std::optional<Callback<void(const std::shared_ptr<HybridObject>& /* ref */)>>> hybridRef;
 
     [[nodiscard]]
     bool hasSameProps(const HybridTestViewProps& other) const noexcept {

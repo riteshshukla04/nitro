@@ -394,23 +394,6 @@ export const cases = {
 }
 
 export const skips = {
-  // Restore after the first v1 nightly publishes. Class identity is being finalized separately.
-  'getHybridClass instanceof / TestObjectCpp / createBase() is an instance of registered Base': {
-    ios: 'Temporary v1 nightly exclusion: C++/platform class identity is not finalized',
-    android: 'Temporary v1 nightly exclusion: C++/platform class identity is not finalized',
-  },
-  'getHybridClass instanceof / TestObjectCpp / createBaseActualChild() is an instance of registered Child': {
-    ios: 'Temporary v1 nightly exclusion: C++/platform class identity is not finalized',
-    android: 'Temporary v1 nightly exclusion: C++/platform class identity is not finalized',
-  },
-  'getHybridClass instanceof / TestObjectCpp / createChild() is an instance of registered Base': {
-    ios: 'Temporary v1 nightly exclusion: C++/platform class identity is not finalized',
-    android: 'Temporary v1 nightly exclusion: C++/platform class identity is not finalized',
-  },
-  'getHybridClass instanceof / TestObjectCpp / createChild() is an instance of registered Child': {
-    ios: 'Temporary v1 nightly exclusion: C++/platform class identity is not finalized',
-    android: 'Temporary v1 nightly exclusion: C++/platform class identity is not finalized',
-  },
   'NitroModules with a HybridObject / TestObjectCpp / box({}) throws because it has no NativeState': {
     release: 'Existing main exclusion: IS_DEBUG',
   },

@@ -19,20 +19,25 @@ export class EnumType implements Type {
   readonly enumMembers: EnumMember[]
   readonly jsType: 'enum' | 'union'
   readonly declarationFile: SourceFile
+  readonly sourceConfig: NitroConfig
 
-  constructor(enumName: string, enumDeclaration: EnumDeclaration)
-  constructor(enumName: string, union: TSMorphType<ts.UnionType>)
+  constructor(enumName: string, enumDeclaration: EnumDeclaration, sourceConfig?: NitroConfig)
+  constructor(enumName: string, union: TSMorphType<ts.UnionType>, sourceConfig?: NitroConfig)
   constructor(type: EnumType)
-  constructor(...args: [enumName: string, declaration: EnumDeclaration | TSMorphType<ts.UnionType>] | [type: EnumType]) {
+  constructor(
+    ...args: [enumName: string, declaration: EnumDeclaration | TSMorphType<ts.UnionType>, sourceConfig?: NitroConfig] | [type: EnumType]
+  ) {
     if (args.length === 1) {
       const [type] = args
       this.enumName = type.enumName
       this.enumMembers = type.enumMembers
       this.jsType = type.jsType
       this.declarationFile = type.declarationFile
+      this.sourceConfig = type.sourceConfig
     } else {
-      const [enumName, declaration] = args
+      const [enumName, declaration, sourceConfig = NitroConfig.current] = args
       this.enumName = enumName
+      this.sourceConfig = sourceConfig
       if (declaration instanceof EnumDeclaration) {
         // It's a JS enum { ... }
         this.jsType = 'enum'

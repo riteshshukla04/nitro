@@ -7,32 +7,22 @@
 
 #include <NitroTest/private/HybridRecyclableTestViewSpec_cxx-Swift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <memory>
-#include <NitroTest/HybridRecyclableTestViewSpec.hpp>
+#include <NitroTest/private/HybridRecyclableTestViewSpecSwift.hpp>
 
 namespace margelo::nitro {
 
-  std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpec> SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpec>>::fromSwift(const SwiftType& value) {
-    return SwiftType::getCxxPart(value);
+  ::NitroTest::HybridRecyclableTestViewSpec_cxx JSIConverter<::NitroTest::HybridRecyclableTestViewSpec_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto hybridSpec = JSIConverter<std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpecSwift>>::fromJSI(runtime, value);
+    return ::NitroTest::HybridRecyclableTestViewSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_margelo__nitro__test__HybridRecyclableTestViewSpec_(hybridSpec));
   }
 
-  SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpec>>::SwiftType SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpec>>::toSwift(const std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpec>& value) {
-    return NitroTest::HybridRecyclableTestViewSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_HybridRecyclableTestViewSpec_(value));
+  jsi::Value JSIConverter<::NitroTest::HybridRecyclableTestViewSpec_cxx>::toJSI(jsi::Runtime& runtime, const ::NitroTest::HybridRecyclableTestViewSpec_cxx& value) {
+    auto hybridSpec = ::NitroTest::HybridRecyclableTestViewSpec_cxx::getCxxPart(value);
+    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpecSwift>>::toJSI(runtime, hybridSpec);
   }
 
-  NitroTest::HybridRecyclableTestViewSpec_cxx JSIConverter<NitroTest::HybridRecyclableTestViewSpec_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    auto hybridSpec = JSIConverter<std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpec>>::fromJSI(runtime, value);
-    return NitroTest::HybridRecyclableTestViewSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_HybridRecyclableTestViewSpec_(hybridSpec));
-  }
-
-  jsi::Value JSIConverter<NitroTest::HybridRecyclableTestViewSpec_cxx>::toJSI(jsi::Runtime& runtime, const NitroTest::HybridRecyclableTestViewSpec_cxx& value) {
-    auto hybridSpec = NitroTest::HybridRecyclableTestViewSpec_cxx::getCxxPart(value);
-    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpec>>::toJSI(runtime, hybridSpec);
-  }
-
-  bool JSIConverter<NitroTest::HybridRecyclableTestViewSpec_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpec>>::canConvert(runtime, value);
+  bool JSIConverter<::NitroTest::HybridRecyclableTestViewSpec_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridRecyclableTestViewSpecSwift>>::canConvert(runtime, value);
   }
 
 } // namespace margelo::nitro

@@ -2,8 +2,10 @@ import type { SourceImport } from './SourceFile.js'
 
 const swiftImportAccess = { private: 0, internal: 1, public: 2 }
 
+type ImportContext = 'declaration' | 'implementation' | 'forward-declaration'
+
 /** Render each import once, keeping the widest access required for Swift modules. */
-export function getImportsCode(sourceImports: SourceImport[], context: 'declaration' | 'implementation' = 'declaration'): string {
+export function getImportsCode(sourceImports: SourceImport[], context: ImportContext = 'declaration'): string {
   const imports = new Map<string, SourceImport>()
   for (const sourceImport of sourceImports) {
     const key = sourceImport.language === 'swift' ? `swift:${sourceImport.name}` : getImportCode(sourceImport, context)
@@ -20,17 +22,20 @@ export function getImportsCode(sourceImports: SourceImport[], context: 'declarat
   return [...imports.values()].map((i) => getImportCode(i, context)).join('\n')
 }
 
-export function getImportCode(sourceImport: SourceImport, context: 'declaration' | 'implementation' = 'declaration'): string {
+export function getImportCode(sourceImport: SourceImport, context: ImportContext = 'declaration'): string {
   switch (sourceImport.language) {
     case 'c++': {
       const { declaration, implementation } = sourceImport
       if (context === 'implementation' && implementation != null) {
         return includeHeader(implementation.name, implementation.space)
       }
+      if (context === 'forward-declaration' && declaration.forwardDeclaration != null) {
+        return declaration.forwardDeclaration
+      }
       if ('name' in declaration) {
         return includeHeader(declaration.name, declaration.space)
       }
-      if (context === 'declaration') {
+      if (context !== 'implementation') {
         return declaration.forwardDeclaration
       }
       return ''

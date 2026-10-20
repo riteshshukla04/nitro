@@ -7,27 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <string>
-#include <unordered_map>
 // Forward declaration of `Record_swift__String_swift__String` to properly resolve imports.
 namespace NitroTest { class Record_swift__String_swift__String; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<std::unordered_map<std::string, std::string>, NitroTest::Record_swift__String_swift__String> final {
-    using SwiftType = NitroTest::Record_swift__String_swift__String;
-
-    static std::unordered_map<std::string, std::string> fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const std::unordered_map<std::string, std::string>& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::Record_swift__String_swift__String> {
-    static NitroTest::Record_swift__String_swift__String fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::Record_swift__String_swift__String& value);
+  struct JSIConverter<::NitroTest::Record_swift__String_swift__String> {
+    static ::NitroTest::Record_swift__String_swift__String fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::Record_swift__String_swift__String& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

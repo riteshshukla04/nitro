@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/MapWrapper.hpp>
 // Forward declaration of `MapWrapper` to properly resolve imports.
 namespace NitroTest { class MapWrapper; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::MapWrapper> final {
-    using SwiftType = NitroTest::MapWrapper;
-
-    static margelo::nitro::test::MapWrapper fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::MapWrapper& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::MapWrapper> {
-    static NitroTest::MapWrapper fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::MapWrapper& value);
+  struct JSIConverter<::NitroTest::MapWrapper> {
+    static ::NitroTest::MapWrapper fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::MapWrapper& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

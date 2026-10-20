@@ -6,8 +6,17 @@
 //
 
 import NitroModules
+import NitroTestExternal
 
 class HybridBase: HybridBaseSpec {
+  static func createAlternativeBase() -> any HybridBaseSpec {
+    return HybridAlternativeBase()
+  }
+
+  static func createInternalExternalObject() -> any HybridSomeExternalObjectSpec {
+    return HybridSomeInternalObject()
+  }
+
   var baseValue: Double {
     return 10
   }
@@ -22,5 +31,11 @@ class HybridBase: HybridBaseSpec {
 
   func mapSize(size: Size, callback: any Callback<Size, Size>) throws -> any Promise<Size> {
     return callback(size)
+  }
+}
+
+private final class HybridAlternativeBase: HybridBase {
+  override var baseValue: Double {
+    return 11
   }
 }

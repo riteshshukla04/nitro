@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <NitroTest/HybridBenchmarkObjectSwiftKotlinSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 
 
@@ -20,12 +20,9 @@ namespace margelo::nitro::test {
    * The C++ part of HybridBenchmarkObjectSwiftKotlinSpec_cxx.swift.
    *
    * HybridBenchmarkObjectSwiftKotlinSpecSwift accesses the concrete Swift wrapper and registers
-   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
-   *
-   * Once Swift can inherit from C++ classes, the Swift implementation could
-   * inherit HybridBenchmarkObjectSwiftKotlinSpec directly to simplify this structure.
+   * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridBenchmarkObjectSwiftKotlinSpecSwift final : public virtual HybridBenchmarkObjectSwiftKotlinSpec {
+  class HybridBenchmarkObjectSwiftKotlinSpecSwift final : public virtual HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -35,12 +32,12 @@ namespace margelo::nitro::test {
 
   public:
     // Constructor from a Swift instance
-    explicit HybridBenchmarkObjectSwiftKotlinSpecSwift(const NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx& swiftPart):
+    explicit HybridBenchmarkObjectSwiftKotlinSpecSwift(const ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx& swiftPart):
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx& getSwiftPart() noexcept {
+    ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -58,46 +55,27 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
-    double getNumberValue() override;
     double getNumberValue_Swift();
-    void setNumberValue(double numberValue) override;
     void setNumberValue_Swift(double numberValue);
-    std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> getThisObject() override;
-    NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx getThisObject_Swift();
+    ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx getThisObject_Swift();
     // Methods
-    void simpleFunc() override;
     void simpleFunc_Swift();
-    double addNumbers(double a, double b) override;
     double addNumbers_Swift(double a, double b);
-    std::string addStrings(const std::string& a, const std::string& b) override;
     swift::String addStrings_Swift(const swift::String& a, const swift::String& b);
-    std::vector<double> bounceNumbers(const std::vector<double>& array) override;
     swift::Array<double> bounceNumbers_Swift(const swift::Array<double>& array);
-    Car bounceCar(const Car& car) override;
-    NitroTest::Car bounceCar_Swift(const NitroTest::Car& car);
-    std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map) override;
-    NitroTest::Record_swift__String_double bounceSimpleMap_Swift(const NitroTest::Record_swift__String_double& map);
-    std::string tryOptionalParams(double num, bool boo, const std::optional<std::string>& str) override;
+    ::NitroTest::Car bounceCar_Swift(const ::NitroTest::Car& car);
+    ::NitroTest::Record_swift__String_double bounceSimpleMap_Swift(const ::NitroTest::Record_swift__String_double& map);
     swift::String tryOptionalParams_Swift(double num, bool boo, const swift::Optional<swift::String>& str);
-    std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) override;
-    NitroTest::Variant_Double_String_cxx passVariant_Swift(const NitroTest::Variant_Bool__Double___String__Double_String_cxx& either);
-    ArrayBuffer bounceArrayBuffer(const ArrayBuffer& buffer) override;
+    ::NitroTest::Variant_Double_String_cxx passVariant_Swift(const ::NitroTest::Variant_Bool__Double___String__Double_String_cxx& either);
     ArrayBuffer bounceArrayBuffer_Swift(const ArrayBuffer& buffer);
-    ArrayBuffer copyBuffer(const ArrayBuffer& buffer) override;
     ArrayBuffer copyBuffer_Swift(const ArrayBuffer& buffer);
-    double callbackSync(const Callback<double()>& callback) override;
     double callbackSync_Swift(const Callback<double()>& callback);
-    Promise<double> promiseReturnsInstantly() override;
     Promise<double> promiseReturnsInstantly_Swift();
-    Promise<double> createPendingPromise() override;
     Promise<double> createPendingPromise_Swift();
-    void resolvePendingPromiseOnWorker() override;
     void resolvePendingPromiseOnWorker_Swift();
-    std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> newBenchmarkObject() override;
-    NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx newBenchmarkObject_Swift();
+    ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx newBenchmarkObject_Swift();
     // Constructor
-    static std::shared_ptr<HybridBenchmarkObjectSwiftKotlinSpec> constructor();
-    static NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx constructor_Swift();
+    static ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx constructor_Swift();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {
@@ -105,7 +83,7 @@ namespace margelo::nitro::test {
     }
 
   private:
-    NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx _swiftPart;
+    ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx _swiftPart;
   };
 
 } // namespace margelo::nitro::test

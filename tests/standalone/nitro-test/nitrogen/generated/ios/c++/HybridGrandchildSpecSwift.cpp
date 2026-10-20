@@ -18,11 +18,6 @@ namespace margelo::nitro::test {
 
   // Properties
 
-  double HybridGrandchildSpecSwift::getGrandchildValue() {
-    auto __result = getGrandchildValue_Swift();
-    return SwiftConverter<double, double>::fromSwift(__result);
-  }
-
   double HybridGrandchildSpecSwift::getGrandchildValue_Swift() {
     return _swiftPart.getGrandchildValue();
   }
@@ -31,17 +26,12 @@ namespace margelo::nitro::test {
 
   // Constructor
 
-  std::shared_ptr<HybridGrandchildSpec> HybridGrandchildSpecSwift::constructor() {
-    auto __result = constructor_Swift();
-    return SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridGrandchildSpec>, NitroTest::HybridGrandchildSpec_cxx>::fromSwift(__result);
-  }
-
-  NitroTest::HybridGrandchildSpec_cxx HybridGrandchildSpecSwift::constructor_Swift() {
-    auto __result = NitroTest::HybridGrandchildSpec_cxx::constructor();
+  ::NitroTest::HybridGrandchildSpec_cxx HybridGrandchildSpecSwift::constructor_Swift() {
+    auto __result = ::NitroTest::HybridGrandchildSpec_cxx::constructor();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
     }
-    return NitroTest::HybridGrandchildSpec_cxx::fromUnsafe(__result.value());
+    return ::NitroTest::HybridGrandchildSpec_cxx::fromUnsafe(__result.value());
   }
 
   const std::shared_ptr<const HybridClass>& HybridGrandchildSpecSwift::Class::get() {

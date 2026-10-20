@@ -1,22 +1,33 @@
+import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { CppHelper } from '../../c++/CppHelper.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import { ArrayType } from '../../types/ArrayType.js'
-import type { GetCodeOptions, TypeContext } from '../../types/Type.js'
+import type { Type, GetCodeOptions, TypeContext } from '../../types/Type.js'
 import { getSwiftGenericImport } from '../getSwiftGenericImport.js'
 import { wrapSwiftType } from '../wrapSwiftType.js'
 import { getClangImporterReferenceName } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
 import { SwiftContainerType } from './SwiftContainerType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
+import { combineSwiftCppConverters, type SwiftCppConverter } from '../SwiftConverter.js'
+import { getTypeAs } from '../../types/getTypeAs.js'
 
 export class SwiftArrayType extends ArrayType implements SwiftType {
   override readonly itemType: SwiftType
 
-  constructor(readonly type: ArrayType) {
-    const itemType = wrapSwiftType(type.itemType)
+  constructor(
+    readonly type: ArrayType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
+    const itemType = wrapSwiftType(type.itemType, config)
     super(itemType)
     this.itemType = itemType
+  }
+
+  getCppConverter(cppType: Type): SwiftCppConverter {
+    const nativeType = getTypeAs(cppType, ArrayType)
+    return combineSwiftCppConverters([this.itemType.getCppConverter?.(nativeType.itemType)])
   }
 
   get isHashable(): boolean {

@@ -7,8 +7,6 @@
 
 #include <NitroTest/private/HardwareBufferFormat-Swift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroHash.hpp>
 #include <NitroModules/NumberUtils.hpp>
@@ -16,33 +14,19 @@
 
 namespace margelo::nitro {
 
-  margelo::nitro::test::HardwareBufferFormat SwiftConverter<margelo::nitro::test::HardwareBufferFormat>::fromSwift(const SwiftType& value) {
-    return static_cast<margelo::nitro::test::HardwareBufferFormat>(value.getRawValue());
-  }
-
-  SwiftConverter<margelo::nitro::test::HardwareBufferFormat>::SwiftType SwiftConverter<margelo::nitro::test::HardwareBufferFormat>::toSwift(const margelo::nitro::test::HardwareBufferFormat& value) {
-    const auto rawValue = static_cast<int32_t>(value);
-    #ifdef NITRO_DEBUG
-    if (rawValue != 0 && rawValue != 1 && rawValue != 2 && rawValue != 3) {
-      throw std::invalid_argument("Invalid value for HardwareBufferFormat");
-    }
-    #endif
-    return SwiftType::fromRawValue(rawValue);
-  }
-
-  NitroTest::HardwareBufferFormat JSIConverter<NitroTest::HardwareBufferFormat>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+  ::NitroTest::HardwareBufferFormat JSIConverter<::NitroTest::HardwareBufferFormat>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     const auto string = value.asString(runtime).utf8(runtime);
     switch (hashString(string)) {
-      case hashString("rgba-8888"): return NitroTest::HardwareBufferFormat::fromRawValue(0);
-      case hashString("rgb-565"): return NitroTest::HardwareBufferFormat::fromRawValue(1);
-      case hashString("rgba-fp16"): return NitroTest::HardwareBufferFormat::fromRawValue(2);
-      case hashString("blob"): return NitroTest::HardwareBufferFormat::fromRawValue(3);
+      case hashString("rgba-8888"): return ::NitroTest::HardwareBufferFormat::fromRawValue(0);
+      case hashString("rgb-565"): return ::NitroTest::HardwareBufferFormat::fromRawValue(1);
+      case hashString("rgba-fp16"): return ::NitroTest::HardwareBufferFormat::fromRawValue(2);
+      case hashString("blob"): return ::NitroTest::HardwareBufferFormat::fromRawValue(3);
       default: [[unlikely]]
         throw std::invalid_argument("Cannot convert \"" + string + "\" to enum HardwareBufferFormat - invalid value!");
     }
   }
 
-  jsi::Value JSIConverter<NitroTest::HardwareBufferFormat>::toJSI(jsi::Runtime& runtime, const NitroTest::HardwareBufferFormat& value) {
+  jsi::Value JSIConverter<::NitroTest::HardwareBufferFormat>::toJSI(jsi::Runtime& runtime, const ::NitroTest::HardwareBufferFormat& value) {
     switch (value.getRawValue()) {
       case 0: return createJSIString<"rgba-8888">(runtime);
       case 1: return createJSIString<"rgb-565">(runtime);
@@ -53,7 +37,7 @@ namespace margelo::nitro {
     }
   }
 
-  bool JSIConverter<NitroTest::HardwareBufferFormat>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+  bool JSIConverter<::NitroTest::HardwareBufferFormat>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
     if (!value.isString()) return false;
     const auto string = value.getString(runtime).utf8(runtime);
     switch (hashString(string)) {

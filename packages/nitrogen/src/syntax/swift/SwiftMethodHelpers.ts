@@ -1,9 +1,9 @@
+import { NitroConfig } from '../../config/NitroConfig.js'
 import type { Method } from '../Method.js'
 import type { StaticMethodOptions } from '../StaticMethod.js'
 import { Parameter } from '../Parameter.js'
 import type { SourceImport } from '../SourceFile.js'
 import { indent } from '../../utils.js'
-import { getSwiftConverter } from './SwiftConverter.js'
 import { getSwiftImports } from './getSwiftImports.js'
 import { wrapSwiftType } from './wrapSwiftType.js'
 import { SwiftBorrowedPointerType } from './types/SwiftBorrowedPointerType.js'
@@ -61,10 +61,10 @@ export interface SwiftMethodInfo {
   resultType: SwiftResultType
 }
 
-export function prepareSwiftMethod(nativeMethod: Method, isThrowing: boolean): SwiftMethodInfo {
-  const returnType = wrapSwiftType(nativeMethod.returnType)
+export function prepareSwiftMethod(nativeMethod: Method, isThrowing: boolean, config: NitroConfig = NitroConfig.current): SwiftMethodInfo {
+  const returnType = wrapSwiftType(nativeMethod.returnType, config)
   const parameters = nativeMethod.parameters.map((parameter) => {
-    const swiftType = wrapSwiftType(parameter.type)
+    const swiftType = wrapSwiftType(parameter.type, config)
     return {
       native: parameter,
       swift: new Parameter(parameter.name, swiftType),
@@ -83,7 +83,7 @@ export function prepareSwiftMethod(nativeMethod: Method, isThrowing: boolean): S
   } else {
     exportedReturnType = returnType
   }
-  const resultType = getSwiftResultType(exportedReturnType)
+  const resultType = getSwiftResultType(exportedReturnType, config)
   return {
     nativeMethod: nativeMethod,
     returnType: returnType,
@@ -95,11 +95,11 @@ export function prepareSwiftMethod(nativeMethod: Method, isThrowing: boolean): S
 }
 
 /** The Result returned by a Swift function; storage holds its value instead. */
-export function getSwiftResultType(returnType: SwiftType): SwiftResultType {
+export function getSwiftResultType(returnType: SwiftType, config: NitroConfig = NitroConfig.current): SwiftResultType {
   if (returnType instanceof SwiftOutPointerType) {
-    return new SwiftResultType(new SwiftVoidType())
+    return new SwiftResultType(new SwiftVoidType(), config)
   }
-  return new SwiftResultType(returnType)
+  return new SwiftResultType(returnType, config)
 }
 
 /** The parameters of a Swift function exported to C++, including result storage. */
@@ -108,27 +108,6 @@ export function getSwiftBridgeParameters(parameters: SwiftBridgeParameter[], ret
     return [...parameters, { name: SWIFT_RESULT_STORAGE, type: returnType }]
   }
   return parameters
-}
-
-interface CppForwarderOptions {
-  nativeMethod: Method
-  swiftMethod: Method
-}
-
-export function createCppForwarderBody({ nativeMethod, swiftMethod }: CppForwarderOptions): string {
-  const cppConvertedArguments = nativeMethod.parameters.map(
-    (parameter) => `${getSwiftConverter(parameter.type, 'parameter-type')}::toSwift(${parameter.type.escapedName})`
-  )
-  const cppForwardCall = `${swiftMethod.name}(${cppConvertedArguments.join(', ')})`
-  if (nativeMethod.returnType.kind === 'void') {
-    return `
-${cppForwardCall};
-`.trim()
-  }
-  return `
-auto __result = ${cppForwardCall};
-return ${getSwiftConverter(nativeMethod.returnType)}::fromSwift(__result);
-`.trim()
 }
 
 interface CppToSwiftCallOptions {

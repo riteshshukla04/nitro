@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/HardwareBufferFormat.hpp>
 // Forward declaration of `HardwareBufferFormat` to properly resolve imports.
 namespace NitroTest { class HardwareBufferFormat; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::HardwareBufferFormat> final {
-    using SwiftType = NitroTest::HardwareBufferFormat;
-
-    static margelo::nitro::test::HardwareBufferFormat fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::HardwareBufferFormat& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::HardwareBufferFormat> {
-    static NitroTest::HardwareBufferFormat fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::HardwareBufferFormat& value);
+  struct JSIConverter<::NitroTest::HardwareBufferFormat> {
+    static ::NitroTest::HardwareBufferFormat fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::HardwareBufferFormat& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

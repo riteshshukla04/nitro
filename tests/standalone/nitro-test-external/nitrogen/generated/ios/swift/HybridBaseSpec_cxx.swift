@@ -29,7 +29,7 @@ public final class HybridBaseSpec_cxx {
   /**
    * Holds a weak pointer to the C++ class that wraps the Swift class.
    */
-  private var __cxxPart: bridge.std__weak_ptr_HybridBaseSpec_ = .init()
+  private var __cxxPart: bridge.std__weak_ptr_margelo__nitro__test__external__HybridBaseSpec_ = .init()
 
   /**
    * Create a new `HybridBaseSpec_cxx` that wraps the given `HybridBaseSpec`.
@@ -69,24 +69,25 @@ public final class HybridBaseSpec_cxx {
 
   /**
    * Gets (or creates) the C++ part of this Hybrid Object.
-   * The C++ part is a `std::shared_ptr<HybridBaseSpec>`.
+   * This handle keeps the original native object alive.
    */
-  public func getCxxPart() -> bridge.std__shared_ptr_HybridBaseSpec_ {
+  public func getCxxPart() -> bridge.std__shared_ptr_margelo__nitro__test__external__HybridBaseSpec_ {
     let cached = __cxxPart.lock()
     if cached.use_count() > 0 {
       return cached
     }
-    let value = bridge.create_std__shared_ptr_HybridBaseSpec_(self.toUnsafe())
-    __cxxPart = bridge.weakify_std__shared_ptr_HybridBaseSpec_(value)
+    let value = bridge.create_std__shared_ptr_margelo__nitro__test__external__HybridBaseSpec_(self.toUnsafe())
+    __cxxPart = bridge.weakify_std__shared_ptr_margelo__nitro__test__external__HybridBaseSpec_(value)
     return value
   }
+
 
 
   // A static borrowing accessor lets C++ pass a const reference without copying it.
   // TODO: Remove this adapter and call the instance method directly once
   // https://github.com/swiftlang/swift/pull/92862 is merged and supported by our Swift toolchain.
   @_spi(NitroCxx)
-  public static func getCxxPart(_ value: borrowing HybridBaseSpec_cxx) -> bridge.std__shared_ptr_HybridBaseSpec_ {
+  public static func getCxxPart(_ value: borrowing HybridBaseSpec_cxx) -> bridge.std__shared_ptr_margelo__nitro__test__external__HybridBaseSpec_ {
     return value.getCxxPart()
   }
 
@@ -153,12 +154,12 @@ public final class HybridBaseSpec_cxx {
     }
   }
 
-  public final func mapSize(size: Size, callback: margelo.nitro.test.external.swift_bridge.Callback_NitroTestExternal__Size_NitroTestExternal__Size) -> bridge.Result_Promise_NitroTestExternal__Size_ {
+  public final func mapSize(size: Size, callback: margelo.nitro.test.external.swift_bridge.Callback___NitroTestExternal__Size___NitroTestExternal__Size) -> bridge.Result_Promise___NitroTestExternal__Size_ {
     do {
       let value = try __implementation.mapSize(size: size, callback: callback)
-      return bridge.Result_Promise_NitroTestExternal__Size_.withValue(value.toCpp())
+      return bridge.Result_Promise___NitroTestExternal__Size_.withValue(value.toCpp())
     } catch {
-      return bridge.Result_Promise_NitroTestExternal__Size_.withError(error.toCpp())
+      return bridge.Result_Promise___NitroTestExternal__Size_.withError(error.toCpp())
     }
   }
 

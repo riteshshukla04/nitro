@@ -95,6 +95,7 @@ self.__implementation = implementation
   for (const property of spec.properties) {
     const getter = new SwiftInstanceMethod({
       method: property.cppGetter,
+      config: spec.config,
       accessor: { kind: 'getter', name: property.name },
     })
     properties.push(getter)
@@ -102,6 +103,7 @@ self.__implementation = implementation
     if (property.cppSetter != null) {
       const setter = new SwiftInstanceMethod({
         method: property.cppSetter,
+        config: spec.config,
         accessor: { kind: 'setter', name: property.name },
       })
       properties.push(setter)
@@ -115,7 +117,7 @@ self.__implementation = implementation
   })
   callableGroups.push({
     name: 'Methods',
-    bridges: spec.methods.map((method) => new SwiftInstanceMethod({ method: method }).createBridge(cppClassName)),
+    bridges: spec.methods.map((method) => new SwiftInstanceMethod({ method: method, config: spec.config }).createBridge(cppClassName)),
   })
   const { constructor, staticMethods, staticProperties } = getSwiftClassMembers(spec)
   const inheritedClassMethods = new Set(spec.baseTypes.flatMap((base) => getSwiftClassMethodDeclarations(base, swiftModuleName)))
@@ -218,8 +220,8 @@ public final func onDropView() {
 
   const swiftBaseOverrides = baseHybridObjects.map((base) =>
     `
-// C++ uses the accessor for this spec. Keep base upcasts in Swift to avoid
-// exporting the same imported pointer metadata from two Swift modules.
+// Keep the base accessor in Swift to avoid exporting the same imported pointer
+// metadata from two modules when the base belongs to an external module.
 @_expose(!Cxx)
 ${swiftMemberAccess} override func getCxxPart() -> bridge.${getHybridObjectBridgeNames(base.type).strong} {
   let own: bridge.${bridgeNames.strong} = getCxxPart()
@@ -309,7 +311,7 @@ ${swiftClassDeclaration} ${hybridObjectNames.HybridTSpecCxx}${swiftSuperclass} {
 
   /**
    * Gets (or creates) the C++ part of this Hybrid Object.
-   * The C++ part is a \`${type.getCode('c++', { context: 'value' })}\`.
+   * This handle keeps the original native object alive.
    */
   ${swiftMemberAccess} func getCxxPart() -> bridge.${bridgeNames.strong} {
     let cached = __cxxPart.lock()
@@ -320,6 +322,7 @@ ${swiftClassDeclaration} ${hybridObjectNames.HybridTSpecCxx}${swiftSuperclass} {
     __cxxPart = bridge.${bridgeNames.weakify}(value)
     return value
   }
+
   ${indent(swiftBaseOverrides.join('\n'), '  ')}
 
   // A static borrowing accessor lets C++ pass a const reference without copying it.
@@ -367,10 +370,7 @@ ${swiftClassDeclaration} ${hybridObjectNames.HybridTSpecCxx}${swiftSuperclass} {
   ${indent(swiftMethodImplementations.join('\n\n'), '  ')}
 }
 `.trim()
-  const cppBaseClasses = [
-    `public virtual ${hybridObjectNames.HybridTSpec}`,
-    ...baseHybridObjects.map((base) => `public virtual ${base.cppName}`),
-  ]
+  const cppBaseClasses = hasBase ? baseHybridObjects.map((base) => `public virtual ${base.cppName}`) : ['public virtual HybridObject']
   // The most derived class initializes every virtual base, including indirect ones.
   const cppVirtualBaseNames = getBaseTypesFromRoot(type).map(getCxxPartName)
   const cppConstructorInitializers = [...cppVirtualBaseNames.map((name) => `${name}(swiftPart)`), '_swiftPart(swiftPart)']
@@ -379,10 +379,7 @@ ${swiftClassDeclaration} ${hybridObjectNames.HybridTSpecCxx}${swiftSuperclass} {
  * The C++ part of ${hybridObjectNames.HybridTSpecCxx}.swift.
  *
  * ${hybridObjectNames.HybridTSpecSwift} accesses the concrete Swift wrapper and registers
- * its Swift signatures for JS. The base spec keeps the public C++ signatures.
- *
- * Once Swift can inherit from C++ classes, the Swift implementation could
- * inherit ${hybridObjectNames.HybridTSpec} directly to simplify this structure.
+ * its Swift signatures for JS. C++ callers use a separate adapter when needed.
  */
 class ${hybridObjectNames.HybridTSpecSwift}${cppFinality} : ${cppBaseClasses.join(', ')} {
 public:
@@ -394,12 +391,12 @@ public:
 
 public:
   // Constructor from a Swift instance
-  explicit ${hybridObjectNames.HybridTSpecSwift}(const ${swiftModuleName}::${hybridObjectNames.HybridTSpecCxx}& swiftPart):
+  explicit ${hybridObjectNames.HybridTSpecSwift}(const ::${swiftModuleName}::${hybridObjectNames.HybridTSpecCxx}& swiftPart):
     ${indent(cppConstructorInitializers.join(',\n'), '    ')} { }
 
 public:
   // Get the Swift part
-  ${swiftModuleName}::${hybridObjectNames.HybridTSpecCxx}& getSwiftPart() noexcept {
+  ::${swiftModuleName}::${hybridObjectNames.HybridTSpecCxx}& getSwiftPart() noexcept {
     return _swiftPart;
   }
 
@@ -424,18 +421,15 @@ protected:
   }
 
 private:
-  ${swiftModuleName}::${hybridObjectNames.HybridTSpecCxx} _swiftPart;
+  ::${swiftModuleName}::${hybridObjectNames.HybridTSpecCxx} _swiftPart;
 };
 `.trim()
   const cppImports = getImportsCode(
     [
       {
         language: 'c++',
-        declaration: type.getCppHeader(),
+        declaration: { name: 'NitroModules/HybridObject.hpp', space: 'system' },
       },
-      ...spec.staticMethods.flatMap((method) => method.getRequiredImports('c++')),
-      ...spec.staticProperties.flatMap((property) => property.getRequiredImports('c++')),
-      ...(spec.constructor?.getRequiredImports('c++') ?? []),
       {
         language: 'c++',
         declaration: {

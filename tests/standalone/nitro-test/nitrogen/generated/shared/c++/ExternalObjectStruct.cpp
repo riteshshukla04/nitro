@@ -8,21 +8,20 @@
 #include <NitroTest/ExternalObjectStruct.hpp>
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
-#include <memory>
-#include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
+#include <NitroTest/HybridSomeExternalObjectSpecCxx+NitroTestExternal.hpp>
 
 namespace margelo::nitro {
 
   margelo::nitro::test::ExternalObjectStruct JSIConverter<margelo::nitro::test::ExternalObjectStruct>::fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
     jsi::Object obj = arg.asObject(runtime);
     return margelo::nitro::test::ExternalObjectStruct(
-      JSIConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "someExternal")))
+      JSIConverter<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "someExternal")))
     );
   }
 
   jsi::Value JSIConverter<margelo::nitro::test::ExternalObjectStruct>::toJSI(jsi::Runtime& runtime, const margelo::nitro::test::ExternalObjectStruct& arg) {
     jsi::Object obj(runtime);
-    obj.setProperty(runtime, PropNameIDCache::get(runtime, "someExternal"), JSIConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>>::toJSI(runtime, arg.someExternal));
+    obj.setProperty(runtime, PropNameIDCache::get(runtime, "someExternal"), JSIConverter<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx>::toJSI(runtime, arg.someExternal));
     return obj;
   }
 
@@ -34,7 +33,7 @@ namespace margelo::nitro {
     if (!nitro::isPlainObject(runtime, obj)) {
       return false;
     }
-    if (!JSIConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "someExternal")))) return false;
+    if (!JSIConverter<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "someExternal")))) return false;
     return true;
   }
 

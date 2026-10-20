@@ -1,22 +1,33 @@
+import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { CppHelper } from '../../c++/CppHelper.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import { OptionalType } from '../../types/OptionalType.js'
-import type { GetCodeOptions, TypeContext } from '../../types/Type.js'
+import type { Type, GetCodeOptions, TypeContext } from '../../types/Type.js'
 import { getSwiftGenericImport } from '../getSwiftGenericImport.js'
 import { wrapSwiftType } from '../wrapSwiftType.js'
 import { getClangImporterReferenceName } from '../ImportedCxxRecord.js'
 import type { SwiftType } from './SwiftType.js'
 import { SwiftContainerType } from './SwiftContainerType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
+import { combineSwiftCppConverters, type SwiftCppConverter } from '../SwiftConverter.js'
+import { getTypeAs } from '../../types/getTypeAs.js'
 
 export class SwiftOptionalType extends OptionalType implements SwiftType {
   override readonly wrappingType: SwiftType
 
-  constructor(readonly type: OptionalType) {
-    const wrappingType = wrapSwiftType(type.wrappingType)
+  constructor(
+    readonly type: OptionalType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
+    const wrappingType = wrapSwiftType(type.wrappingType, config)
     super(wrappingType)
     this.wrappingType = wrappingType
+  }
+
+  getCppConverter(cppType: Type): SwiftCppConverter {
+    const nativeType = getTypeAs(cppType, OptionalType)
+    return combineSwiftCppConverters([this.wrappingType.getCppConverter?.(nativeType.wrappingType)])
   }
 
   get isHashable(): boolean {

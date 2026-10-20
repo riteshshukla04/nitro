@@ -5,7 +5,6 @@ import { getHybridObjectName } from '../getHybridObjectName.js'
 import { HybridObjectType } from '../types/HybridObjectType.js'
 import {
   createCppBridgeBody,
-  createCppForwarderBody,
   createSwiftEndpoint,
   getSwiftMethodImports,
   prepareSwiftMethod,
@@ -34,7 +33,7 @@ export class SwiftConstructor extends Constructor {
     }
     const returnType = new HybridObjectType(spec)
     const nativeFactory = constructor.toStaticMethod(returnType)
-    const callable = prepareSwiftMethod(nativeFactory, true)
+    const callable = prepareSwiftMethod(nativeFactory, true, spec.config)
     const parameters = callable.parameters.map((parameter) => parameter.swift)
     super(constructor.name, callable.returnType, parameters, {
       generated: true,
@@ -43,7 +42,7 @@ export class SwiftConstructor extends Constructor {
     this.nativeFactory = nativeFactory
     this.implementationClassName = implementation.className
     const hybridObjectNames = getHybridObjectName(spec.name)
-    this.cppInvocationTarget = `${spec.config.getIosModuleName()}::${hybridObjectNames.HybridTSpecCxx}`
+    this.cppInvocationTarget = `::${spec.config.getIosModuleName()}::${hybridObjectNames.HybridTSpecCxx}`
     this.callable = callable
   }
 
@@ -51,10 +50,6 @@ export class SwiftConstructor extends Constructor {
     // The C++ bridge calls static factories rather than C++ constructors.
     const nativeFactory = this.nativeFactory
     const swiftFactory = new StaticMethod(`${nativeFactory.name}_Swift`, this.returnType, this.parameters, { generated: true })
-    const cppForwarderBody = createCppForwarderBody({
-      nativeMethod: nativeFactory,
-      swiftMethod: swiftFactory,
-    })
     const cppBridgeBody = createCppBridgeBody({
       callable: this.callable,
       getCppInvocation: (args) => `${this.cppInvocationTarget}::${nativeFactory.name}(${args.join(', ')})`,
@@ -76,10 +71,7 @@ export class SwiftConstructor extends Constructor {
 clazz.registerHybridConstructor(&${cppClassName}::${swiftFactory.name});
 `.trim()
     return {
-      cppMethods: [
-        { method: nativeFactory, body: cppForwarderBody },
-        { method: swiftFactory, body: cppBridgeBody },
-      ],
+      cppMethods: [{ method: swiftFactory, body: cppBridgeBody }],
       swiftMethod: { method: swiftMethod, body: endpoint.body },
       swiftImports: getSwiftMethodImports(this.callable),
       cppRegistrations: [cppRegistration],

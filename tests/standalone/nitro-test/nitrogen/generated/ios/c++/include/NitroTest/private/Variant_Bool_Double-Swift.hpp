@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <variant>
 // Forward declaration of `Variant_Bool_Double_cxx` to properly resolve imports.
 namespace NitroTest { class Variant_Bool_Double_cxx; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<std::variant<bool, double>, NitroTest::Variant_Bool_Double_cxx> final {
-    using SwiftType = NitroTest::Variant_Bool_Double_cxx;
-
-    static std::variant<bool, double> fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const std::variant<bool, double>& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::Variant_Bool_Double_cxx> {
-    static NitroTest::Variant_Bool_Double_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::Variant_Bool_Double_cxx& value);
+  struct JSIConverter<::NitroTest::Variant_Bool_Double_cxx> {
+    static ::NitroTest::Variant_Bool_Double_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::Variant_Bool_Double_cxx& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

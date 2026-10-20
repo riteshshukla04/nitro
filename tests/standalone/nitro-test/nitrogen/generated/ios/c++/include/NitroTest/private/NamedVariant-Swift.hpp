@@ -7,28 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <string>
-#include <NitroTest/Car.hpp>
-#include <variant>
 // Forward declaration of `NamedVariant_cxx` to properly resolve imports.
 namespace NitroTest { class NamedVariant_cxx; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<std::variant<std::string, margelo::nitro::test::Car>, NitroTest::NamedVariant_cxx> final {
-    using SwiftType = NitroTest::NamedVariant_cxx;
-
-    static std::variant<std::string, margelo::nitro::test::Car> fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const std::variant<std::string, margelo::nitro::test::Car>& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::NamedVariant_cxx> {
-    static NitroTest::NamedVariant_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::NamedVariant_cxx& value);
+  struct JSIConverter<::NitroTest::NamedVariant_cxx> {
+    static ::NitroTest::NamedVariant_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::NamedVariant_cxx& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

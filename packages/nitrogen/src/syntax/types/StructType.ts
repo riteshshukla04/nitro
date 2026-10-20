@@ -1,5 +1,6 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
 import type { Language } from '../../getPlatformSpecs.js'
+import { getForwardDeclaration } from '../c++/getForwardDeclaration.js'
 import { createCppStruct } from '../c++/CppStruct.js'
 import { type FileWithReferencedTypes, type SourceFile, type SourceImport } from '../SourceFile.js'
 import type { GetCodeOptions, NamedType, Type, TypeKind } from './Type.js'
@@ -9,10 +10,12 @@ export class StructType implements Type {
   readonly properties: NamedType[]
   readonly declarationFile: FileWithReferencedTypes
   readonly implementationFile: SourceFile
+  readonly sourceConfig: NitroConfig
 
-  constructor(structName: string, properties: NamedType[]) {
+  constructor(structName: string, properties: NamedType[], sourceConfig: NitroConfig = NitroConfig.current) {
     this.structName = structName
     this.properties = properties
+    this.sourceConfig = sourceConfig
     const [declarationFile, implementationFile] = createCppStruct(structName, properties)
     this.declarationFile = declarationFile
     this.implementationFile = implementationFile
@@ -59,7 +62,10 @@ export class StructType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: NitroConfig.current.getCxxHeader(this.declarationFile.name),
+          declaration: {
+            ...NitroConfig.current.getCxxHeader(this.declarationFile.name),
+            forwardDeclaration: getForwardDeclaration('struct', this.structName, NitroConfig.current.getCxxNamespace('c++')),
+          },
         })
         break
     }

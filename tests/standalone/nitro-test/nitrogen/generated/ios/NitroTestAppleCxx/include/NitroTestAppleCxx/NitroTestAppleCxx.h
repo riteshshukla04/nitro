@@ -17,6 +17,8 @@ namespace NitroTest { class SizeUnit; }
 // Forward declaration of `Size` to properly resolve imports.
 namespace NitroTest { class Size; }
 #include <NitroModules/Promise.hpp>
+// Forward declaration of `HybridSomeExternalObjectSpec_cxx` to properly resolve imports.
+namespace NitroTestExternal { class HybridSomeExternalObjectSpec_cxx; }
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/Result.hpp>
 // Forward declaration of `HybridChildSpec_cxx` to properly resolve imports.
@@ -53,22 +55,22 @@ namespace NitroTest { class OldEnum; }
 namespace NitroTest { class TruckPowertrain; }
 // Forward declaration of `PartialPerson` to properly resolve imports.
 namespace NitroTest { class PartialPerson; }
-// Forward declaration of `SwiftContainer_swift__Array_NitroTest__Powertrain_` to properly resolve imports.
-namespace NitroTest { class SwiftContainer_swift__Array_NitroTest__Powertrain_; }
+// Forward declaration of `SwiftContainer_swift__Array___NitroTest__Powertrain_` to properly resolve imports.
+namespace NitroTest { class SwiftContainer_swift__Array___NitroTest__Powertrain_; }
 namespace NitroModules { class AnyJSON; }
 #include <NitroModules/ArrayBuffer.hpp>
 // Forward declaration of `Variant_Bool_Double_cxx` to properly resolve imports.
 namespace NitroTest { class Variant_Bool_Double_cxx; }
-// Forward declaration of `Record_swift__String_NitroTest__Variant_Bool_Double_cxx` to properly resolve imports.
-namespace NitroTest { class Record_swift__String_NitroTest__Variant_Bool_Double_cxx; }
+// Forward declaration of `Record_swift__String___NitroTest__Variant_Bool_Double_cxx` to properly resolve imports.
+namespace NitroTest { class Record_swift__String___NitroTest__Variant_Bool_Double_cxx; }
 // Forward declaration of `Record_swift__String_double` to properly resolve imports.
 namespace NitroTest { class Record_swift__String_double; }
 // Forward declaration of `Record_swift__String_swift__Optional_swift__String_` to properly resolve imports.
 namespace NitroTest { class Record_swift__String_swift__Optional_swift__String_; }
-// Forward declaration of `Record_swift__String_NitroTest__Variant_NullType_String_cxx` to properly resolve imports.
-namespace NitroTest { class Record_swift__String_NitroTest__Variant_NullType_String_cxx; }
-// Forward declaration of `Record_swift__String_swift__Optional_NitroTest__Variant_NullType_String_cxx_` to properly resolve imports.
-namespace NitroTest { class Record_swift__String_swift__Optional_NitroTest__Variant_NullType_String_cxx_; }
+// Forward declaration of `Record_swift__String___NitroTest__Variant_NullType_String_cxx` to properly resolve imports.
+namespace NitroTest { class Record_swift__String___NitroTest__Variant_NullType_String_cxx; }
+// Forward declaration of `Record_swift__String_swift__Optional___NitroTest__Variant_NullType_String_cxx_` to properly resolve imports.
+namespace NitroTest { class Record_swift__String_swift__Optional___NitroTest__Variant_NullType_String_cxx_; }
 // Forward declaration of `Record_swift__String_swift__String` to properly resolve imports.
 namespace NitroTest { class Record_swift__String_swift__String; }
 // Forward declaration of `JsStyleStruct` to properly resolve imports.
@@ -97,16 +99,18 @@ namespace NitroTest { class Variant_Person_Car_cxx; }
 namespace NitroTest { class Variant__any_HybridBaseSpec__OptionalWrapper_cxx; }
 // Forward declaration of `CoreTypesVariant_cxx` to properly resolve imports.
 namespace NitroTest { class CoreTypesVariant_cxx; }
-// Forward declaration of `HybridSomeExternalObjectSpec_cxx` to properly resolve imports.
-namespace NitroTestExternal { class HybridSomeExternalObjectSpec_cxx; }
 // Forward declaration of `ExternalObjectStruct` to properly resolve imports.
 namespace NitroTest { class ExternalObjectStruct; }
 // Forward declaration of `StringOrExternal_cxx` to properly resolve imports.
 namespace NitroTest { class StringOrExternal_cxx; }
+// Forward declaration of `CppOnlyValueKind` to properly resolve imports.
+namespace NitroTest { class CppOnlyValueKind; }
+// Forward declaration of `CppOnlyValue` to properly resolve imports.
+namespace NitroTest { class CppOnlyValue; }
 // Forward declaration of `Variant__any_HybridTestObjectSwiftKotlinSpec__Person_cxx` to properly resolve imports.
 namespace NitroTest { class Variant__any_HybridTestObjectSwiftKotlinSpec__Person_cxx; }
-// Forward declaration of `SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___` to properly resolve imports.
-namespace NitroTest { class SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___; }
+// Forward declaration of `SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___` to properly resolve imports.
+namespace NitroTest { class SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___; }
 // Forward declaration of `SecondMapWrapper` to properly resolve imports.
 namespace NitroTest { class SecondMapWrapper; }
 // Forward declaration of `MapWrapper` to properly resolve imports.
@@ -117,80 +121,99 @@ namespace NitroTest { class MapWrapper; }
 namespace NitroTest { class HardwareBufferFormat; }
 // Forward declaration of `Variant_Bool__Double___String__Double_String_cxx` to properly resolve imports.
 namespace NitroTest { class Variant_Bool__Double___String__Double_String_cxx; }
-#include <memory>
-// Forward declaration of `HybridBaseSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridBaseSpec; }
+// Forward declaration of `OptionalPrimitivesHolder` to properly resolve imports.
+namespace NitroTestExternal { class OptionalPrimitivesHolder; }
+#include <NitroModules/HybridObject.hpp>
+// Forward declaration of `HybridBaseSpecSwift` to properly resolve imports.
+namespace margelo::nitro::test { class HybridBaseSpecSwift; }
 #include <NitroModules/NitroDefines.hpp>
-// Forward declaration of `HybridChildSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridChildSpec; }
-// Forward declaration of `HybridGrandchildSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridGrandchildSpec; }
-// Forward declaration of `HybridPlatformObjectSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridPlatformObjectSpec; }
-// Forward declaration of `HybridTestObjectSwiftKotlinSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridTestObjectSwiftKotlinSpec; }
-// Forward declaration of `HybridSomeExternalObjectSpec` to properly resolve imports.
-namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpec; }
+// Forward declaration of `HybridSomeExternalObjectSpecSwift` to properly resolve imports.
+namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpecSwift; }
+// Forward declaration of `HybridChildSpecSwift` to properly resolve imports.
+namespace margelo::nitro::test { class HybridChildSpecSwift; }
+// Forward declaration of `HybridGrandchildSpecSwift` to properly resolve imports.
+namespace margelo::nitro::test { class HybridGrandchildSpecSwift; }
+// Forward declaration of `HybridPlatformObjectSpecSwift` to properly resolve imports.
+namespace margelo::nitro::test { class HybridPlatformObjectSpecSwift; }
+// Forward declaration of `HybridTestObjectSwiftKotlinSpecSwift` to properly resolve imports.
+namespace margelo::nitro::test { class HybridTestObjectSwiftKotlinSpecSwift; }
 
 namespace margelo::nitro::test::swift_bridge {
-  using std__shared_ptr_HybridBaseSpec_ = std::shared_ptr<HybridBaseSpec>;
-  using std__weak_ptr_HybridBaseSpec_ = std::weak_ptr<HybridBaseSpec>;
-  inline std__weak_ptr_HybridBaseSpec_ weakify_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value) { return value; }
-  std__shared_ptr_HybridBaseSpec_ create_std__shared_ptr_HybridBaseSpec_(void* NON_NULL pointer);
-  void* NON_NULL get_std__shared_ptr_HybridBaseSpec_(const std__shared_ptr_HybridBaseSpec_& value);
-  using Promise_NitroTest__Size = Promise<NitroTest::Size>;
-  Promise_NitroTest__Size create_Promise_NitroTest__Size();
-  void reject_Promise_NitroTest__Size(const Promise_NitroTest__Size& promise, std::exception_ptr error);
-  void listenRejected_Promise_NitroTest__Size(const Promise_NitroTest__Size& promise, std::function<void(const std::exception_ptr&)> listener);
-  void resolve_Promise_NitroTest__Size(const Promise_NitroTest__Size& promise, const void* NON_NULL value);
-  void listen_Promise_NitroTest__Size(const Promise_NitroTest__Size& promise, std::function<void(const void* NON_NULL)> listener);
+  using std__shared_ptr_margelo__nitro__test__HybridBaseSpec_ = std::shared_ptr<margelo::nitro::test::HybridBaseSpecSwift>;
+  using std__weak_ptr_margelo__nitro__test__HybridBaseSpec_ = std::weak_ptr<margelo::nitro::test::HybridBaseSpecSwift>;
+  inline std__weak_ptr_margelo__nitro__test__HybridBaseSpec_ weakify_std__shared_ptr_margelo__nitro__test__HybridBaseSpec_(const std__shared_ptr_margelo__nitro__test__HybridBaseSpec_& value) {
+    return value;
+  }
+  std__shared_ptr_margelo__nitro__test__HybridBaseSpec_ create_std__shared_ptr_margelo__nitro__test__HybridBaseSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__HybridBaseSpec_(const std::shared_ptr<HybridObject>& value);
+  using Promise___NitroTest__Size = Promise<::NitroTest::Size>;
+  Promise___NitroTest__Size create_Promise___NitroTest__Size();
+  void reject_Promise___NitroTest__Size(const Promise___NitroTest__Size& promise, std::exception_ptr error);
+  void listenRejected_Promise___NitroTest__Size(const Promise___NitroTest__Size& promise, std::function<void(const std::exception_ptr&)> listener);
+  void resolve_Promise___NitroTest__Size(const Promise___NitroTest__Size& promise, const void* NON_NULL value);
+  void listen_Promise___NitroTest__Size(const Promise___NitroTest__Size& promise, std::function<void(const void* NON_NULL)> listener);
+  using std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ = std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpecSwift>;
+  using std__weak_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ = std::weak_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpecSwift>;
+  inline std__weak_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ weakify_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(const std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_& value) {
+    return value;
+  }
+  std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ create_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(const std::shared_ptr<HybridObject>& value);
   // Distinct specializations prevent duplicate Swift metadata across module headers.
   struct ResultTag {};
   using Result_void = Result<void, margelo::nitro::test::swift_bridge::ResultTag>;
-  using Callback_NitroTest__Size_NitroTest__Size = Callback<NitroTest::Size(const NitroTest::Size&)>;
-  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_NitroTest__Size_NitroTest__Size(const Callback_NitroTest__Size_NitroTest__Size& callback, const void* NON_NULL param0, void* NON_NULL __outResult) noexcept;
-  Promise<NitroTest::Size> callAsync_Callback_NitroTest__Size_NitroTest__Size(const Callback_NitroTest__Size_NitroTest__Size& callback, const void* NON_NULL param0);
-  void callAndForget_Callback_NitroTest__Size_NitroTest__Size(const Callback_NitroTest__Size_NitroTest__Size& callback, const void* NON_NULL param0);
-  Callback_NitroTest__Size_NitroTest__Size create_Callback_NitroTest__Size_NitroTest__Size(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0, void* NON_NULL __outResult)> closure);
-  using Result_Promise_NitroTest__Size_ = Result<Promise<NitroTest::Size>, margelo::nitro::test::swift_bridge::ResultTag>;
+  using Callback___NitroTest__Size___NitroTest__Size = Callback<::NitroTest::Size(const ::NitroTest::Size&)>;
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback___NitroTest__Size___NitroTest__Size(const Callback___NitroTest__Size___NitroTest__Size& callback, const void* NON_NULL param0, void* NON_NULL __outResult) noexcept;
+  Promise<::NitroTest::Size> callAsync_Callback___NitroTest__Size___NitroTest__Size(const Callback___NitroTest__Size___NitroTest__Size& callback, const void* NON_NULL param0);
+  void callAndForget_Callback___NitroTest__Size___NitroTest__Size(const Callback___NitroTest__Size___NitroTest__Size& callback, const void* NON_NULL param0);
+  Callback___NitroTest__Size___NitroTest__Size create_Callback___NitroTest__Size___NitroTest__Size(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0, void* NON_NULL __outResult)> closure);
+  using Result_Promise___NitroTest__Size_ = Result<Promise<::NitroTest::Size>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_void_ = Result<void*, margelo::nitro::test::swift_bridge::ResultTag>;
-  using std__shared_ptr_HybridChildSpec_ = std::shared_ptr<HybridChildSpec>;
-  using std__weak_ptr_HybridChildSpec_ = std::weak_ptr<HybridChildSpec>;
-  inline std__weak_ptr_HybridChildSpec_ weakify_std__shared_ptr_HybridChildSpec_(const std__shared_ptr_HybridChildSpec_& value) { return value; }
-  std__shared_ptr_HybridChildSpec_ create_std__shared_ptr_HybridChildSpec_(void* NON_NULL pointer);
-  void* NON_NULL get_std__shared_ptr_HybridChildSpec_(const std__shared_ptr_HybridChildSpec_& value);
-  std::shared_ptr<HybridBaseSpec> upcast_Child_to_Base(const std__shared_ptr_HybridChildSpec_& value);
-  using std__shared_ptr_HybridGrandchildSpec_ = std::shared_ptr<HybridGrandchildSpec>;
-  using std__weak_ptr_HybridGrandchildSpec_ = std::weak_ptr<HybridGrandchildSpec>;
-  inline std__weak_ptr_HybridGrandchildSpec_ weakify_std__shared_ptr_HybridGrandchildSpec_(const std__shared_ptr_HybridGrandchildSpec_& value) { return value; }
-  std__shared_ptr_HybridGrandchildSpec_ create_std__shared_ptr_HybridGrandchildSpec_(void* NON_NULL pointer);
-  void* NON_NULL get_std__shared_ptr_HybridGrandchildSpec_(const std__shared_ptr_HybridGrandchildSpec_& value);
-  std::shared_ptr<HybridChildSpec> upcast_Grandchild_to_Child(const std__shared_ptr_HybridGrandchildSpec_& value);
-  using std__shared_ptr_HybridPlatformObjectSpec_ = std::shared_ptr<HybridPlatformObjectSpec>;
-  using std__weak_ptr_HybridPlatformObjectSpec_ = std::weak_ptr<HybridPlatformObjectSpec>;
-  inline std__weak_ptr_HybridPlatformObjectSpec_ weakify_std__shared_ptr_HybridPlatformObjectSpec_(const std__shared_ptr_HybridPlatformObjectSpec_& value) { return value; }
-  std__shared_ptr_HybridPlatformObjectSpec_ create_std__shared_ptr_HybridPlatformObjectSpec_(void* NON_NULL pointer);
-  void* NON_NULL get_std__shared_ptr_HybridPlatformObjectSpec_(const std__shared_ptr_HybridPlatformObjectSpec_& value);
-  using std__shared_ptr_HybridTestObjectSwiftKotlinSpec_ = std::shared_ptr<HybridTestObjectSwiftKotlinSpec>;
-  using std__weak_ptr_HybridTestObjectSwiftKotlinSpec_ = std::weak_ptr<HybridTestObjectSwiftKotlinSpec>;
-  inline std__weak_ptr_HybridTestObjectSwiftKotlinSpec_ weakify_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(const std__shared_ptr_HybridTestObjectSwiftKotlinSpec_& value) { return value; }
-  std__shared_ptr_HybridTestObjectSwiftKotlinSpec_ create_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(void* NON_NULL pointer);
-  void* NON_NULL get_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(const std__shared_ptr_HybridTestObjectSwiftKotlinSpec_& value);
+  using std__shared_ptr_margelo__nitro__test__HybridChildSpec_ = std::shared_ptr<margelo::nitro::test::HybridChildSpecSwift>;
+  using std__weak_ptr_margelo__nitro__test__HybridChildSpec_ = std::weak_ptr<margelo::nitro::test::HybridChildSpecSwift>;
+  inline std__weak_ptr_margelo__nitro__test__HybridChildSpec_ weakify_std__shared_ptr_margelo__nitro__test__HybridChildSpec_(const std__shared_ptr_margelo__nitro__test__HybridChildSpec_& value) {
+    return value;
+  }
+  std__shared_ptr_margelo__nitro__test__HybridChildSpec_ create_std__shared_ptr_margelo__nitro__test__HybridChildSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__HybridChildSpec_(const std::shared_ptr<HybridObject>& value);
+  std::shared_ptr<margelo::nitro::test::HybridBaseSpecSwift> upcast_Child_to_Base(const std__shared_ptr_margelo__nitro__test__HybridChildSpec_& value);
+  using std__shared_ptr_margelo__nitro__test__HybridGrandchildSpec_ = std::shared_ptr<margelo::nitro::test::HybridGrandchildSpecSwift>;
+  using std__weak_ptr_margelo__nitro__test__HybridGrandchildSpec_ = std::weak_ptr<margelo::nitro::test::HybridGrandchildSpecSwift>;
+  inline std__weak_ptr_margelo__nitro__test__HybridGrandchildSpec_ weakify_std__shared_ptr_margelo__nitro__test__HybridGrandchildSpec_(const std__shared_ptr_margelo__nitro__test__HybridGrandchildSpec_& value) {
+    return value;
+  }
+  std__shared_ptr_margelo__nitro__test__HybridGrandchildSpec_ create_std__shared_ptr_margelo__nitro__test__HybridGrandchildSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__HybridGrandchildSpec_(const std::shared_ptr<HybridObject>& value);
+  std::shared_ptr<margelo::nitro::test::HybridChildSpecSwift> upcast_Grandchild_to_Child(const std__shared_ptr_margelo__nitro__test__HybridGrandchildSpec_& value);
+  using std__shared_ptr_margelo__nitro__test__HybridPlatformObjectSpec_ = std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpecSwift>;
+  using std__weak_ptr_margelo__nitro__test__HybridPlatformObjectSpec_ = std::weak_ptr<margelo::nitro::test::HybridPlatformObjectSpecSwift>;
+  inline std__weak_ptr_margelo__nitro__test__HybridPlatformObjectSpec_ weakify_std__shared_ptr_margelo__nitro__test__HybridPlatformObjectSpec_(const std__shared_ptr_margelo__nitro__test__HybridPlatformObjectSpec_& value) {
+    return value;
+  }
+  std__shared_ptr_margelo__nitro__test__HybridPlatformObjectSpec_ create_std__shared_ptr_margelo__nitro__test__HybridPlatformObjectSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__HybridPlatformObjectSpec_(const std::shared_ptr<HybridObject>& value);
+  using std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_ = std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpecSwift>;
+  using std__weak_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_ = std::weak_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpecSwift>;
+  inline std__weak_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_ weakify_std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_(const std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_& value) {
+    return value;
+  }
+  std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_ create_std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_(const std::shared_ptr<HybridObject>& value);
   using Promise_void = Promise<void>;
   using Callback_void_double = Callback<void(double)>;
   Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void_double(const Callback_void_double& callback, double param0) noexcept;
   Callback_void_double create_Callback_void_double(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(double param0)> closure);
-  using Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_ = Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>;
-  Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_ create_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_();
-  void reject_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& promise, std::exception_ptr error);
-  void listenRejected_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& promise, std::function<void(const std::exception_ptr&)> listener);
-  void resolve_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& promise, const void* NON_NULL value);
-  void listen_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& promise, std::function<void(const void* NON_NULL)> listener);
-  using Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_ = Callback<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)>;
-  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0, void* NON_NULL __outResult) noexcept;
-  Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_> callAsync_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0);
-  void callAndForget_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0);
-  Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_ create_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0, void* NON_NULL __outResult)> closure);
+  using Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_ = Promise<::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_>;
+  Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_ create_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_();
+  void reject_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(const Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_& promise, std::exception_ptr error);
+  void listenRejected_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(const Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_& promise, std::function<void(const std::exception_ptr&)> listener);
+  void resolve_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(const Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_& promise, const void* NON_NULL value);
+  void listen_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(const Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_& promise, std::function<void(const void* NON_NULL)> listener);
+  using Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_ = Callback<::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_(const ::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_&)>;
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(const Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_& callback, const void* NON_NULL param0, void* NON_NULL __outResult) noexcept;
+  Promise<::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_> callAsync_Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(const Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_& callback, const void* NON_NULL param0);
+  void callAndForget_Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(const Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_& callback, const void* NON_NULL param0);
+  Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_ create_Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0, void* NON_NULL __outResult)> closure);
   using Callback_void = Callback<void()>;
   Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void(const Callback_void& callback) noexcept;
   Callback_void create_Callback_void(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>()> closure);
@@ -202,12 +225,12 @@ namespace margelo::nitro::test::swift_bridge {
   void listenRejected_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, std::function<void(const std::exception_ptr&)> listener);
   void resolve_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, const void* NON_NULL value);
   void listen_Promise_swift__Optional_double_(const Promise_swift__Optional_double_& promise, std::function<void(const void* NON_NULL)> listener);
-  using Promise_NitroTest__Car = Promise<NitroTest::Car>;
-  Promise_NitroTest__Car create_Promise_NitroTest__Car();
-  void reject_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::exception_ptr error);
-  void listenRejected_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::function<void(const std::exception_ptr&)> listener);
-  void resolve_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, const void* NON_NULL value);
-  void listen_Promise_NitroTest__Car(const Promise_NitroTest__Car& promise, std::function<void(const void* NON_NULL)> listener);
+  using Promise___NitroTest__Car = Promise<::NitroTest::Car>;
+  Promise___NitroTest__Car create_Promise___NitroTest__Car();
+  void reject_Promise___NitroTest__Car(const Promise___NitroTest__Car& promise, std::exception_ptr error);
+  void listenRejected_Promise___NitroTest__Car(const Promise___NitroTest__Car& promise, std::function<void(const std::exception_ptr&)> listener);
+  void resolve_Promise___NitroTest__Car(const Promise___NitroTest__Car& promise, const void* NON_NULL value);
+  void listen_Promise___NitroTest__Car(const Promise___NitroTest__Car& promise, std::function<void(const void* NON_NULL)> listener);
   using Promise_ArrayBuffer = Promise<ArrayBuffer>;
   using Result_double = Result<double, margelo::nitro::test::swift_bridge::ResultTag>;
   using Callback_double = Callback<double()>;
@@ -217,40 +240,35 @@ namespace margelo::nitro::test::swift_bridge {
   using Callback_int64_t_int64_t = Callback<int64_t(int64_t)>;
   Result<int64_t, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_int64_t_int64_t(const Callback_int64_t_int64_t& callback, int64_t param0) noexcept;
   Callback_int64_t_int64_t create_Callback_int64_t_int64_t(std::function<Result<int64_t, margelo::nitro::test::swift_bridge::ResultTag>(int64_t param0)> closure);
-  using std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ = std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>;
-  using std__weak_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ = std::weak_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>;
-  inline std__weak_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ weakify_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(const std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_& value) { return value; }
-  std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_ create_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(void* NON_NULL pointer);
-  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(const std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_& value);
-  using Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx = Promise<NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>;
-  Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx create_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx();
-  void reject_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::exception_ptr error);
-  void listenRejected_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::function<void(const std::exception_ptr&)> listener);
-  void resolve_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, const void* NON_NULL value);
-  void listen_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::function<void(const void* NON_NULL)> listener);
-  using Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_ = Callback<void(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)>;
-  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0) noexcept;
-  Promise<void> callAsync_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0);
-  void callAndForget_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(const Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_& callback, const void* NON_NULL param0);
-  Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_ create_Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0)> closure);
-  using Promise_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__ = Promise<Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>>;
-  using Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__ = Result<Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>, margelo::nitro::test::swift_bridge::ResultTag>;
-  using Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__ = Callback<Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>()>;
-  Result<Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__(const Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__& callback) noexcept;
-  Promise<Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>> callAsync_Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__(const Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__& callback);
-  void callAndForget_Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__(const Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__& callback);
-  Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__ create_Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__(std::function<Result<Promise<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_>, margelo::nitro::test::swift_bridge::ResultTag>()> closure);
-  using Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___ = Promise<NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___>;
-  Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___ create_Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___();
-  void reject_Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___& promise, std::exception_ptr error);
-  void listenRejected_Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___& promise, std::function<void(const std::exception_ptr&)> listener);
-  void resolve_Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___& promise, const void* NON_NULL value);
-  void listen_Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___& promise, std::function<void(const void* NON_NULL)> listener);
-  using Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___ = Callback<NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___&)>;
-  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___& callback, const void* NON_NULL param0, void* NON_NULL __outResult) noexcept;
-  Promise<NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___> callAsync_Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___& callback, const void* NON_NULL param0);
-  void callAndForget_Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(const Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___& callback, const void* NON_NULL param0);
-  Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___ create_Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0, void* NON_NULL __outResult)> closure);
+  using Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx = Promise<::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>;
+  Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx create_Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx();
+  void reject_Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::exception_ptr error);
+  void listenRejected_Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::function<void(const std::exception_ptr&)> listener);
+  void resolve_Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, const void* NON_NULL value);
+  void listen_Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx(const Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx& promise, std::function<void(const void* NON_NULL)> listener);
+  using Callback_void___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_ = Callback<void(const ::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_&)>;
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_void___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(const Callback_void___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_& callback, const void* NON_NULL param0) noexcept;
+  Promise<void> callAsync_Callback_void___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(const Callback_void___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_& callback, const void* NON_NULL param0);
+  void callAndForget_Callback_void___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(const Callback_void___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_& callback, const void* NON_NULL param0);
+  Callback_void___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_ create_Callback_void___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0)> closure);
+  using Promise_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__ = Promise<Promise<::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_>>;
+  using Result_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__ = Result<Promise<::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_>, margelo::nitro::test::swift_bridge::ResultTag>;
+  using Callback_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__ = Callback<Promise<::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_>()>;
+  Result<Promise<::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_>, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__(const Callback_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__& callback) noexcept;
+  Promise<Promise<::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_>> callAsync_Callback_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__(const Callback_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__& callback);
+  void callAndForget_Callback_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__(const Callback_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__& callback);
+  Callback_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__ create_Callback_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__(std::function<Result<Promise<::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_>, margelo::nitro::test::swift_bridge::ResultTag>()> closure);
+  using Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___ = Promise<::NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___>;
+  Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___ create_Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___();
+  void reject_Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___(const Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___& promise, std::exception_ptr error);
+  void listenRejected_Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___(const Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___& promise, std::function<void(const std::exception_ptr&)> listener);
+  void resolve_Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___(const Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___& promise, const void* NON_NULL value);
+  void listen_Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___(const Promise___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___& promise, std::function<void(const void* NON_NULL)> listener);
+  using Callback___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person______NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___ = Callback<::NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___(const ::NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___&)>;
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person______NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___(const Callback___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person______NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___& callback, const void* NON_NULL param0, void* NON_NULL __outResult) noexcept;
+  Promise<::NitroTest::SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___> callAsync_Callback___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person______NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___(const Callback___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person______NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___& callback, const void* NON_NULL param0);
+  void callAndForget_Callback___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person______NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___(const Callback___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person______NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___& callback, const void* NON_NULL param0);
+  Callback___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person______NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___ create_Callback___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person______NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(const void* NON_NULL param0, void* NON_NULL __outResult)> closure);
   using InlineCallback_void = InlineCallback<void()>;
   Result<void, margelo::nitro::test::swift_bridge::ResultTag> call_InlineCallback_void(const InlineCallback_void& callback) noexcept;
   using Callback_double_double = Callback<double(double)>;
@@ -303,26 +321,26 @@ namespace margelo::nitro::test::swift_bridge {
   Promise<swift::String> callAsync_Callback_swift__String(const Callback_swift__String& callback);
   void callAndForget_Callback_swift__String(const Callback_swift__String& callback);
   Callback_swift__String create_Callback_swift__String(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(void* NON_NULL __outResult)> closure);
-  using Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx = Promise<NitroTestExternal::HybridSomeExternalObjectSpec_cxx>;
-  Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx create_Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx();
-  void reject_Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx& promise, std::exception_ptr error);
-  void listenRejected_Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx& promise, std::function<void(const std::exception_ptr&)> listener);
-  void resolve_Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx& promise, const void* NON_NULL value);
-  void listen_Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx& promise, std::function<void(const void* NON_NULL)> listener);
-  using Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx = Callback<NitroTestExternal::HybridSomeExternalObjectSpec_cxx()>;
-  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx& callback, void* NON_NULL __outResult) noexcept;
-  Promise<NitroTestExternal::HybridSomeExternalObjectSpec_cxx> callAsync_Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx& callback);
-  void callAndForget_Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx& callback);
-  Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx create_Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(void* NON_NULL __outResult)> closure);
+  using Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx = Promise<::NitroTestExternal::HybridSomeExternalObjectSpec_cxx>;
+  Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx create_Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx();
+  void reject_Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx& promise, std::exception_ptr error);
+  void listenRejected_Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx& promise, std::function<void(const std::exception_ptr&)> listener);
+  void resolve_Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx& promise, const void* NON_NULL value);
+  void listen_Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Promise___NitroTestExternal__HybridSomeExternalObjectSpec_cxx& promise, std::function<void(const void* NON_NULL)> listener);
+  using Callback___NitroTestExternal__HybridSomeExternalObjectSpec_cxx = Callback<::NitroTestExternal::HybridSomeExternalObjectSpec_cxx()>;
+  Result<void, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback___NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Callback___NitroTestExternal__HybridSomeExternalObjectSpec_cxx& callback, void* NON_NULL __outResult) noexcept;
+  Promise<::NitroTestExternal::HybridSomeExternalObjectSpec_cxx> callAsync_Callback___NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Callback___NitroTestExternal__HybridSomeExternalObjectSpec_cxx& callback);
+  void callAndForget_Callback___NitroTestExternal__HybridSomeExternalObjectSpec_cxx(const Callback___NitroTestExternal__HybridSomeExternalObjectSpec_cxx& callback);
+  Callback___NitroTestExternal__HybridSomeExternalObjectSpec_cxx create_Callback___NitroTestExternal__HybridSomeExternalObjectSpec_cxx(std::function<Result<void, margelo::nitro::test::swift_bridge::ResultTag>(void* NON_NULL __outResult)> closure);
   using Result_nitro__NullType = Result<nitro::NullType, margelo::nitro::test::swift_bridge::ResultTag>;
-  using Result_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__const_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain____ = Result<Callback<NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_(const NitroTest::SwiftContainer_swift__Array_NitroTest__Powertrain_&)>, margelo::nitro::test::swift_bridge::ResultTag>;
+  using Result_Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__const___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____ = Result<Callback<::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_(const ::NitroTest::SwiftContainer_swift__Array___NitroTest__Powertrain_&)>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_bool = Result<bool, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_Promise_int64_t_ = Result<Promise<int64_t>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_Promise_swift__Optional_double__ = Result<Promise<swift::Optional<double>>, margelo::nitro::test::swift_bridge::ResultTag>;
-  using Result_Promise_NitroTest__Car_ = Result<Promise<NitroTest::Car>, margelo::nitro::test::swift_bridge::ResultTag>;
+  using Result_Promise___NitroTest__Car_ = Result<Promise<::NitroTest::Car>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_Callback_void_double__ = Result<Callback<void(double)>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_ArrayBuffer = Result<ArrayBuffer, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_Callback_double___ = Result<Callback<double()>, margelo::nitro::test::swift_bridge::ResultTag>;
   using Result_Callback_int64_t_int64_t__ = Result<Callback<int64_t(int64_t)>, margelo::nitro::test::swift_bridge::ResultTag>;
-  using Result_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx_ = Result<Promise<NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>, margelo::nitro::test::swift_bridge::ResultTag>;
+  using Result_Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx_ = Result<Promise<::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>, margelo::nitro::test::swift_bridge::ResultTag>;
 } // namespace margelo::nitro::test::swift_bridge

@@ -7,55 +7,35 @@
 
 #include <NitroTest/private/Variant_Person_Car-Swift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <NitroTest/Person.hpp>
-#include <NitroTest/Car.hpp>
-#include <variant>
 
 namespace margelo::nitro {
 
-  std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car> SwiftConverter<std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>, NitroTest::Variant_Person_Car_cxx>::fromSwift(const SwiftType& value) {
+  ::NitroTest::Variant_Person_Car_cxx JSIConverter<::NitroTest::Variant_Person_Car_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (JSIConverter<::NitroTest::Person>::canConvert(runtime, value)) {
+      auto payload = JSIConverter<::NitroTest::Person>::fromJSI(runtime, value);
+      return NitroModules::makeSwiftValue<::NitroTest::Variant_Person_Car_cxx>([&](void* result) {
+        ::NitroTest::Variant_Person_Car_cxx::initializeFirst(payload, result);
+      });
+    }
+    if (JSIConverter<::NitroTest::Car>::canConvert(runtime, value)) {
+      auto payload = JSIConverter<::NitroTest::Car>::fromJSI(runtime, value);
+      return NitroModules::makeSwiftValue<::NitroTest::Variant_Person_Car_cxx>([&](void* result) {
+        ::NitroTest::Variant_Person_Car_cxx::initializeSecond(payload, result);
+      });
+    }
+    throw std::runtime_error("Cannot convert \"" + value.toString(runtime).utf8(runtime) + "\" to any type in variant<margelo::nitro::test::Person, margelo::nitro::test::Car>!");
+  }
+
+  jsi::Value JSIConverter<::NitroTest::Variant_Person_Car_cxx>::toJSI(jsi::Runtime& runtime, const ::NitroTest::Variant_Person_Car_cxx& value) {
     switch (value.getIndex()) {
-      case 0: {
-        auto payload = value.getFirst();
-        return std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>(std::in_place_index<0>, SwiftConverter<margelo::nitro::test::Person, NitroTest::Person>::fromSwift(payload));
-      }
-      case 1: {
-        auto payload = value.getSecond();
-        return std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>(std::in_place_index<1>, SwiftConverter<margelo::nitro::test::Car, NitroTest::Car>::fromSwift(payload));
-      }
+      case 0: return JSIConverter<::NitroTest::Person>::toJSI(runtime, value.getFirst());
+      case 1: return JSIConverter<::NitroTest::Car>::toJSI(runtime, value.getSecond());
       default: throw std::invalid_argument("Invalid variant index");
     }
   }
 
-  SwiftConverter<std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>, NitroTest::Variant_Person_Car_cxx>::SwiftType SwiftConverter<std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>, NitroTest::Variant_Person_Car_cxx>::toSwift(const std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>& value) {
-    switch (value.index()) {
-      case 0: {
-        auto payload = SwiftConverter<margelo::nitro::test::Person, NitroTest::Person>::toSwift(std::get<0>(value));
-        return NitroModules::makeSwiftValue<NitroTest::Variant_Person_Car_cxx>([&](void* result) {
-          SwiftType::initializeFirst(payload, result);
-        });
-      }
-      case 1: {
-        auto payload = SwiftConverter<margelo::nitro::test::Car, NitroTest::Car>::toSwift(std::get<1>(value));
-        return NitroModules::makeSwiftValue<NitroTest::Variant_Person_Car_cxx>([&](void* result) {
-          SwiftType::initializeSecond(payload, result);
-        });
-      }
-      default: throw std::bad_variant_access();
-    }
-  }
-
-  NitroTest::Variant_Person_Car_cxx JSIConverter<NitroTest::Variant_Person_Car_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    return SwiftConverter<std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>, NitroTest::Variant_Person_Car_cxx>::toSwift(JSIConverter<std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>>::fromJSI(runtime, value));
-  }
-
-  jsi::Value JSIConverter<NitroTest::Variant_Person_Car_cxx>::toJSI(jsi::Runtime& runtime, const NitroTest::Variant_Person_Car_cxx& value) {
-    return JSIConverter<std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>>::toJSI(runtime, SwiftConverter<std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>, NitroTest::Variant_Person_Car_cxx>::fromSwift(value));
-  }
-
-  bool JSIConverter<NitroTest::Variant_Person_Car_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    return JSIConverter<std::variant<margelo::nitro::test::Person, margelo::nitro::test::Car>>::canConvert(runtime, value);
+  bool JSIConverter<::NitroTest::Variant_Person_Car_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    return JSIConverter<::NitroTest::Person>::canConvert(runtime, value) || JSIConverter<::NitroTest::Car>::canConvert(runtime, value);
   }
 
 } // namespace margelo::nitro

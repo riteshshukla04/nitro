@@ -758,6 +758,10 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     return externalStruct
   }
 
+  func bounceCppOnlyValue(value: CppOnlyValue) throws -> CppOnlyValue {
+    return value
+  }
+
   func bounceExternalVariant(variant: StringOrExternal) throws -> StringOrExternal {
     return variant
   }

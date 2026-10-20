@@ -7,26 +7,16 @@
 
 #include <NitroTestExternal/private/OptionalPrimitivesHolder-Swift.hpp>
 #include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <NitroTestExternal/OptionalPrimitivesHolder.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 
 namespace margelo::nitro {
 
-  margelo::nitro::test::external::OptionalPrimitivesHolder SwiftConverter<margelo::nitro::test::external::OptionalPrimitivesHolder>::fromSwift(const SwiftType& value) {
-    return margelo::nitro::test::external::OptionalPrimitivesHolder(SwiftConverter<std::optional<double>, swift::Optional<double>>::fromSwift(value.getOptionalNumber_cxx()), SwiftConverter<std::optional<bool>, swift::Optional<bool>>::fromSwift(value.getOptionalBoolean_cxx()), SwiftConverter<std::optional<uint64_t>, swift::Optional<uint64_t>>::fromSwift(value.getOptionalUInt64_cxx()), SwiftConverter<std::optional<int64_t>, swift::Optional<int64_t>>::fromSwift(value.getOptionalInt64_cxx()));
-  }
-
-  SwiftConverter<margelo::nitro::test::external::OptionalPrimitivesHolder>::SwiftType SwiftConverter<margelo::nitro::test::external::OptionalPrimitivesHolder>::toSwift(const margelo::nitro::test::external::OptionalPrimitivesHolder& value) {
-    return SwiftType::init_cxx(SwiftConverter<std::optional<double>, swift::Optional<double>>::toSwift(value.optionalNumber), SwiftConverter<std::optional<bool>, swift::Optional<bool>>::toSwift(value.optionalBoolean), SwiftConverter<std::optional<uint64_t>, swift::Optional<uint64_t>>::toSwift(value.optionalUInt64), SwiftConverter<std::optional<int64_t>, swift::Optional<int64_t>>::toSwift(value.optionalInt64));
-  }
-
-  NitroTestExternal::OptionalPrimitivesHolder JSIConverter<NitroTestExternal::OptionalPrimitivesHolder>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+  ::NitroTestExternal::OptionalPrimitivesHolder JSIConverter<::NitroTestExternal::OptionalPrimitivesHolder>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     auto object = value.asObject(runtime);
-    return NitroTestExternal::OptionalPrimitivesHolder::init_cxx(JSIConverter<swift::Optional<double>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalNumber"))), JSIConverter<swift::Optional<bool>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalBoolean"))), JSIConverter<swift::Optional<uint64_t>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalUInt64"))), JSIConverter<swift::Optional<int64_t>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalInt64"))));
+    return ::NitroTestExternal::OptionalPrimitivesHolder::init_cxx(JSIConverter<swift::Optional<double>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalNumber"))), JSIConverter<swift::Optional<bool>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalBoolean"))), JSIConverter<swift::Optional<uint64_t>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalUInt64"))), JSIConverter<swift::Optional<int64_t>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalInt64"))));
   }
 
-  jsi::Value JSIConverter<NitroTestExternal::OptionalPrimitivesHolder>::toJSI(jsi::Runtime& runtime, const NitroTestExternal::OptionalPrimitivesHolder& value) {
+  jsi::Value JSIConverter<::NitroTestExternal::OptionalPrimitivesHolder>::toJSI(jsi::Runtime& runtime, const ::NitroTestExternal::OptionalPrimitivesHolder& value) {
     jsi::Object object(runtime);
     object.setProperty(runtime, PropNameIDCache::get(runtime, "optionalNumber"), JSIConverter<swift::Optional<double>>::toJSI(runtime, value.getOptionalNumber_cxx()));
     object.setProperty(runtime, PropNameIDCache::get(runtime, "optionalBoolean"), JSIConverter<swift::Optional<bool>>::toJSI(runtime, value.getOptionalBoolean_cxx()));
@@ -35,7 +25,7 @@ namespace margelo::nitro {
     return object;
   }
 
-  bool JSIConverter<NitroTestExternal::OptionalPrimitivesHolder>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+  bool JSIConverter<::NitroTestExternal::OptionalPrimitivesHolder>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
     if (!value.isObject()) return false;
     auto object = value.getObject(runtime);
     if (!isPlainObject(runtime, object)) return false;

@@ -7,32 +7,22 @@
 
 #include <NitroTestExternal/private/HybridSomeExternalObjectSpec_cxx-Swift.hpp>
 #include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <memory>
-#include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
+#include <NitroTestExternal/private/HybridSomeExternalObjectSpecSwift.hpp>
 
 namespace margelo::nitro {
 
-  std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> SwiftConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>>::fromSwift(const SwiftType& value) {
-    return SwiftType::getCxxPart(value);
+  ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx JSIConverter<::NitroTestExternal::HybridSomeExternalObjectSpec_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto hybridSpec = JSIConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpecSwift>>::fromJSI(runtime, value);
+    return ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx::fromUnsafe(margelo::nitro::test::external::swift_bridge::get_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_(hybridSpec));
   }
 
-  SwiftConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>>::SwiftType SwiftConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>>::toSwift(const std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>& value) {
-    return NitroTestExternal::HybridSomeExternalObjectSpec_cxx::fromUnsafe(margelo::nitro::test::external::swift_bridge::get_std__shared_ptr_HybridSomeExternalObjectSpec_(value));
+  jsi::Value JSIConverter<::NitroTestExternal::HybridSomeExternalObjectSpec_cxx>::toJSI(jsi::Runtime& runtime, const ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx& value) {
+    auto hybridSpec = ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx::getCxxPart(value);
+    return JSIConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpecSwift>>::toJSI(runtime, hybridSpec);
   }
 
-  NitroTestExternal::HybridSomeExternalObjectSpec_cxx JSIConverter<NitroTestExternal::HybridSomeExternalObjectSpec_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    auto hybridSpec = JSIConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>>::fromJSI(runtime, value);
-    return NitroTestExternal::HybridSomeExternalObjectSpec_cxx::fromUnsafe(margelo::nitro::test::external::swift_bridge::get_std__shared_ptr_HybridSomeExternalObjectSpec_(hybridSpec));
-  }
-
-  jsi::Value JSIConverter<NitroTestExternal::HybridSomeExternalObjectSpec_cxx>::toJSI(jsi::Runtime& runtime, const NitroTestExternal::HybridSomeExternalObjectSpec_cxx& value) {
-    auto hybridSpec = NitroTestExternal::HybridSomeExternalObjectSpec_cxx::getCxxPart(value);
-    return JSIConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>>::toJSI(runtime, hybridSpec);
-  }
-
-  bool JSIConverter<NitroTestExternal::HybridSomeExternalObjectSpec_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    return JSIConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>>::canConvert(runtime, value);
+  bool JSIConverter<::NitroTestExternal::HybridSomeExternalObjectSpec_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    return JSIConverter<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpecSwift>>::canConvert(runtime, value);
   }
 
 } // namespace margelo::nitro

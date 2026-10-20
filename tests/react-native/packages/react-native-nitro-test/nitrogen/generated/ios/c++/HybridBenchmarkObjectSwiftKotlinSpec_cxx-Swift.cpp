@@ -7,32 +7,22 @@
 
 #include <NitroTest/private/HybridBenchmarkObjectSwiftKotlinSpec_cxx-Swift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <memory>
-#include <NitroTest/HybridBenchmarkObjectSwiftKotlinSpec.hpp>
+#include <NitroTest/private/HybridBenchmarkObjectSwiftKotlinSpecSwift.hpp>
 
 namespace margelo::nitro {
 
-  std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpec> SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpec>>::fromSwift(const SwiftType& value) {
-    return SwiftType::getCxxPart(value);
+  ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx JSIConverter<::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto hybridSpec = JSIConverter<std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpecSwift>>::fromJSI(runtime, value);
+    return ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_margelo__nitro__test__HybridBenchmarkObjectSwiftKotlinSpec_(hybridSpec));
   }
 
-  SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpec>>::SwiftType SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpec>>::toSwift(const std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpec>& value) {
-    return NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_(value));
+  jsi::Value JSIConverter<::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx>::toJSI(jsi::Runtime& runtime, const ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx& value) {
+    auto hybridSpec = ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx::getCxxPart(value);
+    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpecSwift>>::toJSI(runtime, hybridSpec);
   }
 
-  NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx JSIConverter<NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    auto hybridSpec = JSIConverter<std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpec>>::fromJSI(runtime, value);
-    return NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_HybridBenchmarkObjectSwiftKotlinSpec_(hybridSpec));
-  }
-
-  jsi::Value JSIConverter<NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx>::toJSI(jsi::Runtime& runtime, const NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx& value) {
-    auto hybridSpec = NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx::getCxxPart(value);
-    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpec>>::toJSI(runtime, hybridSpec);
-  }
-
-  bool JSIConverter<NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpec>>::canConvert(runtime, value);
+  bool JSIConverter<::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridBenchmarkObjectSwiftKotlinSpecSwift>>::canConvert(runtime, value);
   }
 
 } // namespace margelo::nitro

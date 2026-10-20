@@ -7,32 +7,22 @@
 
 #include <NitroTest/private/HybridTestObjectSwiftKotlinSpec_cxx-Swift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <memory>
-#include <NitroTest/HybridTestObjectSwiftKotlinSpec.hpp>
+#include <NitroTest/private/HybridTestObjectSwiftKotlinSpecSwift.hpp>
 
 namespace margelo::nitro {
 
-  std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec> SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec>>::fromSwift(const SwiftType& value) {
-    return SwiftType::getCxxPart(value);
+  ::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx JSIConverter<::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto hybridSpec = JSIConverter<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpecSwift>>::fromJSI(runtime, value);
+    return ::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_(hybridSpec));
   }
 
-  SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec>>::SwiftType SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec>>::toSwift(const std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec>& value) {
-    return NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(value));
+  jsi::Value JSIConverter<::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>::toJSI(jsi::Runtime& runtime, const ::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx& value) {
+    auto hybridSpec = ::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::getCxxPart(value);
+    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpecSwift>>::toJSI(runtime, hybridSpec);
   }
 
-  NitroTest::HybridTestObjectSwiftKotlinSpec_cxx JSIConverter<NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    auto hybridSpec = JSIConverter<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec>>::fromJSI(runtime, value);
-    return NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(hybridSpec));
-  }
-
-  jsi::Value JSIConverter<NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>::toJSI(jsi::Runtime& runtime, const NitroTest::HybridTestObjectSwiftKotlinSpec_cxx& value) {
-    auto hybridSpec = NitroTest::HybridTestObjectSwiftKotlinSpec_cxx::getCxxPart(value);
-    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec>>::toJSI(runtime, hybridSpec);
-  }
-
-  bool JSIConverter<NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec>>::canConvert(runtime, value);
+  bool JSIConverter<::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpecSwift>>::canConvert(runtime, value);
   }
 
 } // namespace margelo::nitro

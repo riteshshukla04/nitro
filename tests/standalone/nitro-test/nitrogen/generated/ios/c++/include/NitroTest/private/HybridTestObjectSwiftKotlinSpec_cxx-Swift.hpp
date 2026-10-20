@@ -7,28 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <memory>
-// Forward declaration of `HybridTestObjectSwiftKotlinSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridTestObjectSwiftKotlinSpec; }
 // Forward declaration of `HybridTestObjectSwiftKotlinSpec_cxx` to properly resolve imports.
 namespace NitroTest { class HybridTestObjectSwiftKotlinSpec_cxx; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec>> final {
-    using SwiftType = NitroTest::HybridTestObjectSwiftKotlinSpec_cxx;
-
-    static std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec> fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec>& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::HybridTestObjectSwiftKotlinSpec_cxx> {
-    static NitroTest::HybridTestObjectSwiftKotlinSpec_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::HybridTestObjectSwiftKotlinSpec_cxx& value);
+  struct JSIConverter<::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx> {
+    static ::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::HybridTestObjectSwiftKotlinSpec_cxx& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

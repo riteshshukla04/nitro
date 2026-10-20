@@ -1,7 +1,7 @@
+import { NitroConfig } from '../../config/NitroConfig.js'
 import { InstanceMethod } from '../InstanceMethod.js'
 import {
   createCppBridgeBody,
-  createCppForwarderBody,
   createSwiftEndpoint,
   getSwiftMethodImports,
   prepareSwiftMethod,
@@ -13,6 +13,7 @@ import type { SwiftType } from './types/SwiftType.js'
 
 interface SwiftInstanceMethodOptions {
   method: InstanceMethod
+  config?: NitroConfig
   accessor?: { kind: 'getter' | 'setter'; name: string }
 }
 
@@ -22,8 +23,8 @@ export class SwiftInstanceMethod extends InstanceMethod {
   private readonly accessor: SwiftInstanceMethodOptions['accessor']
   private readonly callable: SwiftMethodInfo
 
-  constructor({ method, accessor }: SwiftInstanceMethodOptions) {
-    const callable = prepareSwiftMethod(method, accessor == null)
+  constructor({ method, accessor, config = NitroConfig.current }: SwiftInstanceMethodOptions) {
+    const callable = prepareSwiftMethod(method, accessor == null, config)
     const parameters = callable.parameters.map((parameter) => parameter.swift)
     super(`${method.name}_Swift`, callable.returnType, parameters, {
       generated: true,
@@ -36,15 +37,6 @@ export class SwiftInstanceMethod extends InstanceMethod {
 
   createBridge(cppClassName: string): SwiftMethodBridge {
     const nativeMethod = this.nativeMethod
-    // Non-throwing accessors can still require throwing C++ conversions.
-    const forwarder = new InstanceMethod(nativeMethod.name, nativeMethod.returnType, nativeMethod.parameters, {
-      override: true,
-      generated: true,
-    })
-    const cppForwarderBody = createCppForwarderBody({
-      nativeMethod: nativeMethod,
-      swiftMethod: this,
-    })
     const cppBridgeBody = createCppBridgeBody({
       callable: this.callable,
       getCppInvocation: (args) => `_swiftPart.${nativeMethod.name}(${args.join(', ')})`,
@@ -64,10 +56,7 @@ export class SwiftInstanceMethod extends InstanceMethod {
       cppRegistrations.push(`clazz.registerHybridMethod("${nativeMethod.name}", &${cppClassName}::${this.name});`)
     }
     return {
-      cppMethods: [
-        { method: forwarder, body: cppForwarderBody },
-        { method: this, body: cppBridgeBody },
-      ],
+      cppMethods: [{ method: this, body: cppBridgeBody }],
       swiftMethod: { method: swiftMethod, body: endpoint.body },
       swiftImports: getSwiftMethodImports(this.callable),
       cppRegistrations: cppRegistrations,

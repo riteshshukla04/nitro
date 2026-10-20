@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/Person.hpp>
 // Forward declaration of `Person` to properly resolve imports.
 namespace NitroTest { class Person; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::Person> final {
-    using SwiftType = NitroTest::Person;
-
-    static margelo::nitro::test::Person fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::Person& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::Person> {
-    static NitroTest::Person fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::Person& value);
+  struct JSIConverter<::NitroTest::Person> {
+    static ::NitroTest::Person fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::Person& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

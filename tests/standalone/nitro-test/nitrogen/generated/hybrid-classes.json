@@ -21,6 +21,37 @@
         "language": "swift"
       }
     },
+    "CppBase": {
+      "ios": {
+        "allowInheritance": true,
+        "allowMultipleImplementations": true,
+        "implementation": {
+          "className": "HybridCppBase",
+          "include": "\"HybridCppBase.hpp\""
+        },
+        "language": "c++"
+      }
+    },
+    "CppChild": {
+      "ios": {
+        "allowInheritance": true,
+        "allowMultipleImplementations": true,
+        "implementation": {
+          "className": "HybridCppChild",
+          "include": "\"HybridCppChild.hpp\""
+        },
+        "language": "c++"
+      }
+    },
+    "CppGrandchild": {
+      "ios": {
+        "implementation": {
+          "className": "HybridCppGrandchild",
+          "include": "\"HybridCppGrandchild.hpp\""
+        },
+        "language": "c++"
+      }
+    },
     "Grandchild": {
       "ios": {
         "implementation": {

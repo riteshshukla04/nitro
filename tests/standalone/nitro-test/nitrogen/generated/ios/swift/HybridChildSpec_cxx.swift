@@ -29,7 +29,7 @@ open class HybridChildSpec_cxx: HybridBaseSpec_cxx {
   /**
    * Holds a weak pointer to the C++ class that wraps the Swift class.
    */
-  private var __cxxPart: bridge.std__weak_ptr_HybridChildSpec_ = .init()
+  private var __cxxPart: bridge.std__weak_ptr_margelo__nitro__test__HybridChildSpec_ = .init()
 
   /**
    * Create a new `HybridChildSpec_cxx` that wraps the given `HybridChildSpec`.
@@ -66,22 +66,23 @@ open class HybridChildSpec_cxx: HybridBaseSpec_cxx {
 
   /**
    * Gets (or creates) the C++ part of this Hybrid Object.
-   * The C++ part is a `std::shared_ptr<HybridChildSpec>`.
+   * This handle keeps the original native object alive.
    */
-  open func getCxxPart() -> bridge.std__shared_ptr_HybridChildSpec_ {
+  open func getCxxPart() -> bridge.std__shared_ptr_margelo__nitro__test__HybridChildSpec_ {
     let cached = __cxxPart.lock()
     if cached.use_count() > 0 {
       return cached
     }
-    let value = bridge.create_std__shared_ptr_HybridChildSpec_(self.toUnsafe())
-    __cxxPart = bridge.weakify_std__shared_ptr_HybridChildSpec_(value)
+    let value = bridge.create_std__shared_ptr_margelo__nitro__test__HybridChildSpec_(self.toUnsafe())
+    __cxxPart = bridge.weakify_std__shared_ptr_margelo__nitro__test__HybridChildSpec_(value)
     return value
   }
-  // C++ uses the accessor for this spec. Keep base upcasts in Swift to avoid
-  // exporting the same imported pointer metadata from two Swift modules.
+
+  // Keep the base accessor in Swift to avoid exporting the same imported pointer
+  // metadata from two modules when the base belongs to an external module.
   @_expose(!Cxx)
-  open override func getCxxPart() -> bridge.std__shared_ptr_HybridBaseSpec_ {
-    let own: bridge.std__shared_ptr_HybridChildSpec_ = getCxxPart()
+  open override func getCxxPart() -> bridge.std__shared_ptr_margelo__nitro__test__HybridBaseSpec_ {
+    let own: bridge.std__shared_ptr_margelo__nitro__test__HybridChildSpec_ = getCxxPart()
     return bridge.upcast_Child_to_Base(own)
   }
 
@@ -89,7 +90,7 @@ open class HybridChildSpec_cxx: HybridBaseSpec_cxx {
   // TODO: Remove this adapter and call the instance method directly once
   // https://github.com/swiftlang/swift/pull/92862 is merged and supported by our Swift toolchain.
   @_spi(NitroCxx)
-  public static func getCxxPart(_ value: borrowing HybridChildSpec_cxx) -> bridge.std__shared_ptr_HybridChildSpec_ {
+  public static func getCxxPart(_ value: borrowing HybridChildSpec_cxx) -> bridge.std__shared_ptr_margelo__nitro__test__HybridChildSpec_ {
     return value.getCxxPart()
   }
 

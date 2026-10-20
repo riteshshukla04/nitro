@@ -1,10 +1,10 @@
+import type { NitroConfig } from '../../config/NitroConfig.js'
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
 import { StaticMethod } from '../StaticMethod.js'
 import { StaticProperty } from '../StaticProperty.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
 import {
   createCppBridgeBody,
-  createCppForwarderBody,
   createSwiftEndpoint,
   getSwiftMethodImports,
   prepareSwiftMethod,
@@ -42,13 +42,13 @@ export class SwiftStaticProperty extends StaticProperty {
     this.implementationClassName = implementation.className
     const moduleName = spec.config.getIosModuleName()
     const { HybridTSpecCxx } = getHybridObjectName(spec.name)
-    this.cppInvocationTarget = `${moduleName}::${HybridTSpecCxx}`
+    this.cppInvocationTarget = `::${moduleName}::${HybridTSpecCxx}`
     // Plain property results can have identical inherited signatures, even
     // across modules. Qualify each endpoint with its declaring module and spec.
     this.endpointSuffix = `${moduleName}_${spec.name}`
     const [getter, setter] = property.getStaticMethods()
-    this.getter = this.createAccessor(getter)
-    this.setter = setter == null ? undefined : this.createAccessor(setter)
+    this.getter = this.createAccessor(getter, spec.config)
+    this.setter = setter == null ? undefined : this.createAccessor(setter, spec.config)
   }
 
   createBridges(inheritedClassMethods: ReadonlySet<string> = new Set()): SwiftMethodBridge[] {
@@ -79,8 +79,8 @@ export class SwiftStaticProperty extends StaticProperty {
     return `clazz.registerStaticHybridProperty("${this.name}", ${references.join(', ')});`
   }
 
-  private createAccessor(nativeMethod: StaticMethod): SwiftStaticAccessor {
-    const callable = prepareSwiftMethod(nativeMethod, false)
+  private createAccessor(nativeMethod: StaticMethod, config: NitroConfig): SwiftStaticAccessor {
+    const callable = prepareSwiftMethod(nativeMethod, false, config)
     const swiftMethod = new StaticMethod(
       `${nativeMethod.name}_Swift`,
       callable.returnType,
@@ -96,15 +96,11 @@ export class SwiftStaticProperty extends StaticProperty {
   }
 
   private createAccessorBridge(
-    { nativeMethod, swiftMethod, endpointName, callable }: SwiftStaticAccessor,
+    { swiftMethod, endpointName, callable }: SwiftStaticAccessor,
     getSwiftInvocation: (args: SwiftArgument[]) => string,
     inheritedClassMethods: ReadonlySet<string>
   ): SwiftMethodBridge {
     // Swift accessors do not throw, but the C++ conversions still can.
-    const cppForwarderBody = createCppForwarderBody({
-      nativeMethod: nativeMethod,
-      swiftMethod: swiftMethod,
-    })
     const cppBridgeBody = createCppBridgeBody({
       callable: callable,
       getCppInvocation: (args) => `${this.cppInvocationTarget}::${endpointName}(${args.join(', ')})`,
@@ -124,10 +120,7 @@ export class SwiftStaticProperty extends StaticProperty {
       override: inheritedClassMethods.has(declaration),
     })
     return {
-      cppMethods: [
-        { method: nativeMethod, body: cppForwarderBody },
-        { method: swiftMethod, body: cppBridgeBody },
-      ],
+      cppMethods: [{ method: swiftMethod, body: cppBridgeBody }],
       swiftMethod: { method: exportedMethod, body: endpoint.body },
       swiftImports: getSwiftMethodImports(callable),
       cppRegistrations: [],

@@ -7,54 +7,35 @@
 
 #include <NitroTest/private/Variant_OldEnum_Bool-Swift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <NitroTest/OldEnum.hpp>
-#include <variant>
 
 namespace margelo::nitro {
 
-  std::variant<margelo::nitro::test::OldEnum, bool> SwiftConverter<std::variant<margelo::nitro::test::OldEnum, bool>, NitroTest::Variant_OldEnum_Bool_cxx>::fromSwift(const SwiftType& value) {
+  ::NitroTest::Variant_OldEnum_Bool_cxx JSIConverter<::NitroTest::Variant_OldEnum_Bool_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (JSIConverter<::NitroTest::OldEnum>::canConvert(runtime, value)) {
+      auto payload = JSIConverter<::NitroTest::OldEnum>::fromJSI(runtime, value);
+      return NitroModules::makeSwiftValue<::NitroTest::Variant_OldEnum_Bool_cxx>([&](void* result) {
+        ::NitroTest::Variant_OldEnum_Bool_cxx::initializeFirst(payload, result);
+      });
+    }
+    if (JSIConverter<bool>::canConvert(runtime, value)) {
+      auto payload = JSIConverter<bool>::fromJSI(runtime, value);
+      return NitroModules::makeSwiftValue<::NitroTest::Variant_OldEnum_Bool_cxx>([&](void* result) {
+        ::NitroTest::Variant_OldEnum_Bool_cxx::initializeSecond(payload, result);
+      });
+    }
+    throw std::runtime_error("Cannot convert \"" + value.toString(runtime).utf8(runtime) + "\" to any type in variant<margelo::nitro::test::OldEnum, bool>!");
+  }
+
+  jsi::Value JSIConverter<::NitroTest::Variant_OldEnum_Bool_cxx>::toJSI(jsi::Runtime& runtime, const ::NitroTest::Variant_OldEnum_Bool_cxx& value) {
     switch (value.getIndex()) {
-      case 0: {
-        auto payload = value.getFirst();
-        return std::variant<margelo::nitro::test::OldEnum, bool>(std::in_place_index<0>, SwiftConverter<margelo::nitro::test::OldEnum, NitroTest::OldEnum>::fromSwift(payload));
-      }
-      case 1: {
-        auto payload = value.getSecond();
-        return std::variant<margelo::nitro::test::OldEnum, bool>(std::in_place_index<1>, SwiftConverter<bool, bool>::fromSwift(payload));
-      }
+      case 0: return JSIConverter<::NitroTest::OldEnum>::toJSI(runtime, value.getFirst());
+      case 1: return JSIConverter<bool>::toJSI(runtime, value.getSecond());
       default: throw std::invalid_argument("Invalid variant index");
     }
   }
 
-  SwiftConverter<std::variant<margelo::nitro::test::OldEnum, bool>, NitroTest::Variant_OldEnum_Bool_cxx>::SwiftType SwiftConverter<std::variant<margelo::nitro::test::OldEnum, bool>, NitroTest::Variant_OldEnum_Bool_cxx>::toSwift(const std::variant<margelo::nitro::test::OldEnum, bool>& value) {
-    switch (value.index()) {
-      case 0: {
-        auto payload = SwiftConverter<margelo::nitro::test::OldEnum, NitroTest::OldEnum>::toSwift(std::get<0>(value));
-        return NitroModules::makeSwiftValue<NitroTest::Variant_OldEnum_Bool_cxx>([&](void* result) {
-          SwiftType::initializeFirst(payload, result);
-        });
-      }
-      case 1: {
-        auto payload = SwiftConverter<bool, bool>::toSwift(std::get<1>(value));
-        return NitroModules::makeSwiftValue<NitroTest::Variant_OldEnum_Bool_cxx>([&](void* result) {
-          SwiftType::initializeSecond(payload, result);
-        });
-      }
-      default: throw std::bad_variant_access();
-    }
-  }
-
-  NitroTest::Variant_OldEnum_Bool_cxx JSIConverter<NitroTest::Variant_OldEnum_Bool_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    return SwiftConverter<std::variant<margelo::nitro::test::OldEnum, bool>, NitroTest::Variant_OldEnum_Bool_cxx>::toSwift(JSIConverter<std::variant<margelo::nitro::test::OldEnum, bool>>::fromJSI(runtime, value));
-  }
-
-  jsi::Value JSIConverter<NitroTest::Variant_OldEnum_Bool_cxx>::toJSI(jsi::Runtime& runtime, const NitroTest::Variant_OldEnum_Bool_cxx& value) {
-    return JSIConverter<std::variant<margelo::nitro::test::OldEnum, bool>>::toJSI(runtime, SwiftConverter<std::variant<margelo::nitro::test::OldEnum, bool>, NitroTest::Variant_OldEnum_Bool_cxx>::fromSwift(value));
-  }
-
-  bool JSIConverter<NitroTest::Variant_OldEnum_Bool_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    return JSIConverter<std::variant<margelo::nitro::test::OldEnum, bool>>::canConvert(runtime, value);
+  bool JSIConverter<::NitroTest::Variant_OldEnum_Bool_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    return JSIConverter<::NitroTest::OldEnum>::canConvert(runtime, value) || JSIConverter<bool>::canConvert(runtime, value);
   }
 
 } // namespace margelo::nitro

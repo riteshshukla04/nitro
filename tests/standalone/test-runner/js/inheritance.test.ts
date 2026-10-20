@@ -293,11 +293,6 @@ export function registeredGrandchildConstructor(): void {
 }
 
 export const skips = {
-  // Restore after the first v1 nightly publishes. Class identity is being finalized separately.
-  'Inheritance prototypes / TestObjectCpp / createChild() shares the registered Child prototype': {
-    ios: 'Temporary v1 nightly exclusion: C++/platform class identity is not finalized',
-    android: 'Temporary v1 nightly exclusion: C++/platform class identity is not finalized',
-  },
   'Inheritance casts / TestObjectCpp / bounceChild(Base) throws': {
     release: "Existing main exclusion: NitroModules.buildType === 'debug'",
   },

@@ -7,32 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroModules/ArrayBuffer.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
-#include <NitroTest/WrappedJsStruct.hpp>
-#include <NitroModules/Promise.hpp>
-#include <NitroModules/AnyJSON.hpp>
-#include <variant>
 // Forward declaration of `CoreTypesVariant_cxx` to properly resolve imports.
 namespace NitroTest { class CoreTypesVariant_cxx; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<std::variant<ArrayBuffer, Callback<void(double /* value */)>, margelo::nitro::test::WrappedJsStruct, Promise<double>, AnyJSON>, NitroTest::CoreTypesVariant_cxx> final {
-    using SwiftType = NitroTest::CoreTypesVariant_cxx;
-
-    static std::variant<ArrayBuffer, Callback<void(double /* value */)>, margelo::nitro::test::WrappedJsStruct, Promise<double>, AnyJSON> fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const std::variant<ArrayBuffer, Callback<void(double /* value */)>, margelo::nitro::test::WrappedJsStruct, Promise<double>, AnyJSON>& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::CoreTypesVariant_cxx> {
-    static NitroTest::CoreTypesVariant_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::CoreTypesVariant_cxx& value);
+  struct JSIConverter<::NitroTest::CoreTypesVariant_cxx> {
+    static ::NitroTest::CoreTypesVariant_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::CoreTypesVariant_cxx& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

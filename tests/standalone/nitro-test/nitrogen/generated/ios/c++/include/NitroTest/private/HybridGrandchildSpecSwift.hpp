@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <NitroTest/HybridGrandchildSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <NitroTest/private/HybridChildSpecSwift.hpp>
 
@@ -20,12 +20,9 @@ namespace margelo::nitro::test {
    * The C++ part of HybridGrandchildSpec_cxx.swift.
    *
    * HybridGrandchildSpecSwift accesses the concrete Swift wrapper and registers
-   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
-   *
-   * Once Swift can inherit from C++ classes, the Swift implementation could
-   * inherit HybridGrandchildSpec directly to simplify this structure.
+   * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridGrandchildSpecSwift final : public virtual HybridGrandchildSpec, public virtual HybridChildSpecSwift {
+  class HybridGrandchildSpecSwift final : public virtual HybridChildSpecSwift {
   public:
     struct Class {
       using Base = HybridChildSpecSwift::Class;
@@ -35,14 +32,14 @@ namespace margelo::nitro::test {
 
   public:
     // Constructor from a Swift instance
-    explicit HybridGrandchildSpecSwift(const NitroTest::HybridGrandchildSpec_cxx& swiftPart):
+    explicit HybridGrandchildSpecSwift(const ::NitroTest::HybridGrandchildSpec_cxx& swiftPart):
       HybridBaseSpecSwift(swiftPart),
       HybridChildSpecSwift(swiftPart),
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    NitroTest::HybridGrandchildSpec_cxx& getSwiftPart() noexcept {
+    ::NitroTest::HybridGrandchildSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -60,12 +57,10 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
-    double getGrandchildValue() override;
     double getGrandchildValue_Swift();
     // Methods
     // Constructor
-    static std::shared_ptr<HybridGrandchildSpec> constructor();
-    static NitroTest::HybridGrandchildSpec_cxx constructor_Swift();
+    static ::NitroTest::HybridGrandchildSpec_cxx constructor_Swift();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {
@@ -73,7 +68,7 @@ namespace margelo::nitro::test {
     }
 
   private:
-    NitroTest::HybridGrandchildSpec_cxx _swiftPart;
+    ::NitroTest::HybridGrandchildSpec_cxx _swiftPart;
   };
 
 } // namespace margelo::nitro::test

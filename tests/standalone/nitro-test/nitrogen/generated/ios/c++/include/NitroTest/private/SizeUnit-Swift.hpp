@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/SizeUnit.hpp>
 // Forward declaration of `SizeUnit` to properly resolve imports.
 namespace NitroTest { class SizeUnit; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::SizeUnit> final {
-    using SwiftType = NitroTest::SizeUnit;
-
-    static margelo::nitro::test::SizeUnit fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::SizeUnit& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::SizeUnit> {
-    static NitroTest::SizeUnit fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::SizeUnit& value);
+  struct JSIConverter<::NitroTest::SizeUnit> {
+    static ::NitroTest::SizeUnit fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::SizeUnit& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

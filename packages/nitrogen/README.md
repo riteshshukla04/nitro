@@ -152,8 +152,58 @@ export declare class View extends HybridObject {
 
 `allowInheritance` defaults to `false`. Set it to `true` to let another Nitrogen spec extend this spec on that platform. Specs with a
 concrete `implementation` cannot enable inheritance; an inheritable base spec must use `allowMultipleImplementations: true`. Swift specs
-with inheritance disabled get a final generated C++ wrapper. The abstract C++ spec remains inheritable by native implementations; mark
-native implementation classes final in their own language when appropriate.
+with inheritance disabled get a final generated C++ wrapper. C++ specs remain inheritable by their native implementations; mark those
+implementation classes final when appropriate.
+
+## Native language boundaries
+
+Each platform decorator selects the language of the generated native API. A Swift spec generates a Swift protocol and a private C++ bridge
+with Swift signatures, such as `swift::String hello_Swift()`. It does not generate an abstract C++ spec with `std::string hello()`.
+`allowMultipleImplementations` allows several implementations in the declared language.
+
+A C++ spec can accept or return a Swift object:
+
+```ts
+@iOS({ language: 'swift', allowMultipleImplementations: true })
+export declare class PlatformSpecific extends HybridObject {
+  platformAPI(): string
+}
+
+@iOS({ language: 'c++', allowMultipleImplementations: true })
+export declare class CrossPlatformObject extends HybridObject {
+  doSomething(platform: PlatformSpecific): void
+}
+```
+
+Nitrogen generates `HybridPlatformSpecificSpecCxx` because the C++ API references it. The C++ implementation receives a value handle:
+
+```cpp
+void doSomething(const HybridPlatformSpecificSpecCxx& platform) override {
+  std::string result = platform.platformAPI();
+}
+```
+
+The handle retains the existing Swift object and converts arguments and return values at the call. Returning it to JavaScript preserves the
+original instance and prototype. A child handle can be copied as its base while retaining the child object. Public constructors become
+`HybridPlatformSpecificSpecCxx::create(...)` factories; declared static methods remain static methods.
+
+Adapters are generated only for objects reached through C++ APIs, including nested structs, containers, callbacks and promises. An adapter
+for an external module belongs to the consuming module. Its class lives in the consumer's `adapters::<SourceModule>` namespace.
+
+Swift structs and enums belong to the module declaring the native API. Importing a TypeScript value into a local Swift spec generates a
+local Swift value. C++ adapters for an external Swift API convert to that API module's Swift values. Handwritten Swift calls between modules
+may need an explicit conversion between their value types.
+
+Structs and enums used by these C++ APIs must have distinct names within the consuming module. Nitrogen reports an error if values from
+different source modules would generate the same C++ name.
+
+Objects exposed through a C++ adapter cannot declare methods named `fromNative` or `getNativeObject`, or a `nativeObject` property: those
+names conflict with adapter helpers. `create` is also reserved when the object or a base class has a public constructor. Nitrogen checks
+inherited members and rejects conflicts before generating files.
+
+Swift and Kotlin APIs can reference objects implemented in the same language on that platform. Nitrogen rejects other references, including
+references inside nested types. A C++ object cannot currently be passed to a Swift API; use callbacks to expose the operations the Swift
+object needs. The Kotlin-to-C++ adapter backend is not implemented yet.
 
 ## Importing classes
 

@@ -5,28 +5,31 @@ import type { Language } from '../getPlatformSpecs.js'
 import { type SourceFile, type SourceImport } from './SourceFile.js'
 import type { NamedType, Type } from './types/Type.js'
 import { NamedWrappingType } from './types/NamedWrappingType.js'
-import { createNamedType } from './createType.js'
+import { createNamedType, type TypeParsingTarget } from './createType.js'
+
+type ParameterArguments = [string, Type, { generated: boolean }?] | [ParameterDeclaration, TypeParsingTarget]
+
+function isDeclarationArguments(args: ParameterArguments): args is [ParameterDeclaration, TypeParsingTarget] {
+  return typeof args[0] !== 'string'
+}
 
 export class Parameter implements CodeNode {
   readonly type: NamedType
 
   constructor(name: string, type: Type, options?: { generated: boolean })
-  constructor(parameter: ParameterDeclaration, language: Language)
-  constructor(...args: [string, Type, { generated: boolean }?] | [ParameterDeclaration, Language]) {
-    if (typeof args[0] === 'string' && typeof args[1] === 'object') {
+  constructor(parameter: ParameterDeclaration, target: TypeParsingTarget)
+  constructor(...args: ParameterArguments) {
+    if (!isDeclarationArguments(args)) {
       // constructor(...) #1
       const [name, type] = args
       this.type = new NamedWrappingType(name, type)
-    } else if (typeof args[0] === 'object' && typeof args[1] === 'string') {
+    } else {
       // constructor(...) #2
-      const [param, language] = args
+      const [param, target] = args
       const name = param.getSymbolOrThrow().getEscapedName()
       const type = param.getType()
       const isOptional = param.hasQuestionToken() || param.isOptional() || type.getUnionTypes().some((t) => t.isUndefined())
-      this.type = createNamedType(language, name, type, isOptional, param.getTypeNode(), { isParameter: true })
-    } else {
-      // constructor(...)???
-      throw new Error(`Invalid constructor! Arguments: ${args}`)
+      this.type = createNamedType(target, name, type, isOptional, param.getTypeNode(), { isParameter: true })
     }
     if (this.type.name.startsWith('__') && args[2]?.generated !== true) {
       throw new Error(`Parameter names are not allowed to start with two underscores (__)! (In ${this.jsSignature})`)

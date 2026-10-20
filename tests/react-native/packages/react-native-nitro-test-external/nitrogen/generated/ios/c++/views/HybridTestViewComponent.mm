@@ -8,6 +8,7 @@
 #include <NitroTestExternal/private/views/HybridTestViewComponent.hpp>
 #include <NitroTestExternal/private/HybridTestViewSpecSwift.hpp>
 #include <NitroTestExternal/private/NitroTestExternal-Swift-Cxx-Umbrella.hpp>
+#include <NitroModules/SwiftConverter.hpp>
 #import <memory>
 #import <react/renderer/componentregistry/ComponentDescriptorProvider.h>
 #import <React/RCTViewComponentView.h>
@@ -103,13 +104,13 @@ using namespace margelo::nitro::test::external::views;
     if (oldViewProps == nullptr
           ? newViewProps.isBlue.isProvided()
           : !newViewProps.isBlue.hasSameValue(oldViewProps->isBlue)) {
-      _hybridView->setIsBlue(newViewProps.isBlue.get());
+      _hybridView->setIsBlue_Swift(nitro::SwiftConverter<bool, bool>::toSwift(newViewProps.isBlue.get()));
     }
     // someCallback: callback
     if (oldViewProps == nullptr
           ? newViewProps.someCallback.isProvided()
           : !newViewProps.someCallback.hasSameValue(oldViewProps->someCallback)) {
-      _hybridView->setSomeCallback(newViewProps.someCallback.get());
+      _hybridView->setSomeCallback_Swift(nitro::SwiftConverter<Callback<void()>, Callback<void()>>::toSwift(newViewProps.someCallback.get()));
     }
 
     // Update hybridRef if it changed

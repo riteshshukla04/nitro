@@ -30,7 +30,7 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
   /**
    * Holds a weak pointer to the C++ class that wraps the Swift class.
    */
-  private var __cxxPart: bridge.std__weak_ptr_HybridTestObjectSwiftKotlinSpec_ = .init()
+  private var __cxxPart: bridge.std__weak_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_ = .init()
 
   /**
    * Create a new `HybridTestObjectSwiftKotlinSpec_cxx` that wraps the given `HybridTestObjectSwiftKotlinSpec`.
@@ -70,24 +70,25 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
 
   /**
    * Gets (or creates) the C++ part of this Hybrid Object.
-   * The C++ part is a `std::shared_ptr<HybridTestObjectSwiftKotlinSpec>`.
+   * This handle keeps the original native object alive.
    */
-  public func getCxxPart() -> bridge.std__shared_ptr_HybridTestObjectSwiftKotlinSpec_ {
+  public func getCxxPart() -> bridge.std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_ {
     let cached = __cxxPart.lock()
     if cached.use_count() > 0 {
       return cached
     }
-    let value = bridge.create_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(self.toUnsafe())
-    __cxxPart = bridge.weakify_std__shared_ptr_HybridTestObjectSwiftKotlinSpec_(value)
+    let value = bridge.create_std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_(self.toUnsafe())
+    __cxxPart = bridge.weakify_std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_(value)
     return value
   }
+
 
 
   // A static borrowing accessor lets C++ pass a const reference without copying it.
   // TODO: Remove this adapter and call the instance method directly once
   // https://github.com/swiftlang/swift/pull/92862 is merged and supported by our Swift toolchain.
   @_spi(NitroCxx)
-  public static func getCxxPart(_ value: borrowing HybridTestObjectSwiftKotlinSpec_cxx) -> bridge.std__shared_ptr_HybridTestObjectSwiftKotlinSpec_ {
+  public static func getCxxPart(_ value: borrowing HybridTestObjectSwiftKotlinSpec_cxx) -> bridge.std__shared_ptr_margelo__nitro__test__HybridTestObjectSwiftKotlinSpec_ {
     return value.getCxxPart()
   }
 
@@ -440,7 +441,7 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
-  public final func complexEnumCallback(array: [Powertrain], callback: margelo.nitro.test.swift_bridge.Callback_void_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_) -> bridge.Result_void {
+  public final func complexEnumCallback(array: [Powertrain], callback: margelo.nitro.test.swift_bridge.Callback_void___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_) -> bridge.Result_void {
     do {
       try __implementation.complexEnumCallback(array: array, callback: callback)
       return bridge.Result_void.withValue()
@@ -449,7 +450,7 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
-  public final func callEnumArrayCallback(array: [Powertrain], callback: margelo.nitro.test.swift_bridge.Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+  public final func callEnumArrayCallback(array: [Powertrain], callback: margelo.nitro.test.swift_bridge.Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
     do {
       let value = try __implementation.callEnumArrayCallback(array: array, callback: callback)
       __outResult.assumingMemoryBound(to: [Powertrain].self).initialize(to: value)
@@ -459,34 +460,34 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
-  public final func getEnumArrayCallback() -> bridge.Result_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__const_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain____ {
+  public final func getEnumArrayCallback() -> bridge.Result_Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__const___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____ {
     do {
       let value = try __implementation.getEnumArrayCallback()
-      return bridge.Result_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__const_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain____.withValue(value.toCpp())
+      return bridge.Result_Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__const___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____.withValue(value.toCpp())
     } catch {
-      return bridge.Result_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__const_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain____.withError(error.toCpp())
+      return bridge.Result_Callback___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__const___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain____.withError(error.toCpp())
     }
   }
 
-  public final func callEnumArrayPromiseCallback(callback: margelo.nitro.test.swift_bridge.Callback_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__) -> bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__ {
+  public final func callEnumArrayPromiseCallback(callback: margelo.nitro.test.swift_bridge.Callback_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__) -> bridge.Result_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__ {
     do {
       let value = try __implementation.callEnumArrayPromiseCallback(callback: callback)
-      return bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__.withValue(value.toCpp())
+      return bridge.Result_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__.withValue(value.toCpp())
     } catch {
-      return bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__.withError(error.toCpp())
+      return bridge.Result_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__.withError(error.toCpp())
     }
   }
 
-  public final func awaitEnumArrayPromise(promise: margelo.nitro.test.swift_bridge.Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_) -> bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__ {
+  public final func awaitEnumArrayPromise(promise: margelo.nitro.test.swift_bridge.Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain_) -> bridge.Result_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__ {
     do {
       let value = try __implementation.awaitEnumArrayPromise(promise: promise)
-      return bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__.withValue(value.toCpp())
+      return bridge.Result_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__.withValue(value.toCpp())
     } catch {
-      return bridge.Result_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__.withError(error.toCpp())
+      return bridge.Result_Promise___NitroTest__SwiftContainer_swift__Array___NitroTest__Powertrain__.withError(error.toCpp())
     }
   }
 
-  public final func callNestedStructCallback(value: [[Person?]], callback: margelo.nitro.test.swift_bridge.Callback_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person____NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+  public final func callNestedStructCallback(value: [[Person?]], callback: margelo.nitro.test.swift_bridge.Callback___NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person______NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional___NitroTest__Person___, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
     do {
       let value = try __implementation.callNestedStructCallback(value: value, callback: callback)
       __outResult.assumingMemoryBound(to: [[Person?]].self).initialize(to: value)
@@ -626,10 +627,10 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
-  public final func bounceMap(map: Record_swift__String_NitroTest__Variant_Bool_Double_cxx, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+  public final func bounceMap(map: Record_swift__String___NitroTest__Variant_Bool_Double_cxx, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
     do {
       let value = try __implementation.bounceMap(map: map.dictionary)
-      __outResult.assumingMemoryBound(to: Record_swift__String_NitroTest__Variant_Bool_Double_cxx.self).initialize(to: Record_swift__String_NitroTest__Variant_Bool_Double_cxx(value))
+      __outResult.assumingMemoryBound(to: Record_swift__String___NitroTest__Variant_Bool_Double_cxx.self).initialize(to: Record_swift__String___NitroTest__Variant_Bool_Double_cxx(value))
       return bridge.Result_void.withValue()
     } catch {
       return bridge.Result_void.withError(error.toCpp())
@@ -656,20 +657,20 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
-  public final func bounceNullMap(map: Record_swift__String_NitroTest__Variant_NullType_String_cxx, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+  public final func bounceNullMap(map: Record_swift__String___NitroTest__Variant_NullType_String_cxx, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
     do {
       let value = try __implementation.bounceNullMap(map: map.dictionary)
-      __outResult.assumingMemoryBound(to: Record_swift__String_NitroTest__Variant_NullType_String_cxx.self).initialize(to: Record_swift__String_NitroTest__Variant_NullType_String_cxx(value))
+      __outResult.assumingMemoryBound(to: Record_swift__String___NitroTest__Variant_NullType_String_cxx.self).initialize(to: Record_swift__String___NitroTest__Variant_NullType_String_cxx(value))
       return bridge.Result_void.withValue()
     } catch {
       return bridge.Result_void.withError(error.toCpp())
     }
   }
 
-  public final func bounceOptionalNullMap(map: Record_swift__String_swift__Optional_NitroTest__Variant_NullType_String_cxx_, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+  public final func bounceOptionalNullMap(map: Record_swift__String_swift__Optional___NitroTest__Variant_NullType_String_cxx_, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
     do {
       let value = try __implementation.bounceOptionalNullMap(map: map.dictionary)
-      __outResult.assumingMemoryBound(to: Record_swift__String_swift__Optional_NitroTest__Variant_NullType_String_cxx_.self).initialize(to: Record_swift__String_swift__Optional_NitroTest__Variant_NullType_String_cxx_(value))
+      __outResult.assumingMemoryBound(to: Record_swift__String_swift__Optional___NitroTest__Variant_NullType_String_cxx_.self).initialize(to: Record_swift__String_swift__Optional___NitroTest__Variant_NullType_String_cxx_(value))
       return bridge.Result_void.withValue()
     } catch {
       return bridge.Result_void.withError(error.toCpp())
@@ -860,12 +861,12 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
-  public final func awaitAndGetComplexPromise(promise: margelo.nitro.test.swift_bridge.Promise_NitroTest__Car) -> bridge.Result_Promise_NitroTest__Car_ {
+  public final func awaitAndGetComplexPromise(promise: margelo.nitro.test.swift_bridge.Promise___NitroTest__Car) -> bridge.Result_Promise___NitroTest__Car_ {
     do {
       let value = try __implementation.awaitAndGetComplexPromise(promise: promise)
-      return bridge.Result_Promise_NitroTest__Car_.withValue(value.toCpp())
+      return bridge.Result_Promise___NitroTest__Car_.withValue(value.toCpp())
     } catch {
-      return bridge.Result_Promise_NitroTest__Car_.withError(error.toCpp())
+      return bridge.Result_Promise___NitroTest__Car_.withError(error.toCpp())
     }
   }
 
@@ -1426,12 +1427,22 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
-  public final func createExternalVariantFromFunc(factory: margelo.nitro.test.swift_bridge.Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx) -> bridge.Result_void_ {
+  public final func createExternalVariantFromFunc(factory: margelo.nitro.test.swift_bridge.Callback___NitroTestExternal__HybridSomeExternalObjectSpec_cxx) -> bridge.Result_void_ {
     do {
       let value = try __implementation.createExternalVariantFromFunc(factory: factory)
       return bridge.Result_void_.withValue(value.getCxxWrapper().toUnsafe())
     } catch {
       return bridge.Result_void_.withError(error.toCpp())
+    }
+  }
+
+  public final func bounceCppOnlyValue(value: CppOnlyValue, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+    do {
+      let value = try __implementation.bounceCppOnlyValue(value: value)
+      __outResult.assumingMemoryBound(to: CppOnlyValue.self).initialize(to: value)
+      return bridge.Result_void.withValue()
+    } catch {
+      return bridge.Result_void.withError(error.toCpp())
     }
   }
 
@@ -1444,12 +1455,12 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
-  public final func newTestObjectAsync() -> bridge.Result_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx_ {
+  public final func newTestObjectAsync() -> bridge.Result_Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx_ {
     do {
       let value = try __implementation.newTestObjectAsync()
-      return bridge.Result_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx_.withValue(value.toCpp())
+      return bridge.Result_Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx_.withValue(value.toCpp())
     } catch {
-      return bridge.Result_Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx_.withError(error.toCpp())
+      return bridge.Result_Promise___NitroTest__HybridTestObjectSwiftKotlinSpec_cxx_.withError(error.toCpp())
     }
   }
 

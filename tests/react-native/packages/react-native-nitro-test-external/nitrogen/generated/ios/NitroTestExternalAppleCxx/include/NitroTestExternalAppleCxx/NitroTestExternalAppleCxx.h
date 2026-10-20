@@ -12,18 +12,20 @@ namespace NitroTestExternal { class HybridTestViewSpec_cxx; }
 #include <NitroModules/Callback.hpp>
 namespace swift { class String; }
 #include <NitroModules/Result.hpp>
-#include <memory>
-// Forward declaration of `HybridTestViewSpec` to properly resolve imports.
-namespace margelo::nitro::test::external { class HybridTestViewSpec; }
+#include <NitroModules/HybridObject.hpp>
+// Forward declaration of `HybridTestViewSpecSwift` to properly resolve imports.
+namespace margelo::nitro::test::external { class HybridTestViewSpecSwift; }
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/Promise.hpp>
 
 namespace margelo::nitro::test::external::swift_bridge {
-  using std__shared_ptr_HybridTestViewSpec_ = std::shared_ptr<HybridTestViewSpec>;
-  using std__weak_ptr_HybridTestViewSpec_ = std::weak_ptr<HybridTestViewSpec>;
-  inline std__weak_ptr_HybridTestViewSpec_ weakify_std__shared_ptr_HybridTestViewSpec_(const std__shared_ptr_HybridTestViewSpec_& value) { return value; }
-  std__shared_ptr_HybridTestViewSpec_ create_std__shared_ptr_HybridTestViewSpec_(void* NON_NULL pointer);
-  void* NON_NULL get_std__shared_ptr_HybridTestViewSpec_(const std__shared_ptr_HybridTestViewSpec_& value);
+  using std__shared_ptr_margelo__nitro__test__external__HybridTestViewSpec_ = std::shared_ptr<margelo::nitro::test::external::HybridTestViewSpecSwift>;
+  using std__weak_ptr_margelo__nitro__test__external__HybridTestViewSpec_ = std::weak_ptr<margelo::nitro::test::external::HybridTestViewSpecSwift>;
+  inline std__weak_ptr_margelo__nitro__test__external__HybridTestViewSpec_ weakify_std__shared_ptr_margelo__nitro__test__external__HybridTestViewSpec_(const std__shared_ptr_margelo__nitro__test__external__HybridTestViewSpec_& value) {
+    return value;
+  }
+  std__shared_ptr_margelo__nitro__test__external__HybridTestViewSpec_ create_std__shared_ptr_margelo__nitro__test__external__HybridTestViewSpec_(void* NON_NULL pointer);
+  void* NON_NULL get_std__shared_ptr_margelo__nitro__test__external__HybridTestViewSpec_(const std::shared_ptr<HybridObject>& value);
   using Promise_void = Promise<void>;
   // Distinct specializations prevent duplicate Swift metadata across module headers.
   struct ResultTag {};

@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/OptionalEnumWrapper.hpp>
 // Forward declaration of `OptionalEnumWrapper` to properly resolve imports.
 namespace NitroTest { class OptionalEnumWrapper; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::OptionalEnumWrapper> final {
-    using SwiftType = NitroTest::OptionalEnumWrapper;
-
-    static margelo::nitro::test::OptionalEnumWrapper fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::OptionalEnumWrapper& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::OptionalEnumWrapper> {
-    static NitroTest::OptionalEnumWrapper fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::OptionalEnumWrapper& value);
+  struct JSIConverter<::NitroTest::OptionalEnumWrapper> {
+    static ::NitroTest::OptionalEnumWrapper fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::OptionalEnumWrapper& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

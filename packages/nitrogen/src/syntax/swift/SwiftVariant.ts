@@ -1,4 +1,8 @@
-import { createSwiftConverter, getSwiftConverter } from './SwiftConverter.js'
+import { createSwiftConverter, getSwiftConverter, type SwiftCppConverter } from './SwiftConverter.js'
+import { createSwiftJSIConverter } from './SwiftJSIConverter.js'
+import { VariantType } from '../types/VariantType.js'
+import { getTypeAs } from '../types/getTypeAs.js'
+import type { Type } from '../types/Type.js'
 import { wrapSwiftType } from './wrapSwiftType.js'
 import { capitalizeName, indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
@@ -34,7 +38,7 @@ export function createSwiftVariant(type: SwiftVariantType): SourceFile[] {
     label: label,
     name: capitalizeName(label),
     type: inner,
-    swiftType: wrapSwiftType(inner),
+    swiftType: wrapSwiftType(inner, type.config),
   }))
   const accessors = payloads.map(({ label, name, swiftType }) => {
     imports.push(...getSwiftImports([swiftType], 'public'))
@@ -114,26 +118,91 @@ public struct ${swiftEnumName}_cxx${conformancePrefix}${protocolNames.join(', ')
     subdirectory: [],
   }
 
-  const cppVariantType = variantType.getCode('c++', {
-    context: 'value',
-    fullyQualified: true,
-  })
-  const swiftToCppCases = payloads.map(({ name, type: payloadType }, index) => {
+  const cppSwiftVariantType = type.getCode('c++', { context: 'value' })
+  const jsToSwiftCases = payloads.map(({ name, swiftType }) => {
+    const payloadType = swiftType.getCode('c++', { context: 'type-argument' })
+    const result = storage.allocate('c++', {
+      storage: 'result',
+      body: (pointer) => `${cppSwiftVariantType}::initialize${name}(payload, ${pointer});`,
+    })
     return `
-case ${index}: {
-  auto payload = value.get${name}();
-  return ${cppVariantType}(std::in_place_index<${index}>, ${getSwiftConverter(payloadType)}::fromSwift(payload));
+if (JSIConverter<${payloadType}>::canConvert(runtime, value)) {
+  auto payload = JSIConverter<${payloadType}>::fromJSI(runtime, value);
+  return ${indent(result, '  ')};
 }
 `.trim()
   })
-  const cppToSwiftCases = payloads.map(({ name, type: payloadType }, index) => {
+  const diagnosticTypes = variantType.variants
+    .map((variant) => variant.getCode('c++', { context: 'type-argument', fullyQualified: true }))
+    .join(', ')
+  const jsToSwiftConverterCode = `
+${jsToSwiftCases.join('\n')}
+throw std::runtime_error("Cannot convert \\"" + value.toString(runtime).utf8(runtime) + "\\" to any type in variant<${diagnosticTypes}>!");
+`.trim()
+  const cppPayloads = payloads.map(({ name, swiftType }) => ({
+    name: name,
+    cppType: swiftType.getCode('c++', { context: 'type-argument' }),
+  }))
+  const swiftToJSICases = cppPayloads.map(({ name, cppType }, index) => {
+    return `
+case ${index}: return JSIConverter<${cppType}>::toJSI(runtime, value.get${name}());
+`.trim()
+  })
+  const swiftToJSConverterCode = `
+switch (value.getIndex()) {
+  ${indent(swiftToJSICases.join('\n'), '  ')}
+  default: throw std::invalid_argument("Invalid variant index");
+}
+`.trim()
+  const jsCanConvertExpressions = cppPayloads.map(({ cppType }) => `JSIConverter<${cppType}>::canConvert(runtime, value)`)
+  const jsCanConvertCode = `
+return ${jsCanConvertExpressions.join(' || ')};
+`.trim()
+  return [
+    swiftFile,
+    ...createSwiftJSIConverter({
+      name: type.name,
+      swiftType: type,
+      forwardDeclaration: type.forwardDeclaration,
+      fromJSI: jsToSwiftConverterCode,
+      toJSI: swiftToJSConverterCode,
+      canConvert: jsCanConvertCode,
+    }),
+  ]
+}
+
+interface SwiftVariantCppConverterOptions {
+  type: SwiftVariantType
+  cppType: Type
+}
+
+export function createSwiftVariantCppConverter({ type, cppType }: SwiftVariantCppConverterOptions): SwiftCppConverter {
+  const variantType = getTypeAs(cppType, VariantType)
+  const cppVariantType = variantType.getCode('c++', { context: 'value', fullyQualified: true })
+  const storage = new SwiftOutPointerType(type)
+  const payloads = variantType.cases.map(([label, native], index) => {
+    const swift = type.variants[index]
+    if (swift == null) throw new Error(`Missing Swift variant case ${type.name}.${label}`)
+    return { name: capitalizeName(label), native: native, swift: swift }
+  })
+  const swiftToCppCases = payloads.map(({ name, native, swift }, index) => {
+    const converter = getSwiftConverter({ cppType: native, swiftType: swift })
+    return `
+case ${index}: {
+  auto payload = value.get${name}();
+  return ${cppVariantType}(std::in_place_index<${index}>, ${converter}::fromSwift(payload));
+}
+`.trim()
+  })
+  const cppToSwiftCases = payloads.map(({ name, native, swift }, index) => {
+    const converter = getSwiftConverter({ cppType: native, swiftType: swift })
     const swiftValue = storage.allocate('c++', {
       storage: 'result',
       body: (pointer) => `SwiftType::initialize${name}(payload, ${pointer});`,
     })
     return `
 case ${index}: {
-  auto payload = ${getSwiftConverter(payloadType)}::toSwift(std::get<${index}>(value));
+  auto payload = ${converter}::toSwift(std::get<${index}>(value));
   return ${indent(swiftValue, '  ')};
 }
 `.trim()
@@ -150,23 +219,17 @@ switch (value.index()) {
   default: throw std::bad_variant_access();
 }
 `.trim()
-  const cppJSIConverter = `JSIConverter<${cppVariantType}>`
-  const swiftConverter = getSwiftConverter(variantType)
-  const jsToSwiftConverterCode = `return ${swiftConverter}::toSwift(${cppJSIConverter}::fromJSI(runtime, value));`
-  const swiftToJSConverterCode = `return ${cppJSIConverter}::toJSI(runtime, ${swiftConverter}::fromSwift(value));`
-  const jsCanConvertCode = `return ${cppJSIConverter}::canConvert(runtime, value);`
-  return [
-    swiftFile,
-    ...createSwiftConverter({
-      name: type.name,
-      cppType: variantType,
-      swiftType: type,
-      forwardDeclaration: type.forwardDeclaration,
-      fromSwift: swiftToCppConverterCode,
-      toSwift: cppToSwiftConverterCode,
-      fromJSI: jsToSwiftConverterCode,
-      toJSI: swiftToJSConverterCode,
-      canConvert: jsCanConvertCode,
-    }),
-  ]
+  const dependencies = payloads.flatMap(({ native, swift }) => {
+    const converter = swift.getCppConverter?.(native)
+    return converter == null ? [] : [converter]
+  })
+  return createSwiftConverter({
+    name: `${type.name}+${type.moduleName}`,
+    cppType: cppType,
+    swiftType: type,
+    forwardDeclaration: type.forwardDeclaration,
+    fromSwift: swiftToCppConverterCode,
+    toSwift: cppToSwiftConverterCode,
+    dependencies: dependencies,
+  })
 }

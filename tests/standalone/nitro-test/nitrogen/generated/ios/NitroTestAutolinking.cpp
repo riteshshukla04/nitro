@@ -10,6 +10,9 @@
 
 #include <NitroTest/private/HybridBaseSpecSwift.hpp>
 #include <NitroTest/private/HybridChildSpecSwift.hpp>
+#include <NitroTest/HybridCppBaseSpec.hpp>
+#include <NitroTest/HybridCppChildSpec.hpp>
+#include <NitroTest/HybridCppGrandchildSpec.hpp>
 #include <NitroTest/private/HybridGrandchildSpecSwift.hpp>
 #include <NitroTest/private/HybridPlatformObjectSpecSwift.hpp>
 #include <NitroTest/HybridTestObjectCppSpec.hpp>
@@ -22,6 +25,9 @@ namespace margelo::nitro::test {
 
     HybridClassRegistry::registerHybridClass("test.Base", HybridBaseSpecSwift::Class::get());
     HybridClassRegistry::registerHybridClass("test.Child", HybridChildSpecSwift::Class::get());
+    HybridClassRegistry::registerHybridClass("test.CppBase", HybridCppBaseSpec::Class::get());
+    HybridClassRegistry::registerHybridClass("test.CppChild", HybridCppChildSpec::Class::get());
+    HybridClassRegistry::registerHybridClass("test.CppGrandchild", HybridCppGrandchildSpec::Class::get());
     HybridClassRegistry::registerHybridClass("test.Grandchild", HybridGrandchildSpecSwift::Class::get());
     HybridClassRegistry::registerHybridClass("test.PlatformObject", HybridPlatformObjectSpecSwift::Class::get());
     HybridClassRegistry::registerHybridClass("test.TestObjectCpp", HybridTestObjectCppSpec::Class::get());

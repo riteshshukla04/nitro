@@ -27,15 +27,12 @@
 #endif
 
 
-#include <memory>
-#include <NitroTestExternal/HybridBaseSpec.hpp>
 #include <NitroTestExternal/private/HybridBaseSpec_cxx-Swift.hpp>
 #include <NitroTestExternal/private/SizeUnit-Swift.hpp>
 #include <NitroTestExternal/private/Size-Swift.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/Result.hpp>
-#include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
 #include <NitroTestExternal/private/HybridSomeExternalObjectSpec_cxx-Swift.hpp>
 #include <NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp>
 #include <NitroModules/JSIConverter+SwiftString.hpp>

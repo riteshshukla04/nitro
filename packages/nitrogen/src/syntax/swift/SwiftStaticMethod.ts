@@ -3,7 +3,6 @@ import { StaticMethod } from '../StaticMethod.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
 import {
   createCppBridgeBody,
-  createCppForwarderBody,
   createSwiftEndpoint,
   getSwiftMethodImports,
   prepareSwiftMethod,
@@ -30,7 +29,7 @@ export class SwiftStaticMethod extends StaticMethod {
     if (implementation == null) {
       throw new Error(`${spec.name}: Cannot generate a static method without a Swift implementation.`)
     }
-    const callable = prepareSwiftMethod(method, true)
+    const callable = prepareSwiftMethod(method, true, spec.config)
     const parameters = callable.parameters.map((parameter) => parameter.swift)
     super(`${method.name}_Swift`, callable.returnType, parameters, {
       generated: true,
@@ -39,17 +38,12 @@ export class SwiftStaticMethod extends StaticMethod {
     this.nativeMethod = method
     this.implementationClassName = implementation.className
     const hybridObjectNames = getHybridObjectName(spec.name)
-    this.cppInvocationTarget = `${spec.config.getIosModuleName()}::${hybridObjectNames.HybridTSpecCxx}`
+    this.cppInvocationTarget = `::${spec.config.getIosModuleName()}::${hybridObjectNames.HybridTSpecCxx}`
     this.callable = callable
   }
 
   createBridge(cppClassName: string, swiftOptions: SwiftClassMethodOptions = {}): SwiftMethodBridge {
     const nativeMethod = this.nativeMethod
-    const forwarder = new StaticMethod(nativeMethod.name, nativeMethod.returnType, nativeMethod.parameters, { generated: true })
-    const cppForwarderBody = createCppForwarderBody({
-      nativeMethod: nativeMethod,
-      swiftMethod: this,
-    })
     const cppBridgeBody = createCppBridgeBody({
       callable: this.callable,
       getCppInvocation: (args) => `${this.cppInvocationTarget}::${nativeMethod.name}(${args.join(', ')})`,
@@ -68,10 +62,7 @@ export class SwiftStaticMethod extends StaticMethod {
       generated: true,
     })
     return {
-      cppMethods: [
-        { method: forwarder, body: cppForwarderBody },
-        { method: this, body: cppBridgeBody },
-      ],
+      cppMethods: [{ method: this, body: cppBridgeBody }],
       swiftMethod: { method: swiftMethod, body: endpoint.body },
       swiftImports: getSwiftMethodImports(this.callable),
       cppRegistrations: [`clazz.registerStaticHybridMethod("${nativeMethod.name}", &${cppClassName}::${this.name});`],

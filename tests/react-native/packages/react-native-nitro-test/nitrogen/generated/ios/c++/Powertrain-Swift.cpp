@@ -7,8 +7,6 @@
 
 #include <NitroTest/private/Powertrain-Swift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <NitroTest/Powertrain.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroHash.hpp>
 #include <NitroModules/NumberUtils.hpp>
@@ -16,32 +14,18 @@
 
 namespace margelo::nitro {
 
-  margelo::nitro::test::Powertrain SwiftConverter<margelo::nitro::test::Powertrain>::fromSwift(const SwiftType& value) {
-    return static_cast<margelo::nitro::test::Powertrain>(value.getRawValue());
-  }
-
-  SwiftConverter<margelo::nitro::test::Powertrain>::SwiftType SwiftConverter<margelo::nitro::test::Powertrain>::toSwift(const margelo::nitro::test::Powertrain& value) {
-    const auto rawValue = static_cast<int32_t>(value);
-    #ifdef NITRO_DEBUG
-    if (rawValue != 0 && rawValue != 1 && rawValue != 2) {
-      throw std::invalid_argument("Invalid value for Powertrain");
-    }
-    #endif
-    return SwiftType::fromRawValue(rawValue);
-  }
-
-  NitroTest::Powertrain JSIConverter<NitroTest::Powertrain>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+  ::NitroTest::Powertrain JSIConverter<::NitroTest::Powertrain>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     const auto string = value.asString(runtime).utf8(runtime);
     switch (hashString(string)) {
-      case hashString("electric"): return NitroTest::Powertrain::fromRawValue(0);
-      case hashString("gas"): return NitroTest::Powertrain::fromRawValue(1);
-      case hashString("hybrid"): return NitroTest::Powertrain::fromRawValue(2);
+      case hashString("electric"): return ::NitroTest::Powertrain::fromRawValue(0);
+      case hashString("gas"): return ::NitroTest::Powertrain::fromRawValue(1);
+      case hashString("hybrid"): return ::NitroTest::Powertrain::fromRawValue(2);
       default: [[unlikely]]
         throw std::invalid_argument("Cannot convert \"" + string + "\" to enum Powertrain - invalid value!");
     }
   }
 
-  jsi::Value JSIConverter<NitroTest::Powertrain>::toJSI(jsi::Runtime& runtime, const NitroTest::Powertrain& value) {
+  jsi::Value JSIConverter<::NitroTest::Powertrain>::toJSI(jsi::Runtime& runtime, const ::NitroTest::Powertrain& value) {
     switch (value.getRawValue()) {
       case 0: return createJSIString<"electric">(runtime);
       case 1: return createJSIString<"gas">(runtime);
@@ -51,7 +35,7 @@ namespace margelo::nitro {
     }
   }
 
-  bool JSIConverter<NitroTest::Powertrain>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+  bool JSIConverter<::NitroTest::Powertrain>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
     if (!value.isString()) return false;
     const auto string = value.getString(runtime).utf8(runtime);
     switch (hashString(string)) {

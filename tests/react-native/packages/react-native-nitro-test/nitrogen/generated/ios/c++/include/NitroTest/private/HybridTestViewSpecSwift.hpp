@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <NitroTest/HybridTestViewSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 
 
@@ -20,12 +20,9 @@ namespace margelo::nitro::test {
    * The C++ part of HybridTestViewSpec_cxx.swift.
    *
    * HybridTestViewSpecSwift accesses the concrete Swift wrapper and registers
-   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
-   *
-   * Once Swift can inherit from C++ classes, the Swift implementation could
-   * inherit HybridTestViewSpec directly to simplify this structure.
+   * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridTestViewSpecSwift final : public virtual HybridTestViewSpec {
+  class HybridTestViewSpecSwift final : public virtual HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -35,12 +32,12 @@ namespace margelo::nitro::test {
 
   public:
     // Constructor from a Swift instance
-    explicit HybridTestViewSpecSwift(const NitroTest::HybridTestViewSpec_cxx& swiftPart):
+    explicit HybridTestViewSpecSwift(const ::NitroTest::HybridTestViewSpec_cxx& swiftPart):
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    NitroTest::HybridTestViewSpec_cxx& getSwiftPart() noexcept {
+    ::NitroTest::HybridTestViewSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -58,40 +55,23 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
-    bool getIsBlue() override;
     bool getIsBlue_Swift();
-    void setIsBlue(bool isBlue) override;
     void setIsBlue_Swift(bool isBlue);
-    bool getHasBeenCalled() override;
     bool getHasBeenCalled_Swift();
-    void setHasBeenCalled(bool hasBeenCalled) override;
     void setHasBeenCalled_Swift(bool hasBeenCalled);
-    int64_t getInt64Value() override;
     int64_t getInt64Value_Swift();
-    void setInt64Value(int64_t int64Value) override;
     void setInt64Value_Swift(int64_t int64Value);
-    ColorScheme getColorScheme() override;
-    NitroTest::ColorScheme getColorScheme_Swift();
-    void setColorScheme(ColorScheme colorScheme) override;
-    void setColorScheme_Swift(NitroTest::ColorScheme colorScheme);
-    Callback<void()> getSomeCallback() override;
+    ::NitroTest::ColorScheme getColorScheme_Swift();
+    void setColorScheme_Swift(::NitroTest::ColorScheme colorScheme);
     Callback<void()> getSomeCallback_Swift();
-    void setSomeCallback(const Callback<void()>& someCallback) override;
     void setSomeCallback_Swift(const Callback<void()>& someCallback);
-    std::optional<double> getNativeDefaultValue() override;
     swift::Optional<double> getNativeDefaultValue_Swift();
-    void setNativeDefaultValue(const std::optional<double>& nativeDefaultValue) override;
     void setNativeDefaultValue_Swift(const swift::Optional<double>& nativeDefaultValue);
     // Methods
-    bool getIsViewBlue(const std::shared_ptr<HybridTestViewSpec>& view) override;
-    bool getIsViewBlue_Swift(const NitroTest::HybridTestViewSpec_cxx& view);
-    double getOnDropViewCount() override;
+    bool getIsViewBlue_Swift(const ::NitroTest::HybridTestViewSpec_cxx& view);
     double getOnDropViewCount_Swift();
-    double getIsBlueSetterCallCount() override;
     double getIsBlueSetterCallCount_Swift();
-    double getNativeDefaultValueSetterCallCount() override;
     double getNativeDefaultValueSetterCallCount_Swift();
-    void someMethod() override;
     void someMethod_Swift();
 
   protected:
@@ -100,7 +80,7 @@ namespace margelo::nitro::test {
     }
 
   private:
-    NitroTest::HybridTestViewSpec_cxx _swiftPart;
+    ::NitroTest::HybridTestViewSpec_cxx _swiftPart;
   };
 
 } // namespace margelo::nitro::test

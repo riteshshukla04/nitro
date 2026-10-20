@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <NitroTestExternal/HybridTestViewSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 
 
@@ -20,12 +20,9 @@ namespace margelo::nitro::test::external {
    * The C++ part of HybridTestViewSpec_cxx.swift.
    *
    * HybridTestViewSpecSwift accesses the concrete Swift wrapper and registers
-   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
-   *
-   * Once Swift can inherit from C++ classes, the Swift implementation could
-   * inherit HybridTestViewSpec directly to simplify this structure.
+   * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridTestViewSpecSwift final : public virtual HybridTestViewSpec {
+  class HybridTestViewSpecSwift final : public virtual HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -35,12 +32,12 @@ namespace margelo::nitro::test::external {
 
   public:
     // Constructor from a Swift instance
-    explicit HybridTestViewSpecSwift(const NitroTestExternal::HybridTestViewSpec_cxx& swiftPart):
+    explicit HybridTestViewSpecSwift(const ::NitroTestExternal::HybridTestViewSpec_cxx& swiftPart):
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    NitroTestExternal::HybridTestViewSpec_cxx& getSwiftPart() noexcept {
+    ::NitroTestExternal::HybridTestViewSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -58,18 +55,12 @@ namespace margelo::nitro::test::external {
     std::string toString() override;
 
     // Properties
-    bool getIsBlue() override;
     bool getIsBlue_Swift();
-    void setIsBlue(bool isBlue) override;
     void setIsBlue_Swift(bool isBlue);
-    Callback<void()> getSomeCallback() override;
     Callback<void()> getSomeCallback_Swift();
-    void setSomeCallback(const Callback<void()>& someCallback) override;
     void setSomeCallback_Swift(const Callback<void()>& someCallback);
     // Methods
-    void someMethod() override;
     void someMethod_Swift();
-    std::string getModuleName() override;
     swift::String getModuleName_Swift();
 
   protected:
@@ -78,7 +69,7 @@ namespace margelo::nitro::test::external {
     }
 
   private:
-    NitroTestExternal::HybridTestViewSpec_cxx _swiftPart;
+    ::NitroTestExternal::HybridTestViewSpec_cxx _swiftPart;
   };
 
 } // namespace margelo::nitro::test::external

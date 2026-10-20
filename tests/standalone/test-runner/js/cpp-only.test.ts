@@ -370,7 +370,7 @@ export const cases = {
       expect(Object.is(testObject.bounceAnyHybrid(swiftKotlinObject), swiftKotlinObject)).to.equal(true)
     },
 
-    'bounceAnyHybrid(...) bounces a C++ Child': () => {
+    'bounceAnyHybrid(...) bounces a Swift Child created from C++': () => {
       const testObject = new TestObjectCpp()
 
       const child = testObject.createChild()

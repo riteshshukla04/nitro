@@ -9,9 +9,7 @@
 
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/NitroDefines.hpp>
-#include <memory>
-// Forward declaration of `HybridSomeExternalObjectSpec` to properly resolve imports.
-namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpec; }
+#include <NitroTest/HybridSomeExternalObjectSpecCxx+NitroTestExternal.hpp>
 #include <utility>
 
 namespace margelo::nitro::test {
@@ -21,11 +19,11 @@ namespace margelo::nitro::test {
    */
   struct ExternalObjectStruct final {
   public:
-    std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> someExternal     SWIFT_PRIVATE;
+    margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx someExternal     SWIFT_PRIVATE;
 
   public:
     ExternalObjectStruct() = default;
-    explicit ExternalObjectStruct(std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> someExternal): someExternal(std::move(someExternal)) {}
+    explicit ExternalObjectStruct(margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx someExternal): someExternal(std::move(someExternal)) {}
 
   public:
     friend bool operator==(const ExternalObjectStruct& lhs, const ExternalObjectStruct& rhs) = default;

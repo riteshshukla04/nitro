@@ -7,28 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <memory>
-// Forward declaration of `HybridTestViewSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridTestViewSpec; }
 // Forward declaration of `HybridTestViewSpec_cxx` to properly resolve imports.
 namespace NitroTest { class HybridTestViewSpec_cxx; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridTestViewSpec>> final {
-    using SwiftType = NitroTest::HybridTestViewSpec_cxx;
-
-    static std::shared_ptr<margelo::nitro::test::HybridTestViewSpec> fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const std::shared_ptr<margelo::nitro::test::HybridTestViewSpec>& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::HybridTestViewSpec_cxx> {
-    static NitroTest::HybridTestViewSpec_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::HybridTestViewSpec_cxx& value);
+  struct JSIConverter<::NitroTest::HybridTestViewSpec_cxx> {
+    static ::NitroTest::HybridTestViewSpec_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::HybridTestViewSpec_cxx& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

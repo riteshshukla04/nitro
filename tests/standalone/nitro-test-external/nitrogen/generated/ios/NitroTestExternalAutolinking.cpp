@@ -9,6 +9,7 @@
 #include <NitroModules/HybridClassRegistry.hpp>
 
 #include <NitroTestExternal/private/HybridBaseSpecSwift.hpp>
+#include <NitroTestExternal/HybridCppValueSourceSpec.hpp>
 #include <NitroTestExternal/private/HybridSomeExternalObjectSpecSwift.hpp>
 
 namespace margelo::nitro::test::external {
@@ -17,6 +18,7 @@ namespace margelo::nitro::test::external {
     using namespace margelo::nitro::test::external;
 
     HybridClassRegistry::registerHybridClass("test.external.Base", HybridBaseSpecSwift::Class::get());
+    HybridClassRegistry::registerHybridClass("test.external.CppValueSource", HybridCppValueSourceSpec::Class::get());
     HybridClassRegistry::registerHybridClass("test.external.SomeExternalObject", HybridSomeExternalObjectSpecSwift::Class::get());
   }
 } // namespace margelo::nitro::test::external

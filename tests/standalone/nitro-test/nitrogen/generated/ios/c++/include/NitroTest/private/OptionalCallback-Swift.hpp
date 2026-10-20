@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/OptionalCallback.hpp>
 // Forward declaration of `OptionalCallback` to properly resolve imports.
 namespace NitroTest { class OptionalCallback; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::OptionalCallback> final {
-    using SwiftType = NitroTest::OptionalCallback;
-
-    static margelo::nitro::test::OptionalCallback fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::OptionalCallback& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::OptionalCallback> {
-    static NitroTest::OptionalCallback fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::OptionalCallback& value);
+  struct JSIConverter<::NitroTest::OptionalCallback> {
+    static ::NitroTest::OptionalCallback fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::OptionalCallback& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

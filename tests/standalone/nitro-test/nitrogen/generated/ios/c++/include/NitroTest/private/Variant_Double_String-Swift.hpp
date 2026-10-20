@@ -7,27 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <string>
-#include <variant>
 // Forward declaration of `Variant_Double_String_cxx` to properly resolve imports.
 namespace NitroTest { class Variant_Double_String_cxx; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<std::variant<double, std::string>, NitroTest::Variant_Double_String_cxx> final {
-    using SwiftType = NitroTest::Variant_Double_String_cxx;
-
-    static std::variant<double, std::string> fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const std::variant<double, std::string>& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::Variant_Double_String_cxx> {
-    static NitroTest::Variant_Double_String_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::Variant_Double_String_cxx& value);
+  struct JSIConverter<::NitroTest::Variant_Double_String_cxx> {
+    static ::NitroTest::Variant_Double_String_cxx fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::Variant_Double_String_cxx& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

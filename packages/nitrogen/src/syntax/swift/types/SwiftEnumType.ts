@@ -1,24 +1,35 @@
-import type { GetCodeOptions } from '../../types/Type.js'
+import type { Type, GetCodeOptions } from '../../types/Type.js'
 import type { CppHelper } from '../../c++/CppHelper.js'
 import type { SourceFile } from '../../SourceFile.js'
 import { EnumType } from '../../types/EnumType.js'
-import { createSwiftEnumBridge } from '../SwiftEnum.js'
+import { createSwiftEnumBridge, createSwiftEnumCppConverter } from '../SwiftEnum.js'
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import { getForwardDeclaration } from '../../c++/getForwardDeclaration.js'
 import type { SourceImport } from '../../SourceFile.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
+import type { SwiftCppConverter } from '../SwiftConverter.js'
 
 export class SwiftEnumType extends EnumType implements SwiftType {
-  constructor(readonly type: EnumType) {
+  constructor(
+    readonly type: EnumType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
     super(type)
+  }
+
+  getCppConverter(cppType: Type): SwiftCppConverter {
+    return createSwiftEnumCppConverter({ type: this, cppType: cppType })
   }
 
   get name(): string {
     return this.type.enumName
   }
   override getExtraFiles(): SourceFile[] {
+    if (this.config.isExternalConfig) {
+      return []
+    }
     return createSwiftEnumBridge(this)
   }
 
@@ -39,7 +50,9 @@ export class SwiftEnumType extends EnumType implements SwiftType {
 
   readonly canImportFromCpp = false
   readonly needsSwiftConversion = false
-  readonly requiresExplicitSwiftTarget = false
+  get requiresExplicitSwiftTarget(): boolean {
+    return this.config.isExternalConfig
+  }
   fromSwift(value: string): string {
     return value
   }
@@ -48,7 +61,7 @@ export class SwiftEnumType extends EnumType implements SwiftType {
   }
 
   get moduleName(): string {
-    return NitroConfig.current.getIosModuleName()
+    return this.config.getIosModuleName()
   }
   get forwardDeclaration(): string {
     return getForwardDeclaration('class', this.name, this.moduleName)
@@ -57,9 +70,9 @@ export class SwiftEnumType extends EnumType implements SwiftType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return `${this.moduleName}::${this.name}`
+        return `::${this.moduleName}::${this.name}`
       case 'swift':
-        return this.name
+        return this.config.isExternalConfig ? `${this.moduleName}.${this.name}` : this.name
       default:
         return super.getCode(language, options)
     }
@@ -85,11 +98,15 @@ export class SwiftEnumType extends EnumType implements SwiftType {
         if (context === 'implementation') {
           imports.push({
             language: language,
-            declaration: NitroConfig.current.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
+            declaration: this.config.getCxxHeader(`${this.name}-Swift.hpp`, 'private'),
           })
         }
         break
       case 'swift':
+        if (this.config.isExternalConfig) {
+          imports.push({ language: 'swift', name: this.moduleName, access: 'public' })
+        }
+        break
       case 'kotlin':
         imports.push(...super.getRequiredImports(language))
         break

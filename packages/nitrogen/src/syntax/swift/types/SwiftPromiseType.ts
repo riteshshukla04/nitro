@@ -1,4 +1,4 @@
-import type { GetCodeOptions, TypeContext } from '../../types/Type.js'
+import type { Type, GetCodeOptions, TypeContext } from '../../types/Type.js'
 import type { CppHelper } from '../../c++/CppHelper.js'
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
@@ -10,14 +10,19 @@ import { getClangImporterReferenceName, getQualifiedSwiftName, type ImportedCxxR
 import { wrapSwiftTypeForBridge } from '../wrapSwiftType.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
+import { combineSwiftCppConverters, type SwiftCppConverter } from '../SwiftConverter.js'
+import { getTypeAs } from '../../types/getTypeAs.js'
 import { SwiftBorrowedPointerType } from './SwiftBorrowedPointerType.js'
 import { indent } from '../../../utils.js'
 
 export class SwiftPromiseType extends PromiseType implements SwiftType {
   override readonly resultingType: SwiftType
 
-  constructor(readonly type: PromiseType) {
-    const resultingType = wrapSwiftTypeForBridge(type.resultingType)
+  constructor(
+    readonly type: PromiseType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
+    const resultingType = wrapSwiftTypeForBridge(type.resultingType, config)
     super(resultingType)
     this.resultingType = resultingType
   }
@@ -30,6 +35,11 @@ export class SwiftPromiseType extends PromiseType implements SwiftType {
 
   getProtocolConformances(): ProtocolConformance[] {
     return []
+  }
+
+  getCppConverter(cppType: Type): SwiftCppConverter {
+    const nativeType = getTypeAs(cppType, PromiseType)
+    return combineSwiftCppConverters([this.resultingType.getCppConverter?.(nativeType.resultingType)])
   }
 
   get isReferenceType(): boolean {
@@ -66,7 +76,7 @@ export class SwiftPromiseType extends PromiseType implements SwiftType {
         return options.context === 'parameter' ? `const ${type}&` : type
       }
       case 'swift':
-        return `${NitroConfig.current.getSwiftBridgeNamespace('swift')}.${this.specializationName}`
+        return `${this.config.getSwiftBridgeNamespace('swift')}.${this.specializationName}`
       default:
         return super.getCode(language, options)
     }

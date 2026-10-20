@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/OldEnum.hpp>
 // Forward declaration of `OldEnum` to properly resolve imports.
 namespace NitroTest { class OldEnum; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::OldEnum> final {
-    using SwiftType = NitroTest::OldEnum;
-
-    static margelo::nitro::test::OldEnum fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::OldEnum& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::OldEnum> {
-    static NitroTest::OldEnum fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::OldEnum& value);
+  struct JSIConverter<::NitroTest::OldEnum> {
+    static ::NitroTest::OldEnum fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::OldEnum& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

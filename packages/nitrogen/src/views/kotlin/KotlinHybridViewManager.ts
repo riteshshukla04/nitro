@@ -208,9 +208,9 @@ public:
 } // namespace ${cxxNamespace}
   `.trim()
 
-  const propsUpdaterCalls = getHybridViewProperties(spec).map((p) => {
-    const name = escapeCppName(p.name)
-    const setter = p.getSetterName('other')
+  const propsUpdaterCalls = getHybridViewProperties(spec).map(({ property }) => {
+    const name = escapeCppName(property.name)
+    const setter = property.getSetterName('other')
     return `
 if (oldProps == nullptr
       ? newProps->${name}.isProvided()

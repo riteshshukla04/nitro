@@ -4,7 +4,6 @@ import { indent } from '../../utils.js'
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
 import { InstanceMethod } from '../InstanceMethod.js'
-import { HybridObjectType } from '../types/HybridObjectType.js'
 import { getImportCode, getImportsCode } from '../getImportCode.js'
 import type { Platform } from '../../getPlatformSpecs.js'
 import { createCppHybridClassBindings, type HybridClassBindings } from './CppHybridClassBindings.js'
@@ -52,7 +51,7 @@ export function createCppHybridObject(spec: HybridObjectSpec, platform: Platform
     ...spec.baseTypes.map(
       (base): SourceImport => ({
         language: 'c++',
-        declaration: new HybridObjectType(base).getCppHeader(),
+        declaration: base.config.getCxxHeader(`${getHybridObjectName(base.name).HybridTSpec}.hpp`),
       })
     ),
   ]
@@ -78,7 +77,7 @@ export function createCppHybridObject(spec: HybridObjectSpec, platform: Platform
   const cppClassIncludes = getImportsCode(classImports, 'implementation')
   const specImport: SourceImport = {
     language: 'c++',
-    declaration: new HybridObjectType(spec).getCppHeader(),
+    declaration: spec.config.getCxxHeader(`${getHybridObjectName(spec.name).HybridTSpec}.hpp`),
   }
   const cppSpecInclude = getImportCode(specImport)
   const cppImplementationIncludes = getImportsCode([specImport, ...memberImports], 'implementation')
@@ -206,20 +205,24 @@ namespace ${cxxNamespace} {
 } // namespace ${cxxNamespace}
 `.trim()
 
+  const isSharedCppSpec = Object.values(spec.platforms).every((options) => options.language === 'c++')
+  const nativePlatform = isSharedCppSpec ? 'shared' : platform
+
   const files: SourceFile[] = []
   files.push({
     content: cppHeaderCode,
     name: `${name.HybridTSpec}.hpp`,
     subdirectory: [],
     language: 'c++',
-    platform: 'shared',
+    platform: nativePlatform,
+    headerVisibility: 'public',
   })
   files.push({
     content: cppBodyCode,
     name: `${name.HybridTSpec}.cpp`,
     subdirectory: [],
     language: 'c++',
-    platform: 'shared',
+    platform: nativePlatform,
   })
   files.push({
     content: cppHybridClassCode,

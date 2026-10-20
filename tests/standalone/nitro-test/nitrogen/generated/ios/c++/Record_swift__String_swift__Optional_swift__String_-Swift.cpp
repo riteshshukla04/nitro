@@ -7,33 +7,20 @@
 
 #include <NitroTest/private/Record_swift__String_swift__Optional_swift__String_-Swift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <string>
-#include <optional>
-#include <unordered_map>
-#include <NitroModules/SwiftConverter+Dictionary.hpp>
 #include <NitroModules/JSIConverter+SwiftDictionary.hpp>
 
 namespace margelo::nitro {
 
-  std::unordered_map<std::string, std::optional<std::string>> SwiftConverter<std::unordered_map<std::string, std::optional<std::string>>, NitroTest::Record_swift__String_swift__Optional_swift__String_>::fromSwift(const SwiftType& value) {
-    return SwiftDictionaryConverter<std::unordered_map<std::string, std::optional<std::string>>, SwiftType, swift::String, swift::Optional<swift::String>>::fromSwift(value);
+  ::NitroTest::Record_swift__String_swift__Optional_swift__String_ JSIConverter<::NitroTest::Record_swift__String_swift__Optional_swift__String_>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return SwiftDictionaryJSIConverter<::NitroTest::Record_swift__String_swift__Optional_swift__String_, swift::String, swift::Optional<swift::String>>::fromJSI(runtime, value);
   }
 
-  SwiftConverter<std::unordered_map<std::string, std::optional<std::string>>, NitroTest::Record_swift__String_swift__Optional_swift__String_>::SwiftType SwiftConverter<std::unordered_map<std::string, std::optional<std::string>>, NitroTest::Record_swift__String_swift__Optional_swift__String_>::toSwift(const std::unordered_map<std::string, std::optional<std::string>>& value) {
-    return SwiftDictionaryConverter<std::unordered_map<std::string, std::optional<std::string>>, SwiftType, swift::String, swift::Optional<swift::String>>::toSwift(value);
+  jsi::Value JSIConverter<::NitroTest::Record_swift__String_swift__Optional_swift__String_>::toJSI(jsi::Runtime& runtime, const ::NitroTest::Record_swift__String_swift__Optional_swift__String_& value) {
+    return SwiftDictionaryJSIConverter<::NitroTest::Record_swift__String_swift__Optional_swift__String_, swift::String, swift::Optional<swift::String>>::toJSI(runtime, value);
   }
 
-  NitroTest::Record_swift__String_swift__Optional_swift__String_ JSIConverter<NitroTest::Record_swift__String_swift__Optional_swift__String_>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    return SwiftDictionaryJSIConverter<NitroTest::Record_swift__String_swift__Optional_swift__String_, swift::String, swift::Optional<swift::String>>::fromJSI(runtime, value);
-  }
-
-  jsi::Value JSIConverter<NitroTest::Record_swift__String_swift__Optional_swift__String_>::toJSI(jsi::Runtime& runtime, const NitroTest::Record_swift__String_swift__Optional_swift__String_& value) {
-    return SwiftDictionaryJSIConverter<NitroTest::Record_swift__String_swift__Optional_swift__String_, swift::String, swift::Optional<swift::String>>::toJSI(runtime, value);
-  }
-
-  bool JSIConverter<NitroTest::Record_swift__String_swift__Optional_swift__String_>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    return SwiftDictionaryJSIConverter<NitroTest::Record_swift__String_swift__Optional_swift__String_, swift::String, swift::Optional<swift::String>>::canConvert(runtime, value);
+  bool JSIConverter<::NitroTest::Record_swift__String_swift__Optional_swift__String_>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    return SwiftDictionaryJSIConverter<::NitroTest::Record_swift__String_swift__Optional_swift__String_, swift::String, swift::Optional<swift::String>>::canConvert(runtime, value);
   }
 
 } // namespace margelo::nitro

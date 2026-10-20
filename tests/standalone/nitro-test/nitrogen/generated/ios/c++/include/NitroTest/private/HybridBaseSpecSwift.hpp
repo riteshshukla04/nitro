@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <NitroTest/HybridBaseSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 
 
@@ -20,12 +20,9 @@ namespace margelo::nitro::test {
    * The C++ part of HybridBaseSpec_cxx.swift.
    *
    * HybridBaseSpecSwift accesses the concrete Swift wrapper and registers
-   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
-   *
-   * Once Swift can inherit from C++ classes, the Swift implementation could
-   * inherit HybridBaseSpec directly to simplify this structure.
+   * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridBaseSpecSwift : public virtual HybridBaseSpec {
+  class HybridBaseSpecSwift : public virtual HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -35,12 +32,12 @@ namespace margelo::nitro::test {
 
   public:
     // Constructor from a Swift instance
-    explicit HybridBaseSpecSwift(const NitroTest::HybridBaseSpec_cxx& swiftPart):
+    explicit HybridBaseSpecSwift(const ::NitroTest::HybridBaseSpec_cxx& swiftPart):
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    NitroTest::HybridBaseSpec_cxx& getSwiftPart() noexcept {
+    ::NitroTest::HybridBaseSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -58,18 +55,16 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
-    double getBaseValue() override;
     double getBaseValue_Swift();
     // Methods
-    Size bounceSize(const Size& size) override;
-    NitroTest::Size bounceSize_Swift(const NitroTest::Size& size);
-    SizeUnit bounceSizeUnit(SizeUnit unit) override;
-    NitroTest::SizeUnit bounceSizeUnit_Swift(NitroTest::SizeUnit unit);
-    Promise<Size> mapSize(const Size& size, const Callback<Size(const Size& /* size */)>& callback) override;
-    Promise<NitroTest::Size> mapSize_Swift(const NitroTest::Size& size, const Callback<NitroTest::Size(const NitroTest::Size&)>& callback);
+    ::NitroTest::Size bounceSize_Swift(const ::NitroTest::Size& size);
+    ::NitroTest::SizeUnit bounceSizeUnit_Swift(::NitroTest::SizeUnit unit);
+    Promise<::NitroTest::Size> mapSize_Swift(const ::NitroTest::Size& size, const Callback<::NitroTest::Size(const ::NitroTest::Size&)>& callback);
     // Constructor
-    static std::shared_ptr<HybridBaseSpec> constructor();
-    static NitroTest::HybridBaseSpec_cxx constructor_Swift();
+    static ::NitroTest::HybridBaseSpec_cxx constructor_Swift();
+    // Static methods
+    static ::NitroTest::HybridBaseSpec_cxx createAlternativeBase_Swift();
+    static ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx createInternalExternalObject_Swift();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {
@@ -77,7 +72,7 @@ namespace margelo::nitro::test {
     }
 
   private:
-    NitroTest::HybridBaseSpec_cxx _swiftPart;
+    ::NitroTest::HybridBaseSpec_cxx _swiftPart;
   };
 
 } // namespace margelo::nitro::test

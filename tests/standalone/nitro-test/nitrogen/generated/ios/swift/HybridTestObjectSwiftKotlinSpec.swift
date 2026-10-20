@@ -154,6 +154,7 @@ public protocol HybridTestObjectSwiftKotlinSpec_protocol: HybridObject {
   func bounceExternalStruct(externalStruct: ExternalObjectStruct) throws -> ExternalObjectStruct
   func bounceExternalVariant(variant: StringOrExternal) throws -> StringOrExternal
   func createExternalVariantFromFunc(factory: any Callback<(), (any HybridSomeExternalObjectSpec)>) throws -> (any HybridSomeExternalObjectSpec)
+  func bounceCppOnlyValue(value: CppOnlyValue) throws -> CppOnlyValue
   func newTestObject() throws -> (any HybridTestObjectSwiftKotlinSpec)
   func newTestObjectAsync() throws -> any Promise<(any HybridTestObjectSwiftKotlinSpec)>
   func getVariantHybrid(variant: Variant__any_HybridTestObjectSwiftKotlinSpec__Person) throws -> Variant__any_HybridTestObjectSwiftKotlinSpec__Person

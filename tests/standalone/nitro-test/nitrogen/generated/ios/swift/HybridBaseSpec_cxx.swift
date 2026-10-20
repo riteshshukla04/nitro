@@ -7,6 +7,7 @@
 internal import NitroModules
 internal import CxxStdlib
 public import NitroTestAppleCxx
+internal import NitroTestExternal
 
 /**
  * A class implementation that bridges HybridBaseSpec over to C++.
@@ -29,7 +30,7 @@ open class HybridBaseSpec_cxx {
   /**
    * Holds a weak pointer to the C++ class that wraps the Swift class.
    */
-  private var __cxxPart: bridge.std__weak_ptr_HybridBaseSpec_ = .init()
+  private var __cxxPart: bridge.std__weak_ptr_margelo__nitro__test__HybridBaseSpec_ = .init()
 
   /**
    * Create a new `HybridBaseSpec_cxx` that wraps the given `HybridBaseSpec`.
@@ -66,24 +67,25 @@ open class HybridBaseSpec_cxx {
 
   /**
    * Gets (or creates) the C++ part of this Hybrid Object.
-   * The C++ part is a `std::shared_ptr<HybridBaseSpec>`.
+   * This handle keeps the original native object alive.
    */
-  open func getCxxPart() -> bridge.std__shared_ptr_HybridBaseSpec_ {
+  open func getCxxPart() -> bridge.std__shared_ptr_margelo__nitro__test__HybridBaseSpec_ {
     let cached = __cxxPart.lock()
     if cached.use_count() > 0 {
       return cached
     }
-    let value = bridge.create_std__shared_ptr_HybridBaseSpec_(self.toUnsafe())
-    __cxxPart = bridge.weakify_std__shared_ptr_HybridBaseSpec_(value)
+    let value = bridge.create_std__shared_ptr_margelo__nitro__test__HybridBaseSpec_(self.toUnsafe())
+    __cxxPart = bridge.weakify_std__shared_ptr_margelo__nitro__test__HybridBaseSpec_(value)
     return value
   }
+
 
 
   // A static borrowing accessor lets C++ pass a const reference without copying it.
   // TODO: Remove this adapter and call the instance method directly once
   // https://github.com/swiftlang/swift/pull/92862 is merged and supported by our Swift toolchain.
   @_spi(NitroCxx)
-  public static func getCxxPart(_ value: borrowing HybridBaseSpec_cxx) -> bridge.std__shared_ptr_HybridBaseSpec_ {
+  public static func getCxxPart(_ value: borrowing HybridBaseSpec_cxx) -> bridge.std__shared_ptr_margelo__nitro__test__HybridBaseSpec_ {
     return value.getCxxPart()
   }
 
@@ -150,12 +152,12 @@ open class HybridBaseSpec_cxx {
     }
   }
 
-  public final func mapSize(size: Size, callback: margelo.nitro.test.swift_bridge.Callback_NitroTest__Size_NitroTest__Size) -> bridge.Result_Promise_NitroTest__Size_ {
+  public final func mapSize(size: Size, callback: margelo.nitro.test.swift_bridge.Callback___NitroTest__Size___NitroTest__Size) -> bridge.Result_Promise___NitroTest__Size_ {
     do {
       let value = try __implementation.mapSize(size: size, callback: callback)
-      return bridge.Result_Promise_NitroTest__Size_.withValue(value.toCpp())
+      return bridge.Result_Promise___NitroTest__Size_.withValue(value.toCpp())
     } catch {
-      return bridge.Result_Promise_NitroTest__Size_.withError(error.toCpp())
+      return bridge.Result_Promise___NitroTest__Size_.withError(error.toCpp())
     }
   }
 
@@ -164,6 +166,26 @@ open class HybridBaseSpec_cxx {
   public class func constructor() -> bridge.Result_void_ {
     do {
       let value = try HybridBase()
+      return bridge.Result_void_.withValue(value.getCxxWrapper().toUnsafe())
+    } catch {
+      return bridge.Result_void_.withError(error.toCpp())
+    }
+  }
+
+  // Static methods
+
+  public class func createAlternativeBase() -> bridge.Result_void_ {
+    do {
+      let value = try HybridBase.createAlternativeBase()
+      return bridge.Result_void_.withValue(value.getCxxWrapper().toUnsafe())
+    } catch {
+      return bridge.Result_void_.withError(error.toCpp())
+    }
+  }
+
+  public class func createInternalExternalObject() -> bridge.Result_void_ {
+    do {
+      let value = try HybridBase.createInternalExternalObject()
       return bridge.Result_void_.withValue(value.getCxxWrapper().toUnsafe())
     } catch {
       return bridge.Result_void_.withError(error.toCpp())

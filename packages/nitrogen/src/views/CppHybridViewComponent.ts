@@ -7,26 +7,32 @@ import { getImportsCode } from '../syntax/getImportCode.js'
 import { Property } from '../syntax/Property.js'
 import { CallbackType } from '../syntax/types/CallbackType.js'
 import { VoidType } from '../syntax/types/VoidType.js'
-import { HybridObjectType } from '../syntax/types/HybridObjectType.js'
+import { AnyHybridObjectType } from '../syntax/types/AnyHybridObjectType.js'
 import { NamedWrappingType } from '../syntax/types/NamedWrappingType.js'
 import { OptionalType } from '../syntax/types/OptionalType.js'
+import type { NitroConfig } from '../config/NitroConfig.js'
 
 export function getHybridViewComponentName(spec: HybridObjectSpec): string {
   return spec.config.getHybridClassRegistryName(spec.name)
 }
 
-/** Properties inherited from view bases are also React props. */
-export function getHybridViewProperties(spec: HybridObjectSpec): Property[] {
-  const properties = new Map<string, Property>()
+interface HybridViewProperty {
+  readonly property: Property
+  readonly config: NitroConfig
+}
+
+/** Inherited React props retain the native module that declares their setters. */
+export function getHybridViewProperties(spec: HybridObjectSpec): HybridViewProperty[] {
+  const properties = new Map<string, HybridViewProperty>()
   for (const base of spec.baseTypes) {
-    for (const property of getHybridViewProperties(base)) {
-      properties.set(property.name, property)
+    for (const inherited of getHybridViewProperties(base)) {
+      properties.set(inherited.property.name, inherited)
     }
   }
   for (const property of spec.properties) {
-    properties.set(property.name, property)
+    properties.set(property.name, { property: property, config: spec.config })
   }
-  return [...properties.values()].filter((property) => !property.isReadonly)
+  return [...properties.values()].filter(({ property }) => !property.isReadonly)
 }
 
 interface ViewComponentNames {
@@ -52,8 +58,8 @@ export function getViewComponentNames(spec: HybridObjectSpec): ViewComponentName
   }
 }
 
-function getHybridRefProperty(spec: HybridObjectSpec): Property {
-  const hybrid = new HybridObjectType(spec)
+function getHybridRefProperty(): Property {
+  const hybrid = new AnyHybridObjectType()
   const type = new CallbackType(new VoidType(), [new NamedWrappingType('ref', hybrid)])
   return new Property('hybridRef', new OptionalType(type), false)
 }
@@ -68,7 +74,7 @@ export function createViewComponentShadowNodeFiles(spec: HybridObjectSpec): Sour
 
   const namespace = spec.config.getCxxNamespace('c++', 'views')
 
-  const props = [...getHybridViewProperties(spec), getHybridRefProperty(spec)]
+  const props = [...getHybridViewProperties(spec).map(({ property }) => property), getHybridRefProperty()]
   const properties = props.map((p) => `nitro::ReactProp<${p.type.getCode('c++', { context: 'property' })}> ${escapeCppName(p.name)};`)
   const filterCases = props.map((prop) => `case hashString("${prop.name}"): return true;`)
   const comparisons = props.map((prop) => {

@@ -16,13 +16,14 @@
 #include <NitroTest/TruckPowertrain.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroTest/HybridBaseSpecCxx.hpp>
 #include <tuple>
 #include <memory>
 #include <NitroTest/Person.hpp>
 #include <NitroTest/PartialPerson.hpp>
 #include <NitroTest/Car.hpp>
 #include <NitroModules/Promise.hpp>
-#include <NitroTest/HybridChildSpec.hpp>
+#include <NitroTest/HybridChildSpecCxx.hpp>
 #include <NitroModules/AnyJSON.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <unordered_map>
@@ -36,9 +37,13 @@
 #include <NitroTest/OptionalEnumWrapper.hpp>
 #include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroTest/WeirdNumbersEnum.hpp>
-#include <NitroTest/HybridBaseSpec.hpp>
-#include <NitroTest/HybridGrandchildSpec.hpp>
-#include <NitroTestExternal/HybridSomeExternalObjectSpec.hpp>
+#include <NitroTest/HybridGrandchildSpecCxx.hpp>
+#include <NitroTest/Size.hpp>
+#include <NitroTest/HybridSomeExternalObjectSpecCxx+NitroTestExternal.hpp>
+#include <NitroTest/OptionalPrimitivesHolder.hpp>
+#include <NitroTest/HybridCppBaseSpec.hpp>
+#include <NitroTest/HybridCppChildSpec.hpp>
+#include <NitroTest/HybridCppGrandchildSpec.hpp>
 #include <NitroTest/ExternalObjectStruct.hpp>
 #include <NitroModules/HybridObject.hpp>
 #include "CustomString.hpp"
@@ -94,6 +99,7 @@ namespace margelo::nitro::test {
       clazz.registerHybridProperty("isolatedBoolean", &HybridTestObjectCppSpec::getIsolatedBoolean, &HybridTestObjectCppSpec::setIsolatedBoolean);
       clazz.registerHybridProperty("isTextValue", &HybridTestObjectCppSpec::getIsTextValue, &HybridTestObjectCppSpec::setIsTextValue);
       clazz.registerHybridProperty("someVariant", &HybridTestObjectCppSpec::getSomeVariant, &HybridTestObjectCppSpec::setSomeVariant);
+      clazz.registerHybridProperty("retainedBase", &HybridTestObjectCppSpec::getRetainedBase, &HybridTestObjectCppSpec::setRetainedBase);
       clazz.registerHybridProperty("someTuple", &HybridTestObjectCppSpec::getSomeTuple, &HybridTestObjectCppSpec::setSomeTuple);
       clazz.registerHybridProperty("thisObject", &HybridTestObjectCppSpec::getThisObject);
       clazz.registerHybridProperty("optionalHybrid", &HybridTestObjectCppSpec::getOptionalHybrid, &HybridTestObjectCppSpec::setOptionalHybrid);
@@ -212,6 +218,20 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("bounceBase", &HybridTestObjectCppSpec::bounceBase);
       clazz.registerHybridMethod("bounceChildBase", &HybridTestObjectCppSpec::bounceChildBase);
       clazz.registerHybridMethod("castBase", &HybridTestObjectCppSpec::castBase);
+      clazz.registerHybridMethod("readBaseValue", &HybridTestObjectCppSpec::readBaseValue);
+      clazz.registerHybridMethod("readChildBaseValue", &HybridTestObjectCppSpec::readChildBaseValue);
+      clazz.registerHybridMethod("bounceSizeThroughBase", &HybridTestObjectCppSpec::bounceSizeThroughBase);
+      clazz.registerHybridMethod("mapSizeThroughBase", &HybridTestObjectCppSpec::mapSizeThroughBase);
+      clazz.registerHybridMethod("bounceVariantThroughChild", &HybridTestObjectCppSpec::bounceVariantThroughChild);
+      clazz.registerHybridMethod("readExternalValue", &HybridTestObjectCppSpec::readExternalValue);
+      clazz.registerHybridMethod("createExternalOptionalPrimitives", &HybridTestObjectCppSpec::createExternalOptionalPrimitives);
+      clazz.registerHybridMethod("createAlternativeBase", &HybridTestObjectCppSpec::createAlternativeBase);
+      clazz.registerHybridMethod("createCppBase", &HybridTestObjectCppSpec::createCppBase);
+      clazz.registerHybridMethod("createCppChild", &HybridTestObjectCppSpec::createCppChild);
+      clazz.registerHybridMethod("createCppGrandchild", &HybridTestObjectCppSpec::createCppGrandchild);
+      clazz.registerHybridMethod("createCppBaseActualChild", &HybridTestObjectCppSpec::createCppBaseActualChild);
+      clazz.registerHybridMethod("bounceCppBase", &HybridTestObjectCppSpec::bounceCppBase);
+      clazz.registerHybridMethod("castCppBase", &HybridTestObjectCppSpec::castCppBase);
       clazz.registerHybridMethod("callbackSync", &HybridTestObjectCppSpec::callbackSync);
       clazz.registerHybridMethod("getSyncNumberCallback", &HybridTestObjectCppSpec::getSyncNumberCallback);
       clazz.registerHybridMethod("bounceSyncInt64Callback", &HybridTestObjectCppSpec::bounceSyncInt64Callback);

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <NitroTest/HybridPlatformObjectSpec.hpp>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 
 
@@ -20,12 +20,9 @@ namespace margelo::nitro::test {
    * The C++ part of HybridPlatformObjectSpec_cxx.swift.
    *
    * HybridPlatformObjectSpecSwift accesses the concrete Swift wrapper and registers
-   * its Swift signatures for JS. The base spec keeps the public C++ signatures.
-   *
-   * Once Swift can inherit from C++ classes, the Swift implementation could
-   * inherit HybridPlatformObjectSpec directly to simplify this structure.
+   * its Swift signatures for JS. C++ callers use a separate adapter when needed.
    */
-  class HybridPlatformObjectSpecSwift final : public virtual HybridPlatformObjectSpec {
+  class HybridPlatformObjectSpecSwift final : public virtual HybridObject {
   public:
     struct Class {
       using Base = HybridObject::Class;
@@ -35,12 +32,12 @@ namespace margelo::nitro::test {
 
   public:
     // Constructor from a Swift instance
-    explicit HybridPlatformObjectSpecSwift(const NitroTest::HybridPlatformObjectSpec_cxx& swiftPart):
+    explicit HybridPlatformObjectSpecSwift(const ::NitroTest::HybridPlatformObjectSpec_cxx& swiftPart):
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    NitroTest::HybridPlatformObjectSpec_cxx& getSwiftPart() noexcept {
+    ::NitroTest::HybridPlatformObjectSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -59,11 +56,9 @@ namespace margelo::nitro::test {
 
     // Properties
     // Methods
-    std::string getOSVersion() override;
     swift::String getOSVersion_Swift();
     // Constructor
-    static std::shared_ptr<HybridPlatformObjectSpec> constructor();
-    static NitroTest::HybridPlatformObjectSpec_cxx constructor_Swift();
+    static ::NitroTest::HybridPlatformObjectSpec_cxx constructor_Swift();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {
@@ -71,7 +66,7 @@ namespace margelo::nitro::test {
     }
 
   private:
-    NitroTest::HybridPlatformObjectSpec_cxx _swiftPart;
+    ::NitroTest::HybridPlatformObjectSpec_cxx _swiftPart;
   };
 
 } // namespace margelo::nitro::test

@@ -2,9 +2,9 @@ import { expect } from 'chai'
 import { casesForTestObjects, namedCases, recordCallback } from './utils/cases'
 
 import { NitroModules } from 'nitro-core'
-import { Base, SizeUnit, type Size } from 'nitro-test'
-import { Base as ExternalBase, SizeUnit as ExternalSizeUnit, type Size as ExternalSize } from 'nitro-test-external'
-import { HybridSomeExternalObject } from './utils/testObjects'
+import { Base, SizeUnit, TestObjectSwiftKotlin, type Size } from 'nitro-test'
+import { Base as ExternalBase, CppOnlyValueKind, SizeUnit as ExternalSizeUnit, type Size as ExternalSize } from 'nitro-test-external'
+import { HybridSomeExternalObject, isSwift } from './utils/testObjects'
 
 import { debugOnly } from './utils/helpers'
 
@@ -28,6 +28,15 @@ const EXTERNAL_SIZE: ExternalSize = {
 }
 
 export const cases = {
+  ...namedCases('Swift values from a C++-only module', {
+    'projects the external struct and enum into the consuming Swift module': () => {
+      const object = new TestObjectSwiftKotlin()
+      for (const kind of [CppOnlyValueKind.First, CppOnlyValueKind.Second]) {
+        const value = { label: 'external C++ value', kind }
+        expect(object.bounceCppOnlyValue(value)).to.deep.equal(value)
+      }
+    },
+  }),
   ...namedCases('Namespaced HybridObjects', {
     'same-named exports construct their own native implementations': () => {
       expect(Base).not.to.equal(ExternalBase)
@@ -263,9 +272,16 @@ export const cases = {
     },
 
     'bounceExternalVariant(number) throws': (testObject) => {
+      // Debug diagnostics name the native representation used by each API.
+      let nativeObjectType: string
+      if (isSwift(testObject)) {
+        nativeObjectType = 'std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>'
+      } else {
+        nativeObjectType = 'margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx'
+      }
       // @ts-expect-error - a number is neither a string nor a SomeExternalObject
       expect(() => testObject.bounceExternalVariant(55)).to.throw(
-        `${testObject.constructor.name}.bounceExternalVariant(...): Cannot convert "55" to any type in variant<${debugOnly('std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>!')}`
+        `${testObject.constructor.name}.bounceExternalVariant(...): Cannot convert "55" to any type in variant<${debugOnly(`${nativeObjectType}, std::string>!`)}`
       )
     },
 

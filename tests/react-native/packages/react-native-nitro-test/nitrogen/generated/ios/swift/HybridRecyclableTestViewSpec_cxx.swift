@@ -29,7 +29,7 @@ public final class HybridRecyclableTestViewSpec_cxx {
   /**
    * Holds a weak pointer to the C++ class that wraps the Swift class.
    */
-  private var __cxxPart: bridge.std__weak_ptr_HybridRecyclableTestViewSpec_ = .init()
+  private var __cxxPart: bridge.std__weak_ptr_margelo__nitro__test__HybridRecyclableTestViewSpec_ = .init()
 
   /**
    * Create a new `HybridRecyclableTestViewSpec_cxx` that wraps the given `HybridRecyclableTestViewSpec`.
@@ -69,24 +69,25 @@ public final class HybridRecyclableTestViewSpec_cxx {
 
   /**
    * Gets (or creates) the C++ part of this Hybrid Object.
-   * The C++ part is a `std::shared_ptr<HybridRecyclableTestViewSpec>`.
+   * This handle keeps the original native object alive.
    */
-  public func getCxxPart() -> bridge.std__shared_ptr_HybridRecyclableTestViewSpec_ {
+  public func getCxxPart() -> bridge.std__shared_ptr_margelo__nitro__test__HybridRecyclableTestViewSpec_ {
     let cached = __cxxPart.lock()
     if cached.use_count() > 0 {
       return cached
     }
-    let value = bridge.create_std__shared_ptr_HybridRecyclableTestViewSpec_(self.toUnsafe())
-    __cxxPart = bridge.weakify_std__shared_ptr_HybridRecyclableTestViewSpec_(value)
+    let value = bridge.create_std__shared_ptr_margelo__nitro__test__HybridRecyclableTestViewSpec_(self.toUnsafe())
+    __cxxPart = bridge.weakify_std__shared_ptr_margelo__nitro__test__HybridRecyclableTestViewSpec_(value)
     return value
   }
+
 
 
   // A static borrowing accessor lets C++ pass a const reference without copying it.
   // TODO: Remove this adapter and call the instance method directly once
   // https://github.com/swiftlang/swift/pull/92862 is merged and supported by our Swift toolchain.
   @_spi(NitroCxx)
-  public static func getCxxPart(_ value: borrowing HybridRecyclableTestViewSpec_cxx) -> bridge.std__shared_ptr_HybridRecyclableTestViewSpec_ {
+  public static func getCxxPart(_ value: borrowing HybridRecyclableTestViewSpec_cxx) -> bridge.std__shared_ptr_margelo__nitro__test__HybridRecyclableTestViewSpec_ {
     return value.getCxxPart()
   }
 
@@ -183,7 +184,7 @@ public final class HybridRecyclableTestViewSpec_cxx {
   }
 
   // Fabric creates views on the UI thread, independently of JavaScript constructors.
-  public static func createRecyclableTestViewView() -> bridge.std__shared_ptr_HybridRecyclableTestViewSpec_ {
+  public static func createRecyclableTestViewView() -> bridge.std__shared_ptr_margelo__nitro__test__HybridRecyclableTestViewSpec_ {
     return HybridRecyclableTestView().getCxxWrapper().getCxxPart()
   }
 

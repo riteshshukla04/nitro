@@ -7,32 +7,22 @@
 
 #include <NitroTest/private/HybridPlatformObjectSpec_cxx-Swift.hpp>
 #include <NitroTest/private/NitroTest-Swift-Cxx-Umbrella.hpp>
-#include <NitroModules/SwiftConverter.hpp>
-#include <memory>
-#include <NitroTest/HybridPlatformObjectSpec.hpp>
+#include <NitroTest/private/HybridPlatformObjectSpecSwift.hpp>
 
 namespace margelo::nitro {
 
-  std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpec> SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpec>>::fromSwift(const SwiftType& value) {
-    return SwiftType::getCxxPart(value);
+  ::NitroTest::HybridPlatformObjectSpec_cxx JSIConverter<::NitroTest::HybridPlatformObjectSpec_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto hybridSpec = JSIConverter<std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpecSwift>>::fromJSI(runtime, value);
+    return ::NitroTest::HybridPlatformObjectSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_margelo__nitro__test__HybridPlatformObjectSpec_(hybridSpec));
   }
 
-  SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpec>>::SwiftType SwiftConverter<std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpec>>::toSwift(const std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpec>& value) {
-    return NitroTest::HybridPlatformObjectSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_HybridPlatformObjectSpec_(value));
+  jsi::Value JSIConverter<::NitroTest::HybridPlatformObjectSpec_cxx>::toJSI(jsi::Runtime& runtime, const ::NitroTest::HybridPlatformObjectSpec_cxx& value) {
+    auto hybridSpec = ::NitroTest::HybridPlatformObjectSpec_cxx::getCxxPart(value);
+    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpecSwift>>::toJSI(runtime, hybridSpec);
   }
 
-  NitroTest::HybridPlatformObjectSpec_cxx JSIConverter<NitroTest::HybridPlatformObjectSpec_cxx>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    auto hybridSpec = JSIConverter<std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpec>>::fromJSI(runtime, value);
-    return NitroTest::HybridPlatformObjectSpec_cxx::fromUnsafe(margelo::nitro::test::swift_bridge::get_std__shared_ptr_HybridPlatformObjectSpec_(hybridSpec));
-  }
-
-  jsi::Value JSIConverter<NitroTest::HybridPlatformObjectSpec_cxx>::toJSI(jsi::Runtime& runtime, const NitroTest::HybridPlatformObjectSpec_cxx& value) {
-    auto hybridSpec = NitroTest::HybridPlatformObjectSpec_cxx::getCxxPart(value);
-    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpec>>::toJSI(runtime, hybridSpec);
-  }
-
-  bool JSIConverter<NitroTest::HybridPlatformObjectSpec_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
-    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpec>>::canConvert(runtime, value);
+  bool JSIConverter<::NitroTest::HybridPlatformObjectSpec_cxx>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    return JSIConverter<std::shared_ptr<margelo::nitro::test::HybridPlatformObjectSpecSwift>>::canConvert(runtime, value);
   }
 
 } // namespace margelo::nitro

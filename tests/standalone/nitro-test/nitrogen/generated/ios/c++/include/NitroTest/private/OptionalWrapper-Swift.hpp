@@ -7,26 +7,16 @@
 
 #pragma once
 
-#include <NitroModules/SwiftConverter_fwd.hpp>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroTest/OptionalWrapper.hpp>
 // Forward declaration of `OptionalWrapper` to properly resolve imports.
 namespace NitroTest { class OptionalWrapper; }
 
 namespace margelo::nitro {
 
   template <>
-  struct SwiftConverter<margelo::nitro::test::OptionalWrapper> final {
-    using SwiftType = NitroTest::OptionalWrapper;
-
-    static margelo::nitro::test::OptionalWrapper fromSwift(const SwiftType& value);
-    static SwiftType toSwift(const margelo::nitro::test::OptionalWrapper& value);
-  };
-
-  template <>
-  struct JSIConverter<NitroTest::OptionalWrapper> {
-    static NitroTest::OptionalWrapper fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
-    static jsi::Value toJSI(jsi::Runtime& runtime, const NitroTest::OptionalWrapper& value);
+  struct JSIConverter<::NitroTest::OptionalWrapper> {
+    static ::NitroTest::OptionalWrapper fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, const ::NitroTest::OptionalWrapper& value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
   };
 

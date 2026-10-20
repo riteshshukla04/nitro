@@ -14,10 +14,9 @@
 #include <sstream>
 #include <thread>
 
-#include "HybridBase.hpp"
-#include "HybridChild.hpp"
-#include "HybridGrandchild.hpp"
-#include "HybridSomeInternalObject.hpp"
+#include "HybridCppBase.hpp"
+#include "HybridCppChild.hpp"
+#include "HybridCppGrandchild.hpp"
 
 namespace margelo::nitro::test {
 
@@ -329,8 +328,7 @@ std::vector<std::vector<std::optional<Person>>> HybridTestObjectCpp::callNestedS
   return callback.callSync(value);
 }
 
-std::vector<std::shared_ptr<HybridChildSpec>>
-HybridTestObjectCpp::bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) {
+std::vector<HybridChildSpecCxx> HybridTestObjectCpp::bounceHybridObjects(const std::vector<HybridChildSpecCxx>& array) {
   return array;
 }
 
@@ -507,8 +505,8 @@ HybridTestObjectCpp::passVariant(const std::variant<bool, std::vector<double>, s
   }
 }
 
-std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>
-HybridTestObjectCpp::passAllEmptyObjectVariant(const std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>& variant) {
+std::variant<HybridBaseSpecCxx, OptionalWrapper>
+HybridTestObjectCpp::passAllEmptyObjectVariant(const std::variant<HybridBaseSpecCxx, OptionalWrapper>& variant) {
   return variant;
 }
 
@@ -896,50 +894,123 @@ jsi::Value HybridTestObjectCpp::rawJsiFunc(jsi::Runtime& runtime, const jsi::Val
   return array;
 }
 
-std::shared_ptr<HybridBaseSpec> HybridTestObjectCpp::createBase() {
-  return std::make_shared<HybridBase>();
+HybridBaseSpecCxx HybridTestObjectCpp::createBase() {
+  return HybridBaseSpecCxx::create();
 }
 
-std::shared_ptr<HybridChildSpec> HybridTestObjectCpp::createChild() {
-  return std::make_shared<HybridChild>();
+HybridChildSpecCxx HybridTestObjectCpp::createChild() {
+  return HybridChildSpecCxx::create();
 }
 
-std::shared_ptr<HybridBaseSpec> HybridTestObjectCpp::createBaseActualChild() {
-  return std::make_shared<HybridChild>();
+HybridBaseSpecCxx HybridTestObjectCpp::createBaseActualChild() {
+  return HybridChildSpecCxx::create();
 }
 
-std::shared_ptr<HybridGrandchildSpec> HybridTestObjectCpp::createGrandchild() {
-  return std::make_shared<HybridGrandchild>();
+HybridGrandchildSpecCxx HybridTestObjectCpp::createGrandchild() {
+  return HybridGrandchildSpecCxx::create();
 }
 
-std::shared_ptr<HybridChildSpec> HybridTestObjectCpp::createChildActualGrandchild() {
-  return std::make_shared<HybridGrandchild>();
+HybridChildSpecCxx HybridTestObjectCpp::createChildActualGrandchild() {
+  return HybridGrandchildSpecCxx::create();
 }
 
-std::shared_ptr<HybridBaseSpec> HybridTestObjectCpp::createBaseActualGrandchild() {
-  return std::make_shared<HybridGrandchild>();
+HybridBaseSpecCxx HybridTestObjectCpp::createBaseActualGrandchild() {
+  return HybridGrandchildSpecCxx::create();
 }
 
-std::shared_ptr<HybridGrandchildSpec> HybridTestObjectCpp::bounceGrandchild(const std::shared_ptr<HybridGrandchildSpec>& grandchild) {
+HybridGrandchildSpecCxx HybridTestObjectCpp::bounceGrandchild(const HybridGrandchildSpecCxx& grandchild) {
   return grandchild;
 }
 
-std::shared_ptr<HybridChildSpec> HybridTestObjectCpp::bounceChild(const std::shared_ptr<HybridChildSpec>& child) {
+HybridChildSpecCxx HybridTestObjectCpp::bounceChild(const HybridChildSpecCxx& child) {
   return child;
 }
 
-std::shared_ptr<HybridBaseSpec> HybridTestObjectCpp::bounceBase(const std::shared_ptr<HybridBaseSpec>& base) {
+HybridBaseSpecCxx HybridTestObjectCpp::bounceBase(const HybridBaseSpecCxx& base) {
   return base;
 }
 
-std::shared_ptr<HybridBaseSpec> HybridTestObjectCpp::bounceChildBase(const std::shared_ptr<HybridChildSpec>& child) {
+HybridBaseSpecCxx HybridTestObjectCpp::bounceChildBase(const HybridChildSpecCxx& child) {
   return child;
 }
 
-std::shared_ptr<HybridChildSpec> HybridTestObjectCpp::castBase(const std::shared_ptr<HybridBaseSpec>& base) {
-  auto child = std::dynamic_pointer_cast<HybridChildSpec>(base);
-  if (child == nullptr) {
+HybridChildSpecCxx HybridTestObjectCpp::castBase(const HybridBaseSpecCxx& base) {
+  try {
+    return HybridChildSpecCxx::fromNative(base.getNativeObject());
+  } catch (const std::exception&) {
     throw std::runtime_error("Cannot cast Base to Child!");
+  }
+}
+
+std::optional<HybridBaseSpecCxx> HybridTestObjectCpp::getRetainedBase() {
+  return _retainedBase;
+}
+
+void HybridTestObjectCpp::setRetainedBase(const std::optional<HybridBaseSpecCxx>& base) {
+  _retainedBase = base;
+}
+
+double HybridTestObjectCpp::readBaseValue(const HybridBaseSpecCxx& base) {
+  return base.getBaseValue();
+}
+
+double HybridTestObjectCpp::readChildBaseValue(const HybridChildSpecCxx& child) {
+  return child.getBaseValue();
+}
+
+Size HybridTestObjectCpp::bounceSizeThroughBase(const HybridBaseSpecCxx& base, const Size& size) {
+  return base.bounceSize(size);
+}
+
+Promise<Size> HybridTestObjectCpp::mapSizeThroughBase(const HybridBaseSpecCxx& base, const Size& size,
+                                                      const Callback<Size(const Size&)>& callback) {
+  return base.mapSize(size, callback);
+}
+
+std::variant<std::string, Car> HybridTestObjectCpp::bounceVariantThroughChild(const HybridChildSpecCxx& child,
+                                                                              const std::variant<std::string, Car>& variant) {
+  return child.bounceVariant(variant);
+}
+
+std::string HybridTestObjectCpp::readExternalValue(const adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& externalObject) {
+  return externalObject.getValue();
+}
+
+OptionalPrimitivesHolder HybridTestObjectCpp::createExternalOptionalPrimitives(
+    const adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& externalObject, const std::optional<double>& optionalNumber,
+    const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64,
+    const std::optional<int64_t>& optionalInt64) {
+  return externalObject.createOptionalPrimitivesHolder(optionalNumber, optionalBoolean, optionalUInt64, optionalInt64);
+}
+
+HybridBaseSpecCxx HybridTestObjectCpp::createAlternativeBase() {
+  return HybridBaseSpecCxx::createAlternativeBase();
+}
+
+std::shared_ptr<HybridCppBaseSpec> HybridTestObjectCpp::createCppBase() {
+  return std::make_shared<HybridCppBase>();
+}
+
+std::shared_ptr<HybridCppChildSpec> HybridTestObjectCpp::createCppChild() {
+  return std::make_shared<HybridCppChild>();
+}
+
+std::shared_ptr<HybridCppGrandchildSpec> HybridTestObjectCpp::createCppGrandchild() {
+  return std::make_shared<HybridCppGrandchild>();
+}
+
+std::shared_ptr<HybridCppBaseSpec> HybridTestObjectCpp::createCppBaseActualChild() {
+  return std::make_shared<HybridCppChild>();
+}
+
+std::shared_ptr<HybridCppBaseSpec> HybridTestObjectCpp::bounceCppBase(const std::shared_ptr<HybridCppBaseSpec>& base) {
+  return base;
+}
+
+std::shared_ptr<HybridCppChildSpec> HybridTestObjectCpp::castCppBase(const std::shared_ptr<HybridCppBaseSpec>& base) {
+  auto child = std::dynamic_pointer_cast<HybridCppChildSpec>(base);
+  if (child == nullptr) {
+    throw std::runtime_error("Cannot cast CppBase to CppChild!");
   }
   return child;
 }
@@ -958,8 +1029,8 @@ HybridTestObjectCpp::bounceSyncInt64Callback(const Callback<int64_t(int64_t /* v
   return callback;
 }
 
-std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> HybridTestObjectCpp::bounceExternalHybrid(
-    const std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>& externalObject) {
+adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx
+HybridTestObjectCpp::bounceExternalHybrid(const adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& externalObject) {
   return externalObject;
 }
 
@@ -967,20 +1038,19 @@ ExternalObjectStruct HybridTestObjectCpp::bounceExternalStruct(const ExternalObj
   return externalStruct;
 }
 
-std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>
-HybridTestObjectCpp::bounceExternalVariant(
-    const std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>& variant) {
+std::variant<adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::string> HybridTestObjectCpp::bounceExternalVariant(
+    const std::variant<adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::string>& variant) {
   return variant;
 }
 
-std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> HybridTestObjectCpp::createExternalVariantFromFunc(
-    const Callback<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>()>& factory) {
+adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx HybridTestObjectCpp::createExternalVariantFromFunc(
+    const Callback<adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx()>& factory) {
   auto obj = factory.callSync();
   return obj;
 }
 
-std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> HybridTestObjectCpp::createInternalObject() {
-  return std::make_shared<HybridSomeInternalObject>();
+adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx HybridTestObjectCpp::createInternalObject() {
+  return HybridBaseSpecCxx::createInternalExternalObject();
 }
 
 void HybridTestObjectCpp::dispose() {

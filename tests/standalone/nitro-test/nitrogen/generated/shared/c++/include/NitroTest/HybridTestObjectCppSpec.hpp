@@ -19,6 +19,7 @@
 #include <NitroTest/TruckPowertrain.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroTest/HybridBaseSpecCxx.hpp>
 #include <tuple>
 #include <memory>
 // Forward declaration of `HybridTestObjectCppSpec` to properly resolve imports.
@@ -27,8 +28,7 @@ namespace margelo::nitro::test { class HybridTestObjectCppSpec; }
 #include <NitroTest/PartialPerson.hpp>
 #include <NitroTest/Car.hpp>
 #include <NitroModules/Promise.hpp>
-// Forward declaration of `HybridChildSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridChildSpec; }
+#include <NitroTest/HybridChildSpecCxx.hpp>
 #include <NitroModules/AnyJSON.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <unordered_map>
@@ -42,12 +42,16 @@ namespace margelo::nitro::test { class HybridChildSpec; }
 #include <NitroTest/OptionalEnumWrapper.hpp>
 #include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroTest/WeirdNumbersEnum.hpp>
-// Forward declaration of `HybridBaseSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridBaseSpec; }
-// Forward declaration of `HybridGrandchildSpec` to properly resolve imports.
-namespace margelo::nitro::test { class HybridGrandchildSpec; }
-// Forward declaration of `HybridSomeExternalObjectSpec` to properly resolve imports.
-namespace margelo::nitro::test::external { class HybridSomeExternalObjectSpec; }
+#include <NitroTest/HybridGrandchildSpecCxx.hpp>
+#include <NitroTest/Size.hpp>
+#include <NitroTest/HybridSomeExternalObjectSpecCxx+NitroTestExternal.hpp>
+#include <NitroTest/OptionalPrimitivesHolder.hpp>
+// Forward declaration of `HybridCppBaseSpec` to properly resolve imports.
+namespace margelo::nitro::test { class HybridCppBaseSpec; }
+// Forward declaration of `HybridCppChildSpec` to properly resolve imports.
+namespace margelo::nitro::test { class HybridCppChildSpec; }
+// Forward declaration of `HybridCppGrandchildSpec` to properly resolve imports.
+namespace margelo::nitro::test { class HybridCppGrandchildSpec; }
 #include <NitroTest/ExternalObjectStruct.hpp>
 // Forward declaration of `HybridObject` to properly resolve imports.
 namespace margelo::nitro { class HybridObject; }
@@ -126,6 +130,8 @@ namespace margelo::nitro::test {
       virtual void setIsTextValue(const std::string& isTextValue) = 0;
       virtual std::variant<double, std::string> getSomeVariant() = 0;
       virtual void setSomeVariant(const std::variant<double, std::string>& someVariant) = 0;
+      virtual std::optional<HybridBaseSpecCxx> getRetainedBase() = 0;
+      virtual void setRetainedBase(const std::optional<HybridBaseSpecCxx>& retainedBase) = 0;
       virtual std::tuple<double, std::string> getSomeTuple() = 0;
       virtual void setSomeTuple(const std::tuple<double, std::string>& someTuple) = 0;
       virtual std::shared_ptr<HybridTestObjectCppSpec> getThisObject() = 0;
@@ -152,7 +158,7 @@ namespace margelo::nitro::test {
       virtual Promise<std::vector<Powertrain>> callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) = 0;
       virtual Promise<std::vector<Powertrain>> awaitEnumArrayPromise(const Promise<std::vector<Powertrain>>& promise) = 0;
       virtual std::vector<std::vector<std::optional<Person>>> callNestedStructCallback(const std::vector<std::vector<std::optional<Person>>>& value, const Callback<std::vector<std::vector<std::optional<Person>>>(const std::vector<std::vector<std::optional<Person>>>& /* value */)>& callback) = 0;
-      virtual std::vector<std::shared_ptr<HybridChildSpec>> bounceHybridObjects(const std::vector<std::shared_ptr<HybridChildSpec>>& array) = 0;
+      virtual std::vector<HybridChildSpecCxx> bounceHybridObjects(const std::vector<HybridChildSpecCxx>& array) = 0;
       virtual std::vector<Callback<void()>> bounceFunctions(const std::vector<Callback<void()>>& functions) = 0;
       virtual std::vector<AnyJSON> bounceMaps(const std::vector<AnyJSON>& maps) = 0;
       virtual std::vector<Promise<double>> bouncePromises(const std::vector<Promise<double>>& promises) = 0;
@@ -236,27 +242,41 @@ namespace margelo::nitro::test {
       virtual std::variant<WeirdNumbersEnum, bool> getVariantWeirdNumbersEnum(const std::variant<WeirdNumbersEnum, bool>& variant) = 0;
       virtual std::variant<Person, Car> getVariantObjects(const std::variant<Person, Car>& variant) = 0;
       virtual std::variant<std::string, Car> passNamedVariant(const std::variant<std::string, Car>& variant) = 0;
-      virtual std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper> passAllEmptyObjectVariant(const std::variant<std::shared_ptr<HybridBaseSpec>, OptionalWrapper>& variant) = 0;
+      virtual std::variant<HybridBaseSpecCxx, OptionalWrapper> passAllEmptyObjectVariant(const std::variant<HybridBaseSpecCxx, OptionalWrapper>& variant) = 0;
       virtual std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON> bounceComplexVariant(const std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStruct, Promise<double>, AnyJSON>& variant) = 0;
-      virtual std::shared_ptr<HybridChildSpec> createChild() = 0;
-      virtual std::shared_ptr<HybridBaseSpec> createBase() = 0;
-      virtual std::shared_ptr<HybridBaseSpec> createBaseActualChild() = 0;
-      virtual std::shared_ptr<HybridGrandchildSpec> createGrandchild() = 0;
-      virtual std::shared_ptr<HybridChildSpec> createChildActualGrandchild() = 0;
-      virtual std::shared_ptr<HybridBaseSpec> createBaseActualGrandchild() = 0;
-      virtual std::shared_ptr<HybridGrandchildSpec> bounceGrandchild(const std::shared_ptr<HybridGrandchildSpec>& grandchild) = 0;
-      virtual std::shared_ptr<HybridChildSpec> bounceChild(const std::shared_ptr<HybridChildSpec>& child) = 0;
-      virtual std::shared_ptr<HybridBaseSpec> bounceBase(const std::shared_ptr<HybridBaseSpec>& base) = 0;
-      virtual std::shared_ptr<HybridBaseSpec> bounceChildBase(const std::shared_ptr<HybridChildSpec>& child) = 0;
-      virtual std::shared_ptr<HybridChildSpec> castBase(const std::shared_ptr<HybridBaseSpec>& base) = 0;
+      virtual HybridChildSpecCxx createChild() = 0;
+      virtual HybridBaseSpecCxx createBase() = 0;
+      virtual HybridBaseSpecCxx createBaseActualChild() = 0;
+      virtual HybridGrandchildSpecCxx createGrandchild() = 0;
+      virtual HybridChildSpecCxx createChildActualGrandchild() = 0;
+      virtual HybridBaseSpecCxx createBaseActualGrandchild() = 0;
+      virtual HybridGrandchildSpecCxx bounceGrandchild(const HybridGrandchildSpecCxx& grandchild) = 0;
+      virtual HybridChildSpecCxx bounceChild(const HybridChildSpecCxx& child) = 0;
+      virtual HybridBaseSpecCxx bounceBase(const HybridBaseSpecCxx& base) = 0;
+      virtual HybridBaseSpecCxx bounceChildBase(const HybridChildSpecCxx& child) = 0;
+      virtual HybridChildSpecCxx castBase(const HybridBaseSpecCxx& base) = 0;
+      virtual double readBaseValue(const HybridBaseSpecCxx& base) = 0;
+      virtual double readChildBaseValue(const HybridChildSpecCxx& child) = 0;
+      virtual Size bounceSizeThroughBase(const HybridBaseSpecCxx& base, const Size& size) = 0;
+      virtual Promise<Size> mapSizeThroughBase(const HybridBaseSpecCxx& base, const Size& size, const Callback<Size(const Size& /* size */)>& callback) = 0;
+      virtual std::variant<std::string, Car> bounceVariantThroughChild(const HybridChildSpecCxx& child, const std::variant<std::string, Car>& variant) = 0;
+      virtual std::string readExternalValue(const margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& externalObject) = 0;
+      virtual OptionalPrimitivesHolder createExternalOptionalPrimitives(const margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& externalObject, const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64) = 0;
+      virtual HybridBaseSpecCxx createAlternativeBase() = 0;
+      virtual std::shared_ptr<HybridCppBaseSpec> createCppBase() = 0;
+      virtual std::shared_ptr<HybridCppChildSpec> createCppChild() = 0;
+      virtual std::shared_ptr<HybridCppGrandchildSpec> createCppGrandchild() = 0;
+      virtual std::shared_ptr<HybridCppBaseSpec> createCppBaseActualChild() = 0;
+      virtual std::shared_ptr<HybridCppBaseSpec> bounceCppBase(const std::shared_ptr<HybridCppBaseSpec>& base) = 0;
+      virtual std::shared_ptr<HybridCppChildSpec> castCppBase(const std::shared_ptr<HybridCppBaseSpec>& base) = 0;
       virtual double callbackSync(const Callback<double()>& callback) = 0;
       virtual Callback<double()> getSyncNumberCallback() = 0;
       virtual Callback<int64_t(int64_t /* value */)> bounceSyncInt64Callback(const Callback<int64_t(int64_t /* value */)>& callback) = 0;
-      virtual std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> bounceExternalHybrid(const std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>& externalObject) = 0;
-      virtual std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> createInternalObject() = 0;
+      virtual margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx bounceExternalHybrid(const margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& externalObject) = 0;
+      virtual margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx createInternalObject() = 0;
       virtual ExternalObjectStruct bounceExternalStruct(const ExternalObjectStruct& externalStruct) = 0;
-      virtual std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string> bounceExternalVariant(const std::variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>& variant) = 0;
-      virtual std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec> createExternalVariantFromFunc(const Callback<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>()>& factory) = 0;
+      virtual std::variant<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::string> bounceExternalVariant(const std::variant<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::string>& variant) = 0;
+      virtual margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx createExternalVariantFromFunc(const Callback<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx()>& factory) = 0;
       virtual std::variant<std::tuple<double, double>, std::tuple<double, double, double>> getVariantTuple(const std::variant<std::tuple<double, double>, std::tuple<double, double, double>>& variant) = 0;
       virtual std::tuple<double, double, double> flip(const std::tuple<double, double, double>& tuple) = 0;
       virtual std::tuple<double, std::string, bool> passTuple(const std::tuple<double, std::string, bool>& tuple) = 0;

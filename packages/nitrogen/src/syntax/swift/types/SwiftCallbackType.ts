@@ -3,7 +3,7 @@ import type { CppHelper } from '../../c++/CppHelper.js'
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import { escapeCppName } from '../../helpers.js'
-import type { TypeContext } from '../../types/Type.js'
+import type { Type, TypeContext } from '../../types/Type.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import { CallbackType, type GetCallbackCodeOptions } from '../../types/CallbackType.js'
 import { PromiseType } from '../../types/PromiseType.js'
@@ -12,6 +12,8 @@ import { getClangImporterReferenceName, getQualifiedSwiftName, type ImportedCxxR
 import { wrapSwiftTypeForBridge } from '../wrapSwiftType.js'
 import type { SwiftType } from './SwiftType.js'
 import type { ProtocolConformance } from '../ProtocolConformance.js'
+import { combineSwiftCppConverters, type SwiftCppConverter } from '../SwiftConverter.js'
+import { getTypeAs } from '../../types/getTypeAs.js'
 import { SwiftNamedType } from './SwiftNamedType.js'
 import { SwiftPromiseType } from './SwiftPromiseType.js'
 import type { SwiftResultType } from './SwiftResultType.js'
@@ -42,14 +44,27 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
   override readonly parameters: SwiftNamedType[]
   readonly asyncResult: SwiftPromiseType
 
-  constructor(readonly type: CallbackType) {
-    const asyncResult = new SwiftPromiseType(new PromiseType(type.returnType))
+  constructor(
+    readonly type: CallbackType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
+    const asyncResult = new SwiftPromiseType(new PromiseType(type.returnType), config)
     const returnType = asyncResult.resultingType
-    const parameters = type.parameters.map((p, index) => new SwiftNamedType(`param${index}`, wrapSwiftTypeForBridge(p)))
+    const parameters = type.parameters.map((p, index) => new SwiftNamedType(`param${index}`, wrapSwiftTypeForBridge(p, config)))
     super(returnType, parameters, type.isInline)
     this.returnType = returnType
     this.parameters = parameters
     this.asyncResult = asyncResult
+  }
+
+  getCppConverter(cppType: Type): SwiftCppConverter {
+    const callback = getTypeAs(cppType, CallbackType)
+    const parameters = this.parameters.map((parameter, index) => {
+      const nativeParameter = callback.parameters[index]
+      if (nativeParameter == null) throw new Error(`Missing C++ callback parameter ${index}`)
+      return parameter.getCppConverter(nativeParameter)
+    })
+    return combineSwiftCppConverters([this.returnType.getCppConverter?.(callback.returnType), ...parameters])
   }
 
   override get specializationName(): string {
@@ -100,7 +115,7 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
         // Swift signatures omit the JS parameter names.
         return super.getCode(language, { ...options, includeNameInfo: false })
       case 'swift': {
-        const namespace = NitroConfig.current.getSwiftBridgeNamespace('swift')
+        const namespace = this.config.getSwiftBridgeNamespace('swift')
         if (!this.isBorrowed(options)) {
           return `${namespace}.${this.specializationName}`
         }
@@ -188,7 +203,7 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
     return imports
   }
   get syncResult(): SwiftResultType {
-    return getSwiftResultType(this.adapterReturnType)
+    return getSwiftResultType(this.adapterReturnType, this.config)
   }
 
   /** How the adapters pass parameters; Swift borrows those it cannot import. */

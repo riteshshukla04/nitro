@@ -1,4 +1,8 @@
-import { createSwiftConverter, getSwiftConverter } from './SwiftConverter.js'
+import { createSwiftConverter, getSwiftConverter, type SwiftCppConverter } from './SwiftConverter.js'
+import { createSwiftJSIConverter } from './SwiftJSIConverter.js'
+import { StructType } from '../types/StructType.js'
+import { getTypeAs } from '../types/getTypeAs.js'
+import type { Type } from '../types/Type.js'
 import { capitalizeName, indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
@@ -91,27 +95,12 @@ auto object = value.getObject(runtime);
 if (!isPlainObject(runtime, object)) return false;
 return ${cppPropertyChecks.join(' && ')};
 `.trim()
-  const cppNativeStructType = structType.getCode('c++', {
-    context: 'value',
-    fullyQualified: true,
-  })
-  const cppInitializerValues = structType.properties.map(
-    (property) => `${getSwiftConverter(property)}::fromSwift(value.get${capitalizeName(property.escapedName)}_cxx())`
-  )
-  const swiftInitializerValues = structType.properties.map(
-    (property) => `${getSwiftConverter(property)}::toSwift(value.${property.escapedName})`
-  )
-  const swiftToCppConverterCode = `return ${cppNativeStructType}(${cppInitializerValues.join(', ')});`
-  const cppToSwiftConverterCode = `return SwiftType::init_cxx(${swiftInitializerValues.join(', ')});`
   return [
     swiftFile,
-    ...createSwiftConverter({
+    ...createSwiftJSIConverter({
       name: swiftType.name,
-      cppType: structType,
       swiftType: swiftType,
       forwardDeclaration: swiftType.forwardDeclaration,
-      fromSwift: swiftToCppConverterCode,
-      toSwift: cppToSwiftConverterCode,
       imports: [
         {
           language: 'c++',
@@ -126,4 +115,45 @@ return ${cppPropertyChecks.join(' && ')};
       canConvert: jsCanConvertCode,
     }),
   ]
+}
+
+interface SwiftStructCppConverterOptions {
+  type: SwiftStructType
+  cppType: Type
+}
+
+export function createSwiftStructCppConverter({ type, cppType }: SwiftStructCppConverterOptions): SwiftCppConverter {
+  const structType = getTypeAs(cppType, StructType)
+  const properties = structType.properties.map((property) => {
+    const swiftProperty = type.properties.find((candidate) => candidate.name === property.name)
+    if (swiftProperty == null) throw new Error(`Missing Swift property ${type.name}.${property.name}`)
+    return { native: property, swift: swiftProperty }
+  })
+  const nativeStructType = structType.getCode('c++', { context: 'value', fullyQualified: true })
+  const cppInitializerValues = properties.map(({ native, swift }) => {
+    const converter = getSwiftConverter({ cppType: native, swiftType: swift })
+    const getterName = `get${capitalizeName(swift.escapedName)}_cxx`
+    return `${converter}::fromSwift(value.${getterName}())`
+  })
+  const swiftInitializerValues = properties.map(({ native, swift }) => {
+    const converter = getSwiftConverter({ cppType: native, swiftType: swift })
+    return `${converter}::toSwift(value.${native.escapedName})`
+  })
+  const swiftToCppConverterCode = `
+return ${nativeStructType}(${cppInitializerValues.join(', ')});
+`.trim()
+  const cppToSwiftConverterCode = `
+return SwiftType::init_cxx(${swiftInitializerValues.join(', ')});
+`.trim()
+  const dependencies = properties.map(({ native, swift }) => swift.getCppConverter(native))
+  const name = `${type.name}+${type.moduleName}`
+  return createSwiftConverter({
+    name: name,
+    cppType: cppType,
+    swiftType: type,
+    forwardDeclaration: type.forwardDeclaration,
+    fromSwift: swiftToCppConverterCode,
+    toSwift: cppToSwiftConverterCode,
+    dependencies: dependencies,
+  })
 }
