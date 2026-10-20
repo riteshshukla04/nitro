@@ -392,15 +392,9 @@ export const cases = {
     },
   }),
   ...casesForTestObjects("getHybridClass instanceof", {
-    "createBase() is an instance of registered Base only for the Swift/Kotlin implementation": (
-      testObject,
-    ) => {
+    "createBase() is an instance of registered Base": (testObject) => {
       const HybridBase = NitroModules.getHybridClass<typeof Base>("test.Base");
-      // The C++ fixture constructs its own implementation. The registry exports
-      // the Swift/Kotlin class, whose methods dispatch through that language.
-      expect(testObject.createBase() instanceof HybridBase).to.equal(
-        testObject.constructor.name === "TestObjectSwiftKotlin",
-      );
+      expect(testObject.createBase()).to.be.instanceOf(HybridBase);
     },
 
     "createBase() is not an instance of Child": (testObject) => {
@@ -409,31 +403,23 @@ export const cases = {
       expect(testObject.createBase()).not.to.be.instanceOf(HybridChild);
     },
 
-    "createChild() is an instance of registered Child only for the Swift/Kotlin implementation": (
-      testObject,
-    ) => {
-      const HybridChild = NitroModules.getHybridClass<typeof Child>("test.Child");
-      expect(testObject.createChild() instanceof HybridChild).to.equal(
-        testObject.constructor.name === "TestObjectSwiftKotlin",
-      );
+    "createChild() is an instance of registered Child": (testObject) => {
+      const HybridChild =
+        NitroModules.getHybridClass<typeof Child>("test.Child");
+      expect(testObject.createChild()).to.be.instanceOf(HybridChild);
     },
 
-    "createChild() is an instance of registered Base only for the Swift/Kotlin implementation": (
-      testObject,
-    ) => {
+    "createChild() is an instance of registered Base": (testObject) => {
       const HybridBase = NitroModules.getHybridClass<typeof Base>("test.Base");
-      expect(testObject.createChild() instanceof HybridBase).to.equal(
-        testObject.constructor.name === "TestObjectSwiftKotlin",
-      );
+      expect(testObject.createChild()).to.be.instanceOf(HybridBase);
     },
 
-    "createBaseActualChild() is an instance of registered Child only for the Swift/Kotlin implementation": (
+    "createBaseActualChild() is an instance of registered Child": (
       testObject,
     ) => {
-      const HybridChild = NitroModules.getHybridClass<typeof Child>("test.Child");
-      expect(testObject.createBaseActualChild() instanceof HybridChild).to.equal(
-        testObject.constructor.name === "TestObjectSwiftKotlin",
-      );
+      const HybridChild =
+        NitroModules.getHybridClass<typeof Child>("test.Child");
+      expect(testObject.createBaseActualChild()).to.be.instanceOf(HybridChild);
     },
 
     "testObject is not an instance of Base": (testObject) => {

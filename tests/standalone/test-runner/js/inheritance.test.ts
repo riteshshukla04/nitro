@@ -252,18 +252,14 @@ export const cases = {
       expect(child).to.be.instanceOf(base.constructor);
     },
 
-    "createChild() shares the registered Child prototype only for the Swift/Kotlin implementation": (
-      testObject,
-    ) => {
-      // Child is registered with Swift/Kotlin. The hand-written C++ fixture
-      // uses its own class and method dispatch, with a separate cached prototype.
+    "createChild() shares the registered Child prototype": (testObject) => {
       expect(
         isSamePrototype(
           Object.getPrototypeOf(testObject.createChild()),
           Object.getPrototypeOf(HybridChild),
         ),
         "Object.getPrototypeOf(child) === Object.getPrototypeOf(HybridChild)",
-      ).to.equal(testObject.constructor.name === "TestObjectSwiftKotlin");
+      ).to.equal(true);
     },
 
     "createChild() prototype chain is Child, Base, HybridObject": (
