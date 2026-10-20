@@ -225,14 +225,18 @@ extension ${swiftClassName}: Callback {
   public ${callingConvention}func callAndForget(_ arguments: Arguments) {
     ${indent(swiftToCppCallAndForgetCode, '    ')}
   }
-  public init(_ closure: @escaping (${swiftParameterTypes.join(', ')}) throws -> Return) {
+  public init(_ closure: @escaping @Sendable (${swiftParameterTypes.join(', ')}) throws -> Return) {
     ${indent(swiftToCppInitializerCode, '    ')}
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension ${swiftClassName}: @unchecked Sendable {}
+
 extension Callback<(${swiftParameterTypes.join(', ')}), ${swiftReturnType}> where Self == ${swiftClassName} {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping (${swiftParameterTypes.join(', ')}) throws -> ${swiftReturnType}) -> Self {
+  public static func native(_ closure: @escaping @Sendable (${swiftParameterTypes.join(', ')}) throws -> ${swiftReturnType}) -> Self {
     return Self(closure)
   }
 }

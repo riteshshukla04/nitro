@@ -33,7 +33,7 @@ extension Callback_swift__String: Callback {
   public func callAndForget(_ arguments: Arguments) {
     bridge.callAndForget_Callback_swift__String(self)
   }
-  public init(_ closure: @escaping () throws -> Return) {
+  public init(_ closure: @escaping @Sendable () throws -> Return) {
     self = bridge.create_Callback_swift__String(.init { (__outResult: UnsafeMutableRawPointer!) -> bridge.Result_void in
       do {
         let value = try closure()
@@ -46,9 +46,13 @@ extension Callback_swift__String: Callback {
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension Callback_swift__String: @unchecked Sendable {}
+
 extension Callback<(), String> where Self == Callback_swift__String {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping () throws -> String) -> Self {
+  public static func native(_ closure: @escaping @Sendable () throws -> String) -> Self {
     return Self(closure)
   }
 }

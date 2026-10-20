@@ -43,6 +43,8 @@ parallel, while the JS thread can continue rendering and performing other busine
     }
     ```
 
+    A `Promise` handle is `Sendable`, but shared mutable results still need synchronization. See [Threads and shared objects](../guides/sync-vs-async#threads-and-shared-objects).
+
     :::note
 
     Import Promise from Nitro: `import NitroModules`

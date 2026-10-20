@@ -57,7 +57,7 @@ extension Promise<Size> where Self == Promise_NitroTest__Size {
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> Size
+    _ run: sending @escaping @isolated(any) () async throws -> sending Size
   ) -> Self {
     let promise = Promise_NitroTest__Size.pending()
     Task(priority: priority) { () async -> Void in

@@ -57,7 +57,7 @@ extension Promise<(any HybridTestObjectSwiftKotlinSpec)> where Self == Promise_N
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> (any HybridTestObjectSwiftKotlinSpec)
+    _ run: sending @escaping @isolated(any) () async throws -> sending (any HybridTestObjectSwiftKotlinSpec)
   ) -> Self {
     let promise = Promise_NitroTest__HybridTestObjectSwiftKotlinSpec_cxx.pending()
     Task(priority: priority) { () async -> Void in

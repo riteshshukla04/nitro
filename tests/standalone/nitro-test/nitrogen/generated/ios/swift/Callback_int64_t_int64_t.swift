@@ -30,7 +30,7 @@ extension Callback_int64_t_int64_t: Callback {
   public borrowing func callAndForget(_ arguments: Arguments) {
     __callAndForget(arguments)
   }
-  public init(_ closure: @escaping (Int64) throws -> Return) {
+  public init(_ closure: @escaping @Sendable (Int64) throws -> Return) {
     self = bridge.create_Callback_int64_t_int64_t(.init { (param0: Int64) -> bridge.Result_int64_t in
       do {
         let value = try closure(param0)
@@ -42,9 +42,13 @@ extension Callback_int64_t_int64_t: Callback {
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension Callback_int64_t_int64_t: @unchecked Sendable {}
+
 extension Callback<(Int64), Int64> where Self == Callback_int64_t_int64_t {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping (Int64) throws -> Int64) -> Self {
+  public static func native(_ closure: @escaping @Sendable (Int64) throws -> Int64) -> Self {
     return Self(closure)
   }
 }

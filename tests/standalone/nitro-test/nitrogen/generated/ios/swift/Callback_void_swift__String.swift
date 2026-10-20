@@ -35,7 +35,7 @@ extension Callback_void_swift__String: Callback {
       bridge.callAndForget_Callback_void_swift__String(self, param0)
     }
   }
-  public init(_ closure: @escaping (String) throws -> Return) {
+  public init(_ closure: @escaping @Sendable (String) throws -> Return) {
     self = bridge.create_Callback_void_swift__String(.init { (param0: UnsafeRawPointer!) -> bridge.Result_void in
       do {
         try closure(param0.load(as: String.self))
@@ -47,9 +47,13 @@ extension Callback_void_swift__String: Callback {
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension Callback_void_swift__String: @unchecked Sendable {}
+
 extension Callback<(String), Void> where Self == Callback_void_swift__String {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping (String) throws -> Void) -> Self {
+  public static func native(_ closure: @escaping @Sendable (String) throws -> Void) -> Self {
     return Self(closure)
   }
 }

@@ -39,7 +39,7 @@ extension Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_
       bridge.callAndForget_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(self, param0)
     }
   }
-  public init(_ closure: @escaping ([Powertrain]) throws -> Return) {
+  public init(_ closure: @escaping @Sendable ([Powertrain]) throws -> Return) {
     self = bridge.create_Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_(.init { (param0: UnsafeRawPointer!, __outResult: UnsafeMutableRawPointer!) -> bridge.Result_void in
       do {
         let value = try closure(param0.load(as: SwiftContainer_swift__Array_NitroTest__Powertrain_.self).value)
@@ -52,9 +52,13 @@ extension Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_: @unchecked Sendable {}
+
 extension Callback<([Powertrain]), [Powertrain]> where Self == Callback_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain_ {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping ([Powertrain]) throws -> [Powertrain]) -> Self {
+  public static func native(_ closure: @escaping @Sendable ([Powertrain]) throws -> [Powertrain]) -> Self {
     return Self(closure)
   }
 }

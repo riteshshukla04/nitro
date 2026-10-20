@@ -55,7 +55,7 @@ extension Promise<ArrayBuffer> where Self == Promise_ArrayBuffer {
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> ArrayBuffer
+    _ run: sending @escaping @isolated(any) () async throws -> sending ArrayBuffer
   ) -> Self {
     let promise = Promise_ArrayBuffer.pending()
     Task(priority: priority) { () async -> Void in

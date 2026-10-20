@@ -29,7 +29,7 @@ extension Callback_void_std__exception_ptr: Callback {
   public borrowing func callAndForget(_ arguments: Arguments) {
     __callAndForget(arguments.toCpp())
   }
-  public init(_ closure: @escaping (any Error) throws -> Return) {
+  public init(_ closure: @escaping @Sendable (any Error) throws -> Return) {
     self = bridge.create_Callback_void_std__exception_ptr(.init { (param0: std.exception_ptr) -> bridge.Result_void in
       do {
         try closure(RuntimeError.from(cppError: param0))
@@ -41,9 +41,13 @@ extension Callback_void_std__exception_ptr: Callback {
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension Callback_void_std__exception_ptr: @unchecked Sendable {}
+
 extension Callback<(any Error), Void> where Self == Callback_void_std__exception_ptr {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping (any Error) throws -> Void) -> Self {
+  public static func native(_ closure: @escaping @Sendable (any Error) throws -> Void) -> Self {
     return Self(closure)
   }
 }

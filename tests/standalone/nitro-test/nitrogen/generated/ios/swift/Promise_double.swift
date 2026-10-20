@@ -55,7 +55,7 @@ extension Promise<Double> where Self == Promise_double {
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> Double
+    _ run: sending @escaping @isolated(any) () async throws -> sending Double
   ) -> Self {
     let promise = Promise_double.pending()
     Task(priority: priority) { () async -> Void in

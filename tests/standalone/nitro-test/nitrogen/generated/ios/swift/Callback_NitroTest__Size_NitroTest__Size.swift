@@ -39,7 +39,7 @@ extension Callback_NitroTest__Size_NitroTest__Size: Callback {
       bridge.callAndForget_Callback_NitroTest__Size_NitroTest__Size(self, param0)
     }
   }
-  public init(_ closure: @escaping (Size) throws -> Return) {
+  public init(_ closure: @escaping @Sendable (Size) throws -> Return) {
     self = bridge.create_Callback_NitroTest__Size_NitroTest__Size(.init { (param0: UnsafeRawPointer!, __outResult: UnsafeMutableRawPointer!) -> bridge.Result_void in
       do {
         let value = try closure(param0.load(as: Size.self))
@@ -52,9 +52,13 @@ extension Callback_NitroTest__Size_NitroTest__Size: Callback {
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension Callback_NitroTest__Size_NitroTest__Size: @unchecked Sendable {}
+
 extension Callback<(Size), Size> where Self == Callback_NitroTest__Size_NitroTest__Size {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping (Size) throws -> Size) -> Self {
+  public static func native(_ closure: @escaping @Sendable (Size) throws -> Size) -> Self {
     return Self(closure)
   }
 }

@@ -13,7 +13,7 @@ public import NitroTestAppleCxx
  * JS type: `callback | number`
  */
 @frozen
-public enum Variant_any_Callback_____Void__Double {
+public enum Variant_any_Callback_____Void__Double: Sendable {
   case first(any Callback<(), Void>)
   case second(Double)
 }
@@ -32,7 +32,7 @@ public extension Variant_any_Callback_____Void__Double {
 
 // Raw Swift storage keeps associated values containing imported C++ types exportable.
 @_expose(Cxx)
-public struct Variant_any_Callback_____Void__Double_cxx {
+public struct Variant_any_Callback_____Void__Double_cxx: Sendable {
   let value: Variant_any_Callback_____Void__Double
 
   init(_ value: Variant_any_Callback_____Void__Double) {

@@ -63,7 +63,9 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
     return `Inline${this.specializationName}`
   }
   readonly isHashable = false
-  readonly isSendable = false
+  get isSendable(): boolean {
+    return !this.isInline
+  }
 
   getProtocolConformances(): ProtocolConformance[] {
     return []

@@ -135,7 +135,7 @@ Since JS callbacks could theoretically be called from any native Thread, callbac
 class HybridMath: HybridMathSpec {
   func calculate(getValue: any Callback<(), Double>) {
     Task {
-      let result = try await getValue() // async Double
+      let result = try await getValue().await() // Double
     }
   }
 }
@@ -146,9 +146,9 @@ class HybridMath: HybridMathSpec {
 `Callback` has three calling conventions:
 
 ```swift
-func call(callback: any Callback<(), Void>) {
+func call(callback: any Callback<(), Void>) throws {
   callback.callAsync()     // Promise<Void>
-  callback.callSync()      // Void (blocking)
+  try callback.callSync()  // Void (blocking)
   callback.callAndForget() // Void
 }
 ```
@@ -167,9 +167,12 @@ func callResult(callback: any Callback<(), Double>) {
 
 :::warning
 
-Use `callSync()` only when you can ensure that you call it on the JS Runtime's Thread - otherwise it will throw.
+For a JS callback, `callSync()` requires the caller to be on its originating runtime's dispatcher; otherwise it throws.
 
 :::
+
+Sharing a callback handle does not synchronize mutable arguments or results. See
+[Threads and shared objects](../guides/sync-vs-async#threads-and-shared-objects).
 
 ## Inline Callbacks
 
@@ -187,8 +190,8 @@ export * from '#nitro/Math'
 
 ```swift title="HybridMath.swift"
 class HybridMath: HybridMathSpec {
-  func calculate(getValue: borrowing some InlineCallback<(), Double> & ~Copyable & ~Escapable) {
-    let result = getValue()                  // Double
+  func calculate(getValue: borrowing some InlineCallback<(), Double> & ~Copyable & ~Escapable) throws {
+    let result = try getValue()              // Double
     let callbackForLater = getValue.escape() // any Callback<(), Double>
   }
 }

@@ -55,7 +55,7 @@ extension Promise<Int64> where Self == Promise_int64_t {
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> Int64
+    _ run: sending @escaping @isolated(any) () async throws -> sending Int64
   ) -> Self {
     let promise = Promise_int64_t.pending()
     Task(priority: priority) { () async -> Void in

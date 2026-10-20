@@ -5,8 +5,25 @@ import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 # Sync vs Async
 
-By default, every method on a [Hybrid Object](../concepts/hybrid-objects) is synchronous and runs on the JS Thread. This means, as long as
-your native method is executing, the JS Thread is blocked and can not do any other work (like state updates or view changes).
+By default, a method on a [Hybrid Object](../concepts/hybrid-objects) runs synchronously on the thread of the JavaScript runtime that called
+it. That runtime cannot continue executing JavaScript until the native method returns.
+
+## Threads and shared objects
+
+Nitro does not guarantee that JavaScript runs on the main thread. React Native normally uses a separate JS thread, and worklet runtimes can
+call native methods from other threads. If several runtimes share a HybridObject, they can call the same native instance concurrently.
+
+The implementation must synchronize shared mutable state, including access from native background work. Use a lock around the state that
+needs protection, immutable snapshots, or an owning queue or actor with asynchronous methods. Avoid holding a lock while calling JavaScript
+or another HybridObject: callbacks and nested calls can reenter your object.
+
+Each runtime has its own dispatcher. A JS callback's `callAsync` and `callAndForget` methods schedule execution on its originating runtime;
+`callSync` requires the caller to already be on that runtime's dispatcher. Native callbacks execute immediately on the calling thread,
+including through `callAsync`.
+
+In Swift, general HybridObject APIs have no actor isolation. Annotating an implementation with `@MainActor` would require its callers to
+honor that isolation; it would not make incoming C++ calls dispatch to the main thread. A custom executor for one JS runtime would only
+protect work submitted to that executor, not an object shared with other runtimes.
 
 ## Light Methods
 

@@ -11,6 +11,10 @@
 /// that conform to this Swift `Promise<T>` protocol.
 ///
 /// The recommended API to create Promises is via `.async { ... }`.
+///
+/// The C++ bridge synchronizes the promise's settlement and listener storage.
+/// Its Sendable handle does not protect mutable state inside T. Native listeners
+/// receiving non-Sendable results must arrange safe access to those values.
 public protocol Promise<T>: Sendable {
   associatedtype T
 
@@ -32,14 +36,18 @@ extension Promise where T == Void {
   }
 }
 
-extension Promise {
+extension Promise where T: Sendable {
   /**
    * Asynchronously await the result of the Promise.
    * If the Promise is already resolved/rejected, this will continue immediately,
    * otherwise it will asynchronously wait for a result or throw on a rejection.
+   *
+   * The result must be Sendable because a Promise can deliver the same value to
+   * multiple observers on different threads. Its internal lock protects settlement,
+   * not the mutable state of an object stored in the result.
    */
-  public func `await`() async throws -> T {
-    return try await withUnsafeThrowingContinuation { continuation in
+  public nonisolated(nonsending) func `await`() async throws -> T {
+    return try await withCheckedThrowingContinuation { continuation in
       self.addOnResolvedListener { result in
         continuation.resume(returning: result)
       }

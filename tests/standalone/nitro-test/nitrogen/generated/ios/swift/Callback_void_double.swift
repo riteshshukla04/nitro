@@ -29,7 +29,7 @@ extension Callback_void_double: Callback {
   public borrowing func callAndForget(_ arguments: Arguments) {
     __callAndForget(arguments)
   }
-  public init(_ closure: @escaping (Double) throws -> Return) {
+  public init(_ closure: @escaping @Sendable (Double) throws -> Return) {
     self = bridge.create_Callback_void_double(.init { (param0: Double) -> bridge.Result_void in
       do {
         try closure(param0)
@@ -41,9 +41,13 @@ extension Callback_void_double: Callback {
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension Callback_void_double: @unchecked Sendable {}
+
 extension Callback<(Double), Void> where Self == Callback_void_double {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping (Double) throws -> Void) -> Self {
+  public static func native(_ closure: @escaping @Sendable (Double) throws -> Void) -> Self {
     return Self(closure)
   }
 }

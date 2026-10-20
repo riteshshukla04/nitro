@@ -6,6 +6,8 @@
 //
 
 /// A base protocol for all Swift-based Hybrid Objects.
+/// Methods run on the calling runtime's thread, which may differ between React Native
+/// and worklet runtimes. Implementations must synchronize state shared across callers.
 public protocol HybridObject: AnyObject, CustomStringConvertible {
   /**
    * Get the memory size of the Swift instance (plus any external heap allocations),

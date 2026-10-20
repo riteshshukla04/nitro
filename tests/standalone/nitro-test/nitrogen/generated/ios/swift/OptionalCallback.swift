@@ -9,7 +9,7 @@ public import NitroModules
 internal import CxxStdlib
 
 @_expose(Cxx)
-public struct OptionalCallback {
+public struct OptionalCallback: Sendable {
   public let callback: Variant_any_Callback_____Void__Double?
 
   public init(callback: Variant_any_Callback_____Void__Double?) {

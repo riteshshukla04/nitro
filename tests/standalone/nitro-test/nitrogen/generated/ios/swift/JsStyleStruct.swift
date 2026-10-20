@@ -10,7 +10,7 @@ public import NitroTestAppleCxx
 internal import CxxStdlib
 
 @_expose(Cxx)
-public struct JsStyleStruct {
+public struct JsStyleStruct: Sendable {
   public let value: Double
   public let onChanged: any Callback<(/* num */ Double), Void>
 

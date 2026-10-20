@@ -9,7 +9,7 @@ internal import NitroModules
 internal import CxxStdlib
 
 @_expose(Cxx)
-public struct WrappedJsStruct {
+public struct WrappedJsStruct: Sendable {
   public let value: JsStyleStruct
   public let items: [JsStyleStruct]
 

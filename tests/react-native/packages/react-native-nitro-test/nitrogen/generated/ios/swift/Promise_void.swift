@@ -55,7 +55,7 @@ extension Promise<Void> where Self == Promise_void {
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> Void
+    _ run: sending @escaping @isolated(any) () async throws -> sending Void
   ) -> Self {
     let promise = Promise_void.pending()
     Task(priority: priority) { () async -> Void in

@@ -57,7 +57,7 @@ extension Promise<Car> where Self == Promise_NitroTest__Car {
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> Car
+    _ run: sending @escaping @isolated(any) () async throws -> sending Car
   ) -> Self {
     let promise = Promise_NitroTest__Car.pending()
     Task(priority: priority) { () async -> Void in

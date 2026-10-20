@@ -170,11 +170,14 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
   func callbackAsyncPromiseBuffer(callback: any Callback<(), any Promise<ArrayBuffer>>) throws
     -> any Promise<ArrayBuffer>
   {
-    return .async {
-      let promise = try await callback().await()
-      let result = try await promise.await()
-      return result
+    let result: any Promise<ArrayBuffer> = .pending()
+    let callbackResult = callback()
+    callbackResult.addOnResolvedListener { promise in
+      promise.addOnResolvedListener { buffer in result.resolve(result: buffer) }
+      promise.addOnRejectedListener { error in result.reject(error: error) }
     }
+    callbackResult.addOnRejectedListener { error in result.reject(error: error) }
+    return result
   }
 
   func getComplexCallback() throws -> any Callback<Double, Void> {

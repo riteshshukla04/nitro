@@ -34,7 +34,7 @@ extension Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx: Callback
   public func callAndForget(_ arguments: Arguments) {
     bridge.callAndForget_Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(self)
   }
-  public init(_ closure: @escaping () throws -> Return) {
+  public init(_ closure: @escaping @Sendable () throws -> Return) {
     self = bridge.create_Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx(.init { (__outResult: UnsafeMutableRawPointer!) -> bridge.Result_void in
       do {
         let value = try closure()
@@ -47,9 +47,13 @@ extension Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx: Callback
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx: @unchecked Sendable {}
+
 extension Callback<(), (any HybridSomeExternalObjectSpec)> where Self == Callback_NitroTestExternal__HybridSomeExternalObjectSpec_cxx {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping () throws -> (any HybridSomeExternalObjectSpec)) -> Self {
+  public static func native(_ closure: @escaping @Sendable () throws -> (any HybridSomeExternalObjectSpec)) -> Self {
     return Self(closure)
   }
 }

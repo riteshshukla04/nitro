@@ -55,7 +55,7 @@ extension Promise<any Promise<[Powertrain]>> where Self == Promise_Promise_Nitro
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> any Promise<[Powertrain]>
+    _ run: sending @escaping @isolated(any) () async throws -> sending any Promise<[Powertrain]>
   ) -> Self {
     let promise = Promise_Promise_NitroTest__SwiftContainer_swift__Array_NitroTest__Powertrain__.pending()
     Task(priority: priority) { () async -> Void in

@@ -31,8 +31,13 @@ extension InlineCallback where Self: ~Copyable & ~Escapable {
 /// Unlike `InlineCallback`, `Callback` is escapable, meaning it can be called
 /// "later", e.g. stored as a class member and invoked at a later point in time.
 ///
-/// `Callback` can be invoked sync (which has to be called on the JS Runtime
-/// context/Thread) or async (which returns a `Promise<T>` and uses the `Dispatcher`)
+/// JS callbacks run on their originating runtime's dispatcher. `callSync` requires
+/// the caller to already be on that dispatcher. `callAsync` and `callAndForget`
+/// schedule JS execution there. Native callbacks run immediately on the calling
+/// thread for all three methods.
+///
+/// Callback handles can be shared across threads. Native closures must be Sendable;
+/// callers must still synchronize access to mutable arguments and results.
 ///
 /// Create a native callback with `.native { ... }` using a signature from your
 /// Nitrogen specs, for example:
@@ -41,7 +46,7 @@ extension InlineCallback where Self: ~Copyable & ~Escapable {
 ///   print(value)
 /// }
 /// ```
-public protocol Callback<Arguments, Return> {
+public protocol Callback<Arguments, Return>: Sendable {
   associatedtype Arguments
   associatedtype Return
   associatedtype AsyncResult: Promise<Return>
@@ -68,9 +73,8 @@ extension Callback {
 }
 
 /// Extension to support Swift `async`
-extension Callback {
-  public func callAsync<each A>(_ args: repeat each A) async throws -> Return
-  where Arguments == (repeat each A) {
+extension Callback where Return: Sendable {
+  public nonisolated(nonsending) func callAsync<each A>(_ args: repeat each A) async throws -> Return where Arguments == (repeat each A) {
     return try await callAsync((repeat each args)).await()
   }
 }

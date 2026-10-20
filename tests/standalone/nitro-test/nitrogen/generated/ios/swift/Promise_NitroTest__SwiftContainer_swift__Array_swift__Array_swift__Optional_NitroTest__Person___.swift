@@ -57,7 +57,7 @@ extension Promise<[[Person?]]> where Self == Promise_NitroTest__SwiftContainer_s
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> [[Person?]]
+    _ run: sending @escaping @isolated(any) () async throws -> sending [[Person?]]
   ) -> Self {
     let promise = Promise_NitroTest__SwiftContainer_swift__Array_swift__Array_swift__Optional_NitroTest__Person___.pending()
     Task(priority: priority) { () async -> Void in

@@ -57,7 +57,7 @@ extension Promise<String> where Self == Promise_swift__String {
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> String
+    _ run: sending @escaping @isolated(any) () async throws -> sending String
   ) -> Self {
     let promise = Promise_swift__String.pending()
     Task(priority: priority) { () async -> Void in

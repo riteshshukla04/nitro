@@ -58,7 +58,7 @@ extension Promise<(any HybridSomeExternalObjectSpec)> where Self == Promise_Nitr
 
   public static func `async`(
     _ priority: TaskPriority? = nil,
-    _ run: sending @escaping @isolated(any) () async throws -> (any HybridSomeExternalObjectSpec)
+    _ run: sending @escaping @isolated(any) () async throws -> sending (any HybridSomeExternalObjectSpec)
   ) -> Self {
     let promise = Promise_NitroTestExternal__HybridSomeExternalObjectSpec_cxx.pending()
     Task(priority: priority) { () async -> Void in

@@ -30,7 +30,7 @@ extension Callback_Promise_void_: Callback {
   public func callAndForget(_ arguments: Arguments) {
     bridge.callAndForget_Callback_Promise_void_(self)
   }
-  public init(_ closure: @escaping () throws -> Return) {
+  public init(_ closure: @escaping @Sendable () throws -> Return) {
     self = bridge.create_Callback_Promise_void_(.init { () -> bridge.Result_Promise_void_ in
       do {
         let value = try closure()
@@ -42,9 +42,13 @@ extension Callback_Promise_void_: Callback {
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension Callback_Promise_void_: @unchecked Sendable {}
+
 extension Callback<(), any Promise<Void>> where Self == Callback_Promise_void_ {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping () throws -> any Promise<Void>) -> Self {
+  public static func native(_ closure: @escaping @Sendable () throws -> any Promise<Void>) -> Self {
     return Self(closure)
   }
 }

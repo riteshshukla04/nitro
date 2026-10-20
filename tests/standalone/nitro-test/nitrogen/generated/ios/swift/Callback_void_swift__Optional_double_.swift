@@ -35,7 +35,7 @@ extension Callback_void_swift__Optional_double_: Callback {
       bridge.callAndForget_Callback_void_swift__Optional_double_(self, param0)
     }
   }
-  public init(_ closure: @escaping (Double?) throws -> Return) {
+  public init(_ closure: @escaping @Sendable (Double?) throws -> Return) {
     self = bridge.create_Callback_void_swift__Optional_double_(.init { (param0: UnsafeRawPointer!) -> bridge.Result_void in
       do {
         try closure(param0.load(as: Double?.self))
@@ -47,9 +47,13 @@ extension Callback_void_swift__Optional_double_: Callback {
   }
 }
 
+// JS calls use the C++ dispatcher; native callbacks require Sendable captures.
+// Mutable arguments and results still require synchronization by their callers.
+extension Callback_void_swift__Optional_double_: @unchecked Sendable {}
+
 extension Callback<(Double?), Void> where Self == Callback_void_swift__Optional_double_ {
   /// Creates a native callback from an escaping Swift closure.
-  public static func native(_ closure: @escaping (Double?) throws -> Void) -> Self {
+  public static func native(_ closure: @escaping @Sendable (Double?) throws -> Void) -> Self {
     return Self(closure)
   }
 }
