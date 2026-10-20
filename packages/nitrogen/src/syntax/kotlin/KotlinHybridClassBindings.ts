@@ -5,13 +5,15 @@ import type { SourceImport } from '../SourceFile.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
 import { KotlinConstructor } from './KotlinConstructor.js'
 import { KotlinStaticMethod } from './KotlinStaticMethod.js'
+import { KotlinStaticProperty } from './KotlinStaticProperty.js'
 
 export interface KotlinClassMembers {
   constructor: KotlinConstructor | undefined
   staticMethods: KotlinStaticMethod[]
+  staticProperties: KotlinStaticProperty[]
 }
 
-/** The constructor and static methods JavaScript calls on the class. */
+/** The constructor and static accessors and methods JavaScript calls on the class. */
 export function getKotlinClassMembers(
   spec: HybridObjectSpec<'kotlin'>
 ): KotlinClassMembers {
@@ -25,7 +27,14 @@ export function getKotlinClassMembers(
   const staticMethods = spec.staticMethods.map(
     (method) => new KotlinStaticMethod({ spec: spec, method: method })
   )
-  return { constructor: constructor, staticMethods: staticMethods }
+  const staticProperties = spec.staticProperties.map(
+    (property) => new KotlinStaticProperty({ spec: spec, property: property })
+  )
+  return {
+    constructor: constructor,
+    staticMethods: staticMethods,
+    staticProperties: staticProperties,
+  }
 }
 
 /** Bind Kotlin class calls through JNI inside the platform's `Class::get()`. */
@@ -35,10 +44,15 @@ export function createKotlinHybridClassBindings(
   const imports: SourceImport[] = []
   const definitions: string[] = []
   const registrations: string[] = []
-  const { constructor, staticMethods } = getKotlinClassMembers(spec)
-  const callables: (KotlinConstructor | KotlinStaticMethod)[] = []
+  const { constructor, staticMethods, staticProperties } =
+    getKotlinClassMembers(spec)
+  const callables: (
+    | KotlinConstructor
+    | KotlinStaticMethod
+    | KotlinStaticProperty
+  )[] = []
   if (constructor != null) callables.push(constructor)
-  callables.push(...staticMethods)
+  callables.push(...staticMethods, ...staticProperties)
   if (callables.length === 0) {
     return {
       imports: imports,

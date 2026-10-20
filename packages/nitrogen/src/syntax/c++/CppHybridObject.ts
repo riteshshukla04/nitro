@@ -34,7 +34,12 @@ export function createCppHybridObject(
   } else {
     hybridClassBase = 'HybridObject'
   }
-  const members = [...spec.properties, ...spec.methods, ...spec.staticMethods]
+  const members = [
+    ...spec.properties,
+    ...spec.methods,
+    ...spec.staticMethods,
+    ...spec.staticProperties,
+  ]
   const extraFiles = members.flatMap((member) => member.getExtraFiles())
   const memberImports = members.flatMap((member) =>
     member.getRequiredImports('c++')
@@ -179,7 +184,9 @@ namespace ${cxxNamespace} {
   // Register properties together with their optional setters, then normal methods.
   const registrations: string[] = []
   for (const property of spec.properties) {
-    const accessors = [`&${name.HybridTSpec}::${property.getGetterName('other')}`]
+    const accessors = [
+      `&${name.HybridTSpec}::${property.getGetterName('other')}`,
+    ]
     if (!property.isReadonly) {
       accessors.push(`&${name.HybridTSpec}::${property.getSetterName('other')}`)
     }

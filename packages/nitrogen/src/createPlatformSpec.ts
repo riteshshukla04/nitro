@@ -11,6 +11,7 @@ import {
 } from './getPlatformSpecs.js'
 import type { HybridObjectSpec } from './syntax/HybridObjectSpec.js'
 import { Property } from './syntax/Property.js'
+import { StaticProperty } from './syntax/StaticProperty.js'
 import { InstanceMethod } from './syntax/InstanceMethod.js'
 import { HybridObjectType } from './syntax/types/HybridObjectType.js'
 import { getHybridObjectName } from './syntax/getHybridObjectName.js'
@@ -134,10 +135,15 @@ function getHybridObjectSpec(
       .map((parameter) => new Parameter(parameter, language))
     constructorParameters = parameters
   }
-  const staticMethods = declaration.getStaticMembers().map((member) => {
-    if (!Node.isMethodDeclaration(member)) {
+  const staticMethods: StaticMethod[] = []
+  const staticProperties: StaticProperty[] = []
+  for (const member of declaration.getStaticMembers()) {
+    if (
+      !Node.isMethodDeclaration(member) &&
+      !Node.isPropertyDeclaration(member)
+    ) {
       throw new Error(
-        `${name}.${member.getName()}: Static properties and accessors are not supported. Declare a static method instead.`
+        `${name}.${member.getName()}: Static accessors are not supported. Declare a static property instead.`
       )
     }
     const scope = member.getScope()
@@ -149,11 +155,31 @@ function getHybridObjectSpec(
     }
     if (options.implementation == null) {
       throw new Error(
-        `${name}.${member.getName()}: Static methods require a concrete implementation on ${platform}. Add \`implementation: ...\` to the ${platform} platform options.`
+        `${name}.${member.getName()}: Static members require a concrete implementation on ${platform}. Add \`implementation: ...\` to the ${platform} platform options.`
       )
     }
-    return new StaticMethod(member, language)
-  })
+    if (Node.isMethodDeclaration(member)) {
+      staticMethods.push(new StaticMethod(member, language))
+    } else if (Node.isPropertyDeclaration(member)) {
+      const memberType = member.getType()
+      const isOptional =
+        member.getSymbolOrThrow().isOptional() ||
+        memberType.getUnionTypes().some((unionType) => unionType.isUndefined())
+      const propType = createType(
+        language,
+        memberType,
+        isOptional,
+        member.getTypeNode()
+      )
+      staticProperties.push(
+        new StaticProperty(
+          member.getSymbolOrThrow().getName(),
+          propType,
+          member.isReadonly()
+        )
+      )
+    }
+  }
   const allowMultipleImplementations =
     options.allowMultipleImplementations === true
   if (
@@ -161,10 +187,11 @@ function getHybridObjectSpec(
     options.implementation != null &&
     !view &&
     constructorParameters == null &&
-    staticMethods.length === 0
+    staticMethods.length === 0 &&
+    staticProperties.length === 0
   ) {
     throw new Error(
-      `${name}: With \`allowMultipleImplementations: true\`, \`implementation\` on ${platform} is only used by a public constructor or static methods. Declare one, or remove \`implementation\`.`
+      `${name}: With \`allowMultipleImplementations: true\`, \`implementation\` on ${platform} is only used by a public constructor or static members. Declare one, or remove \`implementation\`.`
     )
   }
 
@@ -184,7 +211,7 @@ function getHybridObjectSpec(
       const memberType = member.getType()
       const isOptional =
         memberSymbol.isOptional() ||
-        memberType.getUnionTypes().some((type) => type.isUndefined())
+        memberType.getUnionTypes().some((unionType) => unionType.isUndefined())
       const propType = createType(
         language,
         memberType,
@@ -258,20 +285,43 @@ function getHybridObjectSpec(
     methods: methods,
     constructor: constructor,
     staticMethods: staticMethods,
+    staticProperties: staticProperties,
     baseTypes: bases,
     config: config,
   }
 
   const accessorNames = new Set(getPropertyAccessorNames(spec))
-  for (const method of staticMethods) {
+  const staticMembers = [...staticMethods, ...staticProperties]
+  for (const member of staticMembers) {
+    if (
+      type.getProperty(member.name) != null ||
+      accessorNames.has(member.name)
+    ) {
+      throw new Error(
+        `${name}.${member.name}: Static members cannot share a name with an instance member or its generated accessor.`
+      )
+    }
+  }
+  const staticCallables = [
+    ...staticMethods,
+    ...staticProperties.flatMap((property) => property.getStaticMethods()),
+  ]
+  const callableNames = new Set<string>()
+  for (const method of staticCallables) {
+    if (callableNames.has(method.name)) {
+      throw new Error(
+        `${name}.${method.name}: Static methods and generated property accessors must have distinct names.`
+      )
+    }
     if (
       type.getProperty(method.name) != null ||
       accessorNames.has(method.name)
     ) {
       throw new Error(
-        `${name}.${method.name}: Static methods cannot share a name with an instance member or its generated accessor.`
+        `${name}.${method.name}: Static members cannot share a name with an instance member or its generated accessor.`
       )
     }
+    callableNames.add(method.name)
   }
   switch (spec.language) {
     case 'kotlin': {
@@ -281,23 +331,42 @@ function getHybridObjectSpec(
         ...getInstanceMethodNames(spec),
         ...getJvmAccessorNames(spec),
       ])
-      for (const method of staticMethods) {
+      for (const method of staticCallables) {
         if (jvmNames.has(method.name) || jvmNames.has(`${method.name}_cxx`)) {
           throw new Error(
-            `${name}.${method.name}: Static methods cannot share a JVM name with an instance member or its accessor on ${platform}.`
+            `${name}.${method.name}: Static members cannot share a JVM name with an instance member or its accessor on ${platform}.`
           )
         }
       }
       break
     }
+    case 'swift': {
+      const instanceNames = [
+        ...getInstanceMethodNames(spec),
+        ...getPropertyAccessorNames(spec),
+      ]
+      const bridgeNames = new Set(
+        instanceNames.flatMap((member) => [member, `${member}_Swift`])
+      )
+      for (const method of staticCallables) {
+        for (const bridgeName of [method.name, `${method.name}_Swift`]) {
+          if (bridgeNames.has(bridgeName)) {
+            throw new Error(
+              `${name}.${method.name}: Static members cannot share a generated Swift bridge name with another member.`
+            )
+          }
+          bridgeNames.add(bridgeName)
+        }
+      }
+      break
+    }
     case 'c++':
-    case 'swift':
       break
   }
 
   if (spec.constructor != null) {
     const constructorMethodNames = new Set<string>()
-    const methodNames = staticMethods.map((method) => method.name)
+    const methodNames = staticCallables.map((method) => method.name)
     switch (spec.language) {
       case 'swift':
         constructorMethodNames.add('constructor')

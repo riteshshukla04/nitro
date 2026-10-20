@@ -26,6 +26,7 @@ export function createSwiftHybridObject(
     .join('\n')
   const extraImports = [
     ...spec.properties.flatMap((p) => p.getRequiredImports('swift')),
+    ...spec.staticProperties.flatMap((p) => p.getRequiredImports('swift')),
     ...spec.methods.flatMap((m) => m.getRequiredImports('swift')),
     ...spec.staticMethods.flatMap((method) =>
       method.getRequiredImports('swift')

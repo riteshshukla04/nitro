@@ -8,7 +8,7 @@ import TabItem from '@theme/TabItem';
 # Hybrid Objects
 
 A **Hybrid Object** is a native object that can also be used from JS.
-Similar to a JavaScript `class`, **Hybrid Objects** can have instance methods, properties (get + set), static methods, constructors (`new`) and inheritance chains via prototypes.
+Similar to a JavaScript `class`, **Hybrid Objects** can have instance methods, properties (get + set), static methods and properties, constructors (`new`) and inheritance chains via prototypes.
 
 <div className="side-by-side-container">
 <div className="side-by-side-block">
@@ -17,6 +17,7 @@ Similar to a JavaScript `class`, **Hybrid Objects** can have instance methods, p
 @iOS(...)
 @Android(...)
 export declare class Math extends HybridObject {
+  static readonly pi: number
   static add(a: number, b: number): number
 }
 export * from '#nitro/Math'
@@ -27,6 +28,7 @@ export * from '#nitro/Math'
 
 ```swift title="HybridMath.swift"
 class HybridMath : HybridMathSpec {
+  static let pi = Double.pi
   static func add(a: Double, b: Double) -> Double {
     return a + b
   }

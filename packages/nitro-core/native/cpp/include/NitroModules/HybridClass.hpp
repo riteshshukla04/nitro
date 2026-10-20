@@ -32,7 +32,7 @@ struct HybridProperty {
 
 /**
  * Shared metadata for a HybridObject class: its name, base class,
- * constructor, static methods, and instance methods and properties.
+ * constructor, and static and instance methods and properties.
  *
  * Each HybridClass materializes one JavaScript constructor and instance prototype
  * per Runtime. HybridObject instances keep their own native state and share these
@@ -48,6 +48,7 @@ private:
   std::unordered_map<std::string, HybridProperty> _properties;
   std::optional<HybridFunction> _constructor;
   std::unordered_map<std::string, HybridFunction> _staticMethods;
+  std::unordered_map<std::string, HybridProperty> _staticProperties;
 
 private:
   HybridClass(std::string name, const HybridClassId& id, std::shared_ptr<const HybridClass> base)
@@ -132,7 +133,45 @@ public:
    */
   template <typename ReturnType, typename... Args>
   void registerStaticHybridMethod(std::string name, ReturnType (*NON_NULL method)(Args...)) {
+    if (_staticProperties.contains(name)) [[unlikely]] {
+      throw std::runtime_error("Cannot add Static Hybrid Method \"" + name + "\" - a property with that name already exists!");
+    }
+    if (_staticMethods.contains(name)) [[unlikely]] {
+      throw std::runtime_error("Cannot add Static Hybrid Method \"" + name + "\" - a method with that name already exists!");
+    }
     _staticMethods.emplace(name, HybridFunction::createStaticHybridFunction(name, method));
+  }
+
+  /**
+   * Registers the given C++ getter as a read-only static property on this type's JavaScript constructor.
+   * Example:
+   * ```cpp
+   * registerStaticHybridProperty("foo", &MyObject::getFoo);
+   * ```
+   */
+  template <typename ReturnType>
+    requires JSIEncodable<ReturnType>
+  inline void registerStaticHybridProperty(std::string name, ReturnType (*NON_NULL getter)()) {
+    registerStaticHybridProperty(name, HybridProperty{
+                                           .getter = HybridFunction::createStaticHybridFunction(name, getter),
+                                           .setter = std::nullopt,
+                                       });
+  }
+
+  /**
+   * Registers the given C++ getter and setter as a static property on this type's JavaScript constructor.
+   * Example:
+   * ```cpp
+   * registerStaticHybridProperty("foo", &MyObject::getFoo, &MyObject::setFoo);
+   * ```
+   */
+  template <typename ReturnType, typename ValueType>
+    requires(JSIEncodable<ReturnType> && JSIDecodable<std::decay_t<ValueType>>)
+  inline void registerStaticHybridProperty(std::string name, ReturnType (*NON_NULL getter)(), void (*NON_NULL setter)(ValueType)) {
+    registerStaticHybridProperty(name, HybridProperty{
+                                           .getter = HybridFunction::createStaticHybridFunction(name, getter),
+                                           .setter = HybridFunction::createStaticHybridFunction(name, setter),
+                                       });
   }
 
   /**
@@ -216,6 +255,16 @@ private:
       throw std::runtime_error("Cannot add Hybrid Property \"" + name + "\" - a method with that name already exists!");
     }
     _properties.emplace(std::move(name), std::move(property));
+  }
+
+  void registerStaticHybridProperty(std::string name, HybridProperty property) {
+    if (_staticProperties.contains(name)) [[unlikely]] {
+      throw std::runtime_error("Cannot add Static Hybrid Property \"" + name + "\" - a property with that name already exists!");
+    }
+    if (_staticMethods.contains(name)) [[unlikely]] {
+      throw std::runtime_error("Cannot add Static Hybrid Property \"" + name + "\" - a method with that name already exists!");
+    }
+    _staticProperties.emplace(std::move(name), std::move(property));
   }
 };
 

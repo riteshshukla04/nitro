@@ -6,7 +6,9 @@ export function getAllTypes(spec: HybridObjectSpec): Type[] {
   const types: Type[] = []
 
   // 1. Properties
-  types.push(...spec.properties.map((p) => p.type))
+  types.push(
+    ...[...spec.properties, ...spec.staticProperties].map((p) => p.type)
+  )
 
   const methods = [...spec.methods, ...spec.staticMethods]
 

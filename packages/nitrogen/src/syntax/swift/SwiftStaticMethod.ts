@@ -76,11 +76,13 @@ export class SwiftStaticMethod extends StaticMethod {
       nativeMethod.name,
       endpoint.returnType,
       endpoint.parameters,
-      { ...swiftOptions, access: 'public', throwing: false, generated: true }
+      {
+        ...swiftOptions,
+        access: 'public',
+        throwing: false,
+        generated: true,
+      }
     )
-    const cppRegistration = `
-clazz.registerStaticHybridMethod("${nativeMethod.name}", &${cppClassName}::${this.name});
-`.trim()
     return {
       cppMethods: [
         { method: forwarder, body: cppForwarderBody },
@@ -88,7 +90,9 @@ clazz.registerStaticHybridMethod("${nativeMethod.name}", &${cppClassName}::${thi
       ],
       swiftMethod: { method: swiftMethod, body: endpoint.body },
       swiftImports: getSwiftMethodImports(this.callable),
-      cppRegistrations: [cppRegistration],
+      cppRegistrations: [
+        `clazz.registerStaticHybridMethod("${nativeMethod.name}", &${cppClassName}::${this.name});`,
+      ],
     }
   }
 }

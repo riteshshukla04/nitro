@@ -5,13 +5,48 @@
 //  Created by Marc Rousavy on 07.08.24.
 //
 
-#include <NitroModules/HybridClass.hpp>
 #include <NitroModules/CommonGlobals.hpp>
-#include <NitroModules/NitroDefines.hpp>
+#include <NitroModules/HybridClass.hpp>
 #include <NitroModules/JSICache.hpp>
+#include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroLogger.hpp>
 
 namespace margelo::nitro {
+
+namespace {
+
+  void defineMethod(jsi::Runtime& runtime, const jsi::Object& object, const std::string& name, const HybridFunction& method,
+                    bool enumerable) {
+    CommonGlobals::Object::defineProperty(runtime, object, name.c_str(),
+                                          PlainPropertyDescriptor{
+                                              .configurable = false,
+                                              .enumerable = enumerable,
+                                              .value = method.toJSFunction(runtime),
+                                              .writable = false,
+                                          });
+  }
+
+  void defineProperty(jsi::Runtime& runtime, const jsi::Object& object, const std::string& name, const HybridProperty& property,
+                      bool enumerable) {
+    if (property.setter.has_value()) {
+      CommonGlobals::Object::defineProperty(runtime, object, name.c_str(),
+                                            ComputedPropertyDescriptor{
+                                                .configurable = false,
+                                                .enumerable = enumerable,
+                                                .get = property.getter.toJSFunction(runtime),
+                                                .set = property.setter->toJSFunction(runtime),
+                                            });
+    } else {
+      CommonGlobals::Object::defineProperty(runtime, object, name.c_str(),
+                                            ComputedReadonlyPropertyDescriptor{
+                                                .configurable = false,
+                                                .enumerable = enumerable,
+                                                .get = property.getter.toJSFunction(runtime),
+                                            });
+    }
+  }
+
+} // namespace
 
 const JSClass& HybridClass::getOrCreateJSClass(jsi::Runtime& runtime) const {
   // 1. Reuse both objects from this Runtime's cache.
@@ -26,40 +61,15 @@ const JSClass& HybridClass::getOrCreateJSClass(jsi::Runtime& runtime) const {
   const JSClass* base = _base != nullptr ? &_base->getOrCreateJSClass(runtime) : nullptr;
   jsi::Object prototypeObject = base != nullptr ? jsi::Object::create(runtime, jsi::Value(runtime, base->prototype)) : jsi::Object(runtime);
 
-  // 3. Add all Hybrid Methods to it
-  for (const auto& method : getMethods()) {
-    // method()
-    const std::string& name = method.first;
-    CommonGlobals::Object::defineProperty(runtime, prototypeObject, name.c_str(),
-                                          PlainPropertyDescriptor{
-                                              .configurable = false,
-                                              .enumerable = true,
-                                              .value = method.second.toJSFunction(runtime),
-                                              .writable = false,
-                                          });
+  // 3. Add all Hybrid Methods and Properties to the Prototype (shared across instances)
+  for (const auto& [name, method] : getMethods()) {
+    defineMethod(runtime, prototypeObject, name, method, true);
   }
-
-  // 4. Add all properties (getter + setter) to it using defineProperty
   for (const auto& [name, property] : getProperties()) {
-    if (property.setter.has_value()) {
-      // get + set
-      CommonGlobals::Object::defineProperty(runtime, prototypeObject, name.c_str(),
-                                            ComputedPropertyDescriptor{// getter + setter
-                                                                       .configurable = false,
-                                                                       .enumerable = true,
-                                                                       .get = property.getter.toJSFunction(runtime),
-                                                                       .set = property.setter->toJSFunction(runtime)});
-    } else {
-      // get
-      CommonGlobals::Object::defineProperty(runtime, prototypeObject, name.c_str(),
-                                            ComputedReadonlyPropertyDescriptor{// getter
-                                                                               .configurable = false,
-                                                                               .enumerable = true,
-                                                                               .get = property.getter.toJSFunction(runtime)});
-    }
+    defineProperty(runtime, prototypeObject, name, property, true);
   }
 
-  // 5. In DEBUG, add a __type info to the prototype object.
+  // 4. In DEBUG, add a __type info to the prototype object.
 #ifdef NITRO_DEBUG
   std::string prototypeName = "Prototype<" + _name + ">";
   CommonGlobals::Object::defineProperty(runtime, prototypeObject, "__type",
@@ -71,7 +81,7 @@ const JSClass& HybridClass::getOrCreateJSClass(jsi::Runtime& runtime) const {
                                         });
 #endif
 
-  // 6. Create the constructor function.
+  // 5. Create the constructor function.
   jsi::HostFunctionType constructor;
   size_t argumentCount = 0;
   if (_constructor.has_value()) {
@@ -83,34 +93,43 @@ const JSClass& HybridClass::getOrCreateJSClass(jsi::Runtime& runtime) const {
     };
   }
   auto constructorFunction = jsi::Function::createFromHostFunction(runtime, jsi::PropNameID::forAscii(runtime, _name),
-                                                                 static_cast<unsigned int>(argumentCount), std::move(constructor));
+                                                                   static_cast<unsigned int>(argumentCount), std::move(constructor));
 
-  // 7. Set the constructor's prototype to the base constructor to inherit static methods.
+  // 6. Set the constructor's prototype to the base constructor to inherit static methods and properties.
   if (base != nullptr) {
     constructorFunction.setPrototype(runtime, jsi::Value(runtime, base->constructor));
   }
 
-  // 8. Add own static methods.
+  // 7. Add all static Hybrid Methods and Properties to the Constructor (static)
   for (const auto& [name, method] : _staticMethods) {
-    CommonGlobals::Object::defineProperty(runtime, constructorFunction, name.c_str(), PlainPropertyDescriptor{
-      .configurable = false, .enumerable = false, .value = method.toJSFunction(runtime), .writable = false,
-    });
+    defineMethod(runtime, constructorFunction, name, method, false);
+  }
+  for (const auto& [name, property] : _staticProperties) {
+    defineProperty(runtime, constructorFunction, name, property, false);
   }
 
-  // 9. Link .prototype and .constructor for JavaScript.
-  CommonGlobals::Object::defineProperty(runtime, constructorFunction, "prototype", PlainPropertyDescriptor{
-    .configurable = false, .enumerable = false, .value = jsi::Value(runtime, prototypeObject), .writable = false,
-  });
-  CommonGlobals::Object::defineProperty(runtime, prototypeObject, "constructor", PlainPropertyDescriptor{
-    .configurable = false, .enumerable = false, .value = jsi::Value(runtime, constructorFunction), .writable = false,
-  });
+  // 8. Link .prototype and .constructor for JavaScript.
+  CommonGlobals::Object::defineProperty(runtime, constructorFunction, "prototype",
+                                        PlainPropertyDescriptor{
+                                            .configurable = false,
+                                            .enumerable = false,
+                                            .value = jsi::Value(runtime, prototypeObject),
+                                            .writable = false,
+                                        });
+  CommonGlobals::Object::defineProperty(runtime, prototypeObject, "constructor",
+                                        PlainPropertyDescriptor{
+                                            .configurable = false,
+                                            .enumerable = false,
+                                            .value = jsi::Value(runtime, constructorFunction),
+                                            .writable = false,
+                                        });
 
-  // 10. Freeze the completed instance prototype in debug builds.
+  // 9. Freeze the completed instance prototype in debug builds.
 #ifdef NITRO_DEBUG
   CommonGlobals::Object::freeze(runtime, prototypeObject);
 #endif
 
-  // 11. Publish one complete cache entry. Its references stay valid until Runtime teardown.
+  // 10. Publish one complete cache entry. Its references stay valid until Runtime teardown.
   return cache.setClass(getId(), JSClass{std::move(prototypeObject), std::move(constructorFunction)});
 }
 

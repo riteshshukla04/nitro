@@ -4,7 +4,7 @@ import { getHybridObjectName } from '../getHybridObjectName.js'
 import { HybridObjectType } from '../types/HybridObjectType.js'
 import { indent } from '../../utils.js'
 
-/** Code that binds a spec's constructor and static methods in its `Class::get()`. */
+/** Code that binds a spec's constructor and static members in its `Class::get()`. */
 export interface HybridClassBindings {
   imports: SourceImport[]
   definitions: string[]
@@ -18,7 +18,11 @@ export function createCppHybridClassBindings(
   const imports: SourceImport[] = []
   const definitions: string[] = []
   const registrations: string[] = []
-  if (spec.constructor == null && spec.staticMethods.length === 0) {
+  if (
+    spec.constructor == null &&
+    spec.staticMethods.length === 0 &&
+    spec.staticProperties.length === 0
+  ) {
     return {
       imports: imports,
       definitions: definitions,
@@ -27,7 +31,7 @@ export function createCppHybridClassBindings(
   }
   if (spec.implementation == null) {
     throw new Error(
-      `${spec.name}: Constructors and static methods require a concrete implementation.`
+      `${spec.name}: Constructors and static members require a concrete implementation.`
     )
   }
 
@@ -44,7 +48,10 @@ export function createCppHybridClassBindings(
   const adapters: string[] = []
   imports.push(
     { language: 'c++', declaration: { name: 'utility', space: 'system' } },
-    { language: 'c++', declaration: { name: headerName, space: headerSpace } }
+    {
+      language: 'c++',
+      declaration: { name: headerName, space: headerSpace },
+    }
   )
   if (spec.constructor != null) {
     const method = spec.constructor.toStaticMethod(new HybridObjectType(spec))
@@ -68,8 +75,14 @@ return std::make_shared<${implementation}>(${argumentsCode.join(', ')});
       })
     )
     imports.push(
-      { language: 'c++', declaration: { name: 'memory', space: 'system' } },
-      { language: 'c++', declaration: { name: 'type_traits', space: 'system' } }
+      {
+        language: 'c++',
+        declaration: { name: 'memory', space: 'system' },
+      },
+      {
+        language: 'c++',
+        declaration: { name: 'type_traits', space: 'system' },
+      }
     )
     const constructorRegistration = `
 clazz.registerHybridConstructor(&${helper}::constructor);
@@ -94,6 +107,27 @@ return ${implementation}::${method.name}(${argumentsCode.join(', ')});
 clazz.registerStaticHybridMethod("${method.name}", &${helper}::${method.name});
 `.trim()
     registrations.push(staticMethodRegistration)
+  }
+  for (const property of spec.staticProperties) {
+    const accessors = property.getStaticMethods()
+    for (const method of accessors) {
+      const argumentsCode = method.parameters.map(
+        (parameter) =>
+          `std::forward<decltype(${parameter.type.escapedName})>(${parameter.type.escapedName})`
+      )
+      adapters.push(
+        method.getDefinition('c++', {
+          placement: 'in-class',
+          body: `return ${implementation}::${method.name}(${argumentsCode.join(', ')});`,
+        })
+      )
+    }
+    const accessorReferences = accessors.map(
+      (method) => `&${helper}::${method.name}`
+    )
+    registrations.push(
+      `clazz.registerStaticHybridProperty("${property.name}", ${accessorReferences.join(', ')});`
+    )
   }
   const helperDefinition = `
 namespace {
