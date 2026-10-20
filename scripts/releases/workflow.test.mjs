@@ -21,38 +21,27 @@ function evaluate(expression, { cancelled = false, ...context } = {}) {
 function prerequisites(branch) {
   const needs = Object.fromEntries(workflow.jobs.release.needs.map((name) => [name, { result: 'success' }]))
   needs.resolve.outputs = { branch, commit: 'a'.repeat(40) }
-  if (branch === 'v1') {
-    for (const name of androidJobs) needs[name].result = 'skipped'
-  }
   return needs
 }
 
-test('v1 may skip only Android prerequisites; main requires every check', () => {
+test('main and v1 require every check, including Android', () => {
   for (const branch of ['main', 'v1']) {
     const needs = prerequisites(branch)
     assert.equal(evaluate(workflow.jobs.release.if, { needs }), true)
     assert.equal(evaluate(workflow.jobs.release.if, { needs, cancelled: true }), false)
     for (const name of workflow.jobs.release.needs) {
       for (const result of ['failure', 'cancelled', 'skipped']) {
-        if (branch === 'v1' && androidJobs.includes(name) && result === 'skipped') continue
         const changed = structuredClone(needs)
         changed[name].result = result
         assert.equal(evaluate(workflow.jobs.release.if, { needs: changed }), false, `${branch}: ${name} ${result} must block publication`)
       }
     }
-    for (const name of androidJobs) {
-      assert.equal(evaluate(workflow.jobs[name].if, { needs }), branch === 'main')
-      if (branch === 'v1') {
-        const changed = structuredClone(needs)
-        changed[name].result = 'success'
-        assert.equal(evaluate(workflow.jobs.release.if, { needs: changed }), false)
-      }
-    }
   }
+  for (const name of androidJobs) assert.equal(workflow.jobs[name].if, undefined)
   assert.equal(evaluate(workflow.jobs.release.if, { needs: prerequisites('other') }), false)
 })
 
-test('branch pushes and alpha release events select the same platform scope', () => {
+test('branch pushes and alpha release events select the correct release branch', () => {
   const expression = workflow.jobs.resolve.outputs.branch
   for (const [event, ref, tag, expected] of [
     ['push', 'main', '', 'main'],
@@ -76,7 +65,8 @@ test('branch pushes and alpha release events select the same platform scope', ()
   }
 })
 
-test('Android artifacts are omitted for v1 alpha in calls and release events', () => {
+test('Android artifact builds include v1 alpha releases', () => {
+  assert.equal(androidArtifacts.jobs.build_release.if, undefined)
   for (const tag of [
     'v1.0.0-alpha.nightly.50.g123456789abc',
     'v1.0.0-alpha.1',
@@ -84,28 +74,15 @@ test('Android artifacts are omitted for v1 alpha in calls and release events', (
     'v0.37.2-nightly.45.g123456789abc',
     'v1.0.0',
   ]) {
-    const expected = !/^v1\.\d+\.\d+-alpha\./.test(tag)
-    for (const event of ['workflow_call', 'release']) {
-      assert.equal(
-        evaluate(androidArtifacts.jobs.build_release.if, {
-          inputs: { 'release-tag': event === 'workflow_call' ? tag : '' },
-          github: {
-            event: { release: { tag_name: event === 'release' ? tag : '' } },
-          },
-        }),
-        expected,
-        `${event}: ${tag}`
-      )
-    }
     assert.equal(
       evaluate(workflow.jobs['android-artifacts'].if, {
         needs: {
-          resolve: { result: 'success', outputs: { branch: expected ? 'main' : 'v1' } },
-          release: { result: 'success', outputs: { tag } },
+          release: { result: 'success', outputs: { tag: tag } },
         },
         github: { event_name: 'push' },
       }),
-      expected
+      true,
+      tag
     )
   }
 })

@@ -28,10 +28,6 @@ on:
 jobs:
   build_release:
     name: Build Android Example App (release, new architecture)
-    # v1 alpha releases currently support iOS only.
-    if: >-
-      !(startsWith(inputs.release-tag || github.event.release.tag_name, 'v1.') &&
-        contains(inputs.release-tag || github.event.release.tag_name, '-alpha.'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
