@@ -16,17 +16,17 @@ on:
       device_model:
         description: 'iOS Simulator device model'
         required: false
-        default: 'iPhone 18 Pro'
+        default: 'iPhone 17 Pro'
         type: string
       ios_version:
         description: 'iOS version'
         required: false
-        default: '27.0'
+        default: '26.5'
         type: string
       xcode_version:
         description: 'Xcode version, or default for the selected Xcode'
         required: false
-        default: '27.1'
+        default: '26.6'
         type: string
   pull_request:
     paths:
@@ -49,15 +49,15 @@ on:
 
 env:
   # Device configuration - can be overridden by workflow_dispatch inputs
-  DEVICE_MODEL: ${{ github.event.inputs.device_model || 'iPhone 18 Pro' }}
-  IOS_VERSION: ${{ github.event.inputs.ios_version || '27.0' }}
-  XCODE_VERSION: ${{ github.event.inputs.xcode_version || '27.1' }}
+  DEVICE_MODEL: ${{ github.event.inputs.device_model || 'iPhone 17 Pro' }}
+  IOS_VERSION: ${{ github.event.inputs.ios_version || '26.5' }}
+  XCODE_VERSION: ${{ github.event.inputs.xcode_version || '26.6' }}
   HARNESS_DEBUG: 1
 
 jobs:
   harness_ios_new:
     name: Harness iOS
-    runs-on: xcode-27
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v7
         with:
