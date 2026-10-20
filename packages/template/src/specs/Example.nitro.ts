@@ -1,7 +1,11 @@
-import { iOS, type HybridObject } from 'nitro-core'
+import { Android, iOS, type HybridObject } from 'nitro-core'
 
 export * from '#nitro/Example'
 
+@Android({
+  language: 'kotlin',
+  implementation: { className: 'HybridExample' },
+})
 @iOS({
   language: 'swift',
   implementation: { className: 'HybridExample' },

@@ -8,6 +8,6 @@ case "${1:-}" in
 esac
 # The scaffold has unsubstituted $$ identifiers, which are not valid Kotlin.
 source "$(dirname "$0")/format-files.sh" '*.kt' '*.kts' \
-  ':(exclude)packages/template/android/src/main/java/com/margelo/nitro/$$androidNamespace$$/$$androidCxxLibName$$Package.kt'
+  ':(exclude)packages/template/android/src/main/java/com/margelo/nitro/$$androidNamespace$$/*.kt'
 [[ ${#files[@]} -eq 0 ]] && exit 0
 ktlint --editorconfig=.editorconfig "${options[@]}" "${files[@]}"
