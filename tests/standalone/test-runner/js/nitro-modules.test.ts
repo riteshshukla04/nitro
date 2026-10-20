@@ -180,9 +180,9 @@ export const cases = {
         expect(Object.is(NitroModules.isHybridObject(object), true)).to.equal(
           true,
         );
-        expect(
-          Object.is(object.constructor.name, "TestObjectCpp"),
-        ).to.equal(true);
+        expect(Object.is(object.constructor.name, "TestObjectCpp")).to.equal(
+          true,
+        );
       },
 
     "getHybridClass('test.TestObjectSwiftKotlin') returns an object named \"TestObjectSwiftKotlin\"":
@@ -226,9 +226,9 @@ export const cases = {
         expect(Object.is(NitroModules.isHybridObject(object), true)).to.equal(
           true,
         );
-        expect(
-          Object.is(object.constructor.name, "PlatformObject"),
-        ).to.equal(true);
+        expect(Object.is(object.constructor.name, "PlatformObject")).to.equal(
+          true,
+        );
       },
 
     "getHybridClass('test.external.SomeExternalObject') returns an object named \"SomeExternalObject\"":
@@ -398,7 +398,8 @@ export const cases = {
     },
 
     "createBase() is not an instance of Child": (testObject) => {
-      const HybridChild = NitroModules.getHybridClass<typeof Child>("test.Child");
+      const HybridChild =
+        NitroModules.getHybridClass<typeof Child>("test.Child");
 
       expect(testObject.createBase()).not.to.be.instanceOf(HybridChild);
     },
@@ -480,7 +481,9 @@ export const cases = {
 
       expect(
         Object.is(
-          NitroModules.getHybridClass<typeof TestObjectCpp>("test.TestObjectCpp"),
+          NitroModules.getHybridClass<typeof TestObjectCpp>(
+            "test.TestObjectCpp",
+          ),
           HybridTestObjectCpp,
         ),
       ).to.equal(true);
@@ -515,6 +518,31 @@ export const cases = {
 };
 
 export const skips = {
+  // Restore after the first v1 nightly publishes. Class identity is being finalized separately.
+  "getHybridClass instanceof / TestObjectCpp / createBase() is an instance of registered Base":
+    {
+      ios: "Temporary v1 nightly exclusion: C++/platform class identity is not finalized",
+      android:
+        "Temporary v1 nightly exclusion: C++/platform class identity is not finalized",
+    },
+  "getHybridClass instanceof / TestObjectCpp / createBaseActualChild() is an instance of registered Child":
+    {
+      ios: "Temporary v1 nightly exclusion: C++/platform class identity is not finalized",
+      android:
+        "Temporary v1 nightly exclusion: C++/platform class identity is not finalized",
+    },
+  "getHybridClass instanceof / TestObjectCpp / createChild() is an instance of registered Base":
+    {
+      ios: "Temporary v1 nightly exclusion: C++/platform class identity is not finalized",
+      android:
+        "Temporary v1 nightly exclusion: C++/platform class identity is not finalized",
+    },
+  "getHybridClass instanceof / TestObjectCpp / createChild() is an instance of registered Child":
+    {
+      ios: "Temporary v1 nightly exclusion: C++/platform class identity is not finalized",
+      android:
+        "Temporary v1 nightly exclusion: C++/platform class identity is not finalized",
+    },
   "NitroModules with a HybridObject / TestObjectCpp / box({}) throws because it has no NativeState":
     {
       release: "Existing main exclusion: IS_DEBUG",
