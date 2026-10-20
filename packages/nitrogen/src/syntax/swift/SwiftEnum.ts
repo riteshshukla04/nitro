@@ -85,7 +85,6 @@ public extension ${enumType.enumName} {
   const cppEnumType = type.getCode('c++', { context: 'value' })
   const enumMemberValues = enumType.enumMembers.map((member) => member.value)
   const enumValues = [...new Set(enumMemberValues)]
-  const invalidValue = `throw std::invalid_argument("Invalid value for ${enumType.enumName}");`
   let jsToSwiftConverterCode: string
   let swiftToJSConverterCode: string
   let jsCanConvertCode: string
@@ -102,12 +101,11 @@ public extension ${enumType.enumName} {
         `case ${member.value}: return createJSIString<"${member.stringValue}">(runtime);`,
     )
     jsToSwiftConverterCode = `
-if (!value.isString()) { ${invalidValue} }
-const auto string = value.getString(runtime).utf8(runtime);
+const auto string = value.asString(runtime).utf8(runtime);
 switch (hashString(string)) {
   ${indent(fromJSICases.join('\n'), '  ')}
   default: [[unlikely]]
-    ${invalidValue}
+    throw std::invalid_argument("Cannot convert \\"" + string + "\\" to enum ${enumType.enumName} - invalid value!");
 }
 `.trim()
     jsCanConvertCode = `
@@ -142,10 +140,11 @@ const auto integer = static_cast<int32_t>(number);
 if (number != integer) { ${onInvalid} }
 `.trim()
     jsToSwiftConverterCode = `
-${readInteger(invalidValue)}
+const int integer = doubleToInt(value.asNumber());
 switch (integer) {
   ${indent(fromJSICases.join('\n'), '  ')}
-  default: ${invalidValue}
+  default: [[unlikely]]
+    throw std::invalid_argument("Cannot convert " + value.toString(runtime).utf8(runtime) + " to enum ${enumType.enumName} - invalid value!");
 }
 `.trim()
     swiftToJSConverterCode = 'return jsi::Value(value.getRawValue());'
@@ -199,6 +198,13 @@ return SwiftType::fromRawValue(rawValue);
           language: 'c++',
           declaration: {
             name: 'NitroModules/NitroHash.hpp',
+            space: 'system',
+          },
+        },
+        {
+          language: 'c++',
+          declaration: {
+            name: 'NitroModules/NumberUtils.hpp',
             space: 'system',
           },
         },

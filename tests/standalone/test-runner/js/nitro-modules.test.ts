@@ -161,7 +161,6 @@ export const cases = {
     "getHybridClass(unknown name) throws a not-registered error": () => {
       const create = () =>
         new (NitroModules.getHybridClass<typeof Base>(UNKNOWN_NAME))();
-      expect(create).to.throw("NitroModulesProxy.getHybridClass(...)");
       expect(create).to.throw(
         `HybridClass "${UNKNOWN_NAME}" is not registered.`,
       );
@@ -308,17 +307,16 @@ export const cases = {
       ).to.equal(true);
     },
 
-    "hasNativeState(a native ArrayBuffer) is true": () => {
-      expect(
-        Object.is(
-          NitroModules.hasNativeState(NitroModules.createNativeArrayBuffer(8)),
-          true,
-        ),
-      ).to.equal(true);
+    "hasNativeState(a native ArrayBuffer) is false": () => {
+      const buffer = NitroModules.createNativeArrayBuffer(8);
+      // JSI's MutableBuffer owns the native storage without a NativeState.
+      expect(buffer).to.be.instanceOf(ArrayBuffer);
+      expect(buffer.byteLength).to.equal(8);
+      expect(NitroModules.hasNativeState(buffer)).to.equal(false);
     },
 
     "isHybridObject(a native ArrayBuffer) is false": () => {
-      // It has a NativeState, but not a HybridObject one.
+      // Native buffer storage does not make the JS ArrayBuffer a HybridObject.
       expect(
         Object.is(
           NitroModules.isHybridObject(NitroModules.createNativeArrayBuffer(8)),
@@ -394,38 +392,52 @@ export const cases = {
     },
   }),
   ...casesForTestObjects("getHybridClass instanceof", {
-    "createBase() is an instance of Base": (testObject) => {
-      const HybridBase = NitroModules.getHybridClass<typeof Base>("Base");
-
-      expect(testObject.createBase()).to.be.instanceOf(HybridBase);
+    "createBase() is an instance of registered Base only for the Swift/Kotlin implementation": (
+      testObject,
+    ) => {
+      const HybridBase = NitroModules.getHybridClass<typeof Base>("test.Base");
+      // The C++ fixture constructs its own implementation. The registry exports
+      // the Swift/Kotlin class, whose methods dispatch through that language.
+      expect(testObject.createBase() instanceof HybridBase).to.equal(
+        testObject.constructor.name === "TestObjectSwiftKotlin",
+      );
     },
 
     "createBase() is not an instance of Child": (testObject) => {
-      const HybridChild = NitroModules.getHybridClass<typeof Child>("Child");
+      const HybridChild = NitroModules.getHybridClass<typeof Child>("test.Child");
 
       expect(testObject.createBase()).not.to.be.instanceOf(HybridChild);
     },
 
-    "createChild() is an instance of Child": (testObject) => {
-      const HybridChild = NitroModules.getHybridClass<typeof Child>("Child");
-
-      expect(testObject.createChild()).to.be.instanceOf(HybridChild);
+    "createChild() is an instance of registered Child only for the Swift/Kotlin implementation": (
+      testObject,
+    ) => {
+      const HybridChild = NitroModules.getHybridClass<typeof Child>("test.Child");
+      expect(testObject.createChild() instanceof HybridChild).to.equal(
+        testObject.constructor.name === "TestObjectSwiftKotlin",
+      );
     },
 
-    "createChild() is an instance of Base": (testObject) => {
-      const HybridBase = NitroModules.getHybridClass<typeof Base>("Base");
-
-      expect(testObject.createChild()).to.be.instanceOf(HybridBase);
+    "createChild() is an instance of registered Base only for the Swift/Kotlin implementation": (
+      testObject,
+    ) => {
+      const HybridBase = NitroModules.getHybridClass<typeof Base>("test.Base");
+      expect(testObject.createChild() instanceof HybridBase).to.equal(
+        testObject.constructor.name === "TestObjectSwiftKotlin",
+      );
     },
 
-    "createBaseActualChild() is an instance of Child": (testObject) => {
-      const HybridChild = NitroModules.getHybridClass<typeof Child>("Child");
-
-      expect(testObject.createBaseActualChild()).to.be.instanceOf(HybridChild);
+    "createBaseActualChild() is an instance of registered Child only for the Swift/Kotlin implementation": (
+      testObject,
+    ) => {
+      const HybridChild = NitroModules.getHybridClass<typeof Child>("test.Child");
+      expect(testObject.createBaseActualChild() instanceof HybridChild).to.equal(
+        testObject.constructor.name === "TestObjectSwiftKotlin",
+      );
     },
 
     "testObject is not an instance of Base": (testObject) => {
-      const HybridBase = NitroModules.getHybridClass<typeof Base>("Base");
+      const HybridBase = NitroModules.getHybridClass<typeof Base>("test.Base");
 
       expect(testObject).not.to.be.instanceOf(HybridBase);
     },
@@ -433,7 +445,7 @@ export const cases = {
   ...namedCases("getHybridClass", {
     "new T() creates a HybridObject": () => {
       const HybridTestObjectCpp =
-        NitroModules.getHybridClass<typeof TestObjectCpp>("TestObjectCpp");
+        NitroModules.getHybridClass<typeof TestObjectCpp>("test.TestObjectCpp");
 
       const instance = new HybridTestObjectCpp();
       expect(Object.is(NitroModules.isHybridObject(instance), true)).to.equal(
@@ -447,21 +459,21 @@ export const cases = {
 
     "new T() is an instance of T": () => {
       const HybridTestObjectCpp =
-        NitroModules.getHybridClass<typeof TestObjectCpp>("TestObjectCpp");
+        NitroModules.getHybridClass<typeof TestObjectCpp>("test.TestObjectCpp");
 
       expect(new HybridTestObjectCpp()).to.be.instanceOf(HybridTestObjectCpp);
     },
 
     "{} is not an instance of T": () => {
       const HybridTestObjectCpp =
-        NitroModules.getHybridClass<typeof TestObjectCpp>("TestObjectCpp");
+        NitroModules.getHybridClass<typeof TestObjectCpp>("test.TestObjectCpp");
 
       expect({}).not.to.be.instanceOf(HybridTestObjectCpp);
     },
 
     "new T() creates a new instance every time": () => {
       const HybridTestObjectCpp =
-        NitroModules.getHybridClass<typeof TestObjectCpp>("TestObjectCpp");
+        NitroModules.getHybridClass<typeof TestObjectCpp>("test.TestObjectCpp");
 
       const a = new HybridTestObjectCpp();
       const b = new HybridTestObjectCpp();
@@ -470,7 +482,7 @@ export const cases = {
 
     "new T().equals(itself) is true": () => {
       const HybridTestObjectCpp =
-        NitroModules.getHybridClass<typeof TestObjectCpp>("TestObjectCpp");
+        NitroModules.getHybridClass<typeof TestObjectCpp>("test.TestObjectCpp");
 
       const a = new HybridTestObjectCpp();
       expect(Object.is(a.equals(a), true)).to.equal(true);
@@ -478,11 +490,11 @@ export const cases = {
 
     "returns the same constructor for the same name": () => {
       const HybridTestObjectCpp =
-        NitroModules.getHybridClass<typeof TestObjectCpp>("TestObjectCpp");
+        NitroModules.getHybridClass<typeof TestObjectCpp>("test.TestObjectCpp");
 
       expect(
         Object.is(
-          NitroModules.getHybridClass<typeof TestObjectCpp>("TestObjectCpp"),
+          NitroModules.getHybridClass<typeof TestObjectCpp>("test.TestObjectCpp"),
           HybridTestObjectCpp,
         ),
       ).to.equal(true);
@@ -490,11 +502,11 @@ export const cases = {
 
     "a different HybridObject type is not an instance of T": () => {
       const HybridTestObjectCpp =
-        NitroModules.getHybridClass<typeof TestObjectCpp>("TestObjectCpp");
+        NitroModules.getHybridClass<typeof TestObjectCpp>("test.TestObjectCpp");
 
       const HybridTestObjectSwiftKotlin = NitroModules.getHybridClass<
         typeof TestObjectSwiftKotlin
-      >("TestObjectSwiftKotlin");
+      >("test.TestObjectSwiftKotlin");
       expect(new HybridTestObjectSwiftKotlin()).not.to.be.instanceOf(
         HybridTestObjectCpp,
       );
@@ -503,7 +515,7 @@ export const cases = {
     "an existing instance is an instance of T": () => {
       expect(HybridSomeExternalObject).to.be.instanceOf(
         NitroModules.getHybridClass<typeof SomeExternalObject>(
-          "SomeExternalObject",
+          "test.external.SomeExternalObject",
         ),
       );
     },

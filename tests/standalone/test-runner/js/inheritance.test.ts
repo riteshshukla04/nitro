@@ -235,34 +235,50 @@ export const cases = {
       ).to.equal(true);
     },
 
-    "createChild() shares the prototype of the registered Child": (
+    "createChild() reuses its implementation's constructor and prototype": (
       testObject,
     ) => {
+      const child = testObject.createChild();
+      const anotherChild = testObject.createChild();
+      const base = testObject.createBase();
+      expect(child.constructor).to.equal(anotherChild.constructor);
       expect(
-        Object.is(
-          isSamePrototype(
-            Object.getPrototypeOf(testObject.createChild()),
-            Object.getPrototypeOf(HybridChild),
-          ),
-          true,
+        isSamePrototype(
+          Object.getPrototypeOf(child),
+          Object.getPrototypeOf(anotherChild),
+        ),
+      ).to.equal(true);
+      expect(child).to.be.instanceOf(child.constructor);
+      expect(child).to.be.instanceOf(base.constructor);
+    },
+
+    "createChild() shares the registered Child prototype only for the Swift/Kotlin implementation": (
+      testObject,
+    ) => {
+      // Child is registered with Swift/Kotlin. The hand-written C++ fixture
+      // uses its own class and method dispatch, with a separate cached prototype.
+      expect(
+        isSamePrototype(
+          Object.getPrototypeOf(testObject.createChild()),
+          Object.getPrototypeOf(HybridChild),
         ),
         "Object.getPrototypeOf(child) === Object.getPrototypeOf(HybridChild)",
-      ).to.equal(true);
+      ).to.equal(testObject.constructor.name === "TestObjectSwiftKotlin");
     },
 
     "createChild() prototype chain is Child, Base, HybridObject": (
       testObject,
     ) => {
       expect(getPrototypeTypes(testObject.createChild())).to.deep.equal([
-        "Prototype<HybridChildSpec>",
-        "Prototype<HybridBaseSpec>",
+        "Prototype<Child>",
+        "Prototype<Base>",
         "Prototype<HybridObject>",
       ]);
     },
 
     "createBase() prototype chain is Base, HybridObject": (testObject) => {
       expect(getPrototypeTypes(testObject.createBase())).to.deep.equal([
-        "Prototype<HybridBaseSpec>",
+        "Prototype<Base>",
         "Prototype<HybridObject>",
       ]);
     },

@@ -11,6 +11,7 @@
 #include <NitroTest/ColorScheme.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroHash.hpp>
+#include <NitroModules/NumberUtils.hpp>
 #include <NitroModules/JSIString.hpp>
 
 namespace margelo::nitro {
@@ -30,13 +31,12 @@ namespace margelo::nitro {
   }
 
   NitroTest::ColorScheme JSIConverter<NitroTest::ColorScheme>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    if (!value.isString()) { throw std::invalid_argument("Invalid value for ColorScheme"); }
-    const auto string = value.getString(runtime).utf8(runtime);
+    const auto string = value.asString(runtime).utf8(runtime);
     switch (hashString(string)) {
       case hashString("light"): return NitroTest::ColorScheme::fromRawValue(0);
       case hashString("dark"): return NitroTest::ColorScheme::fromRawValue(1);
       default: [[unlikely]]
-        throw std::invalid_argument("Invalid value for ColorScheme");
+        throw std::invalid_argument("Cannot convert \"" + string + "\" to enum ColorScheme - invalid value!");
     }
   }
 

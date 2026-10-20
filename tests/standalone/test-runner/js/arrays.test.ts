@@ -465,6 +465,13 @@ export const cases = {
       );
     },
 
+    "bounceEnums(...) rejects a number element": (testObject) => {
+      // @ts-expect-error passing a number instead of a Powertrain
+      expect(() => testObject.bounceEnums(["gas", 1])).to.throw(
+        `${testObject.constructor.name}.bounceEnums(...): Value is a number, expected a String`,
+      );
+    },
+
     "bounceStructs(...) rejects an element with a missing field": (
       testObject,
     ) => {

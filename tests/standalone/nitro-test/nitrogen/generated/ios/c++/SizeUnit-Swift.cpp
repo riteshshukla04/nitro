@@ -11,6 +11,7 @@
 #include <NitroTest/SizeUnit.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroHash.hpp>
+#include <NitroModules/NumberUtils.hpp>
 #include <NitroModules/JSIString.hpp>
 
 namespace margelo::nitro {
@@ -30,15 +31,12 @@ namespace margelo::nitro {
   }
 
   NitroTest::SizeUnit JSIConverter<NitroTest::SizeUnit>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    if (!value.isNumber()) { throw std::invalid_argument("Invalid value for SizeUnit"); }
-    const double number = value.getNumber();
-    if (!(number >= 1 && number <= 2)) { throw std::invalid_argument("Invalid value for SizeUnit"); }
-    const auto integer = static_cast<int32_t>(number);
-    if (number != integer) { throw std::invalid_argument("Invalid value for SizeUnit"); }
+    const int integer = doubleToInt(value.asNumber());
     switch (integer) {
       case 1: return NitroTest::SizeUnit::fromRawValue(1);
       case 2: return NitroTest::SizeUnit::fromRawValue(2);
-      default: throw std::invalid_argument("Invalid value for SizeUnit");
+      default: [[unlikely]]
+        throw std::invalid_argument("Cannot convert " + value.toString(runtime).utf8(runtime) + " to enum SizeUnit - invalid value!");
     }
   }
 

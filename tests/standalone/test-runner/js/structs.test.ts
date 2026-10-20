@@ -506,6 +506,32 @@ export const cases = {
       );
     },
 
+    "bounceCar(...) rejects a missing powertrain": (testObject) => {
+      const car = withoutKey(TEST_CAR, "powertrain");
+      // @ts-expect-error passing a Car without its required enum field
+      expect(() => testObject.bounceCar(car)).to.throw(
+        `${testObject.constructor.name}.bounceCar(...): Value is undefined, expected a String`,
+      );
+    },
+
+    "bounceCar(...) rejects a null powertrain": (testObject) => {
+      expect(() =>
+        // @ts-expect-error passing null instead of a Powertrain
+        testObject.bounceCar({ ...TEST_CAR, powertrain: null }),
+      ).to.throw(
+        `${testObject.constructor.name}.bounceCar(...): Value is null, expected a String`,
+      );
+    },
+
+    "bounceCar(...) rejects a numeric powertrain": (testObject) => {
+      expect(() =>
+        // @ts-expect-error passing a number instead of a Powertrain
+        testObject.bounceCar({ ...TEST_CAR, powertrain: 55 }),
+      ).to.throw(
+        `${testObject.constructor.name}.bounceCar(...): Value is a number, expected a String`,
+      );
+    },
+
     "bounceCar(...) rejects a null driver": (testObject) => {
       expect(() =>
         // @ts-expect-error passing null where only undefined is optional
@@ -561,6 +587,24 @@ export const cases = {
       // @ts-expect-error passing an unknown Powertrain
       expect(() => testObject.bounceOptionalEnumStruct(wrapper)).to.throw(
         `${testObject.constructor.name}.bounceOptionalEnumStruct(...): Cannot convert "diesel" to enum Powertrain - invalid value!`,
+      );
+    },
+
+    "bounceOptionalEnumStruct(...) rejects a null enum field": (testObject) => {
+      expect(() =>
+        // @ts-expect-error optional enum fields accept undefined, not null
+        testObject.bounceOptionalEnumStruct({ tier: null }),
+      ).to.throw(
+        `${testObject.constructor.name}.bounceOptionalEnumStruct(...): Value is null, expected a String`,
+      );
+    },
+
+    "bounceOptionalEnumStruct(...) rejects a numeric enum field": (
+      testObject,
+    ) => {
+      // @ts-expect-error passing a number instead of an optional Powertrain
+      expect(() => testObject.bounceOptionalEnumStruct({ tier: 55 })).to.throw(
+        `${testObject.constructor.name}.bounceOptionalEnumStruct(...): Value is a number, expected a String`,
       );
     },
 

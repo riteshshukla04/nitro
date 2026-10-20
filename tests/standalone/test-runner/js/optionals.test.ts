@@ -102,6 +102,36 @@ export const cases = {
       );
     },
 
+    "optionalOldEnum rejects an unknown integer": (testObject) => {
+      expect(() => {
+        // @ts-expect-error passing an unknown OldEnum value
+        testObject.optionalOldEnum = 9999;
+      }).to.throw(
+        `${testObject.constructor.name}.optionalOldEnum: Cannot convert 9999 to enum OldEnum - invalid value!`,
+      );
+    },
+
+    "optionalOldEnum rejects fractional and out-of-range numbers": (
+      testObject,
+    ) => {
+      for (const value of [1.5, 2147483648]) {
+        expect(() => {
+          testObject.optionalOldEnum = value;
+        }).to.throw(
+          `${testObject.constructor.name}.optionalOldEnum: Cannot convert ${value.toFixed(6)} to int - expected an integer within the int range!`,
+        );
+      }
+    },
+
+    "optionalOldEnum rejects a string": (testObject) => {
+      expect(() => {
+        // @ts-expect-error passing a string instead of a numeric enum
+        testObject.optionalOldEnum = "1";
+      }).to.throw(
+        `${testObject.constructor.name}.optionalOldEnum: Value is a string, expected a number`,
+      );
+    },
+
     "optionalCallback roundtrips a function and undefined": (testObject) => {
       testObject.optionalCallback = () => {};
       expect(testObject.optionalCallback).to.be.a("function");
@@ -439,16 +469,19 @@ export const cases = {
         }
       },
 
-    "optionalCallback getter returns a function that checks its argument count":
+    "optionalCallback getter preserves the original JS function":
       (testObject) => {
+        const callback = recordCallback<(value: number) => void>();
         try {
-          testObject.optionalCallback = () => {};
+          testObject.optionalCallback = callback;
           const forward = testObject.optionalCallback;
-          expect(forward).to.be.a("function");
-          // @ts-expect-error
-          expect(() => forward?.()).to.throw(
-            "Function expected 1 arguments, but received 0!",
-          );
+          expect(forward).to.equal(callback);
+          // Returning a JS callback preserves its identity and JS call semantics.
+          // @ts-expect-error intentionally omit the callback argument
+          forward?.();
+          // @ts-expect-error intentionally pass an extra callback argument
+          forward?.(55, 89);
+          expect(callback.calls).to.deep.equal([[], [55, 89]]);
         } finally {
           testObject.optionalCallback = undefined;
         }

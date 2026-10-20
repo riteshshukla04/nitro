@@ -11,6 +11,7 @@
 #include <NitroTest/Powertrain.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroHash.hpp>
+#include <NitroModules/NumberUtils.hpp>
 #include <NitroModules/JSIString.hpp>
 
 namespace margelo::nitro {
@@ -30,14 +31,13 @@ namespace margelo::nitro {
   }
 
   NitroTest::Powertrain JSIConverter<NitroTest::Powertrain>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    if (!value.isString()) { throw std::invalid_argument("Invalid value for Powertrain"); }
-    const auto string = value.getString(runtime).utf8(runtime);
+    const auto string = value.asString(runtime).utf8(runtime);
     switch (hashString(string)) {
       case hashString("electric"): return NitroTest::Powertrain::fromRawValue(0);
       case hashString("gas"): return NitroTest::Powertrain::fromRawValue(1);
       case hashString("hybrid"): return NitroTest::Powertrain::fromRawValue(2);
       default: [[unlikely]]
-        throw std::invalid_argument("Invalid value for Powertrain");
+        throw std::invalid_argument("Cannot convert \"" + string + "\" to enum Powertrain - invalid value!");
     }
   }
 

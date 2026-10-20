@@ -11,6 +11,7 @@
 #include <NitroTest/OldEnum.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroHash.hpp>
+#include <NitroModules/NumberUtils.hpp>
 #include <NitroModules/JSIString.hpp>
 
 namespace margelo::nitro {
@@ -30,16 +31,13 @@ namespace margelo::nitro {
   }
 
   NitroTest::OldEnum JSIConverter<NitroTest::OldEnum>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    if (!value.isNumber()) { throw std::invalid_argument("Invalid value for OldEnum"); }
-    const double number = value.getNumber();
-    if (!(number >= 0 && number <= 2)) { throw std::invalid_argument("Invalid value for OldEnum"); }
-    const auto integer = static_cast<int32_t>(number);
-    if (number != integer) { throw std::invalid_argument("Invalid value for OldEnum"); }
+    const int integer = doubleToInt(value.asNumber());
     switch (integer) {
       case 0: return NitroTest::OldEnum::fromRawValue(0);
       case 1: return NitroTest::OldEnum::fromRawValue(1);
       case 2: return NitroTest::OldEnum::fromRawValue(2);
-      default: throw std::invalid_argument("Invalid value for OldEnum");
+      default: [[unlikely]]
+        throw std::invalid_argument("Cannot convert " + value.toString(runtime).utf8(runtime) + " to enum OldEnum - invalid value!");
     }
   }
 

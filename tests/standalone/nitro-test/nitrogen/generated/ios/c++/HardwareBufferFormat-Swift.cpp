@@ -11,6 +11,7 @@
 #include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroHash.hpp>
+#include <NitroModules/NumberUtils.hpp>
 #include <NitroModules/JSIString.hpp>
 
 namespace margelo::nitro {
@@ -30,15 +31,14 @@ namespace margelo::nitro {
   }
 
   NitroTest::HardwareBufferFormat JSIConverter<NitroTest::HardwareBufferFormat>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
-    if (!value.isString()) { throw std::invalid_argument("Invalid value for HardwareBufferFormat"); }
-    const auto string = value.getString(runtime).utf8(runtime);
+    const auto string = value.asString(runtime).utf8(runtime);
     switch (hashString(string)) {
       case hashString("rgba-8888"): return NitroTest::HardwareBufferFormat::fromRawValue(0);
       case hashString("rgb-565"): return NitroTest::HardwareBufferFormat::fromRawValue(1);
       case hashString("rgba-fp16"): return NitroTest::HardwareBufferFormat::fromRawValue(2);
       case hashString("blob"): return NitroTest::HardwareBufferFormat::fromRawValue(3);
       default: [[unlikely]]
-        throw std::invalid_argument("Invalid value for HardwareBufferFormat");
+        throw std::invalid_argument("Cannot convert \"" + string + "\" to enum HardwareBufferFormat - invalid value!");
     }
   }
 

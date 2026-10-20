@@ -351,7 +351,7 @@ export const cases = {
       expect(() =>
         // @ts-expect-error intentionally omitting the argument
         callback(),
-      ).to.throw(exactly("Function expected 1 arguments, but received 0!"));
+      ).to.throw(exactly("Callback expected 1 arguments, but received 0!"));
     },
 
     "getComplexCallback() function throws when called with too many arguments":
@@ -360,7 +360,7 @@ export const cases = {
         expect(() =>
           // @ts-expect-error intentionally passing an extra argument
           callback(1, 2),
-        ).to.throw(exactly("Function expected 1 arguments, but received 2!"));
+        ).to.throw(exactly("Callback expected 1 arguments, but received 2!"));
       },
 
     // TODO: Fix HybridTestObjectSwift.callSumUpNTimes - its `1...Int(n)` range traps for n < 1, so callSumUpNTimes(callback, 0) crashes the app (SIGTRAP); C++ and Kotlin resolve to 0
@@ -627,7 +627,7 @@ export const cases = {
       expect(() =>
         // @ts-expect-error intentionally passing an extra argument
         callback(1),
-      ).to.throw(exactly("Function expected 0 arguments, but received 1!"));
+      ).to.throw(exactly("Callback expected 0 arguments, but received 1!"));
     },
 
     "bounceSyncInt64Callback(...) returns the result of the JS callback": (

@@ -388,12 +388,14 @@ export const cases = {
       expect(setNumberValue).to.throw("dispose()");
     },
 
-    "name after dispose() throws": (testObject) => {
+    "constructor and class name remain available after dispose()": (
+      testObject,
+    ) => {
       const object = testObject.newTestObject();
+      const constructor = object.constructor;
       object.dispose();
-      expect(() => object.constructor.name).to.throw(
-        "Cannot get hybrid property `HybridObject.name`",
-      );
+      expect(object.constructor).to.equal(constructor);
+      expect(object.constructor.name).to.equal(testObject.constructor.name);
     },
 
     "toString() after dispose() throws": (testObject) => {
@@ -517,13 +519,6 @@ export const skips = {
       release: "Existing main exclusion: IS_DEBUG",
     },
   "HybridObject dispose() / TestObjectSwiftKotlin / a property write after dispose() throws":
-    {
-      release: "Existing main exclusion: IS_DEBUG",
-    },
-  "HybridObject dispose() / TestObjectCpp / name after dispose() throws": {
-    release: "Existing main exclusion: IS_DEBUG",
-  },
-  "HybridObject dispose() / TestObjectSwiftKotlin / name after dispose() throws":
     {
       release: "Existing main exclusion: IS_DEBUG",
     },
