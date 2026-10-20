@@ -147,15 +147,16 @@ caches its bytecode by source contents. Each runtime evaluates that bytecode wit
 fresh globals and native objects. Compilation happens before the JS deadlines;
 Hermes' watchdog cannot interrupt the native compiler.
 
-The native thread owns the runtime and pumps its dispatcher. On iOS, a dedicated
-serial queue runs this blocking work while the Swift test awaits a continuation.
+The native thread owns the runtime and pumps its dispatcher. On iOS, an operation
+queue runs at most two native tests at once while Swift awaits continuations.
 This leaves Swift's cooperative executor free to run `Promise.async` tasks that
 the JavaScript case awaits. The iOS runner restricts the cooperative pool to one
 worker so the concurrent native Promise test checks this behavior.
 Native work runs on background threads; its callbacks are queued back to the
 runtime's owning thread. When the microtask queue is empty, the dispatcher sleeps
 until a native callback arrives or the deadline expires.
-Runtime execution is serialized because Nitro currently has process-wide caches.
+Each runtime owns its JSI caches. The shared prepared-bundle cache is locked only
+while compiling or replacing bytecode; test execution can overlap.
 
 An async case keeps that same runtime alive across every `await`. Put repeated
 calls, concurrent Promises, or cache-growth checks in one case when they must
