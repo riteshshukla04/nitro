@@ -56,13 +56,13 @@ namespace margelo::nitro::test::external {
     std::string toString() override;
 
     // Properties
-    double getBaseValue_Swift();
+    double getBaseValue();
     // Methods
-    ::NitroTestExternal::Size bounceSize_Swift(const ::NitroTestExternal::Size& size);
-    ::NitroTestExternal::SizeUnit bounceSizeUnit_Swift(::NitroTestExternal::SizeUnit unit);
-    Promise<::NitroTestExternal::Size> mapSize_Swift(const ::NitroTestExternal::Size& size, const Callback<::NitroTestExternal::Size(const ::NitroTestExternal::Size&)>& callback);
+    ::NitroTestExternal::Size bounceSize(const ::NitroTestExternal::Size& size);
+    ::NitroTestExternal::SizeUnit bounceSizeUnit(::NitroTestExternal::SizeUnit unit);
+    Promise<::NitroTestExternal::Size> mapSize(const ::NitroTestExternal::Size& size, const Callback<::NitroTestExternal::Size(const ::NitroTestExternal::Size&)>& callback);
     // Constructor
-    static ::NitroTestExternal::HybridBaseSpec_cxx constructor_Swift();
+    static ::NitroTestExternal::HybridBaseSpec_cxx constructor();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {

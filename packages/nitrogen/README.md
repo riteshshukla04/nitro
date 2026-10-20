@@ -158,7 +158,7 @@ implementation classes final when appropriate.
 ## Native language boundaries
 
 Each platform decorator selects the language of the generated native API. A Swift spec generates a Swift protocol and a private C++ bridge
-with Swift signatures, such as `swift::String hello_Swift()`. It does not generate an abstract C++ spec with `std::string hello()`.
+with Swift signatures, such as `swift::String hello()`. It does not generate an abstract C++ spec with `std::string hello()`.
 `allowMultipleImplementations` allows several implementations in the declared language.
 
 A C++ spec can accept or return a Swift object:

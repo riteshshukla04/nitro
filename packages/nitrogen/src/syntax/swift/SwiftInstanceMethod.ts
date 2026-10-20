@@ -26,7 +26,7 @@ export class SwiftInstanceMethod extends InstanceMethod {
   constructor({ method, accessor, config = NitroConfig.current }: SwiftInstanceMethodOptions) {
     const callable = prepareSwiftMethod(method, accessor == null, config)
     const parameters = callable.parameters.map((parameter) => parameter.swift)
-    super(`${method.name}_Swift`, callable.returnType, parameters, {
+    super(method.name, callable.returnType, parameters, {
       generated: true,
     })
     this.returnType = callable.returnType

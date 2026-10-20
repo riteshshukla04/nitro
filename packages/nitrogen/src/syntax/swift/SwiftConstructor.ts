@@ -49,7 +49,7 @@ export class SwiftConstructor extends Constructor {
   createBridge(cppClassName: string, swiftOptions: SwiftClassMethodOptions = {}): SwiftMethodBridge {
     // The C++ bridge calls static factories rather than C++ constructors.
     const nativeFactory = this.nativeFactory
-    const swiftFactory = new StaticMethod(`${nativeFactory.name}_Swift`, this.returnType, this.parameters, { generated: true })
+    const swiftFactory = new StaticMethod(nativeFactory.name, this.returnType, this.parameters, { generated: true })
     const cppBridgeBody = createCppBridgeBody({
       callable: this.callable,
       getCppInvocation: (args) => `${this.cppInvocationTarget}::${nativeFactory.name}(${args.join(', ')})`,

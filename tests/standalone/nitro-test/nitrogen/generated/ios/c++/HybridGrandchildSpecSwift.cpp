@@ -18,7 +18,7 @@ namespace margelo::nitro::test {
 
   // Properties
 
-  double HybridGrandchildSpecSwift::getGrandchildValue_Swift() {
+  double HybridGrandchildSpecSwift::getGrandchildValue() {
     return _swiftPart.getGrandchildValue();
   }
 
@@ -26,7 +26,7 @@ namespace margelo::nitro::test {
 
   // Constructor
 
-  ::NitroTest::HybridGrandchildSpec_cxx HybridGrandchildSpecSwift::constructor_Swift() {
+  ::NitroTest::HybridGrandchildSpec_cxx HybridGrandchildSpecSwift::constructor() {
     auto __result = ::NitroTest::HybridGrandchildSpec_cxx::constructor();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
@@ -36,8 +36,8 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridGrandchildSpecSwift::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridProperty("grandchildValue", &HybridGrandchildSpecSwift::getGrandchildValue_Swift);
-      clazz.registerHybridConstructor(&HybridGrandchildSpecSwift::constructor_Swift);
+      clazz.registerHybridProperty("grandchildValue", &HybridGrandchildSpecSwift::getGrandchildValue);
+      clazz.registerHybridConstructor(&HybridGrandchildSpecSwift::constructor);
     });
     return hybridClass;
   }

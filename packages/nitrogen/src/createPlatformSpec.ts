@@ -262,19 +262,7 @@ export function getHybridObjectSpec(
       }
       break
     }
-    case 'swift': {
-      const instanceNames = [...getInstanceMethodNames(spec), ...getPropertyAccessorNames(spec)]
-      const bridgeNames = new Set(instanceNames.flatMap((member) => [member, `${member}_Swift`]))
-      for (const method of staticCallables) {
-        for (const bridgeName of [method.name, `${method.name}_Swift`]) {
-          if (bridgeNames.has(bridgeName)) {
-            throw new Error(`${name}.${method.name}: Static members cannot share a generated Swift bridge name with another member.`)
-          }
-          bridgeNames.add(bridgeName)
-        }
-      }
-      break
-    }
+    case 'swift':
     case 'c++':
       break
   }
@@ -285,7 +273,6 @@ export function getHybridObjectSpec(
     switch (spec.language) {
       case 'swift':
         constructorMethodNames.add('constructor')
-        constructorMethodNames.add('constructor_Swift')
         methodNames.push(...getInstanceMethodNames(spec))
         break
       case 'c++':

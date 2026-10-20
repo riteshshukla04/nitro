@@ -20,7 +20,7 @@ namespace margelo::nitro::test {
 
   // Methods
 
-  swift::String HybridPlatformObjectSpecSwift::getOSVersion_Swift() {
+  swift::String HybridPlatformObjectSpecSwift::getOSVersion() {
     auto __result = withSwiftResult<swift::String>([&](void* __outResult) {
       return _swiftPart.getOSVersion(__outResult);
     });
@@ -32,7 +32,7 @@ namespace margelo::nitro::test {
 
   // Constructor
 
-  ::NitroTest::HybridPlatformObjectSpec_cxx HybridPlatformObjectSpecSwift::constructor_Swift() {
+  ::NitroTest::HybridPlatformObjectSpec_cxx HybridPlatformObjectSpecSwift::constructor() {
     auto __result = ::NitroTest::HybridPlatformObjectSpec_cxx::constructor();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
@@ -42,8 +42,8 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridPlatformObjectSpecSwift::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridMethod("getOSVersion", &HybridPlatformObjectSpecSwift::getOSVersion_Swift);
-      clazz.registerHybridConstructor(&HybridPlatformObjectSpecSwift::constructor_Swift);
+      clazz.registerHybridMethod("getOSVersion", &HybridPlatformObjectSpecSwift::getOSVersion);
+      clazz.registerHybridConstructor(&HybridPlatformObjectSpecSwift::constructor);
     });
     return hybridClass;
   }

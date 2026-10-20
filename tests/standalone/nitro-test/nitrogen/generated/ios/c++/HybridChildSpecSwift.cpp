@@ -18,13 +18,13 @@ namespace margelo::nitro::test {
 
   // Properties
 
-  double HybridChildSpecSwift::getChildValue_Swift() {
+  double HybridChildSpecSwift::getChildValue() {
     return _swiftPart.getChildValue();
   }
 
   // Methods
 
-  ::NitroTest::NamedVariant_cxx HybridChildSpecSwift::bounceVariant_Swift(const ::NitroTest::NamedVariant_cxx& variant) {
+  ::NitroTest::NamedVariant_cxx HybridChildSpecSwift::bounceVariant(const ::NitroTest::NamedVariant_cxx& variant) {
     auto __result = withSwiftResult<::NitroTest::NamedVariant_cxx>([&](void* __outResult) {
       return _swiftPart.bounceVariant(variant, __outResult);
     });
@@ -36,7 +36,7 @@ namespace margelo::nitro::test {
 
   // Constructor
 
-  ::NitroTest::HybridChildSpec_cxx HybridChildSpecSwift::constructor_Swift() {
+  ::NitroTest::HybridChildSpec_cxx HybridChildSpecSwift::constructor() {
     auto __result = ::NitroTest::HybridChildSpec_cxx::constructor();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
@@ -46,9 +46,9 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridChildSpecSwift::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridProperty("childValue", &HybridChildSpecSwift::getChildValue_Swift);
-      clazz.registerHybridMethod("bounceVariant", &HybridChildSpecSwift::bounceVariant_Swift);
-      clazz.registerHybridConstructor(&HybridChildSpecSwift::constructor_Swift);
+      clazz.registerHybridProperty("childValue", &HybridChildSpecSwift::getChildValue);
+      clazz.registerHybridMethod("bounceVariant", &HybridChildSpecSwift::bounceVariant);
+      clazz.registerHybridConstructor(&HybridChildSpecSwift::constructor);
     });
     return hybridClass;
   }

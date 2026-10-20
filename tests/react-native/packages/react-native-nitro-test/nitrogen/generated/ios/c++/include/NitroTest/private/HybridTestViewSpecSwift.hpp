@@ -56,24 +56,24 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
-    bool getIsBlue_Swift();
-    void setIsBlue_Swift(bool isBlue);
-    bool getHasBeenCalled_Swift();
-    void setHasBeenCalled_Swift(bool hasBeenCalled);
-    int64_t getInt64Value_Swift();
-    void setInt64Value_Swift(int64_t int64Value);
-    ::NitroTest::ColorScheme getColorScheme_Swift();
-    void setColorScheme_Swift(::NitroTest::ColorScheme colorScheme);
-    Callback<void()> getSomeCallback_Swift();
-    void setSomeCallback_Swift(const Callback<void()>& someCallback);
-    swift::Optional<double> getNativeDefaultValue_Swift();
-    void setNativeDefaultValue_Swift(const swift::Optional<double>& nativeDefaultValue);
+    bool getIsBlue();
+    void setIsBlue(bool isBlue);
+    bool getHasBeenCalled();
+    void setHasBeenCalled(bool hasBeenCalled);
+    int64_t getInt64Value();
+    void setInt64Value(int64_t int64Value);
+    ::NitroTest::ColorScheme getColorScheme();
+    void setColorScheme(::NitroTest::ColorScheme colorScheme);
+    Callback<void()> getSomeCallback();
+    void setSomeCallback(const Callback<void()>& someCallback);
+    swift::Optional<double> getNativeDefaultValue();
+    void setNativeDefaultValue(const swift::Optional<double>& nativeDefaultValue);
     // Methods
-    bool getIsViewBlue_Swift(const ::NitroTest::HybridTestViewSpec_cxx& view);
-    double getOnDropViewCount_Swift();
-    double getIsBlueSetterCallCount_Swift();
-    double getNativeDefaultValueSetterCallCount_Swift();
-    void someMethod_Swift();
+    bool getIsViewBlue(const ::NitroTest::HybridTestViewSpec_cxx& view);
+    double getOnDropViewCount();
+    double getIsBlueSetterCallCount();
+    double getNativeDefaultValueSetterCallCount();
+    void someMethod();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {

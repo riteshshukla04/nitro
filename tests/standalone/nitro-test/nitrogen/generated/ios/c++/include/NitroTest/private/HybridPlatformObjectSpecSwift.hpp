@@ -57,9 +57,9 @@ namespace margelo::nitro::test {
 
     // Properties
     // Methods
-    swift::String getOSVersion_Swift();
+    swift::String getOSVersion();
     // Constructor
-    static ::NitroTest::HybridPlatformObjectSpec_cxx constructor_Swift();
+    static ::NitroTest::HybridPlatformObjectSpec_cxx constructor();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {

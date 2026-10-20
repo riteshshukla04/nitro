@@ -20,7 +20,7 @@ namespace margelo::nitro::test::external {
 
   // Methods
 
-  swift::String HybridSomeExternalObjectSpecSwift::getValue_Swift() {
+  swift::String HybridSomeExternalObjectSpecSwift::getValue() {
     auto __result = withSwiftResult<swift::String>([&](void* __outResult) {
       return _swiftPart.getValue(__outResult);
     });
@@ -30,7 +30,7 @@ namespace margelo::nitro::test::external {
     return std::move(__result.value());
   }
 
-  ::NitroTestExternal::OptionalPrimitivesHolder HybridSomeExternalObjectSpecSwift::createOptionalPrimitivesHolder_Swift(const swift::Optional<double>& optionalNumber, const swift::Optional<bool>& optionalBoolean, const swift::Optional<uint64_t>& optionalUInt64, const swift::Optional<int64_t>& optionalInt64) {
+  ::NitroTestExternal::OptionalPrimitivesHolder HybridSomeExternalObjectSpecSwift::createOptionalPrimitivesHolder(const swift::Optional<double>& optionalNumber, const swift::Optional<bool>& optionalBoolean, const swift::Optional<uint64_t>& optionalUInt64, const swift::Optional<int64_t>& optionalInt64) {
     auto __result = withSwiftResult<::NitroTestExternal::OptionalPrimitivesHolder>([&](void* __outResult) {
       return _swiftPart.createOptionalPrimitivesHolder(optionalNumber, optionalBoolean, optionalUInt64, optionalInt64, __outResult);
     });
@@ -42,7 +42,7 @@ namespace margelo::nitro::test::external {
 
   // Constructor
 
-  ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx HybridSomeExternalObjectSpecSwift::constructor_Swift() {
+  ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx HybridSomeExternalObjectSpecSwift::constructor() {
     auto __result = ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx::constructor();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
@@ -52,9 +52,9 @@ namespace margelo::nitro::test::external {
 
   const std::shared_ptr<const HybridClass>& HybridSomeExternalObjectSpecSwift::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridMethod("getValue", &HybridSomeExternalObjectSpecSwift::getValue_Swift);
-      clazz.registerHybridMethod("createOptionalPrimitivesHolder", &HybridSomeExternalObjectSpecSwift::createOptionalPrimitivesHolder_Swift);
-      clazz.registerHybridConstructor(&HybridSomeExternalObjectSpecSwift::constructor_Swift);
+      clazz.registerHybridMethod("getValue", &HybridSomeExternalObjectSpecSwift::getValue);
+      clazz.registerHybridMethod("createOptionalPrimitivesHolder", &HybridSomeExternalObjectSpecSwift::createOptionalPrimitivesHolder);
+      clazz.registerHybridConstructor(&HybridSomeExternalObjectSpecSwift::constructor);
     });
     return hybridClass;
   }

@@ -18,13 +18,13 @@ namespace margelo::nitro::test {
 
   // Properties
 
-  double HybridBaseSpecSwift::getBaseValue_Swift() {
+  double HybridBaseSpecSwift::getBaseValue() {
     return _swiftPart.getBaseValue();
   }
 
   // Methods
 
-  ::NitroTest::Size HybridBaseSpecSwift::bounceSize_Swift(const ::NitroTest::Size& size) {
+  ::NitroTest::Size HybridBaseSpecSwift::bounceSize(const ::NitroTest::Size& size) {
     auto __result = withSwiftResult<::NitroTest::Size>([&](void* __outResult) {
       return _swiftPart.bounceSize(size, __outResult);
     });
@@ -34,7 +34,7 @@ namespace margelo::nitro::test {
     return std::move(__result.value());
   }
 
-  ::NitroTest::SizeUnit HybridBaseSpecSwift::bounceSizeUnit_Swift(::NitroTest::SizeUnit unit) {
+  ::NitroTest::SizeUnit HybridBaseSpecSwift::bounceSizeUnit(::NitroTest::SizeUnit unit) {
     auto __result = withSwiftResult<::NitroTest::SizeUnit>([&](void* __outResult) {
       return _swiftPart.bounceSizeUnit(unit, __outResult);
     });
@@ -44,7 +44,7 @@ namespace margelo::nitro::test {
     return std::move(__result.value());
   }
 
-  Promise<::NitroTest::Size> HybridBaseSpecSwift::mapSize_Swift(const ::NitroTest::Size& size, const Callback<::NitroTest::Size(const ::NitroTest::Size&)>& callback) {
+  Promise<::NitroTest::Size> HybridBaseSpecSwift::mapSize(const ::NitroTest::Size& size, const Callback<::NitroTest::Size(const ::NitroTest::Size&)>& callback) {
     auto __result = _swiftPart.mapSize(size, callback);
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
@@ -54,7 +54,7 @@ namespace margelo::nitro::test {
 
   // Constructor
 
-  ::NitroTest::HybridBaseSpec_cxx HybridBaseSpecSwift::constructor_Swift() {
+  ::NitroTest::HybridBaseSpec_cxx HybridBaseSpecSwift::constructor() {
     auto __result = ::NitroTest::HybridBaseSpec_cxx::constructor();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
@@ -64,7 +64,7 @@ namespace margelo::nitro::test {
 
   // Static methods
 
-  ::NitroTest::HybridBaseSpec_cxx HybridBaseSpecSwift::createAlternativeBase_Swift() {
+  ::NitroTest::HybridBaseSpec_cxx HybridBaseSpecSwift::createAlternativeBase() {
     auto __result = ::NitroTest::HybridBaseSpec_cxx::createAlternativeBase();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
@@ -72,7 +72,7 @@ namespace margelo::nitro::test {
     return ::NitroTest::HybridBaseSpec_cxx::fromUnsafe(__result.value());
   }
 
-  ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx HybridBaseSpecSwift::createInternalExternalObject_Swift() {
+  ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx HybridBaseSpecSwift::createInternalExternalObject() {
     auto __result = ::NitroTest::HybridBaseSpec_cxx::createInternalExternalObject();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
@@ -82,13 +82,13 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridBaseSpecSwift::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridProperty("baseValue", &HybridBaseSpecSwift::getBaseValue_Swift);
-      clazz.registerHybridMethod("bounceSize", &HybridBaseSpecSwift::bounceSize_Swift);
-      clazz.registerHybridMethod("bounceSizeUnit", &HybridBaseSpecSwift::bounceSizeUnit_Swift);
-      clazz.registerHybridMethod("mapSize", &HybridBaseSpecSwift::mapSize_Swift);
-      clazz.registerHybridConstructor(&HybridBaseSpecSwift::constructor_Swift);
-      clazz.registerStaticHybridMethod("createAlternativeBase", &HybridBaseSpecSwift::createAlternativeBase_Swift);
-      clazz.registerStaticHybridMethod("createInternalExternalObject", &HybridBaseSpecSwift::createInternalExternalObject_Swift);
+      clazz.registerHybridProperty("baseValue", &HybridBaseSpecSwift::getBaseValue);
+      clazz.registerHybridMethod("bounceSize", &HybridBaseSpecSwift::bounceSize);
+      clazz.registerHybridMethod("bounceSizeUnit", &HybridBaseSpecSwift::bounceSizeUnit);
+      clazz.registerHybridMethod("mapSize", &HybridBaseSpecSwift::mapSize);
+      clazz.registerHybridConstructor(&HybridBaseSpecSwift::constructor);
+      clazz.registerStaticHybridMethod("createAlternativeBase", &HybridBaseSpecSwift::createAlternativeBase);
+      clazz.registerStaticHybridMethod("createInternalExternalObject", &HybridBaseSpecSwift::createInternalExternalObject);
     });
     return hybridClass;
   }

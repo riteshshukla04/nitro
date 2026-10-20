@@ -58,7 +58,7 @@ export function createSwiftHybridViewManager(spec: HybridObjectSpec<'swift'>): S
 if (oldViewProps == nullptr
       ? newViewProps.${name}.isProvided()
       : !newViewProps.${name}.hasSameValue(oldViewProps->${name})) {
-  _hybridView->${setter}_Swift(nitro::${converter}::toSwift(newViewProps.${name}.get()));
+  _hybridView->${setter}(nitro::${converter}::toSwift(newViewProps.${name}.get()));
 }
 `.trim()
   })

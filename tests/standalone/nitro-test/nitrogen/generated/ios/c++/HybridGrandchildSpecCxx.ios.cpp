@@ -22,7 +22,7 @@ namespace margelo::nitro::test {
   }
 
   HybridGrandchildSpecCxx HybridGrandchildSpecCxx::create() {
-    auto __result = margelo::nitro::test::HybridGrandchildSpecSwift::constructor_Swift();
+    auto __result = margelo::nitro::test::HybridGrandchildSpecSwift::constructor();
     return SwiftConverter<margelo::nitro::test::HybridGrandchildSpecCxx, ::NitroTest::HybridGrandchildSpec_cxx>::fromSwift(__result);
   }
 
@@ -31,7 +31,7 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Grandchild.getGrandchildValue on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->getGrandchildValue_Swift();
+    auto __result = __implementation->getGrandchildValue();
     return SwiftConverter<double, double>::fromSwift(__result);
   }
 

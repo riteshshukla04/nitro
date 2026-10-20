@@ -30,7 +30,7 @@ namespace margelo::nitro::test {
   }
 
   HybridChildSpecCxx HybridChildSpecCxx::create() {
-    auto __result = margelo::nitro::test::HybridChildSpecSwift::constructor_Swift();
+    auto __result = margelo::nitro::test::HybridChildSpecSwift::constructor();
     return SwiftConverter<margelo::nitro::test::HybridChildSpecCxx, ::NitroTest::HybridChildSpec_cxx>::fromSwift(__result);
   }
 
@@ -39,7 +39,7 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Child.getChildValue on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->getChildValue_Swift();
+    auto __result = __implementation->getChildValue();
     return SwiftConverter<double, double>::fromSwift(__result);
   }
 
@@ -48,7 +48,7 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Child.bounceVariant on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->bounceVariant_Swift(SwiftConverter<std::variant<std::string, margelo::nitro::test::Car>, ::NitroTest::NamedVariant_cxx>::toSwift(variant));
+    auto __result = __implementation->bounceVariant(SwiftConverter<std::variant<std::string, margelo::nitro::test::Car>, ::NitroTest::NamedVariant_cxx>::toSwift(variant));
     return SwiftConverter<std::variant<std::string, margelo::nitro::test::Car>, ::NitroTest::NamedVariant_cxx>::fromSwift(__result);
   }
 

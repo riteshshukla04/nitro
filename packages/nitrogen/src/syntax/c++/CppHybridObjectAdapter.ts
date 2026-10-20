@@ -180,11 +180,10 @@ return ${converter}::fromSwift(__result);
     ...instanceMethods.map((method) => `${getSignature(method, false, false)};`),
     ...staticMethods.map((method) => `${getSignature(method, false, true)};`),
   ]
-  const bridgeSuffix = spec.language === 'swift' ? '_Swift' : ''
   const definitions = [
     ...instanceMethods.map((method) => {
       const signature = getSignature(method, true, false)
-      const body = getForwarder(method, `__implementation->${method.name}${bridgeSuffix}`)
+      const body = getForwarder(method, `__implementation->${method.name}`)
       return `
 ${signature} {
   auto __implementation = std::dynamic_pointer_cast<${bridge}>(getNativeObject());
@@ -197,7 +196,7 @@ ${signature} {
     }),
     ...staticMethods.map((method) => {
       const signature = getSignature(method, true, true)
-      const body = getForwarder(method, `${staticTarget}::${method.name}${bridgeSuffix}`)
+      const body = getForwarder(method, `${staticTarget}::${method.name}`)
       return `
 ${signature} {
   ${indent(body, '  ')}
@@ -213,7 +212,7 @@ ${signature} {
     if (spec.language === 'swift') {
       const converter = getSwiftConverter({ cppType: type, swiftType: wrapSwiftType(type, spec.config) })
       body = `
-auto __result = ${bridge}::constructor_Swift(${argumentsList});
+auto __result = ${bridge}::constructor(${argumentsList});
 return ${converter}::fromSwift(__result);
 `.trim()
     } else {

@@ -56,27 +56,27 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
-    double getNumberValue_Swift();
-    void setNumberValue_Swift(double numberValue);
-    ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx getThisObject_Swift();
+    double getNumberValue();
+    void setNumberValue(double numberValue);
+    ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx getThisObject();
     // Methods
-    void simpleFunc_Swift();
-    double addNumbers_Swift(double a, double b);
-    swift::String addStrings_Swift(const swift::String& a, const swift::String& b);
-    swift::Array<double> bounceNumbers_Swift(const swift::Array<double>& array);
-    ::NitroTest::Car bounceCar_Swift(const ::NitroTest::Car& car);
-    ::NitroTest::Record_swift__String_double bounceSimpleMap_Swift(const ::NitroTest::Record_swift__String_double& map);
-    swift::String tryOptionalParams_Swift(double num, bool boo, const swift::Optional<swift::String>& str);
-    ::NitroTest::Variant_Double_String_cxx passVariant_Swift(const ::NitroTest::Variant_Bool__Double___String__Double_String_cxx& either);
-    ArrayBuffer bounceArrayBuffer_Swift(const ArrayBuffer& buffer);
-    ArrayBuffer copyBuffer_Swift(const ArrayBuffer& buffer);
-    double callbackSync_Swift(const Callback<double()>& callback);
-    Promise<double> promiseReturnsInstantly_Swift();
-    Promise<double> createPendingPromise_Swift();
-    void resolvePendingPromiseOnWorker_Swift();
-    ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx newBenchmarkObject_Swift();
+    void simpleFunc();
+    double addNumbers(double a, double b);
+    swift::String addStrings(const swift::String& a, const swift::String& b);
+    swift::Array<double> bounceNumbers(const swift::Array<double>& array);
+    ::NitroTest::Car bounceCar(const ::NitroTest::Car& car);
+    ::NitroTest::Record_swift__String_double bounceSimpleMap(const ::NitroTest::Record_swift__String_double& map);
+    swift::String tryOptionalParams(double num, bool boo, const swift::Optional<swift::String>& str);
+    ::NitroTest::Variant_Double_String_cxx passVariant(const ::NitroTest::Variant_Bool__Double___String__Double_String_cxx& either);
+    ArrayBuffer bounceArrayBuffer(const ArrayBuffer& buffer);
+    ArrayBuffer copyBuffer(const ArrayBuffer& buffer);
+    double callbackSync(const Callback<double()>& callback);
+    Promise<double> promiseReturnsInstantly();
+    Promise<double> createPendingPromise();
+    void resolvePendingPromiseOnWorker();
+    ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx newBenchmarkObject();
     // Constructor
-    static ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx constructor_Swift();
+    static ::NitroTest::HybridBenchmarkObjectSwiftKotlinSpec_cxx constructor();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {

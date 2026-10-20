@@ -56,10 +56,10 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
-    double getGrandchildValue_Swift();
+    double getGrandchildValue();
     // Methods
     // Constructor
-    static ::NitroTest::HybridGrandchildSpec_cxx constructor_Swift();
+    static ::NitroTest::HybridGrandchildSpec_cxx constructor();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {

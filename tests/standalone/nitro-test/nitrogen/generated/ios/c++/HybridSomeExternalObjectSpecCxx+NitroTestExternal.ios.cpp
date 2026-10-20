@@ -26,7 +26,7 @@ namespace margelo::nitro::test::adapters::NitroTestExternal {
   }
 
   HybridSomeExternalObjectSpecCxx HybridSomeExternalObjectSpecCxx::create() {
-    auto __result = margelo::nitro::test::external::HybridSomeExternalObjectSpecSwift::constructor_Swift();
+    auto __result = margelo::nitro::test::external::HybridSomeExternalObjectSpecSwift::constructor();
     return SwiftConverter<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx>::fromSwift(__result);
   }
 
@@ -35,7 +35,7 @@ namespace margelo::nitro::test::adapters::NitroTestExternal {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call SomeExternalObject.getValue on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->getValue_Swift();
+    auto __result = __implementation->getValue();
     return SwiftConverter<std::string, swift::String>::fromSwift(__result);
   }
 
@@ -44,7 +44,7 @@ namespace margelo::nitro::test::adapters::NitroTestExternal {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call SomeExternalObject.createOptionalPrimitivesHolder on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->createOptionalPrimitivesHolder_Swift(SwiftConverter<std::optional<double>, swift::Optional<double>>::toSwift(optionalNumber), SwiftConverter<std::optional<bool>, swift::Optional<bool>>::toSwift(optionalBoolean), SwiftConverter<std::optional<uint64_t>, swift::Optional<uint64_t>>::toSwift(optionalUInt64), SwiftConverter<std::optional<int64_t>, swift::Optional<int64_t>>::toSwift(optionalInt64));
+    auto __result = __implementation->createOptionalPrimitivesHolder(SwiftConverter<std::optional<double>, swift::Optional<double>>::toSwift(optionalNumber), SwiftConverter<std::optional<bool>, swift::Optional<bool>>::toSwift(optionalBoolean), SwiftConverter<std::optional<uint64_t>, swift::Optional<uint64_t>>::toSwift(optionalUInt64), SwiftConverter<std::optional<int64_t>, swift::Optional<int64_t>>::toSwift(optionalInt64));
     return SwiftConverter<margelo::nitro::test::OptionalPrimitivesHolder, ::NitroTestExternal::OptionalPrimitivesHolder>::fromSwift(__result);
   }
 

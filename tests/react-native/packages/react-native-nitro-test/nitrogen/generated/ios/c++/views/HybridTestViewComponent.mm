@@ -105,37 +105,37 @@ using namespace margelo::nitro::test::views;
     if (oldViewProps == nullptr
           ? newViewProps.isBlue.isProvided()
           : !newViewProps.isBlue.hasSameValue(oldViewProps->isBlue)) {
-      _hybridView->setIsBlue_Swift(nitro::SwiftConverter<bool, bool>::toSwift(newViewProps.isBlue.get()));
+      _hybridView->setIsBlue(nitro::SwiftConverter<bool, bool>::toSwift(newViewProps.isBlue.get()));
     }
     // hasBeenCalled: boolean
     if (oldViewProps == nullptr
           ? newViewProps.hasBeenCalled.isProvided()
           : !newViewProps.hasBeenCalled.hasSameValue(oldViewProps->hasBeenCalled)) {
-      _hybridView->setHasBeenCalled_Swift(nitro::SwiftConverter<bool, bool>::toSwift(newViewProps.hasBeenCalled.get()));
+      _hybridView->setHasBeenCalled(nitro::SwiftConverter<bool, bool>::toSwift(newViewProps.hasBeenCalled.get()));
     }
     // int64Value: int64
     if (oldViewProps == nullptr
           ? newViewProps.int64Value.isProvided()
           : !newViewProps.int64Value.hasSameValue(oldViewProps->int64Value)) {
-      _hybridView->setInt64Value_Swift(nitro::SwiftConverter<int64_t, int64_t>::toSwift(newViewProps.int64Value.get()));
+      _hybridView->setInt64Value(nitro::SwiftConverter<int64_t, int64_t>::toSwift(newViewProps.int64Value.get()));
     }
     // colorScheme: enum
     if (oldViewProps == nullptr
           ? newViewProps.colorScheme.isProvided()
           : !newViewProps.colorScheme.hasSameValue(oldViewProps->colorScheme)) {
-      _hybridView->setColorScheme_Swift(nitro::SwiftConverter<margelo::nitro::test::ColorScheme, ::NitroTest::ColorScheme>::toSwift(newViewProps.colorScheme.get()));
+      _hybridView->setColorScheme(nitro::SwiftConverter<margelo::nitro::test::ColorScheme, ::NitroTest::ColorScheme>::toSwift(newViewProps.colorScheme.get()));
     }
     // someCallback: callback
     if (oldViewProps == nullptr
           ? newViewProps.someCallback.isProvided()
           : !newViewProps.someCallback.hasSameValue(oldViewProps->someCallback)) {
-      _hybridView->setSomeCallback_Swift(nitro::SwiftConverter<margelo::nitro::Callback<void()>, margelo::nitro::Callback<void()>>::toSwift(newViewProps.someCallback.get()));
+      _hybridView->setSomeCallback(nitro::SwiftConverter<margelo::nitro::Callback<void()>, margelo::nitro::Callback<void()>>::toSwift(newViewProps.someCallback.get()));
     }
     // nativeDefaultValue: optional
     if (oldViewProps == nullptr
           ? newViewProps.nativeDefaultValue.isProvided()
           : !newViewProps.nativeDefaultValue.hasSameValue(oldViewProps->nativeDefaultValue)) {
-      _hybridView->setNativeDefaultValue_Swift(nitro::SwiftConverter<std::optional<double>, swift::Optional<double>>::toSwift(newViewProps.nativeDefaultValue.get()));
+      _hybridView->setNativeDefaultValue(nitro::SwiftConverter<std::optional<double>, swift::Optional<double>>::toSwift(newViewProps.nativeDefaultValue.get()));
     }
 
     // Update hybridRef if it changed

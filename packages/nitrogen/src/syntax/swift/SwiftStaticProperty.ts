@@ -82,7 +82,7 @@ export class SwiftStaticProperty extends StaticProperty {
   private createAccessor(nativeMethod: StaticMethod, config: NitroConfig): SwiftStaticAccessor {
     const callable = prepareSwiftMethod(nativeMethod, false, config)
     const swiftMethod = new StaticMethod(
-      `${nativeMethod.name}_Swift`,
+      nativeMethod.name,
       callable.returnType,
       callable.parameters.map((parameter) => parameter.swift),
       { generated: true }

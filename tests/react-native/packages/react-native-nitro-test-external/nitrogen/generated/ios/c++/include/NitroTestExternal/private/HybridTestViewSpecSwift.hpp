@@ -56,13 +56,13 @@ namespace margelo::nitro::test::external {
     std::string toString() override;
 
     // Properties
-    bool getIsBlue_Swift();
-    void setIsBlue_Swift(bool isBlue);
-    Callback<void()> getSomeCallback_Swift();
-    void setSomeCallback_Swift(const Callback<void()>& someCallback);
+    bool getIsBlue();
+    void setIsBlue(bool isBlue);
+    Callback<void()> getSomeCallback();
+    void setSomeCallback(const Callback<void()>& someCallback);
     // Methods
-    void someMethod_Swift();
-    swift::String getModuleName_Swift();
+    void someMethod();
+    swift::String getModuleName();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {

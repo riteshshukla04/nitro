@@ -56,16 +56,16 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
-    double getBaseValue_Swift();
+    double getBaseValue();
     // Methods
-    ::NitroTest::Size bounceSize_Swift(const ::NitroTest::Size& size);
-    ::NitroTest::SizeUnit bounceSizeUnit_Swift(::NitroTest::SizeUnit unit);
-    Promise<::NitroTest::Size> mapSize_Swift(const ::NitroTest::Size& size, const Callback<::NitroTest::Size(const ::NitroTest::Size&)>& callback);
+    ::NitroTest::Size bounceSize(const ::NitroTest::Size& size);
+    ::NitroTest::SizeUnit bounceSizeUnit(::NitroTest::SizeUnit unit);
+    Promise<::NitroTest::Size> mapSize(const ::NitroTest::Size& size, const Callback<::NitroTest::Size(const ::NitroTest::Size&)>& callback);
     // Constructor
-    static ::NitroTest::HybridBaseSpec_cxx constructor_Swift();
+    static ::NitroTest::HybridBaseSpec_cxx constructor();
     // Static methods
-    static ::NitroTest::HybridBaseSpec_cxx createAlternativeBase_Swift();
-    static ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx createInternalExternalObject_Swift();
+    static ::NitroTest::HybridBaseSpec_cxx createAlternativeBase();
+    static ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx createInternalExternalObject();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {

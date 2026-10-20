@@ -18,32 +18,32 @@ namespace margelo::nitro::test::external {
 
   // Properties
 
-  bool HybridTestViewSpecSwift::getIsBlue_Swift() {
+  bool HybridTestViewSpecSwift::getIsBlue() {
     return _swiftPart.getIsBlue();
   }
 
-  void HybridTestViewSpecSwift::setIsBlue_Swift(bool isBlue) {
+  void HybridTestViewSpecSwift::setIsBlue(bool isBlue) {
     return _swiftPart.setIsBlue(isBlue);
   }
 
-  Callback<void()> HybridTestViewSpecSwift::getSomeCallback_Swift() {
+  Callback<void()> HybridTestViewSpecSwift::getSomeCallback() {
     return _swiftPart.getSomeCallback();
   }
 
-  void HybridTestViewSpecSwift::setSomeCallback_Swift(const Callback<void()>& someCallback) {
+  void HybridTestViewSpecSwift::setSomeCallback(const Callback<void()>& someCallback) {
     return _swiftPart.setSomeCallback(someCallback);
   }
 
   // Methods
 
-  void HybridTestViewSpecSwift::someMethod_Swift() {
+  void HybridTestViewSpecSwift::someMethod() {
     auto __result = _swiftPart.someMethod();
     if (__result.hasError()) [[unlikely]] {
       std::rethrow_exception(__result.error());
     }
   }
 
-  swift::String HybridTestViewSpecSwift::getModuleName_Swift() {
+  swift::String HybridTestViewSpecSwift::getModuleName() {
     auto __result = withSwiftResult<swift::String>([&](void* __outResult) {
       return _swiftPart.getModuleName(__outResult);
     });
@@ -55,10 +55,10 @@ namespace margelo::nitro::test::external {
 
   const std::shared_ptr<const HybridClass>& HybridTestViewSpecSwift::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
-      clazz.registerHybridProperty("isBlue", &HybridTestViewSpecSwift::getIsBlue_Swift, &HybridTestViewSpecSwift::setIsBlue_Swift);
-      clazz.registerHybridProperty("someCallback", &HybridTestViewSpecSwift::getSomeCallback_Swift, &HybridTestViewSpecSwift::setSomeCallback_Swift);
-      clazz.registerHybridMethod("someMethod", &HybridTestViewSpecSwift::someMethod_Swift);
-      clazz.registerHybridMethod("getModuleName", &HybridTestViewSpecSwift::getModuleName_Swift);
+      clazz.registerHybridProperty("isBlue", &HybridTestViewSpecSwift::getIsBlue, &HybridTestViewSpecSwift::setIsBlue);
+      clazz.registerHybridProperty("someCallback", &HybridTestViewSpecSwift::getSomeCallback, &HybridTestViewSpecSwift::setSomeCallback);
+      clazz.registerHybridMethod("someMethod", &HybridTestViewSpecSwift::someMethod);
+      clazz.registerHybridMethod("getModuleName", &HybridTestViewSpecSwift::getModuleName);
     });
     return hybridClass;
   }

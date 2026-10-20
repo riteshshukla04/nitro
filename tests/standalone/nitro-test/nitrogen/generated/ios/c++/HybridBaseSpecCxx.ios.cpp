@@ -31,7 +31,7 @@ namespace margelo::nitro::test {
   }
 
   HybridBaseSpecCxx HybridBaseSpecCxx::create() {
-    auto __result = margelo::nitro::test::HybridBaseSpecSwift::constructor_Swift();
+    auto __result = margelo::nitro::test::HybridBaseSpecSwift::constructor();
     return SwiftConverter<margelo::nitro::test::HybridBaseSpecCxx, ::NitroTest::HybridBaseSpec_cxx>::fromSwift(__result);
   }
 
@@ -40,7 +40,7 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Base.getBaseValue on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->getBaseValue_Swift();
+    auto __result = __implementation->getBaseValue();
     return SwiftConverter<double, double>::fromSwift(__result);
   }
 
@@ -49,7 +49,7 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Base.bounceSize on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->bounceSize_Swift(SwiftConverter<margelo::nitro::test::Size, ::NitroTest::Size>::toSwift(size));
+    auto __result = __implementation->bounceSize(SwiftConverter<margelo::nitro::test::Size, ::NitroTest::Size>::toSwift(size));
     return SwiftConverter<margelo::nitro::test::Size, ::NitroTest::Size>::fromSwift(__result);
   }
 
@@ -58,7 +58,7 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Base.bounceSizeUnit on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->bounceSizeUnit_Swift(SwiftConverter<margelo::nitro::test::SizeUnit, ::NitroTest::SizeUnit>::toSwift(unit));
+    auto __result = __implementation->bounceSizeUnit(SwiftConverter<margelo::nitro::test::SizeUnit, ::NitroTest::SizeUnit>::toSwift(unit));
     return SwiftConverter<margelo::nitro::test::SizeUnit, ::NitroTest::SizeUnit>::fromSwift(__result);
   }
 
@@ -67,17 +67,17 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Base.mapSize on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->mapSize_Swift(SwiftConverter<margelo::nitro::test::Size, ::NitroTest::Size>::toSwift(size), SwiftConverter<margelo::nitro::Callback<margelo::nitro::test::Size(const margelo::nitro::test::Size& /* size */)>, margelo::nitro::Callback<::NitroTest::Size(const ::NitroTest::Size&)>>::toSwift(callback));
+    auto __result = __implementation->mapSize(SwiftConverter<margelo::nitro::test::Size, ::NitroTest::Size>::toSwift(size), SwiftConverter<margelo::nitro::Callback<margelo::nitro::test::Size(const margelo::nitro::test::Size& /* size */)>, margelo::nitro::Callback<::NitroTest::Size(const ::NitroTest::Size&)>>::toSwift(callback));
     return SwiftConverter<Promise<margelo::nitro::test::Size>, Promise<::NitroTest::Size>>::fromSwift(__result);
   }
 
   margelo::nitro::test::HybridBaseSpecCxx HybridBaseSpecCxx::createAlternativeBase() {
-    auto __result = margelo::nitro::test::HybridBaseSpecSwift::createAlternativeBase_Swift();
+    auto __result = margelo::nitro::test::HybridBaseSpecSwift::createAlternativeBase();
     return SwiftConverter<margelo::nitro::test::HybridBaseSpecCxx, ::NitroTest::HybridBaseSpec_cxx>::fromSwift(__result);
   }
 
   margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx HybridBaseSpecCxx::createInternalExternalObject() {
-    auto __result = margelo::nitro::test::HybridBaseSpecSwift::createInternalExternalObject_Swift();
+    auto __result = margelo::nitro::test::HybridBaseSpecSwift::createInternalExternalObject();
     return SwiftConverter<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, ::NitroTestExternal::HybridSomeExternalObjectSpec_cxx>::fromSwift(__result);
   }
 

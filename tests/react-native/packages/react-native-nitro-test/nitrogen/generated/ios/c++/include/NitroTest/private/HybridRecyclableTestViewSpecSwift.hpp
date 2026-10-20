@@ -56,15 +56,15 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
-    bool getIsBlue_Swift();
-    void setIsBlue_Swift(bool isBlue);
-    swift::Optional<double> getNativeDefaultValue_Swift();
-    void setNativeDefaultValue_Swift(const swift::Optional<double>& nativeDefaultValue);
+    bool getIsBlue();
+    void setIsBlue(bool isBlue);
+    swift::Optional<double> getNativeDefaultValue();
+    void setNativeDefaultValue(const swift::Optional<double>& nativeDefaultValue);
     // Methods
-    double getInvalidLifecycleOrderCount_Swift();
-    double getOnDropViewCount_Swift();
-    double getPrepareForRecycleCount_Swift();
-    double getNativeDefaultValueSetterCallCount_Swift();
+    double getInvalidLifecycleOrderCount();
+    double getOnDropViewCount();
+    double getPrepareForRecycleCount();
+    double getNativeDefaultValueSetterCallCount();
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {
