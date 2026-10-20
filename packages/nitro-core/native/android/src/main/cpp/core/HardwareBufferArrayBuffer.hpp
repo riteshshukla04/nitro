@@ -16,13 +16,14 @@
 
 namespace margelo::nitro {
 
-using namespace facebook;
+namespace jni = facebook::jni;
+namespace jsi = facebook::jsi;
 
 #if __ANDROID_API__ >= 26
 /**
  * Represents an `ArrayBuffer` that holds a `HardwareBuffer`.
  */
-class HardwareBufferArrayBuffer final : public ArrayBuffer {
+class HardwareBufferArrayBuffer final : public jsi::MutableBuffer {
 public:
   /**
    * Create a new `HardwareBufferArrayBuffer` instance that wraps the given `HardwareBuffer`.
@@ -39,9 +40,8 @@ public:
   }
 
   ~HardwareBufferArrayBuffer() override {
-    // Hermes GC can destroy JS objects on a non-JNI Thread.
     unlock();
-    jni::ThreadScope::WithClassLoader([&] { AHardwareBuffer_release(_hardwareBuffer); });
+    AHardwareBuffer_release(_hardwareBuffer);
   }
 
 public:
@@ -84,12 +84,6 @@ public:
   }
   [[nodiscard]] size_t size() const override {
     return JHardwareBufferUtils::getHardwareBufferSize(_hardwareBuffer);
-  }
-  [[nodiscard]] bool isOwner() const noexcept override {
-    return true;
-  }
-  [[nodiscard]] size_t getExternalMemorySize() const override {
-    return size();
   }
 
 public:

@@ -141,13 +141,9 @@ react {
 }
 
 tasks.register('prepareHeaders', Sync) {
-  from(fileTree('./src/main/cpp').filter { it.isFile() }) {
-    include '*.hpp'
-    into 'NitroModules'
-  }
-  from(fileTree('./core/main/cpp').filter { it.isFile() }) {
-    include '*.hpp'
-    into 'NitroModules'
+  from(['./src/main/cpp', './core/main/cpp']) {
+    include '**/*.hpp'
+    eachFile { path = "NitroModules/${name}" }
   }
   from('../cpp/core/include') { include '**/*.hpp' }
   from('../include') { include '**/*.hpp' }

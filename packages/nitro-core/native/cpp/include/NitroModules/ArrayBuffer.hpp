@@ -107,6 +107,8 @@ public:
   /** Whether this buffer retains its storage lifetime independently of the JS Runtime. */
   bool isOwner() const SWIFT_PRIVATE;
   ArrayBuffer asOwning() const;
+  /** Returns the retained native backing buffer, or nullptr for JS-backed storage. */
+  NativeArrayBuffer getNativeBuffer() const SWIFT_PRIVATE;
 
 public:
   /**

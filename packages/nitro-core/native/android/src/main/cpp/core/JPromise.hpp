@@ -8,13 +8,15 @@
 #pragma once
 
 #include <NitroModules/Promise.hpp>
+#include <exception>
 #include <fbjni/fbjni.h>
-#include <mutex>
-#include <variant>
+#include <functional>
+#include <optional>
+#include <utility>
 
 namespace margelo::nitro {
 
-using namespace facebook;
+namespace jni = facebook::jni;
 
 struct JOnResolvedCallback : public jni::JavaClass<JOnResolvedCallback> {
   static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/core/Promise$OnResolvedCallback;";
@@ -33,13 +35,13 @@ struct JOnRejectedCallback : public jni::JavaClass<JOnRejectedCallback> {
 };
 
 /**
- * Represents a Promise implemented in Java.
+ * JNI wrapper around the shared C++ Promise.
+ * Calls require an attached calling thread. Destruction attaches as needed.
  */
 class JPromise final : public jni::HybridClass<JPromise> {
 public:
   static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/core/Promise;";
   using ResultType = jni::global_ref<jni::JObject>;
-  using ErrorType = jni::global_ref<jni::JThrowable>;
   using OnResolvedFunc = std::function<void(jni::alias_ref<jni::JObject>)>;
   using OnRejectedFunc = std::function<void(jni::alias_ref<jni::JThrowable>)>;
 
@@ -61,83 +63,64 @@ public:
 
 public:
   ~JPromise() override {
-    if (isPending()) [[unlikely]] {
-      jni::ThreadScope::WithClassLoader([&]() {
-        std::runtime_error error("Timeouted: JPromise was destroyed!");
-        this->reject(jni::getJavaExceptionForCppException(std::make_exception_ptr(error)));
-      });
-    }
+    // Destroy stored JNI references and notify pending listeners while attached.
+    jni::ThreadScope::WithClassLoader([&]() { _promise.reset(); });
   }
 
 public:
   void resolve(jni::alias_ref<jni::JObject> result) {
-    std::unique_lock lock(_mutex);
-    jni::global_ref<jni::JObject> globalResult = jni::make_global(result);
-    _state = globalResult;
-    for (const auto& onResolved : _onResolvedListeners) {
-      onResolved(result);
-    }
+    const auto promise = *_promise;
+    promise.resolve(jni::make_global(result));
   }
   void reject(jni::alias_ref<jni::JThrowable> error) {
-    std::unique_lock lock(_mutex);
-    jni::global_ref<jni::JThrowable> globalError = jni::make_global(error);
-    _state = globalError;
-    for (const auto& onRejected : _onRejectedListeners) {
-      onRejected(error);
-    }
+    const auto promise = *_promise;
+    promise.reject(std::make_exception_ptr(jni::JniException(error)));
+  }
+  void reject(std::exception_ptr error) {
+    const auto promise = *_promise;
+    promise.reject(std::move(error));
   }
 
 public:
-  void addOnResolvedListener(OnResolvedFunc&& onResolved) {
-    std::unique_lock lock(_mutex);
-    if (auto result = std::get_if<ResultType>(&_state)) {
-      // Promise is already resolved! Call the callback immediately
-      onResolved(*result);
-    } else {
-      // Promise is not yet resolved, put the listener in our queue.
-      _onResolvedListeners.push_back(std::move(onResolved));
-    }
+  void addOnResolvedListener(OnResolvedFunc onResolved) {
+    const auto promise = *_promise;
+    promise.addOnResolvedListener([onResolved = std::move(onResolved)](const ResultType& result) { onResolved(result); });
   }
-  void addOnRejectedListener(OnRejectedFunc&& onRejected) {
-    std::unique_lock lock(_mutex);
-    if (auto error = std::get_if<ErrorType>(&_state)) {
-      // Promise is already rejected! Call the callback immediately
-      onRejected(*error);
-    } else {
-      // Promise is not yet rejected, put the listener in our queue.
-      _onRejectedListeners.push_back(std::move(onRejected));
-    }
+  void addOnRejectedListener(OnRejectedFunc onRejected) {
+    const auto promise = *_promise;
+    promise.addOnRejectedListener(
+        [onRejected = std::move(onRejected)](const std::exception_ptr& error) { onRejected(getJavaException(error)); });
   }
 
 private:
+  void rejectJava(jni::alias_ref<jni::JThrowable> error) {
+    reject(error);
+  }
   void addOnResolvedListenerJava(jni::alias_ref<JOnResolvedCallback> callback) {
-    std::unique_lock lock(_mutex);
-    if (auto result = std::get_if<ResultType>(&_state)) {
-      // Promise is already resolved! Call the callback immediately
-      callback->onResolved(*result);
-    } else {
-      // Promise is not yet resolved, put the listener in our queue.
-      auto sharedCallback = jni::make_global(callback);
-      _onResolvedListeners.emplace_back(
-          [sharedCallback = std::move(sharedCallback)](const auto& result) { sharedCallback->onResolved(result); });
-    }
+    addOnResolvedListener([callback = jni::make_global(callback)](auto result) { callback->onResolved(result); });
   }
   void addOnRejectedListenerJava(jni::alias_ref<JOnRejectedCallback> callback) {
-    std::unique_lock lock(_mutex);
-    if (auto error = std::get_if<ErrorType>(&_state)) {
-      // Promise is already rejected! Call the callback immediately
-      callback->onRejected(*error);
-    } else {
-      // Promise is not yet rejected, put the listener in our queue.
-      auto sharedCallback = jni::make_global(callback);
-      _onRejectedListeners.emplace_back(
-          [sharedCallback = std::move(sharedCallback)](const auto& error) { sharedCallback->onRejected(error); });
-    }
+    addOnRejectedListener([callback = jni::make_global(callback)](auto error) { callback->onRejected(error); });
   }
 
 private:
-  [[nodiscard]] bool isPending() const noexcept {
-    return std::holds_alternative<std::monostate>(_state);
+  static jni::local_ref<jni::JThrowable> getJavaException(const std::exception_ptr& error) {
+    try {
+      std::rethrow_exception(error);
+    } catch (const jni::JniException& exception) {
+      // fbjni's generic conversion consumes JniException's throwable. Keep it for subsequent listeners.
+      return exception.getThrowable();
+    } catch (const std::nested_exception& exception) {
+      // fbjni also consumes nested JniException causes. Preserve them when converting this shared error.
+      const auto* nativeException = dynamic_cast<const std::exception*>(&exception);
+      auto javaException = jni::JCppException::create(nativeException != nullptr ? nativeException->what() : "Nested C++ exception");
+      if (const auto cause = exception.nested_ptr()) {
+        javaException->initCause(getJavaException(cause));
+      }
+      return javaException;
+    } catch (...) {
+      return jni::getJavaExceptionForCppException(error);
+    }
   }
 
 private:
@@ -146,17 +129,14 @@ private:
 private:
   friend HybridBase;
   using HybridBase::HybridBase;
-  std::variant<std::monostate, ResultType, ErrorType> _state;
-  std::vector<OnResolvedFunc> _onResolvedListeners;
-  std::vector<OnRejectedFunc> _onRejectedListeners;
-  std::mutex _mutex;
+  std::optional<Promise<ResultType>> _promise = Promise<ResultType>::pending();
 
 public:
   static void registerNatives() {
     registerHybrid({
         makeNativeMethod("initHybrid", JPromise::initHybrid),
         makeNativeMethod("nativeResolve", JPromise::resolve),
-        makeNativeMethod("nativeReject", JPromise::reject),
+        makeNativeMethod("nativeReject", JPromise::rejectJava),
         makeNativeMethod("addOnResolvedListener", JPromise::addOnResolvedListenerJava),
         makeNativeMethod("addOnRejectedListener", JPromise::addOnRejectedListenerJava),
     });

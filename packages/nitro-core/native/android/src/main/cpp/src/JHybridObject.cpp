@@ -6,12 +6,11 @@
 //
 
 #include "JHybridObject.hpp"
-#include "JNISharedPtr.hpp"
 #include <fbjni/fbjni.h>
 
 namespace margelo::nitro {
 
-using namespace facebook;
+namespace jni = facebook::jni;
 
 std::shared_ptr<JHybridObject> JHybridObject::JavaPart::getJHybridObject() {
   jni::local_ref<JHybridObject::JavaPart> javaPart = jni::make_local(self());
@@ -59,7 +58,7 @@ JHybridObject::~JHybridObject() {
 }
 
 size_t JHybridObject::getExternalMemorySize() noexcept {
-  static const auto method = _javaPart->javaClassStatic()->getMethod<jlong()>("getMemorySize");
+  static const auto method = JavaPart::javaClassStatic()->getMethod<jlong()>("getMemorySize");
   return method(_javaPart);
 }
 
@@ -70,15 +69,14 @@ bool JHybridObject::equals(const std::shared_ptr<HybridObject>& other) {
   return false;
 }
 
-void JHybridObject::dispose() noexcept {
-  static const auto method = _javaPart->javaClassStatic()->getMethod<void()>("dispose");
+void JHybridObject::dispose() {
+  static const auto method = JavaPart::javaClassStatic()->getMethod<void()>("dispose");
   method(_javaPart);
 }
 
 std::string JHybridObject::toString() {
-  static const auto method = _javaPart->javaClassStatic()->getMethod<jni::JString()>("toString");
-  auto javaString = method(_javaPart);
-  return javaString->toStdString();
+  static const auto method = JavaPart::javaClassStatic()->getMethod<jni::JString()>("toString");
+  return method(_javaPart)->toStdString();
 }
 
 } // namespace margelo::nitro

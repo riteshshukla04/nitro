@@ -16,12 +16,13 @@
 
 namespace margelo::nitro {
 
-using namespace facebook;
+namespace jni = facebook::jni;
 
 // Implementation for the C++ shared `ThreadUtils` class
 std::string ThreadUtils::getThreadName() {
-  auto name = JThreadUtils::getCurrentThreadName();
-  return name->toStdString();
+  std::string name;
+  jni::ThreadScope::WithClassLoader([&] { name = JThreadUtils::getCurrentThreadName()->toStdString(); });
+  return name;
 }
 
 void ThreadUtils::setThreadName(const std::string& name) {
@@ -32,7 +33,9 @@ void ThreadUtils::setThreadName(const std::string& name) {
 }
 
 bool ThreadUtils::isUIThread() {
-  return JThreadUtils::isOnUIThread();
+  bool isUIThread = false;
+  jni::ThreadScope::WithClassLoader([&] { isUIThread = JThreadUtils::isOnUIThread(); });
+  return isUIThread;
 }
 
 std::shared_ptr<Dispatcher> ThreadUtils::createUIThreadDispatcher() {

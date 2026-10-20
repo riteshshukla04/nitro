@@ -12,6 +12,7 @@
 #include <NitroModules/ArrayBuffer.hpp>
 #include <android/hardware_buffer.h>
 #include <android/hardware_buffer_jni.h>
+#include <cstring>
 #include <fbjni/ByteBuffer.h>
 #include <fbjni/fbjni.h>
 #include <functional>
@@ -19,7 +20,7 @@
 
 namespace margelo::nitro {
 
-using namespace facebook;
+namespace jni = facebook::jni;
 
 /**
  * Represents a `ArrayBuffer` that can either hold a `ByteBuffer` (owning),
@@ -33,7 +34,7 @@ public:
   /**
    * Create a new `JArrayBuffer` that wraps the given ArrayBuffer.
    */
-  static jni::local_ref<JArrayBuffer::javaobject> wrap(const std::shared_ptr<ArrayBuffer>& arrayBuffer) {
+  static jni::local_ref<JArrayBuffer::javaobject> wrap(const ArrayBuffer& arrayBuffer) {
     return newObjectCxxArgs(arrayBuffer);
   }
 
@@ -64,7 +65,7 @@ public:
    * Get whether the `ArrayBuffer` is holding data from a `ByteBuffer`.
    */
   bool getIsByteBuffer() {
-    auto byteBufferArrayBuffer = std::dynamic_pointer_cast<ByteBufferArrayBuffer>(_arrayBuffer);
+    auto byteBufferArrayBuffer = std::dynamic_pointer_cast<ByteBufferArrayBuffer>(_arrayBuffer.getNativeBuffer());
     return byteBufferArrayBuffer != nullptr;
   }
 
@@ -73,7 +74,7 @@ public:
    */
   bool getIsHardwareBuffer() {
 #if __ANDROID_API__ >= 26
-    auto hardwareBufferArrayBuffer = std::dynamic_pointer_cast<HardwareBufferArrayBuffer>(_arrayBuffer);
+    auto hardwareBufferArrayBuffer = std::dynamic_pointer_cast<HardwareBufferArrayBuffer>(_arrayBuffer.getNativeBuffer());
     return hardwareBufferArrayBuffer != nullptr;
 #else
     return false;
@@ -84,7 +85,7 @@ public:
    * Get whether the `ArrayBuffer` is owning the data and can safely hold onto it longer.
    */
   bool getIsOwner() {
-    return _arrayBuffer->isOwner();
+    return _arrayBuffer.isOwner();
   }
 
   /**
@@ -97,20 +98,23 @@ public:
    * `copyIfNeeded` is `true`, and **wrap** the data into a new `ByteBuffer` if `copyIfNeeded` is false.
    */
   [[nodiscard]] jni::local_ref<jni::JByteBuffer> getByteBuffer(bool copyIfNeeded) {
-    auto byteBufferArrayBuffer = std::dynamic_pointer_cast<ByteBufferArrayBuffer>(_arrayBuffer);
+    auto byteBufferArrayBuffer = std::dynamic_pointer_cast<ByteBufferArrayBuffer>(_arrayBuffer.getNativeBuffer());
     if (byteBufferArrayBuffer != nullptr) {
       // It is a `ByteBufferArrayBuffer`, which has a `ByteBuffer` underneath!
       return jni::make_local(byteBufferArrayBuffer->getBuffer());
     } else {
       // It is a different kind of `ArrayBuffer`, we need to copy or wrap the data.
-      size_t size = _arrayBuffer->size();
+      size_t size = _arrayBuffer.size();
+      if (size == 0) {
+        return jni::JByteBuffer::allocateDirect(0);
+      }
       if (copyIfNeeded) {
         auto buffer = jni::JByteBuffer::allocateDirect(size);
         buffer->order(jni::JByteOrder::nativeOrder());
-        memcpy(buffer->getDirectAddress(), _arrayBuffer->data(), size);
+        memcpy(buffer->getDirectAddress(), _arrayBuffer.data(), size);
         return buffer;
       } else {
-        auto buffer = jni::JByteBuffer::wrapBytes(_arrayBuffer->data(), size);
+        auto buffer = jni::JByteBuffer::wrapBytes(_arrayBuffer.data(), size);
         buffer->order(jni::JByteOrder::nativeOrder());
         return buffer;
       }
@@ -128,14 +132,14 @@ public:
   }
 
   int getBufferSize() {
-    return static_cast<int>(_arrayBuffer->size());
+    return static_cast<int>(_arrayBuffer.size());
   }
 
 public:
   /**
    * Get the underlying `ArrayBuffer`.
    */
-  [[nodiscard]] std::shared_ptr<ArrayBuffer> getArrayBuffer() const {
+  [[nodiscard]] ArrayBuffer getArrayBuffer() const {
     return _arrayBuffer;
   }
   /**
@@ -144,7 +148,7 @@ public:
    */
   [[nodiscard]] AHardwareBuffer* getHardwareBuffer() const {
 #if __ANDROID_API__ >= 26
-    auto hardwareBufferArrayBuffer = std::dynamic_pointer_cast<HardwareBufferArrayBuffer>(_arrayBuffer);
+    auto hardwareBufferArrayBuffer = std::dynamic_pointer_cast<HardwareBufferArrayBuffer>(_arrayBuffer.getNativeBuffer());
     if (hardwareBufferArrayBuffer != nullptr) {
       return hardwareBufferArrayBuffer->getBuffer();
     } else {
@@ -156,21 +160,19 @@ public:
   }
 
 private:
-  explicit JArrayBuffer(const std::shared_ptr<ArrayBuffer>& arrayBuffer) : _arrayBuffer(arrayBuffer) {}
-  explicit JArrayBuffer(const jni::alias_ref<jni::JByteBuffer>& byteBuffer) {
-    _arrayBuffer = std::make_shared<ByteBufferArrayBuffer>(byteBuffer);
-  }
+  explicit JArrayBuffer(const ArrayBuffer& arrayBuffer) : _arrayBuffer(arrayBuffer) {}
+  explicit JArrayBuffer(const jni::alias_ref<jni::JByteBuffer>& byteBuffer)
+      : _arrayBuffer(std::make_shared<ByteBufferArrayBuffer>(byteBuffer)) {}
 
 #if __ANDROID_API__ >= 26
-  explicit JArrayBuffer(AHardwareBuffer* /* 0 retain */ hardwareBuffer) {
-    _arrayBuffer = std::make_shared<HardwareBufferArrayBuffer>(hardwareBuffer);
-  }
+  explicit JArrayBuffer(AHardwareBuffer* /* 0 retain */ hardwareBuffer)
+      : _arrayBuffer(std::make_shared<HardwareBufferArrayBuffer>(hardwareBuffer)) {}
 #endif
 
 private:
   friend HybridBase;
   using HybridBase::HybridBase;
-  std::shared_ptr<ArrayBuffer> _arrayBuffer;
+  ArrayBuffer _arrayBuffer;
 
 public:
   static void registerNatives() {

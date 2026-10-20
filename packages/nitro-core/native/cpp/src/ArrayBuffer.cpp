@@ -170,6 +170,13 @@ bool ArrayBuffer::isOwner() const {
   return std::holds_alternative<NativeArrayBuffer>(_impl);
 }
 
+NativeArrayBuffer ArrayBuffer::getNativeBuffer() const {
+  if (auto* nativeBuffer = std::get_if<NativeArrayBuffer>(&_impl)) {
+    return *nativeBuffer;
+  }
+  return nullptr;
+}
+
 ArrayBuffer ArrayBuffer::asOwning() const {
   if (auto* jsArrayBuffer = std::get_if<JSArrayBuffer>(&_impl)) {
     // It's a JS ArrayBuffer. We have to try to unwrap the `jsi::MutableBuffer`, or otherwise copy it.

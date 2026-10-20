@@ -1,6 +1,4 @@
 #include "NitroOnLoad.hpp"
-#include "JAnyMap.hpp"
-#include "JAnyValue.hpp"
 #include "JArrayBuffer.hpp"
 #include "JHardwareBufferUtils.hpp"
 #include "JHybridObject.hpp"
@@ -11,8 +9,6 @@ namespace margelo::nitro {
 
 void registerNatives() {
   JArrayBuffer::registerNatives();
-  JAnyMap::registerNatives();
-  JAnyValue::registerNatives();
   JHardwareBufferUtils::registerNatives();
   JPromise::registerNatives();
   JNativeRunnable::registerNatives();

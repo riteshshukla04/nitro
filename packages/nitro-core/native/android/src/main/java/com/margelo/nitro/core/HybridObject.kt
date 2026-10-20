@@ -42,7 +42,6 @@ abstract class HybridObject {
    *
    * By default, this method only destroys the connected C++ part.
    * It can be overridden to perform actual disposing/cleanup if required.
-   * This method must not throw.
    */
   @DoNotStrip
   @Keep

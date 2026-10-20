@@ -8,6 +8,7 @@ namespace margelo::nitro {
 class UIThreadDispatcher : public Dispatcher {
 public:
   void runSync(std::function<void()>&& function) override;
+  bool isOnDispatcher() override;
   void runAsync(std::function<void()>&& function) override;
 };
 

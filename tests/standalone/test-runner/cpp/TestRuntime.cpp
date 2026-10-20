@@ -4,6 +4,9 @@
 #include <NitroTest/NitroTestAutolinking.hpp>
 #include <NitroTestExternal/NitroTestExternalAutolinking.hpp>
 #endif
+#ifdef __ANDROID__
+#include <fbjni/fbjni.h>
+#endif
 
 #include <NitroModules/Dispatcher.hpp>
 #include <NitroModules/InstallNitro.hpp>
@@ -245,7 +248,14 @@ namespace {
 
 std::string runTest(const std::string& bundle, const std::string& name, uint32_t timeoutMs, const std::function<void()>& onTestStarted) {
   try {
+#ifdef __ANDROID__
+    // The host owns JNI attachment for the whole runtime lifetime, including
+    // dispatcher callbacks, microtasks and teardown.
+    std::string error;
+    facebook::jni::ThreadScope::WithClassLoader([&] { error = execute(bundle, name, timeoutMs, onTestStarted); });
+#else
     auto error = execute(bundle, name, timeoutMs, onTestStarted);
+#endif
     return error.empty() ? "" : name + ": " + error;
   } catch (const std::exception& error) {
     return name + ": " + error.what();

@@ -12,14 +12,15 @@
 
 namespace margelo::nitro {
 
-using namespace facebook;
+namespace jni = facebook::jni;
 
 /**
  * Bridges a Java `HybridObject` instance over to C++.
  * - JavaPart: The actual Java Class (HybridObject) - this will be held by `JHybridObject`
  * - CxxPart: The nested Java CxxPart (HybridObject.CxxPart) - this builds the proper inheritance chain and caches C++ state
+ * Calls into Java require an attached calling thread. Destruction attaches as needed.
  */
-class JHybridObject : public virtual HybridObject {
+class JHybridObject : public HybridObject {
 public:
   struct JavaPart : jni::JavaClass<JavaPart> {
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/core/HybridObject;";
@@ -47,7 +48,7 @@ public:
   ~JHybridObject() override;
 
 public:
-  void dispose() noexcept override;
+  void dispose() override;
   bool equals(const std::shared_ptr<HybridObject>& other) override;
   size_t getExternalMemorySize() noexcept override;
   std::string toString() override;
