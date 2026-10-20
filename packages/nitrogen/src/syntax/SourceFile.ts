@@ -52,7 +52,7 @@ export type SourceImport<L extends Language = Language> = L extends 'c++'
       declaration:
         | { forwardDeclaration: string }
         | {
-            name: string
+            header: string
             space: 'user' | 'system'
             /** Available to headers that only declare methods using this type. */
             forwardDeclaration?: string
@@ -61,7 +61,7 @@ export type SourceImport<L extends Language = Language> = L extends 'c++'
        * A definition needed by implementations using this type.
        * Defaults to the declaration if it is an include.
        */
-      implementation?: { name: string; space: 'user' | 'system' }
+      implementation?: { header: string; space: 'user' | 'system' }
     }
   : L extends 'swift'
     ? {

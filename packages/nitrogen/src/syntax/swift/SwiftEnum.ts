@@ -173,28 +173,28 @@ ${canConvertIntegerBody}
         {
           language: 'c++',
           declaration: {
-            name: 'NitroModules/NitroDefines.hpp',
+            header: 'NitroModules/NitroDefines.hpp',
             space: 'system',
           },
         },
         {
           language: 'c++',
           declaration: {
-            name: 'NitroModules/NitroHash.hpp',
+            header: 'NitroModules/NitroHash.hpp',
             space: 'system',
           },
         },
         {
           language: 'c++',
           declaration: {
-            name: 'NitroModules/NumberUtils.hpp',
+            header: 'NitroModules/NumberUtils.hpp',
             space: 'system',
           },
         },
         {
           language: 'c++',
           declaration: {
-            name: 'NitroModules/JSIString.hpp',
+            header: 'NitroModules/JSIString.hpp',
             space: 'system',
           },
         },
@@ -236,6 +236,6 @@ return SwiftType::fromRawValue(rawValue);
     forwardDeclaration: type.forwardDeclaration,
     fromSwift: swiftToCppConverterCode,
     toSwift: cppToSwiftConverterCode,
-    imports: [{ language: 'c++', declaration: { name: 'NitroModules/NitroDefines.hpp', space: 'system' } }],
+    imports: [{ language: 'c++', declaration: { header: 'NitroModules/NitroDefines.hpp', space: 'system' } }],
   })
 }

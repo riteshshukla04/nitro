@@ -59,7 +59,7 @@ export class OptionalType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: 'optional', space: 'system' },
+          declaration: { header: 'optional', space: 'system' },
         })
         break
     }

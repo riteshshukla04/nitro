@@ -67,19 +67,19 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec<'swift' | 'c
   const declarationImports: SourceImport[] = [
     {
       language: 'c++',
-      declaration: { name: 'memory', space: 'system' },
+      declaration: { header: 'memory', space: 'system' },
     },
     {
       language: 'c++',
-      declaration: { name: 'utility', space: 'system' },
+      declaration: { header: 'utility', space: 'system' },
     },
     {
       language: 'c++',
-      declaration: { name: 'NitroModules/HybridObject.hpp', space: 'system' },
+      declaration: { header: 'NitroModules/HybridObject.hpp', space: 'system' },
     },
     {
       language: 'c++',
-      declaration: { name: 'NitroModules/JSIConverter.hpp', space: 'system' },
+      declaration: { header: 'NitroModules/JSIConverter.hpp', space: 'system' },
     },
     ...memberImports,
   ]
@@ -100,7 +100,7 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec<'swift' | 'c
     },
     {
       language: 'c++',
-      declaration: { name: 'stdexcept', space: 'system' },
+      declaration: { header: 'stdexcept', space: 'system' },
     },
     ...memberImports,
   ]
@@ -122,7 +122,7 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec<'swift' | 'c
       {
         language: 'c++',
         declaration: {
-          name: 'NitroModules/SwiftConverter.hpp',
+          header: 'NitroModules/SwiftConverter.hpp',
           space: 'system',
         },
       }

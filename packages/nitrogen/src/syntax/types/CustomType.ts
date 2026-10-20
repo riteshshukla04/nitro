@@ -36,7 +36,7 @@ export class CustomType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: this.typeConfig.include, space: 'user' },
+          declaration: { header: this.typeConfig.include, space: 'user' },
         })
         break
     }

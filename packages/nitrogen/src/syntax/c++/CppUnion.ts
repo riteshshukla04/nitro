@@ -24,21 +24,21 @@ export function createCppUnion(typename: string, enumMembers: EnumMember[]): Sou
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/NitroHash.hpp',
+        header: 'NitroModules/NitroHash.hpp',
         space: 'system',
       },
     },
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/JSIConverter.hpp',
+        header: 'NitroModules/JSIConverter.hpp',
         space: 'system',
       },
     },
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/NitroDefines.hpp',
+        header: 'NitroModules/NitroDefines.hpp',
         space: 'system',
       },
     },

@@ -35,7 +35,7 @@ export class ErrorType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: 'exception', space: 'system' },
+          declaration: { header: 'exception', space: 'system' },
         })
         break
     }

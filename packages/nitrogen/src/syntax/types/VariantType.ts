@@ -66,7 +66,7 @@ export class VariantType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: 'variant', space: 'system' },
+          declaration: { header: 'variant', space: 'system' },
         })
         break
     }

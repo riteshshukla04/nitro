@@ -114,10 +114,10 @@ export class NitroConfig {
   /**
    * Get the include of a generated C++ header that belongs to this module.
    */
-  getCxxHeader(fileName: string, visibility: CxxHeaderVisibility = 'public'): { name: string; space: 'system' } {
+  getCxxHeader(fileName: string, visibility: CxxHeaderVisibility = 'public'): { header: string; space: 'system' } {
     const directory = this.getCxxHeaderDirectory(visibility).slice(1)
     return {
-      name: [...directory, fileName].join('/'),
+      header: [...directory, fileName].join('/'),
       space: 'system',
     }
   }
@@ -136,10 +136,10 @@ export class NitroConfig {
   }
 
   /** Get the public C++ bridge declarations that this module exposes to Swift. */
-  getAppleCxxHeader(): { name: string; space: 'system' } {
+  getAppleCxxHeader(): { header: string; space: 'system' } {
     const targetName = this.getAppleCxxTargetName()
     return {
-      name: `${targetName}/${targetName}.h`,
+      header: `${targetName}/${targetName}.h`,
       space: 'system',
     }
   }

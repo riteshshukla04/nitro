@@ -51,7 +51,7 @@ export class ForeignHybridObjectType extends HybridObjectType {
     }
   }
 
-  override getCppHeader(): { name: string; space: 'user' | 'system' } {
+  override getCppHeader(): { header: string; space: 'user' | 'system' } {
     return getCppHybridObjectAdapterNames(this).header
   }
 

@@ -37,7 +37,7 @@ export class KotlinNullType extends NullType implements KotlinType {
       case 'c++':
         imports.push({
           language: language,
-          declaration: { name: 'NitroModules/JNull.hpp', space: 'system' },
+          declaration: { header: 'NitroModules/JNull.hpp', space: 'system' },
         })
         break
     }

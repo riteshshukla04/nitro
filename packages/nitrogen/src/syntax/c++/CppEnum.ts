@@ -36,21 +36,21 @@ case ${member.value}: return true;
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/JSIConverter.hpp',
+        header: 'NitroModules/JSIConverter.hpp',
         space: 'system',
       },
     },
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/NitroDefines.hpp',
+        header: 'NitroModules/NitroDefines.hpp',
         space: 'system',
       },
     },
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/NumberUtils.hpp',
+        header: 'NitroModules/NumberUtils.hpp',
         space: 'system',
       },
     },

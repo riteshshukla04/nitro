@@ -38,7 +38,7 @@ export class KotlinArrayBufferType extends ArrayBufferType implements KotlinType
         imports.push({
           language: language,
           declaration: {
-            name: 'NitroModules/JArrayBuffer.hpp',
+            header: 'NitroModules/JArrayBuffer.hpp',
             space: 'system',
           },
         })

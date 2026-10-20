@@ -125,20 +125,20 @@ export class CallbackType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: 'NitroModules/Callback.hpp', space: 'system' },
+          declaration: { header: 'NitroModules/Callback.hpp', space: 'system' },
         })
         if (this.isInline) {
           imports.push({
             language,
             declaration: {
-              name: 'NitroModules/InlineCallback.hpp',
+              header: 'NitroModules/InlineCallback.hpp',
               space: 'system',
             },
           })
         }
         imports.push({
           language,
-          declaration: { name: 'functional', space: 'system' },
+          declaration: { header: 'functional', space: 'system' },
         })
         break
       case 'swift':

@@ -31,7 +31,7 @@ export class AnyJSONType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: 'NitroModules/AnyJSON.hpp', space: 'system' },
+          declaration: { header: 'NitroModules/AnyJSON.hpp', space: 'system' },
         })
         break
       case 'swift':

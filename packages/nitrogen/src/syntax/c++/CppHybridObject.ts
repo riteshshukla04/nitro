@@ -36,14 +36,14 @@ export function createCppHybridObject(spec: HybridObjectSpec, platform: Platform
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/HybridObject.hpp',
+        header: 'NitroModules/HybridObject.hpp',
         space: 'system',
       },
     },
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/HybridClass.hpp',
+        header: 'NitroModules/HybridClass.hpp',
         space: 'system',
       },
     },

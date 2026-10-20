@@ -264,7 +264,7 @@ ${swiftImports}
 ${swiftClassDeclaration} ${hybridObjectNames.HybridTSpecCxx}${swiftSuperclass} {
   /**
    * The Swift <> C++ bridge's namespace (\`${spec.config.getSwiftBridgeNamespace('c++')}\`)
-   * from \`${spec.config.getAppleCxxHeader().name}\`.
+   * from \`${spec.config.getAppleCxxHeader().header}\`.
    * This contains specialized C++ templates, and C++ helper functions that can be accessed from Swift.
    */
   public typealias bridge = ${spec.config.getSwiftBridgeNamespace('swift')}
@@ -428,12 +428,12 @@ private:
     [
       {
         language: 'c++',
-        declaration: { name: 'NitroModules/HybridObject.hpp', space: 'system' },
+        declaration: { header: 'NitroModules/HybridObject.hpp', space: 'system' },
       },
       {
         language: 'c++',
         declaration: {
-          name: 'NitroModules/HybridClass.hpp',
+          header: 'NitroModules/HybridClass.hpp',
           space: 'system',
         },
       },

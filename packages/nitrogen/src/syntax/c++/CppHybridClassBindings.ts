@@ -31,12 +31,12 @@ export function createCppHybridClassBindings(spec: HybridObjectSpec<'c++'>): Hyb
   const { HybridTSpec } = getHybridObjectName(spec.name)
   const helper = `${HybridTSpec}Bindings`
   const adapters: string[] = []
-  imports.push({ language: 'c++', declaration: { name: 'utility', space: 'system' } }, spec.implementation.include)
+  imports.push({ language: 'c++', declaration: { header: 'utility', space: 'system' } }, spec.implementation.include)
   if (spec.constructor != null) {
     // JS construction returns the native object even when its public C++ API
     // uses a facade to keep signatures consistent with another platform.
     const nativeType = new CustomType(`std::shared_ptr<${HybridTSpec}>`, {
-      include: spec.config.getCxxHeader(`${HybridTSpec}.hpp`).name,
+      include: spec.config.getCxxHeader(`${HybridTSpec}.hpp`).header,
     })
     const method = spec.constructor.toStaticMethod(nativeType)
     const argumentTypes = method.parameters.map((parameter) => `decltype(${parameter.type.escapedName})`)
@@ -58,11 +58,11 @@ return std::make_shared<${implementation}>(${argumentsCode.join(', ')});
     imports.push(
       {
         language: 'c++',
-        declaration: { name: 'memory', space: 'system' },
+        declaration: { header: 'memory', space: 'system' },
       },
       {
         language: 'c++',
-        declaration: { name: 'type_traits', space: 'system' },
+        declaration: { header: 'type_traits', space: 'system' },
       }
     )
     const constructorRegistration = `

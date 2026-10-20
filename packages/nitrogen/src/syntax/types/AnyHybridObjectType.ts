@@ -35,7 +35,7 @@ export class AnyHybridObjectType implements Type {
         imports.push(
           {
             language,
-            declaration: { name: 'memory', space: 'system' },
+            declaration: { header: 'memory', space: 'system' },
           },
           {
             language,
@@ -43,7 +43,7 @@ export class AnyHybridObjectType implements Type {
               forwardDeclaration: getForwardDeclaration('class', 'HybridObject', 'margelo::nitro'),
             },
             implementation: {
-              name: `NitroModules/HybridObject.hpp`,
+              header: `NitroModules/HybridObject.hpp`,
               space: 'system',
             },
           }

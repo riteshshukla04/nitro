@@ -68,14 +68,14 @@ export function createCppStruct(typename: string, properties: NamedType[]): [hea
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/JSIConverter.hpp',
+        header: 'NitroModules/JSIConverter.hpp',
         space: 'system',
       },
     },
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/NitroDefines.hpp',
+        header: 'NitroModules/NitroDefines.hpp',
         space: 'system',
       },
     },
@@ -84,7 +84,7 @@ export function createCppStruct(typename: string, properties: NamedType[]): [hea
   if (movedProperties.length > 0) {
     declarationImports.push({
       language: 'c++',
-      declaration: { name: 'utility', space: 'system' },
+      declaration: { header: 'utility', space: 'system' },
     })
   }
   const implementationImports: SourceImport[] = [
@@ -95,14 +95,14 @@ export function createCppStruct(typename: string, properties: NamedType[]): [hea
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/JSIHelpers.hpp',
+        header: 'NitroModules/JSIHelpers.hpp',
         space: 'system',
       },
     },
     {
       language: 'c++',
       declaration: {
-        name: 'NitroModules/PropNameIDCache.hpp',
+        header: 'NitroModules/PropNameIDCache.hpp',
         space: 'system',
       },
     },

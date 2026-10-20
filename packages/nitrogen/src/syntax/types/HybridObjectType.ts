@@ -104,7 +104,7 @@ export class HybridObjectType implements Type {
     return []
   }
 
-  getCppHeader(): { name: string; space: 'user' | 'system' } {
+  getCppHeader(): { header: string; space: 'user' | 'system' } {
     const { HybridTSpec } = getHybridObjectName(this.hybridObjectName)
     return this.sourceConfig.getCxxHeader(`${HybridTSpec}.hpp`)
   }
@@ -118,7 +118,7 @@ export class HybridObjectType implements Type {
       case 'c++': {
         imports.push({
           language,
-          declaration: { name: 'memory', space: 'system' },
+          declaration: { header: 'memory', space: 'system' },
         })
         imports.push({
           language,

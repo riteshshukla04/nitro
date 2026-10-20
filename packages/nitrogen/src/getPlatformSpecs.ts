@@ -95,7 +95,7 @@ const cppIncludeSchema = z.string().transform((include, context): SourceImport<'
   const space = systemHeader != null ? 'system' : 'user'
   return {
     language: 'c++',
-    declaration: { name: header, space: space },
+    declaration: { header: header, space: space },
   }
 })
 const cppImplementationSchema = z.strictObject({

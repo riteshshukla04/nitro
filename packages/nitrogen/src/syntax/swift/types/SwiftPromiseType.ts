@@ -111,7 +111,7 @@ export class SwiftPromiseType extends PromiseType implements SwiftType {
       case 'c++':
         imports.push(...this.resultingType.getRequiredImports(language, context), {
           language,
-          declaration: { name: 'NitroModules/Promise.hpp', space: 'system' },
+          declaration: { header: 'NitroModules/Promise.hpp', space: 'system' },
         })
         break
       case 'swift':

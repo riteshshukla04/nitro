@@ -130,13 +130,13 @@ ${value}->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>&
       case 'c++':
         imports.push({
           language: language,
-          declaration: { name: 'NitroModules/JPromise.hpp', space: 'system' },
+          declaration: { header: 'NitroModules/JPromise.hpp', space: 'system' },
         })
         if (this.resultingType.kind === 'void') {
           // Promise<void> resolves with JUnit
           imports.push({
             language: language,
-            declaration: { name: 'NitroModules/JUnit.hpp', space: 'system' },
+            declaration: { header: 'NitroModules/JUnit.hpp', space: 'system' },
           })
         }
         break

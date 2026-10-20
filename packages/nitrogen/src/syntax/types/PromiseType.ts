@@ -51,7 +51,7 @@ export class PromiseType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: 'NitroModules/Promise.hpp', space: 'system' },
+          declaration: { header: 'NitroModules/Promise.hpp', space: 'system' },
         })
         break
       case 'swift':

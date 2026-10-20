@@ -123,7 +123,7 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
   }
 
   /** The header declaring the C++ class that wraps this Swift implementation. */
-  getCxxPartHeader(): { name: string; space: 'user' | 'system' } {
+  getCxxPartHeader(): { header: string; space: 'user' | 'system' } {
     const { HybridTSpecSwift } = getHybridObjectName(this.hybridObjectName)
     return this.sourceConfig.getCxxHeader(`${HybridTSpecSwift}.hpp`, 'private')
   }
@@ -189,7 +189,7 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
     const headerImports: SourceImport[] = [
       {
         language: 'c++',
-        declaration: { name: 'NitroModules/HybridObject.hpp', space: 'system' },
+        declaration: { header: 'NitroModules/HybridObject.hpp', space: 'system' },
       },
       {
         language: 'c++',
@@ -200,7 +200,7 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
       {
         language: 'c++',
         declaration: {
-          name: 'NitroModules/NitroDefines.hpp',
+          header: 'NitroModules/NitroDefines.hpp',
           space: 'system',
         },
       },

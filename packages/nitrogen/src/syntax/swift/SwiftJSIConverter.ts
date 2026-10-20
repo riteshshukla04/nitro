@@ -31,7 +31,7 @@ export function createSwiftJSIConverter({
   const declarationImports: SourceImport[] = [
     {
       language: 'c++',
-      declaration: { name: 'NitroModules/JSIConverter.hpp', space: 'system' },
+      declaration: { header: 'NitroModules/JSIConverter.hpp', space: 'system' },
     },
     {
       language: 'c++',

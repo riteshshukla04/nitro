@@ -105,7 +105,7 @@ return ${cppPropertyChecks.join(' && ')};
         {
           language: 'c++',
           declaration: {
-            name: 'NitroModules/PropNameIDCache.hpp',
+            header: 'NitroModules/PropNameIDCache.hpp',
             space: 'system',
           },
         },

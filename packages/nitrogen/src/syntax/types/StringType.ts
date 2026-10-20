@@ -35,7 +35,7 @@ export class StringType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: 'string', space: 'system' },
+          declaration: { header: 'string', space: 'system' },
         })
         break
     }

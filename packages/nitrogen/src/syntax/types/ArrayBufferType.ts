@@ -34,7 +34,7 @@ export class ArrayBufferType implements Type {
         imports.push({
           language,
           declaration: {
-            name: 'NitroModules/ArrayBuffer.hpp',
+            header: 'NitroModules/ArrayBuffer.hpp',
             space: 'system',
           },
         })

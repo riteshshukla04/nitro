@@ -99,7 +99,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
           {
             language: language,
             declaration: {
-              name: 'NitroModules/JNICallable.hpp',
+              header: 'NitroModules/JNICallable.hpp',
               space: 'system',
             },
           }

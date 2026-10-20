@@ -70,7 +70,7 @@ export class SwiftStringType extends StringType implements SwiftType {
             forwardDeclaration: 'namespace swift { class String; }',
           },
           implementation: {
-            name: 'NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp',
+            header: 'NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp',
             space: 'system',
           },
         })
@@ -78,7 +78,7 @@ export class SwiftStringType extends StringType implements SwiftType {
           imports.push({
             language,
             declaration: {
-              name: 'NitroModules/JSIConverter+SwiftString.hpp',
+              header: 'NitroModules/JSIConverter+SwiftString.hpp',
               space: 'system',
             },
           })

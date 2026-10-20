@@ -67,7 +67,7 @@ export class SwiftAnyJSONType extends AnyJSONType implements SwiftType {
             forwardDeclaration: 'namespace NitroModules { class AnyJSON; }',
           },
           implementation: {
-            name: 'NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp',
+            header: 'NitroModules/NitroModules-Swift-Cxx-Umbrella.hpp',
             space: 'system',
           },
         })
@@ -75,7 +75,7 @@ export class SwiftAnyJSONType extends AnyJSONType implements SwiftType {
           imports.push({
             language,
             declaration: {
-              name: 'NitroModules/JSIConverter+SwiftAnyJSON.hpp',
+              header: 'NitroModules/JSIConverter+SwiftAnyJSON.hpp',
               space: 'system',
             },
           })

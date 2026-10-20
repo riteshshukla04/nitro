@@ -27,13 +27,13 @@ export function getImportCode(sourceImport: SourceImport, context: ImportContext
     case 'c++': {
       const { declaration, implementation } = sourceImport
       if (context === 'implementation' && implementation != null) {
-        return includeHeader(implementation.name, implementation.space)
+        return includeHeader(implementation.header, implementation.space)
       }
       if (context === 'forward-declaration' && declaration.forwardDeclaration != null) {
         return declaration.forwardDeclaration
       }
-      if ('name' in declaration) {
-        return includeHeader(declaration.name, declaration.space)
+      if ('header' in declaration) {
+        return includeHeader(declaration.header, declaration.space)
       }
       if (context !== 'implementation') {
         return declaration.forwardDeclaration

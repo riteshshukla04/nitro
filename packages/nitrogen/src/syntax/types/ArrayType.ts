@@ -56,7 +56,7 @@ export class ArrayType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: 'vector', space: 'system' },
+          declaration: { header: 'vector', space: 'system' },
         })
         break
     }

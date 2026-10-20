@@ -20,6 +20,6 @@ namespace swift { template <class T> class ${name}; }
   return {
     language: 'c++',
     declaration: { forwardDeclaration: forwardDeclaration },
-    implementation: { name: jsiConverterHeader, space: 'system' },
+    implementation: { header: jsiConverterHeader, space: 'system' },
   }
 }

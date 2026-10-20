@@ -18,7 +18,7 @@ export function getCppHybridObjectAdapterNames(
   namespace: string
   qualifiedName: string
   fileName: string
-  header: { name: string; space: 'system' }
+  header: { header: string; space: 'system' }
 } {
   const className = `${getHybridObjectName(type.hybridObjectName).HybridTSpec}Cxx`
   const sourceNamespace = type.sourceConfig.getCxxNamespace('c++')

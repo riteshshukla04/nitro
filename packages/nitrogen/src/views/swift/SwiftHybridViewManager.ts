@@ -44,7 +44,7 @@ export function createSwiftHybridViewManager(spec: HybridObjectSpec<'swift'>): S
     },
     {
       language: 'c++',
-      declaration: { name: 'NitroModules/SwiftConverter.hpp', space: 'system' },
+      declaration: { header: 'NitroModules/SwiftConverter.hpp', space: 'system' },
     },
     ...converterImports,
   ])

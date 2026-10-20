@@ -61,7 +61,7 @@ export class RecordType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: 'unordered_map', space: 'system' },
+          declaration: { header: 'unordered_map', space: 'system' },
         })
         break
     }

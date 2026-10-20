@@ -39,7 +39,7 @@ export class TupleType implements Type {
       case 'c++':
         imports.push({
           language,
-          declaration: { name: 'tuple', space: 'system' },
+          declaration: { header: 'tuple', space: 'system' },
         })
         break
     }

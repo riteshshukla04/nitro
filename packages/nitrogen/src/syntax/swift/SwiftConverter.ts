@@ -73,7 +73,7 @@ export function createSwiftConverter({
   const declarationImports: SourceImport[] = [
     {
       language: 'c++',
-      declaration: { name: 'NitroModules/SwiftConverter_fwd.hpp', space: 'system' },
+      declaration: { header: 'NitroModules/SwiftConverter_fwd.hpp', space: 'system' },
     },
     ...type.getRequiredImports('c++'),
     {
@@ -91,7 +91,7 @@ export function createSwiftConverter({
     },
     {
       language: 'c++',
-      declaration: { name: 'NitroModules/SwiftConverter.hpp', space: 'system' },
+      declaration: { header: 'NitroModules/SwiftConverter.hpp', space: 'system' },
     },
     ...type.getRequiredImports('c++'),
     ...dependencyImports,

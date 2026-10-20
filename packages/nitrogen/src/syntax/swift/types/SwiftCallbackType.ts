@@ -176,14 +176,14 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
           ...this.parameters.flatMap((p) => p.getRequiredImports(language, context)),
           {
             language: language,
-            declaration: { name: 'NitroModules/Callback.hpp', space: 'system' },
+            declaration: { header: 'NitroModules/Callback.hpp', space: 'system' },
           }
         )
         if (this.isInline) {
           imports.push({
             language: language,
             declaration: {
-              name: 'NitroModules/InlineCallback.hpp',
+              header: 'NitroModules/InlineCallback.hpp',
               space: 'system',
             },
           })
@@ -344,7 +344,7 @@ ${signature} {
       cppToSwiftImports.push({
         language: 'c++',
         declaration: {
-          name: 'NitroModules/SwiftResult.hpp',
+          header: 'NitroModules/SwiftResult.hpp',
           space: 'system',
         },
       })

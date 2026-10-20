@@ -106,7 +106,7 @@ using ${this.specializationName} = ${this.getCode('c++', { context: 'value' })};
           {
             language: language,
             declaration: {
-              name: 'NitroModules/Result.hpp',
+              header: 'NitroModules/Result.hpp',
               space: 'system',
             },
           },

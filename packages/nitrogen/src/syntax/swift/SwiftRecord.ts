@@ -93,7 +93,7 @@ public struct ${swiftStructName}${conformancePrefix}${protocolNames.join(', ')} 
         {
           language: 'c++',
           declaration: {
-            name: 'NitroModules/JSIConverter+SwiftDictionary.hpp',
+            header: 'NitroModules/JSIConverter+SwiftDictionary.hpp',
             space: 'system',
           },
         },
@@ -133,6 +133,6 @@ return ${converter}::toSwift(value);
     fromSwift: swiftToCppConverterCode,
     toSwift: cppToSwiftConverterCode,
     dependencies: dependencies,
-    imports: [{ language: 'c++', declaration: { name: 'NitroModules/SwiftConverter+Dictionary.hpp', space: 'system' } }],
+    imports: [{ language: 'c++', declaration: { header: 'NitroModules/SwiftConverter+Dictionary.hpp', space: 'system' } }],
   })
 }
