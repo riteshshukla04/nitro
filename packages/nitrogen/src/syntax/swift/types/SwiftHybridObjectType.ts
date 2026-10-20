@@ -19,11 +19,15 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
 
   constructor(readonly type: HybridObjectType) {
     const baseTypes = type.baseTypes.map((base) => new SwiftHybridObjectType(base))
-    super(type.hybridObjectName, type.implementationLanguage, baseTypes, type.sourceConfig, type.swiftProtocolConformances)
+    super(type.hybridObjectName, type.platforms, baseTypes, type.sourceConfig)
     this.baseTypes = baseTypes
   }
 
   getProtocolConformances(): ProtocolConformance[] {
+    const ios = this.platforms.ios
+    if (ios?.language !== 'swift') {
+      throw new Error(`${this.hybridObjectName}: Swift protocol conformances require an iOS declaration with language 'swift'.`)
+    }
     const conformances: ProtocolConformance[] = [
       {
         name: 'HybridObject',
@@ -48,7 +52,7 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
       }
       conformances.push(conformance)
     }
-    for (const protocol of this.swiftProtocolConformances) {
+    for (const protocol of ios.protocolConformances) {
       const conformance: ProtocolConformance = { name: protocol.protocol }
       let module = protocol.module
       if (module == null && this.sourceConfig.isExternalConfig) {
@@ -189,9 +193,7 @@ export class SwiftHybridObjectType extends HybridObjectType implements SwiftType
     let implementationImports: SourceImport[]
     if (type.sourceConfig.isExternalConfig) {
       const namespace = type.sourceConfig.getSwiftBridgeNamespace('c++')
-      const localNames = getHybridObjectBridgeNames(
-        new HybridObjectType(type.hybridObjectName, type.implementationLanguage, [], NitroConfig.current)
-      )
+      const localNames = getHybridObjectBridgeNames(new HybridObjectType(type.hybridObjectName, type.platforms, [], NitroConfig.current))
       createBody = `return ${namespace}::${localNames.create}(pointer);`
       getBody = `return ${namespace}::${localNames.get}(value);`
       implementationImports = [

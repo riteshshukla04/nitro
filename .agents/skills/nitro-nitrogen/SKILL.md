@@ -34,6 +34,9 @@ description: Apply Nitro v1's review conventions when editing Nitrogen generator
   strings.
 - In a PR stack, run Nitrogen at each atomic PR and commit its affected generated files in that PR. Keep every PR buildable with its own
   generated output; do not defer regeneration to the end of the stack.
+- Apply review fixes in the earliest PR that introduces the affected code, then carry them through the rest of the stack.
+- When authorized to reply to reviews, explain the change made or the disagreement for each comment. Resolve a thread only after verifying
+  that the pushed code addresses its concern; leave unaddressed concerns open.
 - Accept incidental blank lines from empty include blocks. Avoid arbitrary gaps between related literal includes.
 
 ```ts

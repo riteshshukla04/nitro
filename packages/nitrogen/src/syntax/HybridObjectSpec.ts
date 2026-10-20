@@ -1,5 +1,5 @@
 import type { NitroConfig } from '../config/NitroConfig.js'
-import type { HybridObjectPlatformOptions, Language } from '../getPlatformSpecs.js'
+import type { HybridObjectPlatformOptions, HybridObjectPlatforms, Language } from '../getPlatformSpecs.js'
 import type { InstanceMethod } from './InstanceMethod.js'
 import type { Property } from './Property.js'
 import type { Constructor } from './Constructor.js'
@@ -24,6 +24,7 @@ type NativePlatformSpec<L extends Language> = L extends Language
 
 export type HybridObjectSpec<L extends Language = Language> = NativePlatformSpec<L> & {
   name: string
+  platforms: HybridObjectPlatforms
   isHybridView: boolean
   allowMultipleImplementations: boolean
   allowInheritance: boolean

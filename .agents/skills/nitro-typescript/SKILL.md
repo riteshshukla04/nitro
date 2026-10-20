@@ -15,6 +15,7 @@ description: Apply Nitro v1's typing rules when writing or reviewing TypeScript 
   `satisfies` does not validate runtime data.
 - Never use non-null assertions (`value!`) or definite-assignment assertions (`field!: Type`). Model optional values and initialization
   accurately, and narrow or handle missing values explicitly.
+- Prefer an explicit local `if`/`throw` for simple preconditions instead of an assertion helper that hides the condition.
 - Use `.map`, `for (const value of values)`, or `.forEach` to work with elements directly. When an index is also needed, use `.entries()` or
   the callback's index parameter. Avoid index-based loops that require unchecked element lookups; when a lookup is necessary, check and
   handle a missing result.

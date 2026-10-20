@@ -10,7 +10,7 @@ export class KotlinHybridObjectType extends HybridObjectType implements KotlinTy
   readonly needsKotlinConversion = false
 
   constructor(type: HybridObjectType) {
-    super(type.hybridObjectName, type.implementationLanguage, type.baseTypes, type.sourceConfig, type.swiftProtocolConformances)
+    super(type.hybridObjectName, type.platforms, type.baseTypes, type.sourceConfig)
   }
 
   /** The C++ class holding the Kotlin instance, e.g. `JHybridImageSpec`. */

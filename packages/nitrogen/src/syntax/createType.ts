@@ -347,9 +347,8 @@ export function createType(
         .map((b) => createType(language, b, false))
       const baseHybrids = baseTypes.filter((b) => b instanceof HybridObjectType)
       const sourceConfig = getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
-      const iosOptions = getHybridObjectPlatformsForType(type).ios
-      const swiftProtocolConformances = iosOptions?.language === 'swift' ? iosOptions.protocolConformances : []
-      return new HybridObjectType(typename, language, baseHybrids, sourceConfig, swiftProtocolConformances)
+      const platforms = getHybridObjectPlatformsForType(type)
+      return new HybridObjectType(typename, platforms, baseHybrids, sourceConfig)
     } else if (type.isInterface()) {
       // It is an `interface T { ... }`, which is a `struct`
       const symbol = type.getAliasSymbol() ?? type.getSymbol()

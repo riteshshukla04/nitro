@@ -5,6 +5,7 @@ import { getDirectBaseTypes, getHybridObjectNitroModuleConfig } from './utils.js
 import { getHybridObjectDecoratorOptions, type DecoratorOptions } from './getHybridObjectDecoratorOptions.js'
 import { getHybridClassManifestOptions } from './hybridClassManifest.js'
 import { NitroConfig } from './config/NitroConfig.js'
+import type { SourceImport } from './syntax/SourceFile.js'
 
 const platformSchema = z.enum(['ios', 'android'])
 export type Platform = z.infer<typeof platformSchema>
@@ -77,12 +78,26 @@ const kotlinImplementedInterfacesSchema = z
 const kotlinOptions = {
   implementedInterfaces: kotlinImplementedInterfacesSchema,
 }
-const cppIncludeSchema = z.string().refine((include) => {
-  const isSystem = include.startsWith('<') && include.endsWith('>')
-  const isLocal = include.startsWith('"') && include.endsWith('"')
-  const name = include.slice(1, -1)
-  return (isSystem || isLocal) && name.length > 0 && !['<', '>', '"', '\r', '\n'].some((character) => name.includes(character))
-}, 'Use a complete C++ include, such as <Library/HybridImage.hpp> or "HybridImage.hpp".')
+// Decorators and manifests store include syntax; generators consume typed imports.
+const cppIncludeSchema = z.string().transform((include, context): SourceImport<'c++'> => {
+  const match = /^(?:<([^<>"\r\n]+)>|"([^<>"\r\n]+)")$/.exec(include)
+  const systemHeader = match?.[1]
+  const userHeader = match?.[2]
+  const header = systemHeader ?? userHeader
+  // `$` can match before a final newline, so require the entire input to match.
+  if (match?.[0] !== include || header == null) {
+    context.addIssue({
+      code: 'custom',
+      message: 'Use a complete C++ include, such as <Library/HybridImage.hpp> or "HybridImage.hpp".',
+    })
+    return z.NEVER
+  }
+  const space = systemHeader != null ? 'system' : 'user'
+  return {
+    language: 'c++',
+    declaration: { name: header, space: space },
+  }
+})
 const cppImplementationSchema = z.strictObject({
   namespace: z.array(nativeNameSchema).default([]),
   include: cppIncludeSchema,

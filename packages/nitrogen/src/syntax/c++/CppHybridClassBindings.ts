@@ -28,19 +28,10 @@ export function createCppHybridClassBindings(spec: HybridObjectSpec<'c++'>): Hyb
   }
 
   const implementation = ['', ...spec.implementation.namespace, spec.implementation.className].join('::')
-  const include = spec.implementation.include
-  const headerName = include.slice(1, -1)
-  const headerSpace = include.startsWith('<') ? 'system' : 'user'
   const { HybridTSpec } = getHybridObjectName(spec.name)
   const helper = `${HybridTSpec}Bindings`
   const adapters: string[] = []
-  imports.push(
-    { language: 'c++', declaration: { name: 'utility', space: 'system' } },
-    {
-      language: 'c++',
-      declaration: { name: headerName, space: headerSpace },
-    }
-  )
+  imports.push({ language: 'c++', declaration: { name: 'utility', space: 'system' } }, spec.implementation.include)
   if (spec.constructor != null) {
     const method = spec.constructor.toStaticMethod(new HybridObjectType(spec))
     const argumentTypes = method.parameters.map((parameter) => `decltype(${parameter.type.escapedName})`)

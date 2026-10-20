@@ -1,6 +1,5 @@
 import { type NitroConfig } from '../../config/NitroConfig.js'
-import type { SwiftProtocolConformance } from 'nitro-core'
-import type { Language } from '../../getPlatformSpecs.js'
+import type { HybridObjectPlatforms, Language } from '../../getPlatformSpecs.js'
 import { getForwardDeclaration } from '../c++/getForwardDeclaration.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
@@ -13,46 +12,31 @@ interface GetHybridObjectCodeOptions extends GetCodeOptions {
 
 export class HybridObjectType implements Type {
   readonly hybridObjectName: string
-  readonly implementationLanguage: Language
+  readonly platforms: HybridObjectPlatforms
   readonly baseTypes: HybridObjectType[]
   readonly sourceConfig: NitroConfig
-  readonly swiftProtocolConformances: SwiftProtocolConformance[]
 
-  constructor(
-    hybridObjectName: string,
-    implementationLanguage: Language,
-    baseTypes: HybridObjectType[],
-    sourceConfig: NitroConfig,
-    swiftProtocolConformances?: SwiftProtocolConformance[]
-  )
+  constructor(hybridObjectName: string, platforms: HybridObjectPlatforms, baseTypes: HybridObjectType[], sourceConfig: NitroConfig)
   constructor(spec: HybridObjectSpec)
   constructor(
     ...args:
-      | [
-          hybridObjectName: string,
-          implementationLanguage: Language,
-          baseTypes: HybridObjectType[],
-          sourceConfig: NitroConfig,
-          swiftProtocolConformances?: SwiftProtocolConformance[],
-        ]
+      | [hybridObjectName: string, platforms: HybridObjectPlatforms, baseTypes: HybridObjectType[], sourceConfig: NitroConfig]
       | [HybridObjectSpec]
   ) {
     if (args.length === 1) {
       const [spec] = args
 
       this.hybridObjectName = spec.name
-      this.implementationLanguage = spec.language
+      this.platforms = spec.platforms
       this.sourceConfig = spec.config
       this.baseTypes = spec.baseTypes.map((b) => new HybridObjectType(b))
-      this.swiftProtocolConformances = spec.language === 'swift' ? spec.protocolConformances : []
     } else {
-      const [hybridObjectName, implementationLanguage, baseTypes, sourceConfig, swiftProtocolConformances = []] = args
+      const [hybridObjectName, platforms, baseTypes, sourceConfig] = args
 
       this.hybridObjectName = hybridObjectName
-      this.implementationLanguage = implementationLanguage
+      this.platforms = platforms
       this.baseTypes = baseTypes
       this.sourceConfig = sourceConfig
-      this.swiftProtocolConformances = swiftProtocolConformances
     }
 
     if (this.hybridObjectName.startsWith('__')) {

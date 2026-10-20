@@ -50,8 +50,9 @@ export function generatePlatformFiles(
   }
 }
 
-function getHybridObjectSpec(type: Type, platform: Platform, options: HybridObjectPlatformOptions): HybridObjectSpec {
+export function getHybridObjectSpec(type: Type, platform: Platform, options: HybridObjectPlatformOptions): HybridObjectSpec {
   const language = options.language
+  const platforms = getHybridObjectPlatformsForType(type)
   const config = getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
   const view = isHybridView(type)
 
@@ -197,13 +198,11 @@ function getHybridObjectSpec(type: Type, platform: Platform, options: HybridObje
 
   let constructor: Constructor | undefined
   if (constructorParameters != null) {
-    const swiftProtocolConformances = options.language === 'swift' ? options.protocolConformances : []
     const constructedType = new HybridObjectType(
       name,
-      language,
+      platforms,
       bases.map((base) => new HybridObjectType(base)),
-      config,
-      swiftProtocolConformances
+      config
     )
     constructor = new Constructor(getHybridObjectName(name).HybridTSpec, constructedType, constructorParameters)
   }
@@ -213,6 +212,7 @@ function getHybridObjectSpec(type: Type, platform: Platform, options: HybridObje
     allowMultipleImplementations: allowMultipleImplementations,
     allowInheritance: options.allowInheritance === true,
     name: name,
+    platforms: platforms,
     isHybridView: view,
     properties: properties,
     methods: methods,
