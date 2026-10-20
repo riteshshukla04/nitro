@@ -17,8 +17,10 @@ import {
   assertPublishedPackages,
   assertValidatedCommit,
   compareVersions,
+  downloadRelease,
   fileIntegrity,
   finishRelease,
+  getRelease,
   git,
   isNightly,
   nightlyVersion,
@@ -35,9 +37,7 @@ import {
 test('publication requires CI for the resolved release commit', () => {
   const releaseCommit = 'a'.repeat(40)
   const newerMainCommit = 'b'.repeat(40)
-  assert.doesNotThrow(() =>
-    assertValidatedCommit(releaseCommit, releaseCommit)
-  )
+  assert.doesNotThrow(() => assertValidatedCommit(releaseCommit, releaseCommit))
   for (const validated of [
     undefined,
     '',
@@ -584,11 +584,7 @@ test('registry lookup reads versions and tags through npm with tarball integrity
       version,
       (command, args, options) => {
         assert.equal(command, 'npm')
-        assert.deepEqual(args, [
-          'view',
-          `@scope/core@${version}`,
-          '--json',
-        ])
+        assert.deepEqual(args, ['view', `@scope/core@${version}`, '--json'])
         assert.equal(options.encoding, 'utf8')
         return { status: 0, stdout: JSON.stringify(pkg), stderr: '' }
       }
@@ -655,7 +651,13 @@ test('registry lookup rejects malformed metadata and unexpected empty output', a
       )
     }
   }
-  for (const metadata of [null, {}, [], '0.37.2', { error: { code: 'E404' } }]) {
+  for (const metadata of [
+    null,
+    {},
+    [],
+    '0.37.2',
+    { error: { code: 'E404' } },
+  ]) {
     await assert.rejects(
       registryPackage('nitro-core', '0.37.2', () => ({
         status: 0,
@@ -911,42 +913,173 @@ test('verification requires every recorded package with matching integrity', asy
   await assertPublishedPackages(manifest, { lookup: registry.lookup })
 })
 
-test('finishing a draft promotes only stable releases newer than GitHub Latest', (t) => {
+function githubFixture(manifest) {
+  const releases = []
+  const bytes = new Map()
+  const calls = []
+  let nextID = 1
+  const repo = `repos/${manifest.repository}`
+  const addRelease = (overrides = {}) => {
+    const release = {
+      id: nextID++,
+      tag_name: manifest.tag,
+      draft: true,
+      assets: [],
+      ...overrides,
+    }
+    releases.push(release)
+    return release
+  }
+  const request = (endpoint, options = {}) => {
+    calls.push({ endpoint, ...options })
+    if (endpoint.startsWith(`${repo}/releases?`)) {
+      const page = Number(
+        new URLSearchParams(endpoint.split('?')[1]).get('page')
+      )
+      return structuredClone(releases.slice((page - 1) * 100, page * 100))
+    }
+    if (endpoint === `${repo}/git/ref/tags/${manifest.tag}`) return {}
+    if (endpoint === `${repo}/releases` && options.method === 'POST') {
+      return structuredClone(addRelease({ draft: options.body.draft }))
+    }
+    if (endpoint === `${repo}/releases/latest`) return null
+    if (options.method === 'DELETE') {
+      const id = Number(endpoint.split('/').at(-1))
+      assert.ok(bytes.delete(id), 'only an existing asset can be deleted')
+      for (const release of releases)
+        release.assets = release.assets.filter((asset) => asset.id !== id)
+      return null
+    }
+    if (options.method === 'PATCH') {
+      const release = releases.find(
+        (entry) => endpoint === `${repo}/releases/${entry.id}`
+      )
+      assert.ok(release, 'finalization must address the selected release ID')
+      Object.assign(release, options.body)
+      return structuredClone(release)
+    }
+    assert.fail(`Unexpected GitHub request: ${endpoint}`)
+  }
+  const upload = (repository, selected, filename) => {
+    assert.equal(repository, manifest.repository)
+    const release = releases.find((entry) => entry.id === selected.id)
+    assert.ok(release)
+    const name = path.basename(filename)
+    assert.ok(
+      !release.assets.some((asset) => asset.name === name),
+      'duplicate asset upload'
+    )
+    const asset = { id: nextID++, name }
+    calls.push({ upload: name, releaseID: release.id })
+    release.assets.push(asset)
+    bytes.set(asset.id, readFileSync(filename))
+    return structuredClone(asset)
+  }
+  const download = (repository, asset, destination) => {
+    assert.equal(repository, manifest.repository)
+    calls.push({ download: asset.id })
+    assert.ok(bytes.has(asset.id))
+    writeFileSync(destination, bytes.get(asset.id))
+  }
+  const lookup = (repository, tag) => getRelease(repository, tag, { request })
+  return {
+    releases,
+    bytes,
+    calls,
+    addRelease,
+    request,
+    upload,
+    download,
+    lookup,
+  }
+}
+
+test('draft lookup scans all pages and selects the exact tag checkpoint past an empty duplicate', (t) => {
   const { manifest } = releaseFixture(t)
+  const github = githubFixture(manifest)
+  github.addRelease()
+  for (let i = 0; i < 99; i++)
+    github.addRelease({ tag_name: `${manifest.tag}-${i}` })
+  const original = github.addRelease({
+    assets: [{ id: 500, name: 'nitro-release.json' }],
+  })
+  assert.deepEqual(github.lookup(manifest.repository, manifest.tag), original)
+  assert.deepEqual(
+    github.calls.map((call) => call.endpoint),
+    [
+      'repos/margelo/nitro/releases?per_page=100&page=1',
+      'repos/margelo/nitro/releases?per_page=100&page=2',
+    ]
+  )
+})
+
+test('draft lookup detects conflicting checkpoints even after the first matching page', (t) => {
+  const { manifest } = releaseFixture(t)
+  const github = githubFixture(manifest)
+  github.addRelease({ assets: [{ id: 500, name: 'nitro-release.json' }] })
+  for (let i = 0; i < 99; i++)
+    github.addRelease({ tag_name: `${manifest.tag}-${i}` })
+  github.addRelease({ assets: [{ id: 501, name: 'nitro-release.json' }] })
+  assert.throws(
+    () => github.lookup(manifest.repository, manifest.tag),
+    /Ambiguous releases/
+  )
+})
+
+test('lookup distinguishes missing, incomplete, published and ambiguous releases', (t) => {
+  const { manifest } = releaseFixture(t)
+  const github = githubFixture(manifest)
+  assert.equal(github.lookup(manifest.repository, manifest.tag), null)
+  const release = github.addRelease()
+  assert.deepEqual(github.lookup(manifest.repository, manifest.tag), release)
+  release.draft = false
+  assert.deepEqual(github.lookup(manifest.repository, manifest.tag), release)
+  github.addRelease()
+  assert.throws(
+    () => github.lookup(manifest.repository, manifest.tag),
+    /Ambiguous releases/
+  )
+})
+
+test('lookup errors cannot be mistaken for an absent draft', () => {
+  for (const status of [401, 403, 404, 503]) {
+    assert.throws(
+      () =>
+        getRelease('margelo/nitro', 'v0.37.2', {
+          request: () => {
+            throw new Error(`GitHub HTTP ${status}`)
+          },
+        }),
+      new RegExp(`HTTP ${status}`)
+    )
+  }
+})
+
+test('finishing a draft promotes only stable releases newer than GitHub Latest', (t) => {
+  const { manifest, directory } = releaseFixture(t)
   for (const [current, expectedLatest] of [
     [null, true],
     [{ tag_name: 'v0.37.1' }, true],
     [{ tag_name: 'v0.37.2' }, true],
     [{ tag_name: 'v0.38.0' }, false],
   ]) {
-    const commands = []
+    const github = githubFixture(manifest)
+    const release = saveDraft(manifest, directory, 'nitro-release.json', github)
     finishRelease(manifest, {
-      lookup: (repository, tag) => {
-        assert.equal(repository, manifest.repository)
-        assert.equal(tag, manifest.tag)
-        return { draft: true }
-      },
+      release,
       request: (endpoint, options) => {
-        assert.equal(endpoint, `repos/${manifest.repository}/releases/latest`)
-        assert.deepEqual(options, { allowNotFound: true })
-        return current
+        if (endpoint.endsWith('/latest')) {
+          assert.deepEqual(options, { allowNotFound: true })
+          return current
+        }
+        return github.request(endpoint, options)
       },
-      execute: (command, args) => commands.push([command, args]),
     })
-    assert.deepEqual(commands, [
-      [
-        'gh',
-        [
-          'release',
-          'edit',
-          manifest.tag,
-          '--repo',
-          manifest.repository,
-          '--draft=false',
-          `--latest=${expectedLatest}`,
-        ],
-      ],
-    ])
+    assert.deepEqual(github.calls.at(-1), {
+      endpoint: `repos/${manifest.repository}/releases/${release.id}`,
+      method: 'PATCH',
+      body: { draft: false, make_latest: String(expectedLatest) },
+    })
   }
 })
 
@@ -955,102 +1088,115 @@ test('prereleases and non-latest channels never become GitHub Latest', (t) => {
     { version: '0.38.0-beta.1', npmTag: 'beta' },
     { version: '0.38.0', npmTag: 'next' },
   ]) {
-    const { manifest } = releaseFixture(t, options)
-    const commands = []
-    finishRelease(manifest, {
-      lookup: () => ({ draft: true }),
-      request: () => assert.fail('no latest lookup is needed for this channel'),
-      execute: (command, args) => commands.push([command, args]),
-    })
-    assert.equal(commands.length, 1)
-    assert.ok(commands[0][1].includes('--latest=false'))
+    const { manifest, directory } = releaseFixture(t, options)
+    const github = githubFixture(manifest)
+    const release = saveDraft(manifest, directory, 'nitro-release.json', github)
+    finishRelease(manifest, { release, request: github.request })
+    assert.equal(github.calls.at(-1).body.make_latest, 'false')
+    assert.ok(!github.calls.some((call) => call.endpoint?.endsWith('/latest')))
   }
 })
 
 test('completed releases are unchanged and missing checkpoints cannot be completed', (t) => {
   const { manifest } = releaseFixture(t)
-  const unavailable = () => assert.fail('must not query or change GitHub')
-  finishRelease(manifest, {
-    lookup: () => ({ draft: false }),
-    request: unavailable,
-    execute: unavailable,
-  })
+  const release = {
+    id: 1,
+    tag_name: manifest.tag,
+    draft: false,
+    assets: [{ id: 2, name: 'nitro-release.json' }],
+  }
+  const request = () => assert.fail('must not query or change GitHub')
+  finishRelease(manifest, { release, request })
+  assert.throws(
+    () => finishRelease(manifest, { release: null, request }),
+    /checkpoint is missing/
+  )
   assert.throws(
     () =>
       finishRelease(manifest, {
-        lookup: () => null,
-        request: unavailable,
-        execute: unavailable,
+        release: { ...release, draft: true, assets: [] },
+        request,
       }),
-    /checkpoint is missing/
+    /Missing or ambiguous release asset/
+  )
+  assert.throws(
+    () =>
+      finishRelease(manifest, {
+        release: { ...release, tag_name: 'v0.37.3' },
+        request,
+      }),
+    /Release ID does not match/
   )
 })
 
 test('a GitHub Latest lookup failure leaves the release as a draft', (t) => {
-  const { manifest } = releaseFixture(t)
+  const { manifest, directory } = releaseFixture(t)
+  const github = githubFixture(manifest)
+  const release = saveDraft(manifest, directory, 'nitro-release.json', github)
   assert.throws(
     () =>
       finishRelease(manifest, {
-        lookup: () => ({ draft: true }),
+        release,
         request: () => {
           throw new Error('GitHub HTTP 503')
         },
-        execute: () =>
-          assert.fail('must not complete a release when latest is unknown'),
       }),
     /GitHub HTTP 503/
   )
+  assert.equal(github.releases[0].draft, true)
 })
 
-test('a draft checkpoint uploads every tarball before the manifest', (t) => {
+test('a draft checkpoint verifies its tag and uploads every tarball before the manifest', (t) => {
   const { manifest, directory } = releaseFixture(t, {
     version: '0.38.0-beta.1',
     npmTag: 'beta',
   })
-  const commands = []
-  saveDraft(manifest, directory, 'nitro-release.json', {
-    lookup: () => null,
-    execute: (command, args) => commands.push([command, args]),
-  })
-  assert.equal(commands.length, 5)
-  assert.deepEqual(commands[0], [
-    'gh',
-    [
-      'release',
-      'create',
-      manifest.tag,
-      '--repo',
-      manifest.repository,
-      '--verify-tag',
-      '--draft',
-      '--title',
-      manifest.tag,
-      '--generate-notes',
-      '--latest=false',
-      '--prerelease',
-    ],
-  ])
-  const uploads = commands.slice(1)
-  assert.deepEqual(
-    uploads.map(([command, args]) => {
-      assert.equal(command, 'gh')
-      assert.deepEqual(args.slice(0, 3), ['release', 'upload', manifest.tag])
-      return path.basename(args[3])
-    }),
-    [...manifest.packages.map((pkg) => pkg.filename), 'nitro-release.json']
+  const github = githubFixture(manifest)
+  const release = saveDraft(manifest, directory, 'nitro-release.json', github)
+  assert.equal(
+    github.calls[1].endpoint,
+    `repos/${manifest.repository}/git/ref/tags/${manifest.tag}`
   )
-  assert.ok(uploads[0][1].includes('--clobber'))
-  assert.ok(uploads[1][1].includes('--clobber'))
-  assert.ok(uploads[2][1].includes('--clobber'))
-  assert.ok(
-    !uploads[3][1].includes('--clobber'),
-    'a completed checkpoint must never be replaced'
+  assert.deepEqual(github.calls[2], {
+    endpoint: `repos/${manifest.repository}/releases`,
+    method: 'POST',
+    body: {
+      tag_name: manifest.tag,
+      name: manifest.tag,
+      draft: true,
+      prerelease: true,
+      generate_release_notes: true,
+      make_latest: 'false',
+    },
+  })
+  assert.deepEqual(
+    github.calls.filter((call) => call.upload),
+    [...manifest.packages.map((pkg) => pkg.filename), 'nitro-release.json'].map(
+      (upload) => ({ upload, releaseID: release.id })
+    )
   )
   assert.deepEqual(
     JSON.parse(
       readFileSync(path.join(directory, 'nitro-release.json'), 'utf8')
     ),
     manifest
+  )
+})
+
+test('a missing remote tag prevents creating a draft', (t) => {
+  const { manifest, directory } = releaseFixture(t)
+  assert.throws(
+    () =>
+      saveDraft(manifest, directory, 'nitro-release.json', {
+        lookup: () => null,
+        request: (endpoint, options) => {
+          assert.ok(endpoint.includes('/git/ref/tags/'))
+          assert.equal(options, undefined)
+          throw new Error('GitHub HTTP 404')
+        },
+        upload: () => assert.fail('must not upload without a tag'),
+      }),
+    /HTTP 404/
   )
 })
 
@@ -1064,114 +1210,95 @@ test('drafts with a checkpoint and completed releases refuse artifact replacemen
       () =>
         saveDraft(manifest, directory, 'nitro-release.json', {
           lookup: () => release,
-          execute: () => assert.fail('saved artifacts must not be overwritten'),
+          request: () => assert.fail('saved artifacts must not be overwritten'),
+          upload: () => assert.fail('saved artifacts must not be overwritten'),
         }),
       /Cannot replace|checkpoint already exists/
     )
   }
 })
 
-test('an interrupted tarball upload leaves no remote manifest and resumes the same draft', (t) => {
+test('an interrupted tarball upload resumes the same draft and writes the manifest last', (t) => {
   const { manifest, directory } = releaseFixture(t)
-  const assets = []
-  let created = false
+  const github = githubFixture(manifest)
   let failSecondUpload = true
-  const commands = []
-  const lookup = () =>
-    created ? { draft: true, assets: assets.map((name) => ({ name })) } : null
-  const execute = (command, args) => {
-    commands.push([command, args])
-    if (args[1] === 'create') {
-      assert.equal(created, false, 'the existing draft must be reused')
-      created = true
-      return
-    }
-    const filename = path.basename(args[3])
-    if (filename === manifest.packages[1].filename && failSecondUpload) {
+  const upload = (...args) => {
+    if (
+      path.basename(args[2]) === manifest.packages[1].filename &&
+      failSecondUpload
+    ) {
       failSecondUpload = false
       throw new Error('upload connection reset')
     }
-    if (!assets.includes(filename)) assets.push(filename)
+    return github.upload(...args)
   }
   assert.throws(
     () =>
-      saveDraft(manifest, directory, 'nitro-release.json', { lookup, execute }),
+      saveDraft(manifest, directory, 'nitro-release.json', {
+        ...github,
+        upload,
+      }),
     /connection reset/
   )
-  assert.deepEqual(assets, [manifest.packages[0].filename])
-  assert.ok(
-    !commands.some(
-      ([, args]) =>
-        args[1] === 'upload' && args[3].endsWith('nitro-release.json')
-    )
+  assert.deepEqual(
+    github.releases[0].assets.map((asset) => asset.name),
+    [manifest.packages[0].filename]
   )
-  saveDraft(manifest, directory, 'nitro-release.json', { lookup, execute })
-  assert.deepEqual(assets, [
-    ...manifest.packages.map((pkg) => pkg.filename),
-    'nitro-release.json',
-  ])
-  assert.equal(commands.filter(([, args]) => args[1] === 'create').length, 1)
+  const releaseID = github.releases[0].id
+  saveDraft(manifest, directory, 'nitro-release.json', { ...github, upload })
+  assert.equal(github.releases.length, 1)
+  assert.equal(github.releases[0].id, releaseID)
+  assert.deepEqual(
+    github.releases[0].assets.map((asset) => asset.name),
+    [...manifest.packages.map((pkg) => pkg.filename), 'nitro-release.json']
+  )
 })
 
-test('a GitHub-published release can save its first checkpoint without replacing public assets', (t) => {
+test('a published release can save its first checkpoint without replacing public assets', (t) => {
   const { manifest, directory } = releaseFixture(t)
-  const commands = []
-  saveDraft(manifest, directory, 'nitro-release.json', {
-    lookup: () => ({ draft: false, assets: [] }),
-    allowPublished: true,
-    execute: (command, args) => commands.push([command, args]),
-  })
-  assert.equal(commands.length, 4)
-  assert.ok(
-    commands.every(
-      ([command, args]) =>
-        command === 'gh' && args[1] === 'upload' && !args.includes('--clobber')
-    )
-  )
-  assert.ok(commands.at(-1)[1][3].endsWith('nitro-release.json'))
-})
-
-test('a published-release retry verifies previously uploaded tarballs before saving its checkpoint', (t) => {
-  const { manifest, directory } = releaseFixture(t)
+  const github = githubFixture(manifest)
+  const release = github.addRelease({ draft: false })
   const first = manifest.packages[0]
-  const lookup = () => ({ draft: false, assets: [{ name: first.filename }] })
-  const uploads = []
+  github.upload(
+    manifest.repository,
+    release,
+    path.join(directory, first.filename)
+  )
+  github.calls.length = 0
   saveDraft(manifest, directory, 'nitro-release.json', {
-    lookup,
+    ...github,
     allowPublished: true,
-    execute: (command, args) => {
-      if (args[1] === 'download') {
-        const destination = args[args.indexOf('--dir') + 1]
-        writeFileSync(
-          path.join(destination, first.filename),
-          readFileSync(path.join(directory, first.filename))
-        )
-      } else uploads.push(path.basename(args[3]))
-    },
   })
-  assert.deepEqual(uploads, [
-    ...manifest.packages.slice(1).map((pkg) => pkg.filename),
-    'nitro-release.json',
-  ])
+  assert.deepEqual(
+    github.calls.filter((call) => call.upload).map((call) => call.upload),
+    [
+      ...manifest.packages.slice(1).map((pkg) => pkg.filename),
+      'nitro-release.json',
+    ]
+  )
+  assert.ok(!github.calls.some((call) => call.method === 'DELETE'))
+})
+
+test('a published-release retry stops on corrupt public tarballs before uploading', (t) => {
+  const { manifest, directory } = releaseFixture(t)
+  const github = githubFixture(manifest)
+  const release = github.addRelease({ draft: false })
+  const asset = github.upload(
+    manifest.repository,
+    release,
+    path.join(directory, manifest.packages[0].filename)
+  )
+  github.bytes.set(asset.id, Buffer.from('different bytes'))
+  github.calls.length = 0
   assert.throws(
     () =>
       saveDraft(manifest, directory, 'nitro-release.json', {
-        lookup,
+        ...github,
         allowPublished: true,
-        execute: (command, args) => {
-          assert.equal(
-            args[1],
-            'download',
-            'corrupt assets must stop before any upload'
-          )
-          writeFileSync(
-            path.join(args[args.indexOf('--dir') + 1], first.filename),
-            'different bytes'
-          )
-        },
       }),
     /Tarball integrity mismatch/
   )
+  assert.ok(!github.calls.some((call) => call.upload || call.method))
 })
 
 test('a published-release checkpoint cannot be replaced even by its release-event retry', (t) => {
@@ -1184,8 +1311,116 @@ test('a published-release checkpoint cannot be replaced even by its release-even
           assets: [{ name: 'nitro-release.json' }],
         }),
         allowPublished: true,
-        execute: () => assert.fail('immutable checkpoint must be reused'),
+        request: () => assert.fail('immutable checkpoint must be reused'),
+        upload: () => assert.fail('immutable checkpoint must be reused'),
       }),
     /checkpoint already exists/
   )
+})
+
+test('a duplicate empty draft cannot redirect checkpoint downloads or finalization after partial publication', async (t) => {
+  const { manifest, directory } = releaseFixture(t, {
+    version: '0.37.2-nightly.32.gbbbbbbbbbbbb',
+    npmTag: 'nightly',
+  })
+  const github = githubFixture(manifest)
+  const original = saveDraft(manifest, directory, 'nitro-release.json', github)
+  const duplicate = github.addRelease()
+  github.releases.reverse() // GitHub lists the newer empty draft first.
+  const registry = registryFixture(manifest)
+  registry.versions.set(
+    registry.key(manifest.packages[0].name, manifest.version),
+    registry.record(manifest.packages[0])
+  )
+  const savedBytes = new Map(github.bytes)
+  github.calls.length = 0
+  const release = github.lookup(manifest.repository, manifest.tag)
+  const recovered = path.join(directory, 'recovered')
+  const checkpoint = downloadRelease(
+    manifest.repository,
+    release,
+    'nitro-release.json',
+    recovered,
+    github
+  )
+  assert.deepEqual(checkpoint, manifest)
+  await publishPackages(checkpoint, recovered, registry)
+  finishRelease(checkpoint, { release, request: github.request })
+  assert.deepEqual(registry.publishes, releasePackages.slice(1))
+  assert.deepEqual(
+    github.calls.filter((call) => call.download).map((call) => call.download),
+    [
+      original.assets.at(-1).id,
+      ...original.assets.slice(0, -1).map((asset) => asset.id),
+    ]
+  )
+  assert.deepEqual(github.bytes, savedBytes)
+  assert.equal(
+    github.releases.find((entry) => entry.id === original.id).draft,
+    false
+  )
+  assert.equal(duplicate.draft, true)
+  assert.deepEqual(duplicate.assets, [])
+  assert.ok(
+    !github.calls.some((call) => call.upload || call.method === 'DELETE')
+  )
+})
+
+test('a lost manifest upload response resumes the completed checkpoint without replacing it', (t) => {
+  const { manifest, directory } = releaseFixture(t)
+  const github = githubFixture(manifest)
+  assert.throws(
+    () =>
+      saveDraft(manifest, directory, 'nitro-release.json', {
+        ...github,
+        upload: (...args) => {
+          const asset = github.upload(...args)
+          if (asset.name === 'nitro-release.json')
+            throw new Error('upload response lost')
+          return asset
+        },
+      }),
+    /upload response lost/
+  )
+  github.calls.length = 0
+  const release = github.lookup(manifest.repository, manifest.tag)
+  assert.throws(
+    () => saveDraft(manifest, directory, 'nitro-release.json', github),
+    /checkpoint already exists/
+  )
+  assert.deepEqual(
+    downloadRelease(
+      manifest.repository,
+      release,
+      'nitro-release.json',
+      path.join(directory, 'recovered'),
+      github
+    ),
+    manifest
+  )
+  assert.ok(!github.calls.some((call) => call.upload || call.method))
+})
+
+test('checkpoint recovery refuses missing, ambiguous and corrupt tarballs', (t) => {
+  for (const defect of ['missing', 'duplicate', 'corrupt']) {
+    const { manifest, directory } = releaseFixture(t)
+    const github = githubFixture(manifest)
+    const release = saveDraft(manifest, directory, 'nitro-release.json', github)
+    if (defect === 'missing') release.assets.shift()
+    if (defect === 'duplicate')
+      release.assets.push({ ...release.assets[0], id: 999 })
+    if (defect === 'corrupt')
+      github.bytes.set(release.assets[0].id, Buffer.from('different bytes'))
+    assert.throws(
+      () =>
+        downloadRelease(
+          manifest.repository,
+          release,
+          'nitro-release.json',
+          path.join(directory, 'recovered'),
+          github
+        ),
+      /Missing or ambiguous release asset|Tarball integrity mismatch/
+    )
+  }
 })

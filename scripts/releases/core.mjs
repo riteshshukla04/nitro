@@ -69,6 +69,7 @@ const exists = !!git(['tag', '--list', tag])
 if (releaseEventTag && !exists)
   throw new Error('The GitHub release tag is missing')
 let manifest
+let release
 let allowPublishedCheckpoint = false
 
 if (exists) {
@@ -78,7 +79,7 @@ if (exists) {
     '--format=%(contents)',
     `refs/tags/${tag}`,
   ])
-  const release = getRelease(repository, tag)
+  release = getRelease(repository, tag)
   allowPublishedCheckpoint = releaseEventTag === tag && release?.draft === false
   if (annotation.split('\n').includes(`Nitro-Release: ${tag}`)) {
     if (!annotation.split('\n').includes(`Npm-Tag: ${npmTag}`))
@@ -118,7 +119,12 @@ if (exists) {
   if (readJSON('package.json').version !== version)
     throw new Error('Tagged version does not match input')
   if (release?.assets.some((asset) => asset.name === 'nitro-release.json')) {
-    manifest = downloadRelease(repository, tag, 'nitro-release.json', directory)
+    manifest = downloadRelease(
+      repository,
+      release,
+      'nitro-release.json',
+      directory
+    )
     if (
       manifest.commit !== commit ||
       manifest.npmTag !== npmTag ||
@@ -238,7 +244,7 @@ if (!manifest) {
     },
     { repository, tag, packages: releasePackages }
   )
-  saveDraft(manifest, directory, 'nitro-release.json', {
+  release = saveDraft(manifest, directory, 'nitro-release.json', {
     allowPublished: allowPublishedCheckpoint,
   })
 }
@@ -247,6 +253,6 @@ if (dryRun) {
   process.exit(0)
 }
 await publishPackages(manifest, directory)
-finishRelease(manifest)
+finishRelease(manifest, { release })
 reportCompletedRelease()
 console.log(`Released ${releasePackages.join(', ')} at ${version}`)

@@ -1,6 +1,12 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  closeSync,
+  mkdirSync,
+  openSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs'
 import path from 'node:path'
 import { releasePackages } from './packages.mjs'
 
@@ -211,8 +217,84 @@ export function github(
   return result.stdout.trim() ? JSON.parse(result.stdout) : null
 }
 
-export const getRelease = (repo, tag) =>
-  github(`repos/${repo}/releases/tags/${tag}`, { allowNotFound: true })
+export function getRelease(
+  repo,
+  tag,
+  { request = github, manifestName = 'nitro-release.json' } = {}
+) {
+  // The tag endpoint excludes drafts. Scan every page so an empty duplicate
+  // cannot hide an older release containing the saved checkpoint.
+  const matches = []
+  for (let page = 1; ; page++) {
+    const releases = request(`repos/${repo}/releases?per_page=100&page=${page}`)
+    matches.push(...releases.filter((release) => release.tag_name === tag))
+    if (releases.length < 100) break
+  }
+  const checkpoints = matches.filter((release) =>
+    release.assets.some((asset) => asset.name === manifestName)
+  )
+  if (checkpoints.length === 1) return checkpoints[0]
+  if (checkpoints.length > 1 || matches.length > 1)
+    throw new Error(`Ambiguous releases for ${tag}; cannot select a checkpoint`)
+  return matches[0] ?? null
+}
+
+function assertRelease(release, tag) {
+  if (
+    !Number.isSafeInteger(release?.id) ||
+    release.id <= 0 ||
+    release.tag_name !== tag
+  )
+    throw new Error(`Release ID does not match ${tag}`)
+}
+
+function releaseAsset(release, name) {
+  const matches = release.assets.filter((asset) => asset.name === name)
+  if (
+    matches.length !== 1 ||
+    !Number.isSafeInteger(matches[0].id) ||
+    matches[0].id <= 0
+  )
+    throw new Error(`Missing or ambiguous release asset: ${name}`)
+  return matches[0]
+}
+
+export function downloadAsset(repo, asset, destination) {
+  const endpoint = `repos/${repo}/releases/assets/${asset.id}`
+  const file = openSync(destination, 'w')
+  try {
+    const result = spawnSync(
+      'gh',
+      ['api', endpoint, '--header', 'Accept: application/octet-stream'],
+      { stdio: ['ignore', file, 'pipe'] }
+    )
+    if (result.error) throw result.error
+    if (result.status !== 0)
+      throw new Error(`GitHub download ${endpoint}: ${result.stderr}`)
+  } finally {
+    closeSync(file)
+  }
+}
+
+export function uploadAsset(repo, release, filename) {
+  const endpoint = `https://uploads.github.com/repos/${repo}/releases/${release.id}/assets?name=${encodeURIComponent(path.basename(filename))}`
+  return JSON.parse(
+    run(
+      'gh',
+      [
+        'api',
+        endpoint,
+        '--method',
+        'POST',
+        '--header',
+        'Content-Type: application/octet-stream',
+        '--input',
+        filename,
+      ],
+      { capture: true }
+    )
+  )
+}
 
 export function fileIntegrity(filename) {
   return `sha512-${createHash('sha512').update(readFileSync(filename)).digest('base64')}`
@@ -226,19 +308,21 @@ export function verifyFiles(manifest, directory) {
   }
 }
 
-export function downloadRelease(repo, tag, manifestName, directory) {
+export function downloadRelease(
+  repo,
+  release,
+  manifestName,
+  directory,
+  { download = downloadAsset } = {}
+) {
+  const tag = release.tag_name
+  assertRelease(release, tag)
   mkdirSync(directory, { recursive: true })
-  run('gh', [
-    'release',
-    'download',
-    tag,
-    '--repo',
+  download(
     repo,
-    '--pattern',
-    manifestName,
-    '--dir',
-    directory,
-  ])
+    releaseAsset(release, manifestName),
+    path.join(directory, manifestName)
+  )
   const manifest = readJSON(path.join(directory, manifestName))
   validateManifest(manifest, {
     repository: repo,
@@ -246,17 +330,11 @@ export function downloadRelease(repo, tag, manifestName, directory) {
     packages: releasePackages,
   })
   for (const pkg of manifest.packages) {
-    run('gh', [
-      'release',
-      'download',
-      tag,
-      '--repo',
+    download(
       repo,
-      '--pattern',
-      pkg.filename,
-      '--dir',
-      directory,
-    ])
+      releaseAsset(release, pkg.filename),
+      path.join(directory, pkg.filename)
+    )
   }
   verifyFiles(manifest, directory)
   return manifest
@@ -390,84 +468,83 @@ export function saveDraft(
   manifest,
   directory,
   manifestName,
-  { lookup = getRelease, execute = run, allowPublished = false } = {}
+  {
+    lookup = getRelease,
+    request = github,
+    upload = uploadAsset,
+    download = downloadAsset,
+    allowPublished = false,
+  } = {}
 ) {
-  const existing = lookup(manifest.repository, manifest.tag)
+  const existing = lookup(manifest.repository, manifest.tag, { manifestName })
   if (existing && !existing.draft && !allowPublished)
     throw new Error('Cannot replace assets of a completed release')
   if (existing?.assets.some((asset) => asset.name === manifestName)) {
     throw new Error('Release checkpoint already exists; download and resume it')
   }
-  if (!existing) {
-    execute('gh', [
-      'release',
-      'create',
-      manifest.tag,
-      '--repo',
-      manifest.repository,
-      '--verify-tag',
-      '--draft',
-      '--title',
-      manifest.tag,
-      '--generate-notes',
-      '--latest=false',
-      ...(parseVersion(manifest.version).prerelease.length
-        ? ['--prerelease']
-        : []),
-    ])
+  verifyFiles(manifest, directory)
+  let release = existing
+  if (!release) {
+    // Keep --verify-tag's guarantee when creating through the API.
+    request(`repos/${manifest.repository}/git/ref/tags/${manifest.tag}`)
+    release = request(`repos/${manifest.repository}/releases`, {
+      method: 'POST',
+      body: {
+        tag_name: manifest.tag,
+        name: manifest.tag,
+        draft: true,
+        prerelease: !!parseVersion(manifest.version).prerelease.length,
+        generate_release_notes: true,
+        make_latest: 'false',
+      },
+    })
   }
+  assertRelease(release, manifest.tag)
   writeJSON(path.join(directory, manifestName), manifest)
   // Upload the manifest last. Its presence means every immutable tarball was saved.
   for (const pkg of manifest.packages) {
-    if (
-      existing &&
-      !existing.draft &&
-      existing.assets.some((asset) => asset.name === pkg.filename)
-    ) {
+    const savedAsset = release.assets.some(
+      (asset) => asset.name === pkg.filename
+    )
+      ? releaseAsset(release, pkg.filename)
+      : undefined
+    if (savedAsset && !release.draft) {
       // A published-release run may have stopped between uploads. Verify its
       // existing bytes instead of replacing a public asset during the retry.
       const saved = path.join(directory, 'existing-assets')
       mkdirSync(saved, { recursive: true })
-      execute('gh', [
-        'release',
-        'download',
-        manifest.tag,
-        '--repo',
-        manifest.repository,
-        '--pattern',
-        pkg.filename,
-        '--dir',
-        saved,
-      ])
+      download(manifest.repository, savedAsset, path.join(saved, pkg.filename))
       verifyFiles({ packages: [pkg] }, saved)
       continue
     }
-    execute('gh', [
-      'release',
-      'upload',
-      manifest.tag,
-      path.join(directory, pkg.filename),
-      '--repo',
-      manifest.repository,
-      ...(!existing || existing.draft ? ['--clobber'] : []),
-    ])
+    if (savedAsset) {
+      request(`repos/${manifest.repository}/releases/assets/${savedAsset.id}`, {
+        method: 'DELETE',
+      })
+      release.assets = release.assets.filter(
+        (asset) => asset.id !== savedAsset.id
+      )
+    }
+    release.assets.push(
+      upload(manifest.repository, release, path.join(directory, pkg.filename))
+    )
   }
-  execute('gh', [
-    'release',
-    'upload',
-    manifest.tag,
-    path.join(directory, manifestName),
-    '--repo',
-    manifest.repository,
-  ])
+  release.assets.push(
+    upload(manifest.repository, release, path.join(directory, manifestName))
+  )
+  return release
 }
 
 export function finishRelease(
   manifest,
-  { lookup = getRelease, request = github, execute = run } = {}
+  {
+    release = getRelease(manifest.repository, manifest.tag),
+    request = github,
+  } = {}
 ) {
-  const release = lookup(manifest.repository, manifest.tag)
   if (!release) throw new Error('The release checkpoint is missing')
+  assertRelease(release, manifest.tag)
+  releaseAsset(release, 'nitro-release.json')
   if (!release.draft) return
   let latest =
     manifest.npmTag === 'latest' &&
@@ -482,15 +559,10 @@ export function finishRelease(
         0
     }
   }
-  execute('gh', [
-    'release',
-    'edit',
-    manifest.tag,
-    '--repo',
-    manifest.repository,
-    '--draft=false',
-    `--latest=${latest}`,
-  ])
+  request(`repos/${manifest.repository}/releases/${release.id}`, {
+    method: 'PATCH',
+    body: { draft: false, make_latest: String(latest) },
+  })
 }
 
 export function assertClean(cwd) {
