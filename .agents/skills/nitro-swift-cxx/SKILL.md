@@ -19,5 +19,5 @@ description: Apply Nitro v1's review decisions when editing native Swift convert
   `.get()` can create owned values with allocation or retain/release costs.
 - In a PR stack, regenerate and commit affected bridge files in each atomic PR alongside its source changes. Keep each PR buildable; do not
   collect generated output in a final PR.
-- In consumer C++, including generated code, qualify Nitro symbols with `nitro::` or `margelo::nitro::`, and JSI symbols with `jsi::`.
-  Declare aliases explicitly where needed; do not rely on `using namespace` declarations in runtime headers.
+- In consumer C++, including generated code, qualify Nitro symbols with `nitro::`, and JSI symbols with `jsi::`. Declare aliases explicitly
+  where needed; do not rely on `using namespace` declarations in runtime headers.
