@@ -23,7 +23,7 @@ namespace margelo::nitro {
         ::NitroTest::Variant_any_Callback_____Void__Double_cxx::initializeSecond(payload, result);
       });
     }
-    throw std::runtime_error("Cannot convert \"" + value.toString(runtime).utf8(runtime) + "\" to any type in variant<Callback<void()>, double>!");
+    throw std::runtime_error("Cannot convert \"" + value.toString(runtime).utf8(runtime) + "\" to any type in variant<margelo::nitro::Callback<void()>, double>!");
   }
 
   jsi::Value JSIConverter<::NitroTest::Variant_any_Callback_____Void__Double_cxx>::toJSI(jsi::Runtime& runtime, const ::NitroTest::Variant_any_Callback_____Void__Double_cxx& value) {

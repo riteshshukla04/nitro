@@ -18,13 +18,13 @@ namespace margelo::nitro {
   margelo::nitro::test::OptionalCallback JSIConverter<margelo::nitro::test::OptionalCallback>::fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
     jsi::Object obj = arg.asObject(runtime);
     return margelo::nitro::test::OptionalCallback(
-      JSIConverter<std::optional<std::variant<Callback<void()>, double>>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "callback")))
+      JSIConverter<std::optional<std::variant<margelo::nitro::Callback<void()>, double>>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "callback")))
     );
   }
 
   jsi::Value JSIConverter<margelo::nitro::test::OptionalCallback>::toJSI(jsi::Runtime& runtime, const margelo::nitro::test::OptionalCallback& arg) {
     jsi::Object obj(runtime);
-    obj.setProperty(runtime, PropNameIDCache::get(runtime, "callback"), JSIConverter<std::optional<std::variant<Callback<void()>, double>>>::toJSI(runtime, arg.callback));
+    obj.setProperty(runtime, PropNameIDCache::get(runtime, "callback"), JSIConverter<std::optional<std::variant<margelo::nitro::Callback<void()>, double>>>::toJSI(runtime, arg.callback));
     return obj;
   }
 
@@ -36,7 +36,7 @@ namespace margelo::nitro {
     if (!nitro::isPlainObject(runtime, obj)) {
       return false;
     }
-    if (!JSIConverter<std::optional<std::variant<Callback<void()>, double>>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "callback")))) return false;
+    if (!JSIConverter<std::optional<std::variant<margelo::nitro::Callback<void()>, double>>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "callback")))) return false;
     return true;
   }
 

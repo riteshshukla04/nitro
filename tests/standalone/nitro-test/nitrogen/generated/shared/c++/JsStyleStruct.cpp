@@ -17,14 +17,14 @@ namespace margelo::nitro {
     jsi::Object obj = arg.asObject(runtime);
     return margelo::nitro::test::JsStyleStruct(
       JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "value"))),
-      JSIConverter<Callback<void(double)>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "onChanged")))
+      JSIConverter<margelo::nitro::Callback<void(double)>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "onChanged")))
     );
   }
 
   jsi::Value JSIConverter<margelo::nitro::test::JsStyleStruct>::toJSI(jsi::Runtime& runtime, const margelo::nitro::test::JsStyleStruct& arg) {
     jsi::Object obj(runtime);
     obj.setProperty(runtime, PropNameIDCache::get(runtime, "value"), JSIConverter<double>::toJSI(runtime, arg.value));
-    obj.setProperty(runtime, PropNameIDCache::get(runtime, "onChanged"), JSIConverter<Callback<void(double)>>::toJSI(runtime, arg.onChanged));
+    obj.setProperty(runtime, PropNameIDCache::get(runtime, "onChanged"), JSIConverter<margelo::nitro::Callback<void(double)>>::toJSI(runtime, arg.onChanged));
     return obj;
   }
 
@@ -37,7 +37,7 @@ namespace margelo::nitro {
       return false;
     }
     if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "value")))) return false;
-    if (!JSIConverter<Callback<void(double)>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "onChanged")))) return false;
+    if (!JSIConverter<margelo::nitro::Callback<void(double)>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "onChanged")))) return false;
     return true;
   }
 

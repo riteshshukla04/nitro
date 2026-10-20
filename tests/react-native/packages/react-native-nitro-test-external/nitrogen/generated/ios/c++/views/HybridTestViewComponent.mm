@@ -110,7 +110,7 @@ using namespace margelo::nitro::test::external::views;
     if (oldViewProps == nullptr
           ? newViewProps.someCallback.isProvided()
           : !newViewProps.someCallback.hasSameValue(oldViewProps->someCallback)) {
-      _hybridView->setSomeCallback_Swift(nitro::SwiftConverter<Callback<void()>, Callback<void()>>::toSwift(newViewProps.someCallback.get()));
+      _hybridView->setSomeCallback_Swift(nitro::SwiftConverter<margelo::nitro::Callback<void()>, margelo::nitro::Callback<void()>>::toSwift(newViewProps.someCallback.get()));
     }
 
     // Update hybridRef if it changed

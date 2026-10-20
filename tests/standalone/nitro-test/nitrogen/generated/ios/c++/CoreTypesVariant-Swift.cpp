@@ -41,7 +41,7 @@ namespace margelo::nitro {
         ::NitroTest::CoreTypesVariant_cxx::initializeFifth(payload, result);
       });
     }
-    throw std::runtime_error("Cannot convert \"" + value.toString(runtime).utf8(runtime) + "\" to any type in variant<ArrayBuffer, Callback<void(double /* value */)>, margelo::nitro::test::WrappedJsStruct, Promise<double>, AnyJSON>!");
+    throw std::runtime_error("Cannot convert \"" + value.toString(runtime).utf8(runtime) + "\" to any type in variant<ArrayBuffer, margelo::nitro::Callback<void(double /* value */)>, margelo::nitro::test::WrappedJsStruct, Promise<double>, AnyJSON>!");
   }
 
   jsi::Value JSIConverter<::NitroTest::CoreTypesVariant_cxx>::toJSI(jsi::Runtime& runtime, const ::NitroTest::CoreTypesVariant_cxx& value) {

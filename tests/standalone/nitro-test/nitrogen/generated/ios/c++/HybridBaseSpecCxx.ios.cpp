@@ -67,7 +67,7 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Base.mapSize on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->mapSize_Swift(SwiftConverter<margelo::nitro::test::Size, ::NitroTest::Size>::toSwift(size), SwiftConverter<Callback<margelo::nitro::test::Size(const margelo::nitro::test::Size& /* size */)>, Callback<::NitroTest::Size(const ::NitroTest::Size&)>>::toSwift(callback));
+    auto __result = __implementation->mapSize_Swift(SwiftConverter<margelo::nitro::test::Size, ::NitroTest::Size>::toSwift(size), SwiftConverter<margelo::nitro::Callback<margelo::nitro::test::Size(const margelo::nitro::test::Size& /* size */)>, margelo::nitro::Callback<::NitroTest::Size(const ::NitroTest::Size&)>>::toSwift(callback));
     return SwiftConverter<Promise<margelo::nitro::test::Size>, Promise<::NitroTest::Size>>::fromSwift(__result);
   }
 

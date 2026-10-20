@@ -24,7 +24,7 @@ export function getSwiftConverter({
     context: context,
   })
   const swiftContext = context === 'parameter-type' ? 'parameter-type' : 'type-argument'
-  const swiftType = swiftRepresentation.getCode('c++', { context: swiftContext })
+  const swiftType = swiftRepresentation.getCode('c++', { context: swiftContext, fullyQualified: true })
   return `SwiftConverter<${cppType}, ${swiftType}>`
 }
 

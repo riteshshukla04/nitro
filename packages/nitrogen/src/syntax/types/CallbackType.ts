@@ -68,7 +68,8 @@ export class CallbackType implements Type {
           context: 'return',
         })
         const name = isBorrowed ? 'InlineCallback' : 'Callback'
-        const type = `${name}<${returnType}(${params})>`
+        const qualifiedName = options.fullyQualified ? `margelo::nitro::${name}` : name
+        const type = `${qualifiedName}<${returnType}(${params})>`
         return options.context === 'parameter' ? `const ${type}&` : type
       }
       case 'swift': {
