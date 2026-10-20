@@ -37,6 +37,7 @@ on:
       - 'packages/nitrogen/**'
       - 'packages/react-native-nitro-modules/**'
       - 'tests/react-native/**'
+      - 'patches/@react-native-harness%2Fplatform-apple@*.patch'
       - 'scripts/sync-core.mjs'
       - 'scripts/core-package.mjs'
       - 'scripts/set-version.mjs'
@@ -69,6 +70,9 @@ jobs:
 
       - name: Install npm dependencies (bun)
         run: bun install --frozen-lockfile
+
+      - name: Check Harness app detection
+        run: bun test tests/react-native/apps/example/harness-apple.test.mjs
 
       - name: Generate test bindings
         run: bun specs

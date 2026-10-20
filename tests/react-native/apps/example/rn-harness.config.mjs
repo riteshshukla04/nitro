@@ -29,6 +29,8 @@ const config = {
   defaultRunner: 'android',
   plugins: [runningTestPlugin()],
   resetEnvironmentBetweenTestFiles: 'runtime',
+  // Keep Metro's in-process transforms out of simulator initialization.
+  eagerPrewarm: false,
   // View cases perform several render/recycling steps and native screenshots.
   testTimeout: process.env.CI === 'true' ? 30000 : 10000,
   platformReadyTimeout: process.env.CI === 'true' ? 420000 : 300000,
