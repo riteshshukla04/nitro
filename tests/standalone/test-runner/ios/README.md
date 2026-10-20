@@ -56,11 +56,12 @@ bun tests/standalone/test-runner/ios/run.mjs --help
 New exported tests in `js/**/*.test.ts` need no Swift changes. Each case keeps its file-qualified name in the test results and can be rerun
 individually in Xcode. Missing, invalid, empty or duplicate manifest entries fail discovery.
 
-Each Swift case awaits its result from `NitroTestScheduler`. The scheduler runs at most two runtime groups at once, each in its own Hermes
-runtime on a dedicated worker thread that executes JavaScript and callbacks. This keeps Swift's cooperative executor available for
-`Promise.async` completions. The shared Xcode scheme and command-line runner set `LIBDISPATCH_COOPERATIVE_POOL_STRICT=1` in the test process
-so the concurrent native Promise case runs with one cooperative worker. Rerunning one case in Xcode runs its whole group, which takes about
-a second. Durations that Xcode reports for a case include the time it waited for its group.
+Each Swift case awaits its result from `NitroTestScheduler`. The scheduler runs one runtime group per CPU core at once (`--workers N` or
+`NITRO_TEST_WORKERS` overrides it), each in its own Hermes runtime on a dedicated worker thread that executes JavaScript and callbacks. This
+keeps Swift's cooperative executor available for `Promise.async` completions. The shared Xcode scheme and command-line runner set
+`LIBDISPATCH_COOPERATIVE_POOL_STRICT=1` in the test process so the concurrent native Promise case runs with one cooperative worker.
+Rerunning one case in Xcode runs its whole group, which takes about a second. Durations that Xcode reports for a case include the time it
+waited for its group.
 
 The `static-properties` cases write shared native storage, so they form a single group whose cases never overlap. Groups of other files can
 run at the same time.

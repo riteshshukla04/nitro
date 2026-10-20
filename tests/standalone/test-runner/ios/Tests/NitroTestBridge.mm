@@ -55,7 +55,7 @@ static NSString* toNSString(const std::string& string) {
     }
     if (onGroupFinished) {
       void (^block)(NSString*) = [onGroupFinished copy];
-      options.onGroupFinished = [block](const TestGroupReport& report) {
+      options.onGroupFinished = [block, workers](const TestGroupReport& report) {
         @autoreleasepool {
           NSDictionary* fields = @{
             @"name" : toNSString(report.name),
@@ -65,6 +65,7 @@ static NSString* toNSString(const std::string& string) {
             @"setupMs" : @(std::round(report.setupMs)),
             @"casesMs" : @(std::round(report.casesMs)),
             @"teardownMs" : @(std::round(report.teardownMs)),
+            @"workers" : @(workers),
           };
           NSData* json = [NSJSONSerialization dataWithJSONObject:fields options:NSJSONWritingSortedKeys error:nil];
           block([[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding]);

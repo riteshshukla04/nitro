@@ -18,6 +18,9 @@
 #include <list>
 #include <mutex>
 #include <pthread.h>
+#ifdef __APPLE__
+#include <pthread/qos.h>
+#endif
 #include <queue>
 #include <system_error>
 #include <thread>
@@ -345,6 +348,12 @@ namespace {
             std::unique_ptr<Start> start(static_cast<Start*>(context));
 #ifdef __APPLE__
             pthread_setname_np(start->name.c_str());
+            // Workers use whatever CPU is idle, but must never starve Swift
+            // concurrency: the test process runs Swift Tasks, including the
+            // ones that complete HybridObject Promises, on a single strict
+            // cooperative thread. On 3-core CI machines, three busy workers
+            // delayed those Tasks past the 10-second case budget.
+            pthread_set_qos_class_self_np(QOS_CLASS_UTILITY, 0);
 #else
             pthread_setname_np(pthread_self(), start->name.substr(0, 15).c_str());
 #endif
