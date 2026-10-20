@@ -16,17 +16,17 @@ on:
       device_model:
         description: "iOS Simulator device model"
         required: false
-        default: "iPhone 17 Pro"
+        default: "iPhone 18 Pro"
         type: string
       ios_version:
         description: "iOS version"
         required: false
-        default: "26.5"
+        default: "27.0"
         type: string
       xcode_version:
         description: "Xcode version, or default for the selected Xcode"
         required: false
-        default: "default"
+        default: "27.1"
         type: string
   pull_request:
     paths:
@@ -48,15 +48,15 @@ on:
 
 env:
   # Device configuration - can be overridden by workflow_dispatch inputs
-  DEVICE_MODEL: ${{ github.event.inputs.device_model || 'iPhone 17 Pro' }}
-  IOS_VERSION: ${{ github.event.inputs.ios_version || '26.5' }}
-  XCODE_VERSION: ${{ github.event.inputs.xcode_version || 'default' }}
+  DEVICE_MODEL: ${{ github.event.inputs.device_model || 'iPhone 18 Pro' }}
+  IOS_VERSION: ${{ github.event.inputs.ios_version || '27.0' }}
+  XCODE_VERSION: ${{ github.event.inputs.xcode_version || '27.1' }}
   HARNESS_DEBUG: 1
 
 jobs:
   harness_ios_new:
     name: Harness iOS
-    runs-on: macOS-26
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@v7
         with:
@@ -87,13 +87,14 @@ jobs:
             echo "CCACHE_INODECACHE=true"
           } >> "$GITHUB_ENV"
 
-      - name: Select default Xcode
+      - name: Select Xcode
         run: |
           if [ "$XCODE_VERSION" = "default" ]; then
             sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
           else
             sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app/Contents/Developer"
           fi
+          xcodebuild -version
           xcrun swift --version
 
       - name: Resolve Swift packages

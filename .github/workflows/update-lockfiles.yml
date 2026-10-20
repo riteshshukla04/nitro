@@ -29,7 +29,7 @@ jobs:
   update-lockfiles:
     name: "Update lockfiles (SwiftPM)"
     if: github.actor == 'dependabot[bot]'
-    runs-on: macOS-26
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@v7
         with:
@@ -40,8 +40,11 @@ jobs:
         with:
           bun-version-file: package.json
 
-      - name: Select default Xcode
-        run: sudo xcode-select -s "/Applications/Xcode.app/Contents/Developer"
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_27.1.app/Contents/Developer
+          xcodebuild -version
+          xcrun swift --version
 
       - run: |
           bun install

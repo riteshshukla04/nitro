@@ -26,13 +26,13 @@ on:
       - 'config/**'
 
 env:
-  XCODE_VERSION: 'default'
+  XCODE_VERSION: '27.1'
   IOS_SIMULATOR_DESTINATION: 'generic/platform=iOS Simulator'
 
 jobs:
   build:
     name: Build iOS Example App
-    runs-on: macOS-26
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@v7
         with:
@@ -61,9 +61,10 @@ jobs:
             echo "CCACHE_INODECACHE=true"
           } >> "$GITHUB_ENV"
 
-      - name: Select default Xcode
+      - name: Select Xcode
         run: |
-          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app/Contents/Developer"
+          xcodebuild -version
           xcrun swift --version
 
       - name: Resolve Swift packages
