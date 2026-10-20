@@ -155,32 +155,39 @@ bun docs start
 
 Before submitting docs changes, run `bun docs typecheck` and `bun docs build` from the same directory.
 
-## Linting
+## Formatting and linting
 
-We value code quality and consistent styling.
+Use 140 columns and two-space indentation across the repository. JavaScript and TypeScript use single quotes and no semicolons. The
+formatters may keep an indivisible token, URL, or string longer than 140 columns.
 
-For JS/TS, we use ESLint and Prettier:
+Install the JavaScript dependencies with `bun install --frozen-lockfile`. Native formatting uses the installed `clang-format`,
+`swift format`, and `ktlint` commands. CI uses clang-format 16.0.6, Swift 6.4.0's bundled formatter, and ktlint 1.8.0 on Java 17. Use
+matching versions locally. On macOS, select the appropriate Xcode or set `DEVELOPER_DIR` to its `Contents/Developer` directory.
 
-```sh
-bun lint
-```
-
-For C++, we use clang-format:
-
-```sh
-bun lint-cpp
-```
-
-For Swift, we use swift format:
+Format the repository or check it without modifying files:
 
 ```sh
-bun lint-swift
+bun format
+bun format:check
 ```
 
-For Kotlin, we use ktlint:
+Prettier runs directly through its CLI. The native shell scripts select Git-visible files and call their formatter CLI in write or check
+mode. They include new files that Git does not ignore and handle filenames containing spaces. Every formatter excludes `nitrogen/generated`.
+Build output and vendored sources are also excluded. The Kotlin scaffold template contains unexpanded `$$` identifiers and is excluded from
+ktlint because it cannot be parsed until Nitrogen substitutes them.
 
-```sh
-bun lint-kotlin
-```
+To run one native formatter, use `bun format:cpp`, `bun format:swift`, or `bun format:kotlin`; append `--check` to check without writing.
+For Prettier, use `bun format:prettier --write` or `bun format:prettier --check`. The existing `bun lint-cpp`, `bun lint-swift`, and
+`bun lint-kotlin` commands remain aliases. `bun lint` applies ESLint's code-quality fixes, and `bun lint-all` runs formatting followed by
+ESLint.
 
-Make sure to lint your files everytime before creating a PR. This is also enforced in the CI, but linting beforehand also applies auto-fixes.
+Prettier reads its settings from `package.json` and exclusions from `.gitignore` and `config/format-ignore`. C++ uses
+`config/.clang-format`. Swift and Kotlin use `.swift-format` and `.editorconfig` at the root so editors discover them automatically.
+Generated sections of Swift package manifests have formatter ignore markers. Keep the template package's Prettier options in sync with the
+root package so newly created modules start with the same style.
+
+VS Code recommends and selects the appropriate formatter extensions, while respecting your personal format-on-save preference. C++ uses
+`clang-format` on your PATH, Kotlin uses ktlint 1.8.0, and Swift uses the formatter from your selected toolchain.
+
+Each language has its own CI workflow with PR path filters for its source files, configuration, and scripts. The release workflow also runs
+all formatting checks on the exact source commit before publishing.

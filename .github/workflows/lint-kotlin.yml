@@ -1,4 +1,4 @@
-name: Lint Kotlin
+name: Check Kotlin formatting
 
 on:
   workflow_call:
@@ -9,15 +9,32 @@ on:
         type: string
   pull_request:
     paths:
-      - '.github/workflows/lint-kotlin.yml'
-      - 'scripts/kotlin-format.sh'
-      - 'config/**'
       - '**/*.kt'
+      - '**/*.kts'
+      - '.github/workflows/lint-kotlin.yml'
+      - '.editorconfig'
+      - 'scripts/kotlin-format.sh'
+      - 'scripts/format-files.sh'
+      - 'package.json'
+      - '.gitignore'
+      - '!**/node_modules/**'
+      - '!**/.build/**'
+      - '!**/.harness/**'
+      - '!**/build/**'
+      - '!**/dist/**'
+      - '!**/lib/**'
+      - '!**/Pods/**'
+      - '!**/vendor/**'
+      - '!tests/standalone/hermes/hermes/**'
+      - '!**/nitrogen/generated/**'
+
+permissions:
+  contents: read
 
 jobs:
   lint:
     name: Format Kotlin
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
@@ -25,16 +42,17 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json
-
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
       - name: Install ktlint
         run: |
-          curl -sSLO https://github.com/pinterest/ktlint/releases/latest/download/ktlint
-          chmod a+x ktlint
-          sudo mv ktlint /usr/local/bin/
-
-      - name: Run ktlint
-        run: bun run lint-kotlin
-
-      - name: Verify no files have changed after format
-        run: git diff --exit-code HEAD -- . ':(exclude)bun.lock'
-
+          mkdir -p "$RUNNER_TEMP/ktlint"
+          curl --fail --location --retry 3 \
+            https://github.com/ktlint/ktlint/releases/download/1.8.0/ktlint \
+            --output "$RUNNER_TEMP/ktlint/ktlint"
+          echo "a3fd620207d5c40da6ca789b95e7f823c54e854b7fade7f613e91096a3706d75  $RUNNER_TEMP/ktlint/ktlint" | sha256sum --check
+          chmod +x "$RUNNER_TEMP/ktlint/ktlint"
+          echo "$RUNNER_TEMP/ktlint" >> "$GITHUB_PATH"
+      - run: bun format:kotlin --check

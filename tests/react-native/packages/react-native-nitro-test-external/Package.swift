@@ -17,6 +17,7 @@ addNitrogenTargets(to: package)
 // Copyright © Marc Rousavy @ Margelo
 //
 
+// swift-format-ignore
 import Foundation
 
 /// Adds the `NitroTestExternal` library and its targets to `package`:
@@ -43,6 +44,7 @@ import Foundation
 ///   - dependencies: Additional dependencies of all targets.
 ///   - swiftSettings: Additional Swift settings of the `NitroTestExternal` Swift target.
 ///   - cxxSettings: Additional C++ settings of the `NitroTestExternalCxx` and `NitroTestExternalSwiftBridge` targets.
+// swift-format-ignore
 func addNitrogenTargets(
     to package: Package,
     swiftSources: [String] = ["ios"],
@@ -164,6 +166,7 @@ func addNitrogenTargets(
 
 /// Returns the files and directories in `path` that are neither `sources` nor contain them.
 /// Excluding them stops SwiftPM from scanning unrelated files, like `node_modules`.
+// swift-format-ignore
 func nitrogenExcludes(in path: String, keeping sources: [String]) -> [String] {
     var parents: Set<String> = [""]
     for source in sources {

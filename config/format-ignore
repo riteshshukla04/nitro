@@ -1,0 +1,21 @@
+# Generated bindings and third-party sources retain their upstream formatting.
+**/nitrogen/generated/
+tests/standalone/nitro-test/cpp/vendor/
+tests/standalone/hermes/hermes/
+
+# Build output, installed dependencies, and dependency lockfiles.
+**/node_modules/
+**/.build/
+**/.harness/
+**/.docusaurus/
+**/.cache-loader/
+**/build/
+**/dist/
+**/lib/
+**/Pods/
+**/vendor/
+**/Package.resolved
+**/.spm-injected.json
+**/Podfile.lock
+bun.lock
+patches/

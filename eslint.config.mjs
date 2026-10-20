@@ -25,17 +25,7 @@ const baseConfig = compat.config({
     sourceType: 'module',
   },
   rules: {
-    'prettier/prettier': [
-      'warn',
-      {
-        quoteProps: 'consistent',
-        singleQuote: true,
-        tabWidth: 2,
-        trailingComma: 'es5',
-        useTabs: false,
-        semi: false,
-      },
-    ],
+    'prettier/prettier': 'error',
   },
 })
 
@@ -58,6 +48,7 @@ export default [
   {
     ignores: [
       '**/node_modules/**',
+      '**/nitrogen/generated/**',
       '**/.harness/**',
       '**/lib/**',
       '**/.eslintrc.*',

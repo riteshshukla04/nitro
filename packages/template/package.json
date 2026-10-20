@@ -87,29 +87,24 @@
       "prettier"
     ],
     "rules": {
-      "prettier/prettier": [
-        "warn",
-        {
-          "quoteProps": "consistent",
-          "singleQuote": true,
-          "tabWidth": 2,
-          "trailingComma": "es5",
-          "useTabs": false
-        }
-      ]
+      "prettier/prettier": "error"
     }
   },
   "eslintIgnore": [
+    "nitrogen/generated/",
     "node_modules/",
     "lib/"
   ],
   "prettier": {
+    "printWidth": 140,
     "quoteProps": "consistent",
     "singleQuote": true,
     "tabWidth": 2,
     "trailingComma": "es5",
     "useTabs": false,
-    "semi": false
+    "semi": false,
+    "jsxSingleQuote": true,
+    "proseWrap": "always"
   },
   "swiftpmConfig": {
     "name": "$$iosModuleName$$",

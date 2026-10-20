@@ -1,4 +1,4 @@
-name: Lint Swift
+name: Check Swift formatting
 
 on:
   workflow_call:
@@ -9,15 +9,32 @@ on:
         type: string
   pull_request:
     paths:
-      - '.github/workflows/lint-swift.yml'
-      - 'scripts/swift-format.sh'
-      - 'config/**'
       - '**/*.swift'
+      - '.github/workflows/lint-swift.yml'
+      - '.swift-format'
+      - 'scripts/swift-format.sh'
+      - 'scripts/format-files.sh'
+      - 'package.json'
+      - '.gitignore'
+      - '!**/node_modules/**'
+      - '!**/.build/**'
+      - '!**/.harness/**'
+      - '!**/build/**'
+      - '!**/dist/**'
+      - '!**/lib/**'
+      - '!**/Pods/**'
+      - '!**/vendor/**'
+      - '!tests/standalone/hermes/hermes/**'
+      - '!**/nitrogen/generated/**'
+
+permissions:
+  contents: read
 
 jobs:
   lint:
     name: Format Swift
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    container: swift:6.4.0-noble@sha256:31d14d727f4451f25e29bac9c42563a098c39ac66415e8bad970f48038e38aca
     steps:
       - uses: actions/checkout@v7
         with:
@@ -25,10 +42,4 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json
-
-      - name: Run swift format
-        run: bun run lint-swift
-
-      - name: Verify no files have changed after format
-        run: git diff --exit-code HEAD -- . ':(exclude)bun.lock'
-
+      - run: bun format:swift --check

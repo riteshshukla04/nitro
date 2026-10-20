@@ -79,28 +79,3 @@ jobs:
       - name: Run ESLint CI in nitro-core
         working-directory: packages/nitro-core
         run: bun lint-ci
-
-      - name: Run ESLint with auto-fix in example
-        working-directory: tests/react-native/apps/example
-        run: bun lint
-      - name: Run ESLint with auto-fix in benchmark
-        working-directory: tests/react-native/apps/benchmark
-        run: bun lint
-      - name: Run ESLint with auto-fix in react-native-nitro-test
-        working-directory: tests/react-native/packages/react-native-nitro-test
-        run: bun lint
-      - name: Run ESLint with auto-fix in react-native-nitro-test-external
-        working-directory: tests/react-native/packages/react-native-nitro-test-external
-        run: bun lint
-      - name: Run ESLint with auto-fix in react-native-nitro-modules
-        working-directory: packages/react-native-nitro-modules
-        run: bun lint
-      - name: Run ESLint with auto-fix in nitrogen
-        working-directory: packages/nitrogen
-        run: bun lint
-      - name: Run ESLint with auto-fix in nitro-core
-        working-directory: packages/nitro-core
-        run: bun lint
-
-      - name: Verify no files have changed after auto-fix
-        run: git diff --exit-code HEAD -- . ':(exclude)bun.lock'

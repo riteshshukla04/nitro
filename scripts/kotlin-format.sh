@@ -1,21 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -eo pipefail
 
-set -e
-
-KOTLIN_DIRS=(
-  "packages/nitro-core/native/android/src/main/java"
-  "packages/react-native-nitro-modules/android/src"
-  "tests/standalone/nitro-core/android/src"
-  "tests/standalone/nitro-test/android/src"
-  "tests/standalone/test-runner/android/src"
-  "tests/standalone/nitro-test-external/android/src"
-  "tests/react-native/packages/react-native-nitro-test/android/src/main/java"
-)
-
-if which ktlint >/dev/null; then
-  ktlint --editorconfig=./config/.editorconfig --format "${KOTLIN_DIRS[@]}"
-  echo "Kotlin Format done!"
-else
-  echo "error: ktlint not installed, install with 'brew install ktlint' (see https://github.com/pinterest/ktlint )"
-  exit 1
-fi
+case "${1:-}" in
+  "") options=(--format) ;;
+  --check) options=() ;;
+  *) echo "Usage: $0 [--check]" >&2; exit 1 ;;
+esac
+# The scaffold has unsubstituted $$ identifiers, which are not valid Kotlin.
+source "$(dirname "$0")/format-files.sh" '*.kt' '*.kts' \
+  ':(exclude)packages/template/android/src/main/java/com/margelo/nitro/$$androidNamespace$$/$$androidCxxLibName$$Package.kt'
+[[ ${#files[@]} -eq 0 ]] && exit 0
+ktlint --editorconfig=.editorconfig "${options[@]}" "${files[@]}"

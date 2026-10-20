@@ -77,6 +77,7 @@ ${SWIFT_PACKAGE_SECTION_BEGIN}
 // Copyright © Marc Rousavy @ Margelo
 //
 
+// swift-format-ignore
 import Foundation
 
 /// Adds the \`${moduleName}\` library and its targets to \`package\`:
@@ -103,6 +104,7 @@ import Foundation
 ///   - dependencies: Additional dependencies of all targets.
 ///   - swiftSettings: Additional Swift settings of the \`${moduleName}\` Swift target.
 ///   - cxxSettings: Additional C++ settings of the \`${cxxTargetName}\` and \`${swiftBridgeTargetName}\` targets.
+// swift-format-ignore
 func ${SWIFT_PACKAGE_FUNCTION_NAME}(
     to package: Package,
     swiftSources: [String] = ["ios"],
@@ -223,6 +225,7 @@ func ${SWIFT_PACKAGE_FUNCTION_NAME}(
 
 /// Returns the files and directories in \`path\` that are neither \`sources\` nor contain them.
 /// Excluding them stops SwiftPM from scanning unrelated files, like \`node_modules\`.
+// swift-format-ignore
 func nitrogenExcludes(in path: String, keeping sources: [String]) -> [String] {
     var parents: Set<String> = [""]
     for source in sources {

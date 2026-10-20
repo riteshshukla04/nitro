@@ -1,0 +1,10 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+max_line_length = 140
+
+[*.{kt,kts}]
+ktlint_standard_filename = disabled
+ktlint_standard_function-expression-body = disabled

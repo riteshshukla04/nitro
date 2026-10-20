@@ -1,4 +1,4 @@
-name: Lint C++
+name: Check C++ formatting
 
 on:
   workflow_call:
@@ -9,19 +9,40 @@ on:
         type: string
   pull_request:
     paths:
-      - '.github/workflows/lint-cpp.yml'
-      - 'scripts/clang-format.sh'
-      - 'config/**'
-      - '**/*.h'
-      - '**/*.hpp'
-      - '**/*.cpp'
       - '**/*.c'
+      - '**/*.h'
+      - '**/*.cc'
+      - '**/*.hh'
+      - '**/*.cpp'
+      - '**/*.hpp'
+      - '**/*.cxx'
+      - '**/*.hxx'
+      - '**/*.m'
       - '**/*.mm'
+      - '.github/workflows/lint-cpp.yml'
+      - 'config/.clang-format'
+      - 'scripts/clang-format.sh'
+      - 'scripts/format-files.sh'
+      - 'package.json'
+      - '.gitignore'
+      - '!**/node_modules/**'
+      - '!**/.build/**'
+      - '!**/.harness/**'
+      - '!**/build/**'
+      - '!**/dist/**'
+      - '!**/lib/**'
+      - '!**/Pods/**'
+      - '!**/vendor/**'
+      - '!tests/standalone/hermes/hermes/**'
+      - '!**/nitrogen/generated/**'
+
+permissions:
+  contents: read
 
 jobs:
   lint:
-    name: Format C++
-    runs-on: ubuntu-latest
+    name: Format C++ and Objective-C
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
@@ -29,10 +50,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json
-
-      - name: Run clang-format
-        run: bun run lint-cpp
-
-      - name: Verify no files have changed after format
-        run: git diff --exit-code HEAD -- . ':(exclude)bun.lock'
-
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install clang-format==16.0.6
+      - run: bun format:cpp --check

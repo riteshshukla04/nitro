@@ -61,6 +61,12 @@ jobs:
     with:
       ref: ${{ needs.resolve.outputs.commit }}
 
+  format-prettier:
+    needs: resolve
+    uses: ./.github/workflows/format-prettier.yml
+    with:
+      ref: ${{ needs.resolve.outputs.commit }}
+
   lint-cpp:
     needs: resolve
     uses: ./.github/workflows/lint-cpp.yml
@@ -144,6 +150,7 @@ jobs:
       - resolve
       - build
       - build-docs
+      - format-prettier
       - lint-cpp
       - lint-swift
       - lint-kotlin

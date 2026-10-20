@@ -1,0 +1,72 @@
+name: Check Prettier formatting
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact commit to validate
+        required: true
+        type: string
+  pull_request:
+    paths:
+      - '**/*.js'
+      - '**/*.jsx'
+      - '**/*.mjs'
+      - '**/*.cjs'
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '**/*.mts'
+      - '**/*.cts'
+      - '**/*.json'
+      - '**/*.jsonc'
+      - '**/*.json5'
+      - '**/*.webmanifest'
+      - '**/.watchmanconfig'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.md'
+      - '**/*.mdx'
+      - '**/*.css'
+      - '**/*.scss'
+      - '**/*.less'
+      - '**/*.html'
+      - '**/*.vue'
+      - '**/*.graphql'
+      - '**/*.gql'
+      - '.github/workflows/format-prettier.yml'
+      - '.editorconfig'
+      - 'config/.clang-format'
+      - 'config/format-ignore'
+      - 'bun.lock'
+      - '.gitignore'
+      - '!**/node_modules/**'
+      - '!**/.build/**'
+      - '!**/.harness/**'
+      - '!**/.docusaurus/**'
+      - '!**/.cache-loader/**'
+      - '!**/build/**'
+      - '!**/dist/**'
+      - '!**/lib/**'
+      - '!**/Pods/**'
+      - '!**/vendor/**'
+      - '!**/.spm-injected.json'
+      - '!patches/**'
+      - '!tests/standalone/hermes/hermes/**'
+      - '!**/nitrogen/generated/**'
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    name: Format JavaScript, TypeScript, and documents
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - run: bun format:prettier --check

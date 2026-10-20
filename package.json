@@ -25,10 +25,10 @@
     "bootstrap": "bun install --frozen-lockfile",
     "typecheck": "bun nitro typecheck && bun nitrogen typecheck && bun nitro-rn typecheck && bun nitro-test-external typecheck && bun nitro-test typecheck && bun nitro-test-runner typecheck && bun nitro-rn-test-external typecheck && bun nitro-rn-test typecheck && bun example typecheck && bun benchmark typecheck && bun docs typecheck",
     "lint": "bun nitro lint && bun nitrogen lint && bun nitro-rn lint && bun nitro-rn-test-external lint && bun nitro-rn-test lint && bun example lint && bun benchmark lint",
-    "lint-cpp": "./scripts/clang-format.sh",
-    "lint-swift": "./scripts/swift-format.sh",
-    "lint-kotlin": "./scripts/kotlin-format.sh",
-    "lint-all": "bun lint-cpp && bun lint-swift && bun lint-kotlin && bun lint",
+    "lint-cpp": "bun format:cpp",
+    "lint-swift": "bun format:swift",
+    "lint-kotlin": "bun format:kotlin",
+    "lint-all": "bun format && bun lint",
     "clean": "git clean -dfx",
     "release": "bun --filter @nitro/scripts release",
     "nitro": "bun --filter nitro-core",
@@ -58,7 +58,13 @@
     "test:react-native:ios": "bun example test:harness --harnessRunner ios",
     "test:react-native:android": "bun example test:harness --harnessRunner android",
     "check-consumer": "bun --filter @nitro/scripts check-consumer",
-    "release:ci": "bun --filter @nitro/scripts release:ci"
+    "release:ci": "bun --filter @nitro/scripts release:ci",
+    "format": "bun format:prettier --write && bun format:cpp && bun format:swift && bun format:kotlin",
+    "format:check": "bun format:prettier --check && bun format:cpp --check && bun format:swift --check && bun format:kotlin --check",
+    "format:prettier": "prettier . --ignore-path .gitignore --ignore-path config/format-ignore",
+    "format:cpp": "bash scripts/clang-format.sh",
+    "format:swift": "bash scripts/swift-format.sh",
+    "format:kotlin": "bash scripts/kotlin-format.sh"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
@@ -85,5 +91,16 @@
   },
   "patchedDependencies": {
     "@react-native-harness/ui@1.5.0": "patches/@react-native-harness%2Fui@1.5.0.patch"
+  },
+  "prettier": {
+    "printWidth": 140,
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false,
+    "semi": false,
+    "jsxSingleQuote": true,
+    "proseWrap": "always"
   }
 }

@@ -46,6 +46,7 @@ jobs:
             .github/workflows/release.yml
             .github/workflows/build.yml
             .github/workflows/build-docs.yml
+            .github/workflows/format-prettier.yml
             .github/workflows/lint-cpp.yml
             .github/workflows/lint-swift.yml
             .github/workflows/lint-kotlin.yml
