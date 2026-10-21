@@ -38,7 +38,8 @@ the package tests directly. `NitroTestRunnerBridge` exports the Objective-C++ te
 `run.mjs` builds with `xcodebuild build-for-testing` for a generic simulator, then boots the selected simulator and runs
 `test-without-building` from the generated `.xctestrun` file, so the Swift package graph is only resolved once. Building first matters on
 3-core CI machines: with a freshly booted simulator as the destination, xcodebuild took minutes to start and compiled slower while the
-simulator migrated data. `--derived-data PATH` moves DerivedData outside the repository. CI uses it, builds with one job per CPU core, and
+simulator migrated data. Parallel testing is off: it shuts the booted simulator down and tests on a fresh clone, which took minutes
+to start there. `--derived-data PATH` moves DerivedData outside the repository. CI uses it, builds with one job per CPU core, and
 moves `node_modules` out of the repository first: Xcode enumerates every file under a local Swift package, and this package is the
 repository root.
 
@@ -69,8 +70,10 @@ JavaScript and callbacks. This keeps Swift's cooperative executor available for 
 user-interactive QoS of React Native's JS thread, so the Swift Tasks that `Promise.async` starts get user-initiated priority, as in apps.
 Swift Testing starts and reports every case at default priority on the cooperative pool, and Tasks at that priority waited behind it. The
 shared Xcode scheme and command-line runner set `LIBDISPATCH_COOPERATIVE_POOL_STRICT=1` in the test process so the concurrent native Promise
-case runs with one cooperative worker. Rerunning one case in Xcode runs its whole group, which takes about a second. Durations that Xcode
-reports for a case include the time it waited for its group.
+case runs with one cooperative worker. A group starts when one of its cases is first requested, so rerunning one case in Xcode runs its
+whole group, which takes about a second. Without parallel testing, Swift Testing requests cases one at a time, so `run.mjs`, which runs
+every case, passes `NITRO_TEST_START_ALL_GROUPS=1` to start every group with the first case. Durations that Xcode reports for a case
+include the time it waited for its group.
 
 The `static-properties` cases write shared native storage, so they form a single group whose cases never overlap. Groups of other files can
 run at the same time.

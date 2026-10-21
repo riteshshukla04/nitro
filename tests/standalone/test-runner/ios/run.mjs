@@ -125,6 +125,8 @@ mkdirSync(results, { recursive: true })
 const groupReport = path.join(results, 'runtime-groups.jsonl')
 environment.TEST_RUNNER_NITRO_TEST_REPORT = groupReport
 if (values.workers !== 'auto') environment.TEST_RUNNER_NITRO_TEST_WORKERS = values.workers
+// This runner always runs every case.
+environment.TEST_RUNNER_NITRO_TEST_START_ALL_GROUPS = '1'
 // Sanitizer builds run several times slower, and CI runs them on 3-core
 // machines. Cases that take milliseconds there occasionally waited longer than
 // 10 seconds for the CPU. Their own explicit budgets (withTestTimeout) and the
@@ -183,12 +185,12 @@ const argumentsForTests = () => [
   // `simctl diagnose`. The result bundle and logs already hold the failure.
   '-collect-test-diagnostics',
   'never',
+  // Parallel testing shuts the booted simulator down and tests on a fresh
+  // clone, which took minutes to start on 3-core CI machines. Without it,
+  // Swift Testing requests cases one at a time, so the tests start every
+  // runtime group up front instead (NITRO_TEST_START_ALL_GROUPS).
   '-parallel-testing-enabled',
-  'YES',
-  // Swift Testing runs cases concurrently inside this one test process.
-  // RuntimeTests.swift runs one runtime group per CPU core but one (see --workers).
-  '-parallel-testing-worker-count',
-  '1',
+  'NO',
 ]
 const log = openSync(path.join(results, 'xcodebuild.log'), 'w')
 let sanitizerFailure = false
