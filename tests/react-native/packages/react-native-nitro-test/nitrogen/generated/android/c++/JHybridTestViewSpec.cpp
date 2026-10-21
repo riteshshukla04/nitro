@@ -77,21 +77,21 @@ namespace margelo::nitro::test {
   }
 
   // Properties
-  bool JHybridTestViewSpec::getIsBlue() {
+  jboolean JHybridTestViewSpec::getIsBlue() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("isBlue");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<bool>(__result);
+    return __result;
   }
-  void JHybridTestViewSpec::setIsBlue(bool isBlue) {
+  void JHybridTestViewSpec::setIsBlue(jboolean isBlue) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jboolean /* isBlue */)>("setBlue");
     __method(_javaPart, CxxPart::getClass(), isBlue);
   }
-  bool JHybridTestViewSpec::getHasBeenCalled() {
+  jboolean JHybridTestViewSpec::getHasBeenCalled() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("getHasBeenCalled");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<bool>(__result);
+    return __result;
   }
-  void JHybridTestViewSpec::setHasBeenCalled(bool hasBeenCalled) {
+  void JHybridTestViewSpec::setHasBeenCalled(jboolean hasBeenCalled) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jboolean /* hasBeenCalled */)>("setHasBeenCalled");
     __method(_javaPart, CxxPart::getClass(), hasBeenCalled);
   }
@@ -141,10 +141,10 @@ namespace margelo::nitro::test {
   }
 
   // Methods
-  bool JHybridTestViewSpec::getIsViewBlue(const std::shared_ptr<JHybridTestViewSpec>& view) {
+  jboolean JHybridTestViewSpec::getIsViewBlue(const std::shared_ptr<JHybridTestViewSpec>& view) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean(jni::alias_ref<JHybridTestViewSpec::JavaPart> /* view */)>("getIsViewBlue");
     auto __result = __method(_javaPart, CxxPart::getClass(), view->getJavaPart());
-    return static_cast<bool>(__result);
+    return __result;
   }
   jdouble JHybridTestViewSpec::getOnDropViewCount() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble()>("getOnDropViewCount");

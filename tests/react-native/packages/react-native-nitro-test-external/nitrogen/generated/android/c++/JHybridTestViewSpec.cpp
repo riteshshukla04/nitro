@@ -9,6 +9,8 @@
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <string>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTestExternal/private/JCallback_void.hpp>
@@ -67,12 +69,12 @@ namespace margelo::nitro::test::external {
   }
 
   // Properties
-  bool JHybridTestViewSpec::getIsBlue() {
+  jboolean JHybridTestViewSpec::getIsBlue() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("isBlue");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<bool>(__result);
+    return __result;
   }
-  void JHybridTestViewSpec::setIsBlue(bool isBlue) {
+  void JHybridTestViewSpec::setIsBlue(jboolean isBlue) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jboolean /* isBlue */)>("setBlue");
     __method(_javaPart, CxxPart::getClass(), isBlue);
   }

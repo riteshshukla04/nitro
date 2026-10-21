@@ -21,6 +21,9 @@ struct JSIPrimitiveJNIConverter {
   }
 };
 
+template <>
+struct JSIConverter<jboolean> : JSIPrimitiveJNIConverter<bool, jboolean> {};
+
 template <typename Cpp, typename JavaBox>
 struct JSIBoxedJNIConverter {
   using JNI = jni::local_ref<JavaBox>;
@@ -35,6 +38,9 @@ struct JSIBoxedJNIConverter {
     return JSIConverter<Cpp>::canConvert(runtime, value);
   }
 };
+
+template <>
+struct JSIConverter<jni::local_ref<jni::JBoolean>> : JSIBoxedJNIConverter<bool, jni::JBoolean> {};
 
 template <>
 struct JSIConverter<jni::local_ref<jni::JInteger>> : JSIBoxedJNIConverter<int32_t, jni::JInteger> {};

@@ -55,8 +55,8 @@ namespace margelo::nitro::test {
 
   public:
     // Properties
-    bool getIsBlue();
-    void setIsBlue(bool isBlue);
+    jboolean getIsBlue();
+    void setIsBlue(jboolean isBlue);
     std::optional<double> getNativeDefaultValue();
     void setNativeDefaultValue(const std::optional<double>& nativeDefaultValue);
 

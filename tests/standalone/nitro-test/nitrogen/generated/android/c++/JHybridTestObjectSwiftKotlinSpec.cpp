@@ -336,12 +336,12 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jdouble /* numberValue */)>("setNumberValue");
     __method(_javaPart, CxxPart::getClass(), numberValue);
   }
-  bool JHybridTestObjectSwiftKotlinSpec::getBoolValue() {
+  jboolean JHybridTestObjectSwiftKotlinSpec::getBoolValue() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("getBoolValue");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<bool>(__result);
+    return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setBoolValue(bool boolValue) {
+  void JHybridTestObjectSwiftKotlinSpec::setBoolValue(jboolean boolValue) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jboolean /* boolValue */)>("setBoolValue");
     __method(_javaPart, CxxPart::getClass(), boolValue);
   }
@@ -479,40 +479,40 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JCallback_void_double::javaobject> /* optionalCallback */)>("setOptionalCallback_cxx");
     __method(_javaPart, CxxPart::getClass(), optionalCallback.has_value() ? JCallback_void_double_cxx::fromCpp(optionalCallback.value()) : nullptr);
   }
-  bool JHybridTestObjectSwiftKotlinSpec::getHasBoolean() {
+  jboolean JHybridTestObjectSwiftKotlinSpec::getHasBoolean() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("getHasBoolean");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<bool>(__result);
+    return __result;
   }
-  bool JHybridTestObjectSwiftKotlinSpec::getIsBoolean() {
+  jboolean JHybridTestObjectSwiftKotlinSpec::getIsBoolean() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("isBoolean");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<bool>(__result);
+    return __result;
   }
-  bool JHybridTestObjectSwiftKotlinSpec::getHasBooleanWritable() {
+  jboolean JHybridTestObjectSwiftKotlinSpec::getHasBooleanWritable() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("getHasBooleanWritable");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<bool>(__result);
+    return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setHasBooleanWritable(bool hasBooleanWritable) {
+  void JHybridTestObjectSwiftKotlinSpec::setHasBooleanWritable(jboolean hasBooleanWritable) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jboolean /* hasBooleanWritable */)>("setHasBooleanWritable");
     __method(_javaPart, CxxPart::getClass(), hasBooleanWritable);
   }
-  bool JHybridTestObjectSwiftKotlinSpec::getIsBooleanWritable() {
+  jboolean JHybridTestObjectSwiftKotlinSpec::getIsBooleanWritable() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("isBooleanWritable");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<bool>(__result);
+    return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setIsBooleanWritable(bool isBooleanWritable) {
+  void JHybridTestObjectSwiftKotlinSpec::setIsBooleanWritable(jboolean isBooleanWritable) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jboolean /* isBooleanWritable */)>("setBooleanWritable");
     __method(_javaPart, CxxPart::getClass(), isBooleanWritable);
   }
-  bool JHybridTestObjectSwiftKotlinSpec::getIsolatedBoolean() {
+  jboolean JHybridTestObjectSwiftKotlinSpec::getIsolatedBoolean() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("getIsolatedBoolean");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<bool>(__result);
+    return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setIsolatedBoolean(bool isolatedBoolean) {
+  void JHybridTestObjectSwiftKotlinSpec::setIsolatedBoolean(jboolean isolatedBoolean) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jboolean /* isolatedBoolean */)>("setIsolatedBoolean");
     __method(_javaPart, CxxPart::getClass(), isolatedBoolean);
   }
@@ -564,7 +564,7 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), a, b);
     return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::multipleArguments(jdouble num, const jni::local_ref<jni::JString>& str, bool boo) {
+  void JHybridTestObjectSwiftKotlinSpec::multipleArguments(jdouble num, const jni::local_ref<jni::JString>& str, jboolean boo) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jdouble /* num */, jni::alias_ref<jni::JString> /* str */, jboolean /* boo */)>("multipleArguments");
     __method(_javaPart, CxxPart::getClass(), num, str, boo);
   }
@@ -1301,14 +1301,14 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<jni::JThrowable> /* error */)>("throwError");
     __method(_javaPart, CxxPart::getClass(), error);
   }
-  jni::local_ref<jni::JString> JHybridTestObjectSwiftKotlinSpec::tryOptionalParams(jdouble num, bool boo, const std::optional<std::string>& str) {
+  jni::local_ref<jni::JString> JHybridTestObjectSwiftKotlinSpec::tryOptionalParams(jdouble num, jboolean boo, const std::optional<std::string>& str) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(jdouble /* num */, jboolean /* boo */, jni::alias_ref<jni::JString> /* str */)>("tryOptionalParams");
     auto __result = __method(_javaPart, CxxPart::getClass(), num, boo, str.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(str.value()) : nullptr);
     return __result;
   }
   jni::local_ref<jni::JString> JHybridTestObjectSwiftKotlinSpec::tryMiddleParam(jdouble num, const std::optional<bool>& boo, const jni::local_ref<jni::JString>& str) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(jdouble /* num */, jni::alias_ref<jni::JBoolean> /* boo */, jni::alias_ref<jni::JString> /* str */)>("tryMiddleParam");
-    auto __result = __method(_javaPart, CxxPart::getClass(), num, boo.has_value() ? jni::JBoolean::valueOf(boo.value()) : nullptr, str);
+    auto __result = __method(_javaPart, CxxPart::getClass(), num, boo.has_value() ? JNIConverter<bool, jni::local_ref<jni::JBoolean>>::toJNI(boo.value()) : nullptr, str);
     return __result;
   }
   std::optional<Powertrain> JHybridTestObjectSwiftKotlinSpec::tryOptionalEnum(const std::optional<Powertrain>& value) {
@@ -1316,10 +1316,10 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), value.has_value() ? JPowertrain::fromCpp(value.value()) : nullptr);
     return __result != nullptr ? std::make_optional(__result->toCpp()) : std::nullopt;
   }
-  bool JHybridTestObjectSwiftKotlinSpec::tryTrailingOptional(jdouble num, const jni::local_ref<jni::JString>& str, const std::optional<bool>& boo) {
+  jboolean JHybridTestObjectSwiftKotlinSpec::tryTrailingOptional(jdouble num, const jni::local_ref<jni::JString>& str, const std::optional<bool>& boo) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean(jdouble /* num */, jni::alias_ref<jni::JString> /* str */, jni::alias_ref<jni::JBoolean> /* boo */)>("tryTrailingOptional");
-    auto __result = __method(_javaPart, CxxPart::getClass(), num, str, boo.has_value() ? jni::JBoolean::valueOf(boo.value()) : nullptr);
-    return static_cast<bool>(__result);
+    auto __result = __method(_javaPart, CxxPart::getClass(), num, str, boo.has_value() ? JNIConverter<bool, jni::local_ref<jni::JBoolean>>::toJNI(boo.value()) : nullptr);
+    return __result;
   }
   int64_t JHybridTestObjectSwiftKotlinSpec::calculateFibonacciSync(jdouble value) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<int64_t(jdouble /* value */)>("calculateFibonacciSync");
@@ -1812,15 +1812,15 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass());
     return __result->toCpp();
   }
-  bool JHybridTestObjectSwiftKotlinSpec::isCarElectric(const CarKotlin& car) {
+  jboolean JHybridTestObjectSwiftKotlinSpec::isCarElectric(const CarKotlin& car) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean(jni::alias_ref<JCar> /* car */)>("isCarElectric");
     auto __result = __method(_javaPart, CxxPart::getClass(), JCar::fromCpp(car));
-    return static_cast<bool>(__result);
+    return __result;
   }
-  bool JHybridTestObjectSwiftKotlinSpec::areCarsEqual(const CarKotlin& a, const CarKotlin& b) {
+  jboolean JHybridTestObjectSwiftKotlinSpec::areCarsEqual(const CarKotlin& a, const CarKotlin& b) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean(jni::alias_ref<JCar> /* a */, jni::alias_ref<JCar> /* b */)>("areCarsEqual");
     auto __result = __method(_javaPart, CxxPart::getClass(), JCar::fromCpp(a), JCar::fromCpp(b));
-    return static_cast<bool>(__result);
+    return __result;
   }
   std::optional<PersonKotlin> JHybridTestObjectSwiftKotlinSpec::getDriver(const CarKotlin& car) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPerson>(jni::alias_ref<JCar> /* car */)>("getDriver");
@@ -1861,7 +1861,7 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass());
     return __result;
   }
-  jni::local_ref<JArrayBuffer::JavaPart> JHybridTestObjectSwiftKotlinSpec::createArrayBufferFromNativeBuffer(bool copy) {
+  jni::local_ref<JArrayBuffer::JavaPart> JHybridTestObjectSwiftKotlinSpec::createArrayBufferFromNativeBuffer(jboolean copy) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JArrayBuffer::JavaPart>(jboolean /* copy */)>("createArrayBufferFromNativeBuffer");
     auto __result = __method(_javaPart, CxxPart::getClass(), copy);
     return __result;

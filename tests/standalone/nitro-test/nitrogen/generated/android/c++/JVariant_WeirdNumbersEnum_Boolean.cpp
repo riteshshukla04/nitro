@@ -9,6 +9,8 @@
 #include <NitroTest/WeirdNumbersEnum.hpp>
 #include <variant>
 #include <NitroTest/private/JWeirdNumbersEnum.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> JVariant_WeirdNumbersEnum_Boolean::create_0(jni::alias_ref<JWeirdNumbersEnum> value) {
@@ -24,7 +26,7 @@ namespace margelo::nitro::test {
   jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> JVariant_WeirdNumbersEnum_Boolean::fromCpp(const std::variant<WeirdNumbersEnum, bool>& variant) {
     switch (variant.index()) {
       case 0: return create_0(JWeirdNumbersEnum::fromCpp(std::get<0>(variant)));
-      case 1: return create_1(std::get<1>(variant));
+      case 1: return create_1(JNIConverter<bool, jboolean>::toJNI(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
   }
@@ -50,7 +52,7 @@ namespace margelo::nitro::test {
     } else if (isInstanceOf(JVariant_WeirdNumbersEnum_Boolean_impl::Second::javaClassStatic())) {
       // It's a `bool`
       auto jniValue = static_cast<const JVariant_WeirdNumbersEnum_Boolean_impl::Second*>(this)->getValue();
-      return static_cast<bool>(jniValue);
+      return JNIConverter<bool, jboolean>::fromJNI(jniValue);
     }
     throw std::invalid_argument("Variant is unknown Kotlin instance!");
   }

@@ -7,6 +7,7 @@
 
 #include <NitroTest/private/views/JHybridRecyclableTestViewStateUpdater.hpp>
 #include <NitroTest/private/views/HybridRecyclableTestViewComponent.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JNIConverter.hpp>
 #include <optional>
 #include <NitroModules/NitroDefines.hpp>
@@ -68,7 +69,7 @@ void JHybridRecyclableTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::
     if (oldProps == nullptr
           ? newProps->isBlue.isProvided()
           : !newProps->isBlue.hasSameValue(oldProps->isBlue)) {
-      hybridView->setIsBlue(JNIConverter<bool, bool>::toJNI(newProps->isBlue.get()));
+      hybridView->setIsBlue(JNIConverter<bool, jboolean>::toJNI(newProps->isBlue.get()));
     }
     if (oldProps == nullptr
           ? newProps->nativeDefaultValue.isProvided()

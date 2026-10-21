@@ -13,6 +13,8 @@
 #include <NitroTest/WeirdNumbersEnum.hpp>
 #include <variant>
 #include <NitroTest/private/JWeirdNumbersEnum.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 

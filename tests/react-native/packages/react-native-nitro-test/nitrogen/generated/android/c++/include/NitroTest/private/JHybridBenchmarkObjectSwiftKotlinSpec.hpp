@@ -84,7 +84,7 @@ namespace margelo::nitro::test {
     std::vector<double> bounceNumbers(const std::vector<double>& array);
     CarKotlin bounceCar(const CarKotlin& car);
     std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map);
-    jni::local_ref<jni::JString> tryOptionalParams(jdouble num, bool boo, const std::optional<std::string>& str);
+    jni::local_ref<jni::JString> tryOptionalParams(jdouble num, jboolean boo, const std::optional<std::string>& str);
     std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either);
     jni::local_ref<JArrayBuffer::JavaPart> bounceArrayBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
     jni::local_ref<JArrayBuffer::JavaPart> copyBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);

@@ -65,12 +65,12 @@ namespace margelo::nitro::test {
   }
 
   // Properties
-  bool JHybridRecyclableTestViewSpec::getIsBlue() {
+  jboolean JHybridRecyclableTestViewSpec::getIsBlue() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("isBlue");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<bool>(__result);
+    return __result;
   }
-  void JHybridRecyclableTestViewSpec::setIsBlue(bool isBlue) {
+  void JHybridRecyclableTestViewSpec::setIsBlue(jboolean isBlue) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jboolean /* isBlue */)>("setBlue");
     __method(_javaPart, CxxPart::getClass(), isBlue);
   }

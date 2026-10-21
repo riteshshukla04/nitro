@@ -23,7 +23,7 @@ namespace margelo::nitro::test {
 
   jni::local_ref<JVariant_Boolean_Double> JVariant_Boolean_Double::fromCpp(const std::variant<bool, double>& variant) {
     switch (variant.index()) {
-      case 0: return create_0(std::get<0>(variant));
+      case 0: return create_0(JNIConverter<bool, jboolean>::toJNI(std::get<0>(variant)));
       case 1: return create_1(JNIConverter<double, jdouble>::toJNI(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
@@ -46,7 +46,7 @@ namespace margelo::nitro::test {
     if (isInstanceOf(JVariant_Boolean_Double_impl::First::javaClassStatic())) {
       // It's a `bool`
       auto jniValue = static_cast<const JVariant_Boolean_Double_impl::First*>(this)->getValue();
-      return static_cast<bool>(jniValue);
+      return JNIConverter<bool, jboolean>::fromJNI(jniValue);
     } else if (isInstanceOf(JVariant_Boolean_Double_impl::Second::javaClassStatic())) {
       // It's a `double`
       auto jniValue = static_cast<const JVariant_Boolean_Double_impl::Second*>(this)->getValue();

@@ -13,6 +13,8 @@
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <string>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
@@ -57,8 +59,8 @@ namespace margelo::nitro::test::external {
 
   public:
     // Properties
-    bool getIsBlue();
-    void setIsBlue(bool isBlue);
+    jboolean getIsBlue();
+    void setIsBlue(jboolean isBlue);
     Callback<void()> getSomeCallback();
     void setSomeCallback(const Callback<void()>& someCallback);
 

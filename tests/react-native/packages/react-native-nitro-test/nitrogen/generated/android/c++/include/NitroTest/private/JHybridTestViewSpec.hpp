@@ -61,10 +61,10 @@ namespace margelo::nitro::test {
 
   public:
     // Properties
-    bool getIsBlue();
-    void setIsBlue(bool isBlue);
-    bool getHasBeenCalled();
-    void setHasBeenCalled(bool hasBeenCalled);
+    jboolean getIsBlue();
+    void setIsBlue(jboolean isBlue);
+    jboolean getHasBeenCalled();
+    void setHasBeenCalled(jboolean hasBeenCalled);
     int64_t getInt64Value();
     void setInt64Value(int64_t int64Value);
     ColorScheme getColorScheme();
@@ -76,7 +76,7 @@ namespace margelo::nitro::test {
 
   public:
     // Methods
-    bool getIsViewBlue(const std::shared_ptr<JHybridTestViewSpec>& view);
+    jboolean getIsViewBlue(const std::shared_ptr<JHybridTestViewSpec>& view);
     jdouble getOnDropViewCount();
     jdouble getIsBlueSetterCallCount();
     jdouble getNativeDefaultValueSetterCallCount();

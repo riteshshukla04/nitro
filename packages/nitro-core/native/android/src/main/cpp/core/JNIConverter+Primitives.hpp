@@ -11,6 +11,16 @@ namespace margelo::nitro {
 namespace jni = facebook::jni;
 
 template <>
+struct JNIConverter<bool, jboolean> {
+  static jboolean toJNI(bool value) {
+    return value ? JNI_TRUE : JNI_FALSE;
+  }
+  static bool fromJNI(jboolean value) {
+    return value != JNI_FALSE;
+  }
+};
+
+template <>
 struct JNIConverter<int32_t, jint> {
   static jint toJNI(int32_t value) {
     return value;
@@ -51,6 +61,9 @@ struct JNIBoxedPrimitiveConverter {
     return JNIConverter<Cpp, JPrimitive>::fromJNI(value->value());
   }
 };
+
+template <>
+struct JNIConverter<bool, jni::local_ref<jni::JBoolean>> : JNIBoxedPrimitiveConverter<bool, jni::JBoolean> {};
 
 template <>
 struct JNIConverter<int32_t, jni::local_ref<jni::JInteger>> : JNIBoxedPrimitiveConverter<int32_t, jni::JInteger> {};

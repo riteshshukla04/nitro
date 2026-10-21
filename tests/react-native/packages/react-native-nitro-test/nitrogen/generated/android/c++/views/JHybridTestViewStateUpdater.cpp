@@ -7,6 +7,7 @@
 
 #include <NitroTest/private/views/JHybridTestViewStateUpdater.hpp>
 #include <NitroTest/private/views/HybridTestViewComponent.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JNIConverter.hpp>
 #include <NitroTest/ColorScheme.hpp>
 #include <NitroModules/Callback.hpp>
@@ -71,12 +72,12 @@ void JHybridTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /*
     if (oldProps == nullptr
           ? newProps->isBlue.isProvided()
           : !newProps->isBlue.hasSameValue(oldProps->isBlue)) {
-      hybridView->setIsBlue(JNIConverter<bool, bool>::toJNI(newProps->isBlue.get()));
+      hybridView->setIsBlue(JNIConverter<bool, jboolean>::toJNI(newProps->isBlue.get()));
     }
     if (oldProps == nullptr
           ? newProps->hasBeenCalled.isProvided()
           : !newProps->hasBeenCalled.hasSameValue(oldProps->hasBeenCalled)) {
-      hybridView->setHasBeenCalled(JNIConverter<bool, bool>::toJNI(newProps->hasBeenCalled.get()));
+      hybridView->setHasBeenCalled(JNIConverter<bool, jboolean>::toJNI(newProps->hasBeenCalled.get()));
     }
     if (oldProps == nullptr
           ? newProps->int64Value.isProvided()

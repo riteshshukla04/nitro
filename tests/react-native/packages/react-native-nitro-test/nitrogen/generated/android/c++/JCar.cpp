@@ -65,7 +65,7 @@ namespace margelo::nitro::test {
         }
         return __vector;
       }(passengers),
-      isFast != nullptr ? std::make_optional(static_cast<bool>(isFast->value())) : std::nullopt,
+      isFast != nullptr ? std::make_optional(JNIConverter<bool, jni::local_ref<jni::JBoolean>>::fromJNI(isFast)) : std::nullopt,
       favouriteTrack != nullptr ? std::make_optional(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(favouriteTrack)) : std::nullopt,
       [&]() {
         size_t __size = performanceScores->size();
@@ -99,7 +99,7 @@ namespace margelo::nitro::test {
         }
         return __array;
       }(value.passengers),
-      value.isFast.has_value() ? jni::JBoolean::valueOf(value.isFast.value()) : nullptr,
+      value.isFast.has_value() ? JNIConverter<bool, jni::local_ref<jni::JBoolean>>::toJNI(value.isFast.value()) : nullptr,
       value.favouriteTrack.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.favouriteTrack.value()) : nullptr,
       [&]() {
         size_t __size = value.performanceScores.size();
