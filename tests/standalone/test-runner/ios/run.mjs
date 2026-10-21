@@ -141,7 +141,7 @@ const buildSettings = [
   '-scheme',
   'NitroRuntimeTests',
   '-destination',
-  destination,
+  'generic/platform=iOS Simulator',
   '-derivedDataPath',
   derivedData,
   '-enableAddressSanitizer',
