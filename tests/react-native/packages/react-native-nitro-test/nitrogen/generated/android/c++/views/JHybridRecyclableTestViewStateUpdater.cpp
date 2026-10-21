@@ -47,7 +47,6 @@ void JHybridRecyclableTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::
                                            jni::alias_ref<JHybridRecyclableTestViewSpec::JavaPart> javaView,
                                            jni::alias_ref<JStateWrapper::javaobject> newState,
                                            jni::alias_ref<JStateWrapper::javaobject> oldState) {
-  std::shared_ptr<JHybridRecyclableTestViewSpec> hybridView = javaView->getJHybridRecyclableTestViewSpec();
   std::shared_ptr<const HybridRecyclableTestViewProps> newProps = getPropsFromStateWrapper(newState);
   std::shared_ptr<const HybridRecyclableTestViewProps> oldProps = getPropsFromStateWrapper(oldState);
   if (newProps == nullptr) [[unlikely]] {
@@ -81,6 +80,7 @@ void JHybridRecyclableTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::
           : !newProps->hybridRef.hasSameValue(oldProps->hybridRef)) {
       const auto& maybeFunc = newProps->hybridRef.get();
       if (maybeFunc.has_value()) {
+        auto hybridView = javaView->getJHybridRecyclableTestViewSpec();
         maybeFunc.value().callAndForget(hybridView);
       }
     }

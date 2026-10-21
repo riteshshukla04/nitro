@@ -47,7 +47,6 @@ void JHybridTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /*
                                            jni::alias_ref<JHybridTestViewSpec::JavaPart> javaView,
                                            jni::alias_ref<JStateWrapper::javaobject> newState,
                                            jni::alias_ref<JStateWrapper::javaobject> oldState) {
-  std::shared_ptr<JHybridTestViewSpec> hybridView = javaView->getJHybridTestViewSpec();
   std::shared_ptr<const HybridTestViewProps> newProps = getPropsFromStateWrapper(newState);
   std::shared_ptr<const HybridTestViewProps> oldProps = getPropsFromStateWrapper(oldState);
   if (newProps == nullptr) [[unlikely]] {
@@ -81,6 +80,7 @@ void JHybridTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /*
           : !newProps->hybridRef.hasSameValue(oldProps->hybridRef)) {
       const auto& maybeFunc = newProps->hybridRef.get();
       if (maybeFunc.has_value()) {
+        auto hybridView = javaView->getJHybridTestViewSpec();
         maybeFunc.value().callAndForget(hybridView);
       }
     }
