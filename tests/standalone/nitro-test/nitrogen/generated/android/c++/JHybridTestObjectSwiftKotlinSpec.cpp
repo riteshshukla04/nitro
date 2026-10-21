@@ -53,6 +53,7 @@
 #include <NitroModules/JSIConverter+JThrowable.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
+#include <NitroModules/JUInt64.hpp>
 #include <NitroTest/private/JVariant_NullType_String.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <NitroTest/private/JOldEnum.hpp>
@@ -366,11 +367,11 @@ namespace margelo::nitro::test {
   uint64_t JHybridTestObjectSwiftKotlinSpec::getUint64Value() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jlong()>("getUint64Value_cxx");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return static_cast<uint64_t>(__result);
+    return JNIConverter<uint64_t, jlong>::fromJNI(__result);
   }
   void JHybridTestObjectSwiftKotlinSpec::setUint64Value(uint64_t uint64Value) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jlong /* uint64Value */)>("setUint64Value_cxx");
-    __method(_javaPart, CxxPart::getClass(), uint64Value);
+    __method(_javaPart, CxxPart::getClass(), JNIConverter<uint64_t, jlong>::toJNI(uint64Value));
   }
   jni::local_ref<JNull> JHybridTestObjectSwiftKotlinSpec::getNullValue() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JNull>()>("getNullValue");

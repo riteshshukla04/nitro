@@ -14,6 +14,7 @@
 #include <NitroTestExternal/private/JOptionalPrimitivesHolder.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JUInt64.hpp>
 
 namespace margelo::nitro::test::external {
 
@@ -78,8 +79,8 @@ namespace margelo::nitro::test::external {
     return __result;
   }
   OptionalPrimitivesHolderKotlin JHybridSomeExternalObjectSpec::createOptionalPrimitivesHolder(const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOptionalPrimitivesHolder>(jni::alias_ref<jni::JDouble> /* optionalNumber */, jni::alias_ref<jni::JBoolean> /* optionalBoolean */, jni::alias_ref<jni::JLong> /* optionalUInt64 */, jni::alias_ref<jni::JLong> /* optionalInt64 */)>("createOptionalPrimitivesHolder_cxx");
-    auto __result = __method(_javaPart, CxxPart::getClass(), optionalNumber.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(optionalNumber.value()) : nullptr, optionalBoolean.has_value() ? JNIConverter<bool, jni::local_ref<jni::JBoolean>>::toJNI(optionalBoolean.value()) : nullptr, optionalUInt64.has_value() ? jni::JLong::valueOf(optionalUInt64.value()) : nullptr, optionalInt64.has_value() ? JNIConverter<int64_t, jni::local_ref<jni::JLong>>::toJNI(optionalInt64.value()) : nullptr);
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOptionalPrimitivesHolder>(jni::alias_ref<jni::JDouble> /* optionalNumber */, jni::alias_ref<jni::JBoolean> /* optionalBoolean */, jni::alias_ref<JUInt64> /* optionalUInt64 */, jni::alias_ref<jni::JLong> /* optionalInt64 */)>("createOptionalPrimitivesHolder_cxx");
+    auto __result = __method(_javaPart, CxxPart::getClass(), optionalNumber.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(optionalNumber.value()) : nullptr, optionalBoolean.has_value() ? JNIConverter<bool, jni::local_ref<jni::JBoolean>>::toJNI(optionalBoolean.value()) : nullptr, optionalUInt64.has_value() ? JNIConverter<uint64_t, jni::local_ref<JUInt64>>::toJNI(optionalUInt64.value()) : nullptr, optionalInt64.has_value() ? JNIConverter<int64_t, jni::local_ref<jni::JLong>>::toJNI(optionalInt64.value()) : nullptr);
     return __result->toCpp();
   }
 

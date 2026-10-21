@@ -54,6 +54,9 @@ template <>
 struct JSIConverter<jni::local_ref<jni::JLong>> : JSIBoxedJNIConverter<int64_t, jni::JLong> {};
 
 template <>
+struct JSIConverter<jni::local_ref<JUInt64>> : JSIBoxedJNIConverter<uint64_t, JUInt64> {};
+
+template <>
 struct JSIConverter<jni::local_ref<jni::JFloat>> : JSIBoxedJNIConverter<float, jni::JFloat> {};
 
 template <>

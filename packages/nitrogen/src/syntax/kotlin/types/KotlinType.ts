@@ -102,19 +102,3 @@ export function getJniPrimitiveCode(jniType: string, options: GetKotlinCodeOptio
   if (boxed) return getJniReferenceCode(boxedType, options)
   return jniType
 }
-
-/** Boxes or unboxes a JNI primitive in C++ where JNI requires an object. */
-export function convertJniPrimitive(value: string, { from, in: language }: KotlinConversion, { boxedType, boxed }: JniPrimitive): string {
-  switch (language) {
-    case 'kotlin':
-      return value
-    case 'c++':
-      if (!boxed) return value
-      switch (from) {
-        case 'c++':
-          return `${boxedType}::valueOf(${value})`
-        case 'kotlin':
-          return `${value}->value()`
-      }
-  }
-}

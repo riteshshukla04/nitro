@@ -1,6 +1,7 @@
 #pragma once
 
 #include "JNIConverter.hpp"
+#include "JUInt64.hpp"
 #include <bit>
 #include <cstdint>
 #include <fbjni/fbjni.h>
@@ -37,6 +38,17 @@ struct JNIConverter<int64_t, jlong> {
   }
   static int64_t fromJNI(jlong value) {
     return static_cast<int64_t>(value);
+  }
+};
+
+template <>
+struct JNIConverter<uint64_t, jlong> {
+  // Kotlin's ULong crosses JNI as a Long with the same bits.
+  static jlong toJNI(uint64_t value) {
+    return std::bit_cast<jlong>(value);
+  }
+  static uint64_t fromJNI(jlong value) {
+    return std::bit_cast<uint64_t>(value);
   }
 };
 
@@ -80,6 +92,22 @@ struct JNIConverter<int32_t, jni::local_ref<jni::JInteger>> : JNIBoxedPrimitiveC
 
 template <>
 struct JNIConverter<int64_t, jni::local_ref<jni::JLong>> : JNIBoxedPrimitiveConverter<int64_t, jni::JLong> {};
+
+template <>
+struct JNIConverter<uint64_t, jni::local_ref<jni::JLong>> : JNIBoxedPrimitiveConverter<uint64_t, jni::JLong> {};
+
+template <>
+struct JNIConverter<uint64_t, jni::local_ref<JUInt64>> {
+  static jni::local_ref<JUInt64> toJNI(uint64_t value) {
+    auto boxed = jni::JLong::valueOf(JNIConverter<uint64_t, jlong>::toJNI(value));
+    auto raw = boxed.release();
+    auto object = static_cast<JUInt64::javaobject>(raw);
+    return jni::adopt_local(object);
+  }
+  static uint64_t fromJNI(jni::alias_ref<JUInt64> value) {
+    return JNIConverter<uint64_t, jlong>::fromJNI(value->value());
+  }
+};
 
 template <>
 struct JNIConverter<float, jni::local_ref<jni::JFloat>> : JNIBoxedPrimitiveConverter<float, jni::JFloat> {};
