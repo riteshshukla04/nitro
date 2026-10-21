@@ -80,7 +80,9 @@ struct JNIBoxedPrimitiveConverter {
     return JavaBox::valueOf(JNIConverter<Cpp, JPrimitive>::toJNI(value));
   }
   static Cpp fromJNI(jni::alias_ref<JavaBox> value) {
-    return JNIConverter<Cpp, JPrimitive>::fromJNI(value->value());
+    static const auto clazz = JavaBox::javaClassStatic();
+    static const auto method = clazz->template getNonvirtualMethod<JPrimitive()>(JavaBox::kValueMethod);
+    return JNIConverter<Cpp, JPrimitive>::fromJNI(method(value, clazz));
   }
 };
 
@@ -105,7 +107,7 @@ struct JNIConverter<uint64_t, jni::local_ref<JUInt64>> {
     return jni::adopt_local(object);
   }
   static uint64_t fromJNI(jni::alias_ref<JUInt64> value) {
-    return JNIConverter<uint64_t, jlong>::fromJNI(value->value());
+    return JNIBoxedPrimitiveConverter<uint64_t, JUInt64>::fromJNI(value);
   }
 };
 
