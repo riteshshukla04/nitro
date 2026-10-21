@@ -23,7 +23,11 @@ private struct JavaScriptFailure: Error, CustomStringConvertible {
 private let workerCount =
   ProcessInfo.processInfo.environment["NITRO_TEST_WORKERS"].flatMap { Int($0) }.flatMap { $0 > 0 ? $0 : nil }
   ?? max(2, ProcessInfo.processInfo.activeProcessorCount - 1)
-private let defaultTimeoutMs: UInt32 = 10_000
+/// Budget for runtime setup and for each case without its own override.
+/// `run.mjs` raises it for sanitizer builds through `NITRO_TEST_TIMEOUT_MS`.
+private let defaultTimeoutMs: UInt32 =
+  ProcessInfo.processInfo.environment["NITRO_TEST_TIMEOUT_MS"].flatMap { UInt32($0) }.flatMap { $0 > 0 ? $0 : nil }
+  ?? 10_000
 
 extension NitroTestScheduler {
   /// Returns nil when the case passes, otherwise its failure and JS stack.

@@ -73,6 +73,9 @@ include the time it waited for its group.
 The `static-properties` cases write shared native storage, so they form a single group whose cases never overlap. Groups of other files can
 run at the same time.
 
+The default budget for runtime setup and for each case is 10 seconds, or 30 seconds with `--sanitizer address` or `--sanitizer thread`;
+`run.mjs` passes it as `NITRO_TEST_TIMEOUT_MS`. Explicit `withTestTimeout` budgets and the runner contract tests do not change.
+
 `run.mjs` passes `NITRO_TEST_REPORT` to the test process, which appends a JSON line with setup, case, and teardown times for every group to
 `runtime-groups.jsonl` in the result directory. The runner prints a summary of those times after the tests.
 

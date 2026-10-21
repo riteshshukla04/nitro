@@ -125,6 +125,12 @@ mkdirSync(results, { recursive: true })
 const groupReport = path.join(results, 'runtime-groups.jsonl')
 environment.TEST_RUNNER_NITRO_TEST_REPORT = groupReport
 if (values.workers !== 'auto') environment.TEST_RUNNER_NITRO_TEST_WORKERS = values.workers
+// Sanitizer builds run several times slower, and CI runs them on 3-core
+// machines. Cases that take milliseconds there occasionally waited longer than
+// 10 seconds for the CPU. Their own explicit budgets (withTestTimeout) and the
+// runner contract tests are unaffected.
+const sanitizerTimeoutMs = { none: 10_000, address: 30_000, thread: 30_000 }[values.sanitizer]
+environment.TEST_RUNNER_NITRO_TEST_TIMEOUT_MS = String(sanitizerTimeoutMs)
 if (values.sanitizer !== 'none') {
   const option = values.sanitizer === 'address' ? 'ASAN_OPTIONS' : 'TSAN_OPTIONS'
   // xcodebuild forwards TEST_RUNNER_ variables to every test process. Preserve
@@ -241,7 +247,7 @@ if (existsSync(groupReport)) {
   console.log(
     `Runtime groups: ${groups.length} groups, ${total('runtimes')} Hermes runtimes, ${total('cases')} cases, ${total('failures')} failed${
       workers > 0 ? `, ${workers} workers` : ''
-    }`
+    }${groups[0]?.timeoutMs ? `, ${groups[0].timeoutMs / 1000} s default case budget` : ''}`
   )
   console.log(
     `  summed over workers: setup ${seconds(total('setupMs'))}, cases ${seconds(total('casesMs'))}, teardown ${seconds(total('teardownMs'))}`

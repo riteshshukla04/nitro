@@ -58,7 +58,7 @@ static NSString* toNSString(const std::string& string) {
     }
     if (onGroupFinished) {
       void (^block)(NSString*) = [onGroupFinished copy];
-      options.onGroupFinished = [block, workers](const TestGroupReport& report) {
+      options.onGroupFinished = [block, workers, timeoutMs](const TestGroupReport& report) {
         @autoreleasepool {
           NSMutableArray* failedCases = [NSMutableArray arrayWithCapacity:report.failedCases.size()];
           for (const auto& [name, failure] : report.failedCases)
@@ -72,6 +72,7 @@ static NSString* toNSString(const std::string& string) {
             @"casesMs" : @(std::round(report.casesMs)),
             @"teardownMs" : @(std::round(report.teardownMs)),
             @"workers" : @(workers),
+            @"timeoutMs" : @(timeoutMs),
             @"failedCases" : failedCases,
           };
           NSData* json = [NSJSONSerialization dataWithJSONObject:fields options:NSJSONWritingSortedKeys error:nil];
