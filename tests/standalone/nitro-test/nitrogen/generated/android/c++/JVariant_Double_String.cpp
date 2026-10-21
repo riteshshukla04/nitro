@@ -6,55 +6,36 @@
 ///
 
 #include <NitroTest/private/JVariant_Double_String.hpp>
-#include <string>
-#include <variant>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JVariant_Double_String> JVariant_Double_String::create_0(jdouble value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Double_String(jdouble)>("fromCpp_0");
-    return method(javaClassStatic(), value);
+
+  size_t JVariant_Double_String::getIndex() const {
+    static const auto field = javaClassStatic()->getField<jint>("index");
+    return static_cast<size_t>(getFieldValue(field));
   }
 
-  jni::local_ref<JVariant_Double_String> JVariant_Double_String::create_1(jni::alias_ref<jni::JString> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Double_String(jni::alias_ref<jni::JString>)>("fromCpp_1");
-    return method(javaClassStatic(), value);
+  jni::local_ref<JVariant_Double_String> JVariant_Double_String_impl::First::create(jdouble value) {
+    static const auto method = JVariant_Double_String::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Double_String>(jdouble)>("fromCpp_0");
+    return method(JVariant_Double_String::javaClassStatic(), value);
   }
 
-  jni::local_ref<JVariant_Double_String> JVariant_Double_String::fromCpp(const std::variant<double, std::string>& variant) {
-    switch (variant.index()) {
-      case 0: return create_0(JNIConverter<double, jdouble>::toJNI(std::get<0>(variant)));
-      case 1: return create_1(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<1>(variant)));
-      default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
-    }
-  }
-
-  jdouble JVariant_Double_String_impl::First::getValue() const {
+  JVariant_Double_String_impl::First::Value JVariant_Double_String_impl::First::getValue() const {
     static const auto field = javaClassStatic()->getField<jdouble>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<jni::JString> JVariant_Double_String_impl::Second::getValue() const {
+  jni::local_ref<JVariant_Double_String> JVariant_Double_String_impl::Second::create(jni::alias_ref<jni::JString> value) {
+    static const auto method = JVariant_Double_String::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Double_String>(jni::alias_ref<jni::JString>)>("fromCpp_1");
+    return method(JVariant_Double_String::javaClassStatic(), value);
+  }
+
+  JVariant_Double_String_impl::Second::Value JVariant_Double_String_impl::Second::getValue() const {
     static const auto field = javaClassStatic()->getField<jni::JString>("value");
     return getFieldValue(field);
   }
 
-  /**
-   * Converts JVariant_Double_String to std::variant<double, std::string>
-   */
-  std::variant<double, std::string> JVariant_Double_String::toCpp() const {
-    if (isInstanceOf(JVariant_Double_String_impl::First::javaClassStatic())) {
-      // It's a `double`
-      auto jniValue = static_cast<const JVariant_Double_String_impl::First*>(this)->getValue();
-      return JNIConverter<double, jdouble>::fromJNI(jniValue);
-    } else if (isInstanceOf(JVariant_Double_String_impl::Second::javaClassStatic())) {
-      // It's a `std::string`
-      auto jniValue = static_cast<const JVariant_Double_String_impl::Second*>(this)->getValue();
-      return JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(jniValue);
-    }
-    throw std::invalid_argument("Variant is unknown Kotlin instance!");
-  }
 } // namespace margelo::nitro::test

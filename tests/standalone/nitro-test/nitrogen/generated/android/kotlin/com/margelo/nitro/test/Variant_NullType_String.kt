@@ -15,11 +15,11 @@ import com.margelo.nitro.core.NullType
  */
 @Suppress("ClassName")
 @DoNotStrip
-sealed class Variant_NullType_String {
+sealed class Variant_NullType_String private constructor(@DoNotStrip private val index: Int) {
   @DoNotStrip
-  data class First(@DoNotStrip val value: NullType): Variant_NullType_String()
+  data class First(@DoNotStrip val value: NullType): Variant_NullType_String(0)
   @DoNotStrip
-  data class Second(@DoNotStrip val value: String): Variant_NullType_String()
+  data class Second(@DoNotStrip val value: String): Variant_NullType_String(1)
 
   inline fun <reified T> asType(): T? {
     return when (this) {

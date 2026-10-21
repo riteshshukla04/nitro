@@ -15,10 +15,12 @@
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTest/private/HybridChildSpecCxx+JNI.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JNIConverter.hpp>
-#include <NitroTest/private/CarKotlin.hpp>
+#include <NitroTest/private/JNamedVariant.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroTest/private/JCar.hpp>
 #include <NitroTest/private/Car+Kotlin+NitroTest.hpp>
-#include <NitroTest/private/Person+Kotlin+NitroTest.hpp>
+#include <NitroModules/JNIConverter+Variant.hpp>
 
 namespace margelo::nitro::test {
 
@@ -47,8 +49,8 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Child.bounceVariant on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->bounceVariant(JNIConverter<std::variant<std::string, margelo::nitro::test::Car>, std::variant<std::string, margelo::nitro::test::CarKotlin>>::toJNI(variant));
-    return JNIConverter<std::variant<std::string, margelo::nitro::test::Car>, std::variant<std::string, margelo::nitro::test::CarKotlin>>::fromJNI(__result);
+    auto __result = __implementation->bounceVariant(JNIConverter<std::variant<std::string, margelo::nitro::test::Car>, jni::local_ref<margelo::nitro::test::JNamedVariant>>::toJNI(variant));
+    return JNIConverter<std::variant<std::string, margelo::nitro::test::Car>, jni::local_ref<margelo::nitro::test::JNamedVariant>>::fromJNI(__result);
   }
 
 } // namespace margelo::nitro::test

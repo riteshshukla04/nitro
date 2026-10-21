@@ -8,15 +8,14 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
-#include <vector>
-#include <string>
-#include <variant>
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <vector>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
+#include <string>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
@@ -25,58 +24,73 @@ namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "Variant_Boolean_DoubleArray_Array_String__Double_String".
-   */
+  namespace JVariant_Boolean_DoubleArray_Array_String__Double_String_impl {
+    class First;
+    class Second;
+    class Third;
+    class Fourth;
+    class Fifth;
+  }
+
+  /** The JNI representation of Kotlin's sealed Variant_Boolean_DoubleArray_Array_String__Double_String class. */
   class JVariant_Boolean_DoubleArray_Array_String__Double_String : public jni::JavaClass<JVariant_Boolean_DoubleArray_Array_String__Double_String> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Boolean_DoubleArray_Array_String__Double_String;";
+    using Cases = std::tuple<JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::First, JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Second, JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Third, JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth, JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_0(jboolean value);
-    static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_1(jni::alias_ref<jni::JArrayDouble> value);
-    static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_2(jni::alias_ref<jni::JArrayClass<jni::JString>> value);
-    static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_3(jdouble value);
-    static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_4(jni::alias_ref<jni::JString> value);
-
-    static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> fromCpp(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& variant);
-
-    [[nodiscard]] std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JVariant_Boolean_DoubleArray_Array_String__Double_String_impl {
     class First final : public jni::JavaClass<First, JVariant_Boolean_DoubleArray_Array_String__Double_String> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Boolean_DoubleArray_Array_String__Double_String$First;";
+      using Value = jboolean;
 
-      [[nodiscard]] jboolean getValue() const;
+      static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create(jboolean value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JVariant_Boolean_DoubleArray_Array_String__Double_String> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Boolean_DoubleArray_Array_String__Double_String$Second;";
+      using Value = jni::local_ref<jni::JArrayDouble>;
 
-      [[nodiscard]] jni::local_ref<jni::JArrayDouble> getValue() const;
+      static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create(jni::alias_ref<jni::JArrayDouble> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Third final : public jni::JavaClass<Third, JVariant_Boolean_DoubleArray_Array_String__Double_String> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Boolean_DoubleArray_Array_String__Double_String$Third;";
+      using Value = jni::local_ref<jni::JArrayClass<jni::JString>>;
 
-      [[nodiscard]] jni::local_ref<jni::JArrayClass<jni::JString>> getValue() const;
+      static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create(jni::alias_ref<jni::JArrayClass<jni::JString>> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Fourth final : public jni::JavaClass<Fourth, JVariant_Boolean_DoubleArray_Array_String__Double_String> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Boolean_DoubleArray_Array_String__Double_String$Fourth;";
+      using Value = jdouble;
 
-      [[nodiscard]] jdouble getValue() const;
+      static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create(jdouble value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Fifth final : public jni::JavaClass<Fifth, JVariant_Boolean_DoubleArray_Array_String__Double_String> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Boolean_DoubleArray_Array_String__Double_String$Fifth;";
+      using Value = jni::local_ref<jni::JString>;
 
-      [[nodiscard]] jni::local_ref<jni::JString> getValue() const;
+      static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create(jni::alias_ref<jni::JString> value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JVariant_Boolean_DoubleArray_Array_String__Double_String_impl
+  }
+
 } // namespace margelo::nitro::test

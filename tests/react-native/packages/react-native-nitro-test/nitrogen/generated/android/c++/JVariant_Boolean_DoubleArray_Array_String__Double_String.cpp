@@ -6,104 +6,71 @@
 ///
 
 #include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
-#include <vector>
-#include <string>
-#include <variant>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <vector>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
+#include <string>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String::create_0(jboolean value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Boolean_DoubleArray_Array_String__Double_String(jboolean)>("fromCpp_0");
-    return method(javaClassStatic(), value);
+
+  size_t JVariant_Boolean_DoubleArray_Array_String__Double_String::getIndex() const {
+    static const auto field = javaClassStatic()->getField<jint>("index");
+    return static_cast<size_t>(getFieldValue(field));
   }
 
-  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String::create_1(jni::alias_ref<jni::JArrayDouble> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Boolean_DoubleArray_Array_String__Double_String(jni::alias_ref<jni::JArrayDouble>)>("fromCpp_1");
-    return method(javaClassStatic(), value);
+  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::First::create(jboolean value) {
+    static const auto method = JVariant_Boolean_DoubleArray_Array_String__Double_String::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String>(jboolean)>("fromCpp_0");
+    return method(JVariant_Boolean_DoubleArray_Array_String__Double_String::javaClassStatic(), value);
   }
 
-  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String::create_2(jni::alias_ref<jni::JArrayClass<jni::JString>> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Boolean_DoubleArray_Array_String__Double_String(jni::alias_ref<jni::JArrayClass<jni::JString>>)>("fromCpp_2");
-    return method(javaClassStatic(), value);
-  }
-
-  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String::create_3(jdouble value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Boolean_DoubleArray_Array_String__Double_String(jdouble)>("fromCpp_3");
-    return method(javaClassStatic(), value);
-  }
-
-  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String::create_4(jni::alias_ref<jni::JString> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Boolean_DoubleArray_Array_String__Double_String(jni::alias_ref<jni::JString>)>("fromCpp_4");
-    return method(javaClassStatic(), value);
-  }
-
-  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String::fromCpp(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& variant) {
-    switch (variant.index()) {
-      case 0: return create_0(JNIConverter<bool, jboolean>::toJNI(std::get<0>(variant)));
-      case 1: return create_1(JNIConverter<std::vector<double>, jni::local_ref<jni::JArrayDouble>>::toJNI(std::get<1>(variant)));
-      case 2: return create_2(JNIConverter<std::vector<std::string>, jni::local_ref<jni::JArrayClass<jni::JString>>>::toJNI(std::get<2>(variant)));
-      case 3: return create_3(JNIConverter<double, jdouble>::toJNI(std::get<3>(variant)));
-      case 4: return create_4(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<4>(variant)));
-      default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
-    }
-  }
-
-  jboolean JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::First::getValue() const {
+  JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::First::Value JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::First::getValue() const {
     static const auto field = javaClassStatic()->getField<jboolean>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<jni::JArrayDouble> JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Second::getValue() const {
+  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Second::create(jni::alias_ref<jni::JArrayDouble> value) {
+    static const auto method = JVariant_Boolean_DoubleArray_Array_String__Double_String::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String>(jni::alias_ref<jni::JArrayDouble>)>("fromCpp_1");
+    return method(JVariant_Boolean_DoubleArray_Array_String__Double_String::javaClassStatic(), value);
+  }
+
+  JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Second::Value JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Second::getValue() const {
     static const auto field = javaClassStatic()->getField<jni::JArrayDouble>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<jni::JArrayClass<jni::JString>> JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Third::getValue() const {
+  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Third::create(jni::alias_ref<jni::JArrayClass<jni::JString>> value) {
+    static const auto method = JVariant_Boolean_DoubleArray_Array_String__Double_String::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String>(jni::alias_ref<jni::JArrayClass<jni::JString>>)>("fromCpp_2");
+    return method(JVariant_Boolean_DoubleArray_Array_String__Double_String::javaClassStatic(), value);
+  }
+
+  JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Third::Value JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Third::getValue() const {
     static const auto field = javaClassStatic()->getField<jni::JArrayClass<jni::JString>>("value");
     return getFieldValue(field);
   }
 
-  jdouble JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth::getValue() const {
+  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth::create(jdouble value) {
+    static const auto method = JVariant_Boolean_DoubleArray_Array_String__Double_String::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String>(jdouble)>("fromCpp_3");
+    return method(JVariant_Boolean_DoubleArray_Array_String__Double_String::javaClassStatic(), value);
+  }
+
+  JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth::Value JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth::getValue() const {
     static const auto field = javaClassStatic()->getField<jdouble>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<jni::JString> JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth::getValue() const {
+  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth::create(jni::alias_ref<jni::JString> value) {
+    static const auto method = JVariant_Boolean_DoubleArray_Array_String__Double_String::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String>(jni::alias_ref<jni::JString>)>("fromCpp_4");
+    return method(JVariant_Boolean_DoubleArray_Array_String__Double_String::javaClassStatic(), value);
+  }
+
+  JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth::Value JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth::getValue() const {
     static const auto field = javaClassStatic()->getField<jni::JString>("value");
     return getFieldValue(field);
   }
 
-  /**
-   * Converts JVariant_Boolean_DoubleArray_Array_String__Double_String to std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>
-   */
-  std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string> JVariant_Boolean_DoubleArray_Array_String__Double_String::toCpp() const {
-    if (isInstanceOf(JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::First::javaClassStatic())) {
-      // It's a `bool`
-      auto jniValue = static_cast<const JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::First*>(this)->getValue();
-      return JNIConverter<bool, jboolean>::fromJNI(jniValue);
-    } else if (isInstanceOf(JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Second::javaClassStatic())) {
-      // It's a `std::vector<double>`
-      auto jniValue = static_cast<const JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Second*>(this)->getValue();
-      return JNIConverter<std::vector<double>, jni::local_ref<jni::JArrayDouble>>::fromJNI(jniValue);
-    } else if (isInstanceOf(JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Third::javaClassStatic())) {
-      // It's a `std::vector<std::string>`
-      auto jniValue = static_cast<const JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Third*>(this)->getValue();
-      return JNIConverter<std::vector<std::string>, jni::local_ref<jni::JArrayClass<jni::JString>>>::fromJNI(jniValue);
-    } else if (isInstanceOf(JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth::javaClassStatic())) {
-      // It's a `double`
-      auto jniValue = static_cast<const JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth*>(this)->getValue();
-      return JNIConverter<double, jdouble>::fromJNI(jniValue);
-    } else if (isInstanceOf(JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth::javaClassStatic())) {
-      // It's a `std::string`
-      auto jniValue = static_cast<const JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth*>(this)->getValue();
-      return JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(jniValue);
-    }
-    throw std::invalid_argument("Variant is unknown Kotlin instance!");
-  }
 } // namespace margelo::nitro::test

@@ -8,33 +8,107 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/CarKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroTest/private/JPowertrain.hpp>
+#include <NitroTest/private/PersonKotlin.hpp>
+#include <optional>
+#include <NitroTest/private/JPerson.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <vector>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <string>
+#include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
+#include <variant>
+#include <NitroTest/private/JVariant_Double_String.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "Car" and the Kotlin data class "Car".
-   */
+  /** JNI access to the Kotlin data class Car. */
   struct JCar final : public jni::JavaClass<JCar> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Car;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct Car by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    CarKotlin toCpp() const;
+    static jni::local_ref<JCar> create(jdouble year, jni::alias_ref<jni::JString> make, jni::alias_ref<jni::JString> model, jdouble power, jni::alias_ref<JPowertrain> powertrain, jni::alias_ref<JOptional<JPerson>> driver, jni::alias_ref<jni::JArrayClass<JPerson>> passengers, jni::alias_ref<JOptional<jni::JBoolean>> isFast, jni::alias_ref<JOptional<jni::JString>> favouriteTrack, jni::alias_ref<jni::JArrayDouble> performanceScores, jni::alias_ref<JOptional<JVariant_Double_String>> someVariant) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JCar(jdouble, jni::alias_ref<jni::JString>, jni::alias_ref<jni::JString>, jdouble, jni::alias_ref<JPowertrain>, jni::alias_ref<JOptional<JPerson>>, jni::alias_ref<jni::JArrayClass<JPerson>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JString>>, jni::alias_ref<jni::JArrayDouble>, jni::alias_ref<JOptional<JVariant_Double_String>>)>("fromCpp");
+      return create(clazz, year, make, model, power, powertrain, driver, passengers, isFast, favouriteTrack, performanceScores, someVariant);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JCar::javaobject> fromCpp(const CarKotlin& value);
+    jdouble getYear() const {
+      static const auto field = javaClassStatic()->getField<jdouble>("year");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<jni::JString> getMake() const {
+      static const auto field = javaClassStatic()->getField<jni::JString>("make");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<jni::JString> getModel() const {
+      static const auto field = javaClassStatic()->getField<jni::JString>("model");
+      return getFieldValue(field);
+    }
+
+    jdouble getPower() const {
+      static const auto field = javaClassStatic()->getField<jdouble>("power");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JPowertrain> getPowertrain() const {
+      static const auto field = javaClassStatic()->getField<JPowertrain>("powertrain");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<JPerson>> getDriver() const {
+      static const auto field = javaClassStatic()->getField<JOptional<JPerson>>("driver");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<jni::JArrayClass<JPerson>> getPassengers() const {
+      static const auto field = javaClassStatic()->getField<jni::JArrayClass<JPerson>>("passengers");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JBoolean>> getIsFast() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JBoolean>>("isFast");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JString>> getFavouriteTrack() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JString>>("favouriteTrack");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<jni::JArrayDouble> getPerformanceScores() const {
+      static const auto field = javaClassStatic()->getField<jni::JArrayDouble>("performanceScores");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<JVariant_Double_String>> getSomeVariant() const {
+      static const auto field = javaClassStatic()->getField<JOptional<JVariant_Double_String>>("someVariant");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JCar>> {
+    static jni::local_ref<margelo::nitro::test::JCar> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JCar> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

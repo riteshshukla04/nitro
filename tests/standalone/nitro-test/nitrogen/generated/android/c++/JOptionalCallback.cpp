@@ -12,10 +12,10 @@
 #include <functional>
 #include <variant>
 #include <optional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroTest/private/JVariant_______Unit_Double.hpp>
 #include <NitroTest/private/JCallback_void.hpp>
 #include <NitroModules/JNICallable.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {

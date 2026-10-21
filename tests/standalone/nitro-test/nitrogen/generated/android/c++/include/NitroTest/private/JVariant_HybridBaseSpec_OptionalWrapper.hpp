@@ -8,51 +8,54 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
-#include <memory>
-#include <NitroModules/JNIConverter+HybridObject.hpp>
-// Forward declaration of `JHybridBaseSpec` to properly resolve imports.
-namespace margelo::nitro::test { class JHybridBaseSpec; }
-#include <NitroTest/private/OptionalWrapperKotlin.hpp>
-#include <variant>
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroTest/private/JHybridBaseSpecJavaPart.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTest/private/JOptionalWrapper.hpp>
-#include <NitroTest/private/OptionalWrapperKotlin+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "Variant_HybridBaseSpec_OptionalWrapper".
-   */
+  namespace JVariant_HybridBaseSpec_OptionalWrapper_impl {
+    class First;
+    class Second;
+  }
+
+  /** The JNI representation of Kotlin's sealed Variant_HybridBaseSpec_OptionalWrapper class. */
   class JVariant_HybridBaseSpec_OptionalWrapper : public jni::JavaClass<JVariant_HybridBaseSpec_OptionalWrapper> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_HybridBaseSpec_OptionalWrapper;";
+    using Cases = std::tuple<JVariant_HybridBaseSpec_OptionalWrapper_impl::First, JVariant_HybridBaseSpec_OptionalWrapper_impl::Second>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>, margelo::nitro::test::OptionalWrapperKotlin>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> create_0(jni::alias_ref<JHybridBaseSpecJavaPart> value);
-    static jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> create_1(jni::alias_ref<JOptionalWrapper> value);
-
-    static jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> fromCpp(const std::variant<std::shared_ptr<JHybridBaseSpec>, OptionalWrapperKotlin>& variant);
-
-    [[nodiscard]] std::variant<std::shared_ptr<JHybridBaseSpec>, OptionalWrapperKotlin> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JVariant_HybridBaseSpec_OptionalWrapper_impl {
     class First final : public jni::JavaClass<First, JVariant_HybridBaseSpec_OptionalWrapper> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_HybridBaseSpec_OptionalWrapper$First;";
+      using Value = jni::local_ref<JHybridBaseSpecJavaPart>;
 
-      [[nodiscard]] jni::local_ref<JHybridBaseSpecJavaPart> getValue() const;
+      static jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> create(jni::alias_ref<JHybridBaseSpecJavaPart> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JVariant_HybridBaseSpec_OptionalWrapper> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_HybridBaseSpec_OptionalWrapper$Second;";
+      using Value = jni::local_ref<JOptionalWrapper>;
 
-      [[nodiscard]] jni::local_ref<JOptionalWrapper> getValue() const;
+      static jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> create(jni::alias_ref<JOptionalWrapper> value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JVariant_HybridBaseSpec_OptionalWrapper_impl
+  }
+
 } // namespace margelo::nitro::test

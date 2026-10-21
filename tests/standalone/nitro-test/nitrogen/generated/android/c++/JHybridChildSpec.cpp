@@ -8,26 +8,12 @@
 #include <NitroTest/private/JHybridChildSpec.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <string>
-#include <NitroTest/private/CarKotlin.hpp>
-#include <variant>
-#include <memory>
-#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroTest/private/JNamedVariant.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JCar.hpp>
-#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
-#include <NitroTest/private/PersonKotlin.hpp>
-#include <optional>
-#include <NitroTest/private/JPerson.hpp>
-#include <NitroModules/JNIConverter+Optional.hpp>
-#include <NitroModules/JSIConverter+JOptional.hpp>
-#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
-#include <vector>
-#include <NitroModules/JNIConverter+Array.hpp>
-#include <NitroModules/JSIConverter+JArrayClass.hpp>
-#include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
+#include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 
 namespace margelo::nitro::test {
 
@@ -90,10 +76,10 @@ namespace margelo::nitro::test {
   }
 
   // Methods
-  std::variant<std::string, CarKotlin> JHybridChildSpec::bounceVariant(const std::variant<std::string, CarKotlin>& variant) {
+  jni::local_ref<JNamedVariant> JHybridChildSpec::bounceVariant(const jni::local_ref<JNamedVariant>& variant) {
     static const auto __method = CxxPart::getClass()->getMethod<jni::local_ref<JNamedVariant>(jni::alias_ref<JNamedVariant> /* variant */)>("bounceVariant");
-    auto __result = __method(_javaPart, JNamedVariant::fromCpp(variant));
-    return __result->toCpp();
+    auto __result = __method(_javaPart, variant);
+    return __result;
   }
 
 } // namespace margelo::nitro::test

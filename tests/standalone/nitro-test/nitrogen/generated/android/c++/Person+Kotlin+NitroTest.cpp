@@ -6,23 +6,20 @@
 ///
 
 #include <NitroTest/private/Person+Kotlin+NitroTest.hpp>
+#include <NitroModules/JNIConverter.hpp>
 #include <NitroTest/Person.hpp>
-#include <NitroTest/private/PersonKotlin.hpp>
+#include <NitroTest/private/JPerson.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
 
 namespace margelo::nitro {
 
-  margelo::nitro::test::PersonKotlin JNIConverter<margelo::nitro::test::Person, margelo::nitro::test::PersonKotlin>::toJNI(const margelo::nitro::test::Person& value) {
-    return margelo::nitro::test::PersonKotlin(
-      JNIConverter<std::string, std::string>::toJNI(value.name),
-      JNIConverter<double, double>::toJNI(value.age)
-    );
+  jni::local_ref<margelo::nitro::test::JPerson> JNIConverter<margelo::nitro::test::Person, jni::local_ref<margelo::nitro::test::JPerson>>::toJNI(const margelo::nitro::test::Person& value) {
+    return margelo::nitro::test::JPerson::create(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.name), JNIConverter<double, jdouble>::toJNI(value.age));
   }
 
-  margelo::nitro::test::Person JNIConverter<margelo::nitro::test::Person, margelo::nitro::test::PersonKotlin>::fromJNI(const margelo::nitro::test::PersonKotlin& value) {
-    return margelo::nitro::test::Person(
-      JNIConverter<std::string, std::string>::fromJNI(value.name),
-      JNIConverter<double, double>::fromJNI(value.age)
-    );
+  margelo::nitro::test::Person JNIConverter<margelo::nitro::test::Person, jni::local_ref<margelo::nitro::test::JPerson>>::fromJNI(jni::alias_ref<margelo::nitro::test::JPerson> value) {
+    return margelo::nitro::test::Person(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(value->getName()), JNIConverter<double, jdouble>::fromJNI(value->getAge()));
   }
 
 } // namespace margelo::nitro

@@ -6,68 +6,34 @@
 ///
 
 #include <NitroTest/private/JVariant_Person_Car.hpp>
-#include <NitroTest/private/PersonKotlin.hpp>
-#include <NitroTest/private/CarKotlin.hpp>
-#include <variant>
 #include <NitroTest/private/JPerson.hpp>
 #include <NitroTest/private/JCar.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JNIConverter+String.hpp>
-#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
-#include <optional>
-#include <NitroModules/JNIConverter+Optional.hpp>
-#include <NitroModules/JSIConverter+JOptional.hpp>
-#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
-#include <vector>
-#include <NitroModules/JNIConverter+Array.hpp>
-#include <NitroModules/JSIConverter+JArrayClass.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <string>
-#include <NitroModules/JSIConverter+JString.hpp>
-#include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JVariant_Person_Car> JVariant_Person_Car::create_0(jni::alias_ref<JPerson> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Person_Car(jni::alias_ref<JPerson>)>("fromCpp_0");
-    return method(javaClassStatic(), value);
+
+  size_t JVariant_Person_Car::getIndex() const {
+    static const auto field = javaClassStatic()->getField<jint>("index");
+    return static_cast<size_t>(getFieldValue(field));
   }
 
-  jni::local_ref<JVariant_Person_Car> JVariant_Person_Car::create_1(jni::alias_ref<JCar> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Person_Car(jni::alias_ref<JCar>)>("fromCpp_1");
-    return method(javaClassStatic(), value);
+  jni::local_ref<JVariant_Person_Car> JVariant_Person_Car_impl::First::create(jni::alias_ref<JPerson> value) {
+    static const auto method = JVariant_Person_Car::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Person_Car>(jni::alias_ref<JPerson>)>("fromCpp_0");
+    return method(JVariant_Person_Car::javaClassStatic(), value);
   }
 
-  jni::local_ref<JVariant_Person_Car> JVariant_Person_Car::fromCpp(const std::variant<PersonKotlin, CarKotlin>& variant) {
-    switch (variant.index()) {
-      case 0: return create_0(JNIConverter<margelo::nitro::test::PersonKotlin, jni::local_ref<margelo::nitro::test::JPerson>>::toJNI(std::get<0>(variant)));
-      case 1: return create_1(JCar::fromCpp(std::get<1>(variant)));
-      default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
-    }
-  }
-
-  jni::local_ref<JPerson> JVariant_Person_Car_impl::First::getValue() const {
+  JVariant_Person_Car_impl::First::Value JVariant_Person_Car_impl::First::getValue() const {
     static const auto field = javaClassStatic()->getField<JPerson>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<JCar> JVariant_Person_Car_impl::Second::getValue() const {
+  jni::local_ref<JVariant_Person_Car> JVariant_Person_Car_impl::Second::create(jni::alias_ref<JCar> value) {
+    static const auto method = JVariant_Person_Car::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Person_Car>(jni::alias_ref<JCar>)>("fromCpp_1");
+    return method(JVariant_Person_Car::javaClassStatic(), value);
+  }
+
+  JVariant_Person_Car_impl::Second::Value JVariant_Person_Car_impl::Second::getValue() const {
     static const auto field = javaClassStatic()->getField<JCar>("value");
     return getFieldValue(field);
   }
 
-  /**
-   * Converts JVariant_Person_Car to std::variant<PersonKotlin, CarKotlin>
-   */
-  std::variant<PersonKotlin, CarKotlin> JVariant_Person_Car::toCpp() const {
-    if (isInstanceOf(JVariant_Person_Car_impl::First::javaClassStatic())) {
-      // It's a `PersonKotlin`
-      auto jniValue = static_cast<const JVariant_Person_Car_impl::First*>(this)->getValue();
-      return JNIConverter<margelo::nitro::test::PersonKotlin, jni::local_ref<margelo::nitro::test::JPerson>>::fromJNI(jniValue);
-    } else if (isInstanceOf(JVariant_Person_Car_impl::Second::javaClassStatic())) {
-      // It's a `CarKotlin`
-      auto jniValue = static_cast<const JVariant_Person_Car_impl::Second*>(this)->getValue();
-      return jniValue->toCpp();
-    }
-    throw std::invalid_argument("Variant is unknown Kotlin instance!");
-  }
 } // namespace margelo::nitro::test

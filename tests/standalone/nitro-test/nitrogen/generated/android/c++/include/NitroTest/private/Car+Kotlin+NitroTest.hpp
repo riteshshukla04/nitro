@@ -10,15 +10,14 @@
 #include <NitroModules/JNIConverter.hpp>
 // Forward declaration of `Car` to properly resolve imports.
 namespace margelo::nitro::test { struct Car; }
-// Forward declaration of `CarKotlin` to properly resolve imports.
-namespace margelo::nitro::test { struct CarKotlin; }
+#include <NitroTest/private/JCar.hpp>
 
 namespace margelo::nitro {
 
   template <>
-  struct JNIConverter<margelo::nitro::test::Car, margelo::nitro::test::CarKotlin> final {
-    static margelo::nitro::test::CarKotlin toJNI(const margelo::nitro::test::Car& value);
-    static margelo::nitro::test::Car fromJNI(const margelo::nitro::test::CarKotlin& value);
+  struct JNIConverter<margelo::nitro::test::Car, jni::local_ref<margelo::nitro::test::JCar>> final {
+    static jni::local_ref<margelo::nitro::test::JCar> toJNI(const margelo::nitro::test::Car& value);
+    static margelo::nitro::test::Car fromJNI(jni::alias_ref<margelo::nitro::test::JCar> value);
   };
 
 } // namespace margelo::nitro

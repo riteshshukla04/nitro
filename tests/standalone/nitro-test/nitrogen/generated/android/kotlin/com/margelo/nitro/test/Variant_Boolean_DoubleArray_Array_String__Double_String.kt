@@ -15,17 +15,17 @@ import com.facebook.proguard.annotations.DoNotStrip
  */
 @Suppress("ClassName")
 @DoNotStrip
-sealed class Variant_Boolean_DoubleArray_Array_String__Double_String {
+sealed class Variant_Boolean_DoubleArray_Array_String__Double_String private constructor(@DoNotStrip private val index: Int) {
   @DoNotStrip
-  data class First(@DoNotStrip val value: Boolean): Variant_Boolean_DoubleArray_Array_String__Double_String()
+  data class First(@DoNotStrip val value: Boolean): Variant_Boolean_DoubleArray_Array_String__Double_String(0)
   @DoNotStrip
-  data class Second(@DoNotStrip val value: DoubleArray): Variant_Boolean_DoubleArray_Array_String__Double_String()
+  data class Second(@DoNotStrip val value: DoubleArray): Variant_Boolean_DoubleArray_Array_String__Double_String(1)
   @DoNotStrip
-  data class Third(@DoNotStrip val value: Array<String>): Variant_Boolean_DoubleArray_Array_String__Double_String()
+  data class Third(@DoNotStrip val value: Array<String>): Variant_Boolean_DoubleArray_Array_String__Double_String(2)
   @DoNotStrip
-  data class Fourth(@DoNotStrip val value: Double): Variant_Boolean_DoubleArray_Array_String__Double_String()
+  data class Fourth(@DoNotStrip val value: Double): Variant_Boolean_DoubleArray_Array_String__Double_String(3)
   @DoNotStrip
-  data class Fifth(@DoNotStrip val value: String): Variant_Boolean_DoubleArray_Array_String__Double_String()
+  data class Fifth(@DoNotStrip val value: String): Variant_Boolean_DoubleArray_Array_String__Double_String(4)
 
   inline fun <reified T> asType(): T? {
     return when (this) {

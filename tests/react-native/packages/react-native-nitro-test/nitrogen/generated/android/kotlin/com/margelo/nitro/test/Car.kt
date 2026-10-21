@@ -52,7 +52,7 @@ data class Car(
   @Keep
   val someVariant: Variant_Double_String?
 ) {
-  /* primary constructor */
+
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

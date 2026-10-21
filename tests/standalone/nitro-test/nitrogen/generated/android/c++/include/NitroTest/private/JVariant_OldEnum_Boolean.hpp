@@ -8,47 +8,53 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
-#include <NitroTest/OldEnum.hpp>
-#include <variant>
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroTest/private/JOldEnum.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTest/private/OldEnum+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "Variant_OldEnum_Boolean".
-   */
+  namespace JVariant_OldEnum_Boolean_impl {
+    class First;
+    class Second;
+  }
+
+  /** The JNI representation of Kotlin's sealed Variant_OldEnum_Boolean class. */
   class JVariant_OldEnum_Boolean : public jni::JavaClass<JVariant_OldEnum_Boolean> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_OldEnum_Boolean;";
+    using Cases = std::tuple<JVariant_OldEnum_Boolean_impl::First, JVariant_OldEnum_Boolean_impl::Second>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<margelo::nitro::test::OldEnum, bool>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JVariant_OldEnum_Boolean> create_0(jni::alias_ref<JOldEnum> value);
-    static jni::local_ref<JVariant_OldEnum_Boolean> create_1(jboolean value);
-
-    static jni::local_ref<JVariant_OldEnum_Boolean> fromCpp(const std::variant<OldEnum, bool>& variant);
-
-    [[nodiscard]] std::variant<OldEnum, bool> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JVariant_OldEnum_Boolean_impl {
     class First final : public jni::JavaClass<First, JVariant_OldEnum_Boolean> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_OldEnum_Boolean$First;";
+      using Value = jni::local_ref<JOldEnum>;
 
-      [[nodiscard]] jni::local_ref<JOldEnum> getValue() const;
+      static jni::local_ref<JVariant_OldEnum_Boolean> create(jni::alias_ref<JOldEnum> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JVariant_OldEnum_Boolean> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_OldEnum_Boolean$Second;";
+      using Value = jboolean;
 
-      [[nodiscard]] jboolean getValue() const;
+      static jni::local_ref<JVariant_OldEnum_Boolean> create(jboolean value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JVariant_OldEnum_Boolean_impl
+  }
+
 } // namespace margelo::nitro::test

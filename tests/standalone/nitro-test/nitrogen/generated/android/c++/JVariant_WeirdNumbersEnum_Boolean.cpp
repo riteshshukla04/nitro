@@ -6,55 +6,35 @@
 ///
 
 #include <NitroTest/private/JVariant_WeirdNumbersEnum_Boolean.hpp>
-#include <NitroTest/WeirdNumbersEnum.hpp>
-#include <variant>
 #include <NitroTest/private/JWeirdNumbersEnum.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTest/private/WeirdNumbersEnum+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> JVariant_WeirdNumbersEnum_Boolean::create_0(jni::alias_ref<JWeirdNumbersEnum> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_WeirdNumbersEnum_Boolean(jni::alias_ref<JWeirdNumbersEnum>)>("fromCpp_0");
-    return method(javaClassStatic(), value);
+
+  size_t JVariant_WeirdNumbersEnum_Boolean::getIndex() const {
+    static const auto field = javaClassStatic()->getField<jint>("index");
+    return static_cast<size_t>(getFieldValue(field));
   }
 
-  jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> JVariant_WeirdNumbersEnum_Boolean::create_1(jboolean value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_WeirdNumbersEnum_Boolean(jboolean)>("fromCpp_1");
-    return method(javaClassStatic(), value);
+  jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> JVariant_WeirdNumbersEnum_Boolean_impl::First::create(jni::alias_ref<JWeirdNumbersEnum> value) {
+    static const auto method = JVariant_WeirdNumbersEnum_Boolean::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_WeirdNumbersEnum_Boolean>(jni::alias_ref<JWeirdNumbersEnum>)>("fromCpp_0");
+    return method(JVariant_WeirdNumbersEnum_Boolean::javaClassStatic(), value);
   }
 
-  jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> JVariant_WeirdNumbersEnum_Boolean::fromCpp(const std::variant<WeirdNumbersEnum, bool>& variant) {
-    switch (variant.index()) {
-      case 0: return create_0(JNIConverter<margelo::nitro::test::WeirdNumbersEnum, jni::local_ref<margelo::nitro::test::JWeirdNumbersEnum>>::toJNI(std::get<0>(variant)));
-      case 1: return create_1(JNIConverter<bool, jboolean>::toJNI(std::get<1>(variant)));
-      default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
-    }
-  }
-
-  jni::local_ref<JWeirdNumbersEnum> JVariant_WeirdNumbersEnum_Boolean_impl::First::getValue() const {
+  JVariant_WeirdNumbersEnum_Boolean_impl::First::Value JVariant_WeirdNumbersEnum_Boolean_impl::First::getValue() const {
     static const auto field = javaClassStatic()->getField<JWeirdNumbersEnum>("value");
     return getFieldValue(field);
   }
 
-  jboolean JVariant_WeirdNumbersEnum_Boolean_impl::Second::getValue() const {
+  jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> JVariant_WeirdNumbersEnum_Boolean_impl::Second::create(jboolean value) {
+    static const auto method = JVariant_WeirdNumbersEnum_Boolean::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_WeirdNumbersEnum_Boolean>(jboolean)>("fromCpp_1");
+    return method(JVariant_WeirdNumbersEnum_Boolean::javaClassStatic(), value);
+  }
+
+  JVariant_WeirdNumbersEnum_Boolean_impl::Second::Value JVariant_WeirdNumbersEnum_Boolean_impl::Second::getValue() const {
     static const auto field = javaClassStatic()->getField<jboolean>("value");
     return getFieldValue(field);
   }
 
-  /**
-   * Converts JVariant_WeirdNumbersEnum_Boolean to std::variant<WeirdNumbersEnum, bool>
-   */
-  std::variant<WeirdNumbersEnum, bool> JVariant_WeirdNumbersEnum_Boolean::toCpp() const {
-    if (isInstanceOf(JVariant_WeirdNumbersEnum_Boolean_impl::First::javaClassStatic())) {
-      // It's a `WeirdNumbersEnum`
-      auto jniValue = static_cast<const JVariant_WeirdNumbersEnum_Boolean_impl::First*>(this)->getValue();
-      return JNIConverter<margelo::nitro::test::WeirdNumbersEnum, jni::local_ref<margelo::nitro::test::JWeirdNumbersEnum>>::fromJNI(jniValue);
-    } else if (isInstanceOf(JVariant_WeirdNumbersEnum_Boolean_impl::Second::javaClassStatic())) {
-      // It's a `bool`
-      auto jniValue = static_cast<const JVariant_WeirdNumbersEnum_Boolean_impl::Second*>(this)->getValue();
-      return JNIConverter<bool, jboolean>::fromJNI(jniValue);
-    }
-    throw std::invalid_argument("Variant is unknown Kotlin instance!");
-  }
 } // namespace margelo::nitro::test

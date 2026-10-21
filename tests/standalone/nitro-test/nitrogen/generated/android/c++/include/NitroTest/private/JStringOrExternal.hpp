@@ -8,15 +8,10 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
-#include <memory>
-#include <NitroModules/JNIConverter+HybridObject.hpp>
-// Forward declaration of `JHybridSomeExternalObjectSpec` to properly resolve imports.
-namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; }
-#include <string>
-#include <variant>
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpecJavaPart.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
@@ -25,34 +20,43 @@ namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "StringOrExternal".
-   */
+  namespace JStringOrExternal_impl {
+    class First;
+    class Second;
+  }
+
+  /** The JNI representation of Kotlin's sealed StringOrExternal class. */
   class JStringOrExternal : public jni::JavaClass<JStringOrExternal> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/StringOrExternal;";
+    using Cases = std::tuple<JStringOrExternal_impl::First, JStringOrExternal_impl::Second>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, std::string>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JStringOrExternal> create_0(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> value);
-    static jni::local_ref<JStringOrExternal> create_1(jni::alias_ref<jni::JString> value);
-
-    static jni::local_ref<JStringOrExternal> fromCpp(const std::variant<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, std::string>& variant);
-
-    [[nodiscard]] std::variant<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, std::string> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JStringOrExternal_impl {
     class First final : public jni::JavaClass<First, JStringOrExternal> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/StringOrExternal$First;";
+      using Value = jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>;
 
-      [[nodiscard]] jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> getValue() const;
+      static jni::local_ref<JStringOrExternal> create(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JStringOrExternal> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/StringOrExternal$Second;";
+      using Value = jni::local_ref<jni::JString>;
 
-      [[nodiscard]] jni::local_ref<jni::JString> getValue() const;
+      static jni::local_ref<JStringOrExternal> create(jni::alias_ref<jni::JString> value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JStringOrExternal_impl
+  }
+
 } // namespace margelo::nitro::test

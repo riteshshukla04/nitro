@@ -20,12 +20,12 @@
 #include <vector>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
-#include <NitroTest/private/CarKotlin.hpp>
+#include <NitroTest/private/JCar.hpp>
 #include <string>
 #include <unordered_map>
 #include <NitroModules/JNIConverter+Map.hpp>
 #include <NitroModules/JSIConverter+JMap.hpp>
-#include <variant>
+#include <NitroTest/private/JVariant_Double_String.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
@@ -35,6 +35,8 @@
 #include <optional>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <NitroTest/private/JHybridBenchmarkObjectSwiftKotlinSpec.hpp>
@@ -90,10 +92,10 @@ namespace margelo::nitro::test {
     jdouble addNumbers(jdouble a, jdouble b);
     jni::local_ref<jni::JString> addStrings(const jni::local_ref<jni::JString>& a, const jni::local_ref<jni::JString>& b);
     jni::local_ref<jni::JArrayDouble> bounceNumbers(const jni::local_ref<jni::JArrayDouble>& array);
-    CarKotlin bounceCar(const CarKotlin& car);
+    jni::local_ref<JCar> bounceCar(const jni::local_ref<JCar>& car);
     jni::local_ref<jni::JMap<jni::JString, jni::JDouble>> bounceSimpleMap(const jni::local_ref<jni::JMap<jni::JString, jni::JDouble>>& map);
     jni::local_ref<jni::JString> tryOptionalParams(jdouble num, jboolean boo, const jni::local_ref<JOptional<jni::JString>>& str);
-    std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either);
+    jni::local_ref<JVariant_Double_String> passVariant(const jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String>& either);
     jni::local_ref<JArrayBuffer::JavaPart> bounceArrayBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
     jni::local_ref<JArrayBuffer::JavaPart> copyBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
     jdouble callbackSync(const Callback<double()>& callback);

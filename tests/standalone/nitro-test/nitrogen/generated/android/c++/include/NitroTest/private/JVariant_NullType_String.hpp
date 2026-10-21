@@ -8,11 +8,9 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroModules/Null.hpp>
-#include <string>
-#include <variant>
 #include <NitroModules/JNIConverter+Null.hpp>
 #include <NitroModules/JSIConverter+JNull.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
@@ -22,34 +20,43 @@ namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "Variant_NullType_String".
-   */
+  namespace JVariant_NullType_String_impl {
+    class First;
+    class Second;
+  }
+
+  /** The JNI representation of Kotlin's sealed Variant_NullType_String class. */
   class JVariant_NullType_String : public jni::JavaClass<JVariant_NullType_String> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_NullType_String;";
+    using Cases = std::tuple<JVariant_NullType_String_impl::First, JVariant_NullType_String_impl::Second>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<nitro::NullType, std::string>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JVariant_NullType_String> create_0(jni::alias_ref<JNull> value);
-    static jni::local_ref<JVariant_NullType_String> create_1(jni::alias_ref<jni::JString> value);
-
-    static jni::local_ref<JVariant_NullType_String> fromCpp(const std::variant<nitro::NullType, std::string>& variant);
-
-    [[nodiscard]] std::variant<nitro::NullType, std::string> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JVariant_NullType_String_impl {
     class First final : public jni::JavaClass<First, JVariant_NullType_String> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_NullType_String$First;";
+      using Value = jni::local_ref<JNull>;
 
-      [[nodiscard]] jni::local_ref<JNull> getValue() const;
+      static jni::local_ref<JVariant_NullType_String> create(jni::alias_ref<JNull> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JVariant_NullType_String> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_NullType_String$Second;";
+      using Value = jni::local_ref<jni::JString>;
 
-      [[nodiscard]] jni::local_ref<jni::JString> getValue() const;
+      static jni::local_ref<JVariant_NullType_String> create(jni::alias_ref<jni::JString> value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JVariant_NullType_String_impl
+  }
+
 } // namespace margelo::nitro::test

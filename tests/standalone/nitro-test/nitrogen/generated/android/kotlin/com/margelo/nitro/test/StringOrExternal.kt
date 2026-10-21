@@ -15,11 +15,11 @@ import com.margelo.nitro.test.external.HybridSomeExternalObjectSpec
  */
 @Suppress("ClassName")
 @DoNotStrip
-sealed class StringOrExternal {
+sealed class StringOrExternal private constructor(@DoNotStrip private val index: Int) {
   @DoNotStrip
-  data class First(@DoNotStrip val value: com.margelo.nitro.test.external.HybridSomeExternalObjectSpec): StringOrExternal()
+  data class First(@DoNotStrip val value: com.margelo.nitro.test.external.HybridSomeExternalObjectSpec): StringOrExternal(0)
   @DoNotStrip
-  data class Second(@DoNotStrip val value: String): StringOrExternal()
+  data class Second(@DoNotStrip val value: String): StringOrExternal(1)
 
   inline fun <reified T> asType(): T? {
     return when (this) {

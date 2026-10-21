@@ -6,57 +6,37 @@
 ///
 
 #include <NitroTest/private/JStringOrExternal.hpp>
-#include <memory>
-#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
-#include <string>
-#include <variant>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JStringOrExternal> JStringOrExternal::create_0(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JStringOrExternal(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>)>("fromCpp_0");
-    return method(javaClassStatic(), value);
+
+  size_t JStringOrExternal::getIndex() const {
+    static const auto field = javaClassStatic()->getField<jint>("index");
+    return static_cast<size_t>(getFieldValue(field));
   }
 
-  jni::local_ref<JStringOrExternal> JStringOrExternal::create_1(jni::alias_ref<jni::JString> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JStringOrExternal(jni::alias_ref<jni::JString>)>("fromCpp_1");
-    return method(javaClassStatic(), value);
+  jni::local_ref<JStringOrExternal> JStringOrExternal_impl::First::create(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> value) {
+    static const auto method = JStringOrExternal::javaClassStatic()->getStaticMethod<jni::local_ref<JStringOrExternal>(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>)>("fromCpp_0");
+    return method(JStringOrExternal::javaClassStatic(), value);
   }
 
-  jni::local_ref<JStringOrExternal> JStringOrExternal::fromCpp(const std::variant<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, std::string>& variant) {
-    switch (variant.index()) {
-      case 0: return create_0(JNIConverter<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::toJNI(std::get<0>(variant)));
-      case 1: return create_1(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<1>(variant)));
-      default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
-    }
-  }
-
-  jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> JStringOrExternal_impl::First::getValue() const {
+  JStringOrExternal_impl::First::Value JStringOrExternal_impl::First::getValue() const {
     static const auto field = javaClassStatic()->getField<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<jni::JString> JStringOrExternal_impl::Second::getValue() const {
+  jni::local_ref<JStringOrExternal> JStringOrExternal_impl::Second::create(jni::alias_ref<jni::JString> value) {
+    static const auto method = JStringOrExternal::javaClassStatic()->getStaticMethod<jni::local_ref<JStringOrExternal>(jni::alias_ref<jni::JString>)>("fromCpp_1");
+    return method(JStringOrExternal::javaClassStatic(), value);
+  }
+
+  JStringOrExternal_impl::Second::Value JStringOrExternal_impl::Second::getValue() const {
     static const auto field = javaClassStatic()->getField<jni::JString>("value");
     return getFieldValue(field);
   }
 
-  /**
-   * Converts JStringOrExternal to std::variant<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, std::string>
-   */
-  std::variant<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, std::string> JStringOrExternal::toCpp() const {
-    if (isInstanceOf(JStringOrExternal_impl::First::javaClassStatic())) {
-      // It's a `std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>`
-      auto jniValue = static_cast<const JStringOrExternal_impl::First*>(this)->getValue();
-      return JNIConverter<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::fromJNI(jniValue);
-    } else if (isInstanceOf(JStringOrExternal_impl::Second::javaClassStatic())) {
-      // It's a `std::string`
-      auto jniValue = static_cast<const JStringOrExternal_impl::Second*>(this)->getValue();
-      return JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(jniValue);
-    }
-    throw std::invalid_argument("Variant is unknown Kotlin instance!");
-  }
 } // namespace margelo::nitro::test

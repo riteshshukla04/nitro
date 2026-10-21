@@ -8,51 +8,54 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
-#include <memory>
-#include <NitroModules/JNIConverter+HybridObject.hpp>
-// Forward declaration of `JHybridTestObjectSwiftKotlinSpec` to properly resolve imports.
-namespace margelo::nitro::test { class JHybridTestObjectSwiftKotlinSpec; }
-#include <NitroTest/private/PersonKotlin.hpp>
-#include <variant>
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroTest/private/JHybridTestObjectSwiftKotlinSpecJavaPart.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTest/private/JPerson.hpp>
-#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "Variant_HybridTestObjectSwiftKotlinSpec_Person".
-   */
+  namespace JVariant_HybridTestObjectSwiftKotlinSpec_Person_impl {
+    class First;
+    class Second;
+  }
+
+  /** The JNI representation of Kotlin's sealed Variant_HybridTestObjectSwiftKotlinSpec_Person class. */
   class JVariant_HybridTestObjectSwiftKotlinSpec_Person : public jni::JavaClass<JVariant_HybridTestObjectSwiftKotlinSpec_Person> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_HybridTestObjectSwiftKotlinSpec_Person;";
+    using Cases = std::tuple<JVariant_HybridTestObjectSwiftKotlinSpec_Person_impl::First, JVariant_HybridTestObjectSwiftKotlinSpec_Person_impl::Second>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<std::shared_ptr<margelo::nitro::test::JHybridTestObjectSwiftKotlinSpec>, margelo::nitro::test::PersonKotlin>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JVariant_HybridTestObjectSwiftKotlinSpec_Person> create_0(jni::alias_ref<JHybridTestObjectSwiftKotlinSpecJavaPart> value);
-    static jni::local_ref<JVariant_HybridTestObjectSwiftKotlinSpec_Person> create_1(jni::alias_ref<JPerson> value);
-
-    static jni::local_ref<JVariant_HybridTestObjectSwiftKotlinSpec_Person> fromCpp(const std::variant<std::shared_ptr<JHybridTestObjectSwiftKotlinSpec>, PersonKotlin>& variant);
-
-    [[nodiscard]] std::variant<std::shared_ptr<JHybridTestObjectSwiftKotlinSpec>, PersonKotlin> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JVariant_HybridTestObjectSwiftKotlinSpec_Person_impl {
     class First final : public jni::JavaClass<First, JVariant_HybridTestObjectSwiftKotlinSpec_Person> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_HybridTestObjectSwiftKotlinSpec_Person$First;";
+      using Value = jni::local_ref<JHybridTestObjectSwiftKotlinSpecJavaPart>;
 
-      [[nodiscard]] jni::local_ref<JHybridTestObjectSwiftKotlinSpecJavaPart> getValue() const;
+      static jni::local_ref<JVariant_HybridTestObjectSwiftKotlinSpec_Person> create(jni::alias_ref<JHybridTestObjectSwiftKotlinSpecJavaPart> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JVariant_HybridTestObjectSwiftKotlinSpec_Person> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_HybridTestObjectSwiftKotlinSpec_Person$Second;";
+      using Value = jni::local_ref<JPerson>;
 
-      [[nodiscard]] jni::local_ref<JPerson> getValue() const;
+      static jni::local_ref<JVariant_HybridTestObjectSwiftKotlinSpec_Person> create(jni::alias_ref<JPerson> value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JVariant_HybridTestObjectSwiftKotlinSpec_Person_impl
+  }
+
 } // namespace margelo::nitro::test

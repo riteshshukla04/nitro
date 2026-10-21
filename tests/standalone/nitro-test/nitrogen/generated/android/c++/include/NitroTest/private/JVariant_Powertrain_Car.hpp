@@ -8,62 +8,52 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
-#include <NitroTest/Powertrain.hpp>
-#include <NitroTest/private/CarKotlin.hpp>
-#include <variant>
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <NitroTest/private/JCar.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JNIConverter+String.hpp>
-#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
-#include <NitroTest/private/PersonKotlin.hpp>
-#include <optional>
-#include <NitroTest/private/JPerson.hpp>
-#include <NitroModules/JNIConverter+Optional.hpp>
-#include <NitroModules/JSIConverter+JOptional.hpp>
-#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
-#include <vector>
-#include <NitroModules/JNIConverter+Array.hpp>
-#include <NitroModules/JSIConverter+JArrayClass.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <string>
-#include <NitroModules/JSIConverter+JString.hpp>
-#include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "Variant_Powertrain_Car".
-   */
+  namespace JVariant_Powertrain_Car_impl {
+    class First;
+    class Second;
+  }
+
+  /** The JNI representation of Kotlin's sealed Variant_Powertrain_Car class. */
   class JVariant_Powertrain_Car : public jni::JavaClass<JVariant_Powertrain_Car> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Powertrain_Car;";
+    using Cases = std::tuple<JVariant_Powertrain_Car_impl::First, JVariant_Powertrain_Car_impl::Second>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<margelo::nitro::test::Powertrain, margelo::nitro::test::CarKotlin>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JVariant_Powertrain_Car> create_0(jni::alias_ref<JPowertrain> value);
-    static jni::local_ref<JVariant_Powertrain_Car> create_1(jni::alias_ref<JCar> value);
-
-    static jni::local_ref<JVariant_Powertrain_Car> fromCpp(const std::variant<Powertrain, CarKotlin>& variant);
-
-    [[nodiscard]] std::variant<Powertrain, CarKotlin> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JVariant_Powertrain_Car_impl {
     class First final : public jni::JavaClass<First, JVariant_Powertrain_Car> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Powertrain_Car$First;";
+      using Value = jni::local_ref<JPowertrain>;
 
-      [[nodiscard]] jni::local_ref<JPowertrain> getValue() const;
+      static jni::local_ref<JVariant_Powertrain_Car> create(jni::alias_ref<JPowertrain> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JVariant_Powertrain_Car> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Powertrain_Car$Second;";
+      using Value = jni::local_ref<JCar>;
 
-      [[nodiscard]] jni::local_ref<JCar> getValue() const;
+      static jni::local_ref<JVariant_Powertrain_Car> create(jni::alias_ref<JCar> value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JVariant_Powertrain_Car_impl
+  }
+
 } // namespace margelo::nitro::test

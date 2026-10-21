@@ -6,52 +6,34 @@
 ///
 
 #include <NitroTest/private/JVariant_Boolean_Double.hpp>
-#include <variant>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JVariant_Boolean_Double> JVariant_Boolean_Double::create_0(jboolean value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Boolean_Double(jboolean)>("fromCpp_0");
-    return method(javaClassStatic(), value);
+
+  size_t JVariant_Boolean_Double::getIndex() const {
+    static const auto field = javaClassStatic()->getField<jint>("index");
+    return static_cast<size_t>(getFieldValue(field));
   }
 
-  jni::local_ref<JVariant_Boolean_Double> JVariant_Boolean_Double::create_1(jdouble value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Boolean_Double(jdouble)>("fromCpp_1");
-    return method(javaClassStatic(), value);
+  jni::local_ref<JVariant_Boolean_Double> JVariant_Boolean_Double_impl::First::create(jboolean value) {
+    static const auto method = JVariant_Boolean_Double::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Boolean_Double>(jboolean)>("fromCpp_0");
+    return method(JVariant_Boolean_Double::javaClassStatic(), value);
   }
 
-  jni::local_ref<JVariant_Boolean_Double> JVariant_Boolean_Double::fromCpp(const std::variant<bool, double>& variant) {
-    switch (variant.index()) {
-      case 0: return create_0(JNIConverter<bool, jboolean>::toJNI(std::get<0>(variant)));
-      case 1: return create_1(JNIConverter<double, jdouble>::toJNI(std::get<1>(variant)));
-      default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
-    }
-  }
-
-  jboolean JVariant_Boolean_Double_impl::First::getValue() const {
+  JVariant_Boolean_Double_impl::First::Value JVariant_Boolean_Double_impl::First::getValue() const {
     static const auto field = javaClassStatic()->getField<jboolean>("value");
     return getFieldValue(field);
   }
 
-  jdouble JVariant_Boolean_Double_impl::Second::getValue() const {
+  jni::local_ref<JVariant_Boolean_Double> JVariant_Boolean_Double_impl::Second::create(jdouble value) {
+    static const auto method = JVariant_Boolean_Double::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_Boolean_Double>(jdouble)>("fromCpp_1");
+    return method(JVariant_Boolean_Double::javaClassStatic(), value);
+  }
+
+  JVariant_Boolean_Double_impl::Second::Value JVariant_Boolean_Double_impl::Second::getValue() const {
     static const auto field = javaClassStatic()->getField<jdouble>("value");
     return getFieldValue(field);
   }
 
-  /**
-   * Converts JVariant_Boolean_Double to std::variant<bool, double>
-   */
-  std::variant<bool, double> JVariant_Boolean_Double::toCpp() const {
-    if (isInstanceOf(JVariant_Boolean_Double_impl::First::javaClassStatic())) {
-      // It's a `bool`
-      auto jniValue = static_cast<const JVariant_Boolean_Double_impl::First*>(this)->getValue();
-      return JNIConverter<bool, jboolean>::fromJNI(jniValue);
-    } else if (isInstanceOf(JVariant_Boolean_Double_impl::Second::javaClassStatic())) {
-      // It's a `double`
-      auto jniValue = static_cast<const JVariant_Boolean_Double_impl::Second*>(this)->getValue();
-      return JNIConverter<double, jdouble>::fromJNI(jniValue);
-    }
-    throw std::invalid_argument("Variant is unknown Kotlin instance!");
-  }
 } // namespace margelo::nitro::test

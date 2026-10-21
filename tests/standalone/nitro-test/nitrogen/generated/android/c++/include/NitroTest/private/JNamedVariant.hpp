@@ -8,60 +8,53 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
-#include <string>
-#include <NitroTest/private/CarKotlin.hpp>
-#include <variant>
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JCar.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
-#include <NitroTest/private/PersonKotlin.hpp>
-#include <optional>
-#include <NitroTest/private/JPerson.hpp>
-#include <NitroModules/JNIConverter+Optional.hpp>
-#include <NitroModules/JSIConverter+JOptional.hpp>
-#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
-#include <vector>
-#include <NitroModules/JNIConverter+Array.hpp>
-#include <NitroModules/JSIConverter+JArrayClass.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "NamedVariant".
-   */
+  namespace JNamedVariant_impl {
+    class First;
+    class Second;
+  }
+
+  /** The JNI representation of Kotlin's sealed NamedVariant class. */
   class JNamedVariant : public jni::JavaClass<JNamedVariant> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/NamedVariant;";
+    using Cases = std::tuple<JNamedVariant_impl::First, JNamedVariant_impl::Second>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<std::string, margelo::nitro::test::CarKotlin>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JNamedVariant> create_0(jni::alias_ref<jni::JString> value);
-    static jni::local_ref<JNamedVariant> create_1(jni::alias_ref<JCar> value);
-
-    static jni::local_ref<JNamedVariant> fromCpp(const std::variant<std::string, CarKotlin>& variant);
-
-    [[nodiscard]] std::variant<std::string, CarKotlin> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JNamedVariant_impl {
     class First final : public jni::JavaClass<First, JNamedVariant> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/NamedVariant$First;";
+      using Value = jni::local_ref<jni::JString>;
 
-      [[nodiscard]] jni::local_ref<jni::JString> getValue() const;
+      static jni::local_ref<JNamedVariant> create(jni::alias_ref<jni::JString> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JNamedVariant> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/NamedVariant$Second;";
+      using Value = jni::local_ref<JCar>;
 
-      [[nodiscard]] jni::local_ref<JCar> getValue() const;
+      static jni::local_ref<JNamedVariant> create(jni::alias_ref<JCar> value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JNamedVariant_impl
+  }
+
 } // namespace margelo::nitro::test

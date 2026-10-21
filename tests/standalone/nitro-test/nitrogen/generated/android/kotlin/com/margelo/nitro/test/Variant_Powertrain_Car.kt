@@ -15,11 +15,11 @@ import com.facebook.proguard.annotations.DoNotStrip
  */
 @Suppress("ClassName")
 @DoNotStrip
-sealed class Variant_Powertrain_Car {
+sealed class Variant_Powertrain_Car private constructor(@DoNotStrip private val index: Int) {
   @DoNotStrip
-  data class First(@DoNotStrip val value: Powertrain): Variant_Powertrain_Car()
+  data class First(@DoNotStrip val value: Powertrain): Variant_Powertrain_Car(0)
   @DoNotStrip
-  data class Second(@DoNotStrip val value: Car): Variant_Powertrain_Car()
+  data class Second(@DoNotStrip val value: Car): Variant_Powertrain_Car(1)
 
   inline fun <reified T> asType(): T? {
     return when (this) {

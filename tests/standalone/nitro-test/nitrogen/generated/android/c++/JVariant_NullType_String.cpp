@@ -7,55 +7,36 @@
 
 #include <NitroTest/private/JVariant_NullType_String.hpp>
 #include <NitroModules/Null.hpp>
-#include <string>
-#include <variant>
 #include <NitroModules/JNIConverter+Null.hpp>
 #include <NitroModules/JSIConverter+JNull.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JVariant_NullType_String> JVariant_NullType_String::create_0(jni::alias_ref<JNull> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_NullType_String(jni::alias_ref<JNull>)>("fromCpp_0");
-    return method(javaClassStatic(), value);
+
+  size_t JVariant_NullType_String::getIndex() const {
+    static const auto field = javaClassStatic()->getField<jint>("index");
+    return static_cast<size_t>(getFieldValue(field));
   }
 
-  jni::local_ref<JVariant_NullType_String> JVariant_NullType_String::create_1(jni::alias_ref<jni::JString> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_NullType_String(jni::alias_ref<jni::JString>)>("fromCpp_1");
-    return method(javaClassStatic(), value);
+  jni::local_ref<JVariant_NullType_String> JVariant_NullType_String_impl::First::create(jni::alias_ref<JNull> value) {
+    static const auto method = JVariant_NullType_String::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_NullType_String>(jni::alias_ref<JNull>)>("fromCpp_0");
+    return method(JVariant_NullType_String::javaClassStatic(), value);
   }
 
-  jni::local_ref<JVariant_NullType_String> JVariant_NullType_String::fromCpp(const std::variant<nitro::NullType, std::string>& variant) {
-    switch (variant.index()) {
-      case 0: return create_0(JNIConverter<NullType, jni::local_ref<JNull>>::toJNI(std::get<0>(variant)));
-      case 1: return create_1(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<1>(variant)));
-      default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
-    }
-  }
-
-  jni::local_ref<JNull> JVariant_NullType_String_impl::First::getValue() const {
+  JVariant_NullType_String_impl::First::Value JVariant_NullType_String_impl::First::getValue() const {
     static const auto field = javaClassStatic()->getField<JNull>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<jni::JString> JVariant_NullType_String_impl::Second::getValue() const {
+  jni::local_ref<JVariant_NullType_String> JVariant_NullType_String_impl::Second::create(jni::alias_ref<jni::JString> value) {
+    static const auto method = JVariant_NullType_String::javaClassStatic()->getStaticMethod<jni::local_ref<JVariant_NullType_String>(jni::alias_ref<jni::JString>)>("fromCpp_1");
+    return method(JVariant_NullType_String::javaClassStatic(), value);
+  }
+
+  JVariant_NullType_String_impl::Second::Value JVariant_NullType_String_impl::Second::getValue() const {
     static const auto field = javaClassStatic()->getField<jni::JString>("value");
     return getFieldValue(field);
   }
 
-  /**
-   * Converts JVariant_NullType_String to std::variant<nitro::NullType, std::string>
-   */
-  std::variant<nitro::NullType, std::string> JVariant_NullType_String::toCpp() const {
-    if (isInstanceOf(JVariant_NullType_String_impl::First::javaClassStatic())) {
-      // It's a `nitro::NullType`
-      auto jniValue = static_cast<const JVariant_NullType_String_impl::First*>(this)->getValue();
-      return JNIConverter<NullType, jni::local_ref<JNull>>::fromJNI(jniValue);
-    } else if (isInstanceOf(JVariant_NullType_String_impl::Second::javaClassStatic())) {
-      // It's a `std::string`
-      auto jniValue = static_cast<const JVariant_NullType_String_impl::Second*>(this)->getValue();
-      return JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(jniValue);
-    }
-    throw std::invalid_argument("Variant is unknown Kotlin instance!");
-  }
 } // namespace margelo::nitro::test

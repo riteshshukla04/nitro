@@ -10,15 +10,14 @@
 #include <NitroModules/JNIConverter.hpp>
 // Forward declaration of `Person` to properly resolve imports.
 namespace margelo::nitro::test { struct Person; }
-// Forward declaration of `PersonKotlin` to properly resolve imports.
-namespace margelo::nitro::test { struct PersonKotlin; }
+#include <NitroTest/private/JPerson.hpp>
 
 namespace margelo::nitro {
 
   template <>
-  struct JNIConverter<margelo::nitro::test::Person, margelo::nitro::test::PersonKotlin> final {
-    static margelo::nitro::test::PersonKotlin toJNI(const margelo::nitro::test::Person& value);
-    static margelo::nitro::test::Person fromJNI(const margelo::nitro::test::PersonKotlin& value);
+  struct JNIConverter<margelo::nitro::test::Person, jni::local_ref<margelo::nitro::test::JPerson>> final {
+    static jni::local_ref<margelo::nitro::test::JPerson> toJNI(const margelo::nitro::test::Person& value);
+    static margelo::nitro::test::Person fromJNI(jni::alias_ref<margelo::nitro::test::JPerson> value);
   };
 
 } // namespace margelo::nitro

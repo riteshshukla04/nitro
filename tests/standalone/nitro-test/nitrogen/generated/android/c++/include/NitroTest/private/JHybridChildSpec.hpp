@@ -13,9 +13,10 @@
 #include <NitroTest/private/JHybridChildSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <string>
-#include <NitroTest/private/CarKotlin.hpp>
-#include <variant>
+#include <NitroTest/private/JNamedVariant.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroTest/private/JCar.hpp>
 #include <NitroTest/private/JHybridChildSpec.hpp>
 #include <memory>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
@@ -65,7 +66,7 @@ namespace margelo::nitro::test {
 
   public:
     // Methods
-    std::variant<std::string, CarKotlin> bounceVariant(const std::variant<std::string, CarKotlin>& variant);
+    jni::local_ref<JNamedVariant> bounceVariant(const jni::local_ref<JNamedVariant>& variant);
 
   public:
     // Constructor and static members

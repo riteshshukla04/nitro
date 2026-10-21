@@ -8,47 +8,53 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
-#include <NitroTest/WeirdNumbersEnum.hpp>
-#include <variant>
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroTest/private/JWeirdNumbersEnum.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTest/private/WeirdNumbersEnum+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "Variant_WeirdNumbersEnum_Boolean".
-   */
+  namespace JVariant_WeirdNumbersEnum_Boolean_impl {
+    class First;
+    class Second;
+  }
+
+  /** The JNI representation of Kotlin's sealed Variant_WeirdNumbersEnum_Boolean class. */
   class JVariant_WeirdNumbersEnum_Boolean : public jni::JavaClass<JVariant_WeirdNumbersEnum_Boolean> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_WeirdNumbersEnum_Boolean;";
+    using Cases = std::tuple<JVariant_WeirdNumbersEnum_Boolean_impl::First, JVariant_WeirdNumbersEnum_Boolean_impl::Second>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<margelo::nitro::test::WeirdNumbersEnum, bool>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> create_0(jni::alias_ref<JWeirdNumbersEnum> value);
-    static jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> create_1(jboolean value);
-
-    static jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> fromCpp(const std::variant<WeirdNumbersEnum, bool>& variant);
-
-    [[nodiscard]] std::variant<WeirdNumbersEnum, bool> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JVariant_WeirdNumbersEnum_Boolean_impl {
     class First final : public jni::JavaClass<First, JVariant_WeirdNumbersEnum_Boolean> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_WeirdNumbersEnum_Boolean$First;";
+      using Value = jni::local_ref<JWeirdNumbersEnum>;
 
-      [[nodiscard]] jni::local_ref<JWeirdNumbersEnum> getValue() const;
+      static jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> create(jni::alias_ref<JWeirdNumbersEnum> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JVariant_WeirdNumbersEnum_Boolean> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_WeirdNumbersEnum_Boolean$Second;";
+      using Value = jboolean;
 
-      [[nodiscard]] jboolean getValue() const;
+      static jni::local_ref<JVariant_WeirdNumbersEnum_Boolean> create(jboolean value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JVariant_WeirdNumbersEnum_Boolean_impl
+  }
+
 } // namespace margelo::nitro::test
