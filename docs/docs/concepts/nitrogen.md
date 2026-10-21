@@ -320,8 +320,8 @@ To implement `Math` now, you just need to implement the spec:
   <TabItem value="kotlin" label="Kotlin">
     ```kotlin title="HybridMath.kt"
     class HybridMath : HybridMathSpec() {
-      companion object {
-        fun add(a: Double, b: Double): Double {
+      companion object : HybridMathSpec.Companion {
+        override fun add(a: Double, b: Double): Double {
           return a + b
         }
       }

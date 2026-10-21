@@ -6,6 +6,10 @@ import NitroModules
 #endif
 
 class HybridBenchmarkObjectSwift: HybridBenchmarkObjectSwiftKotlinSpec {
+  required override init() {
+    super.init()
+  }
+
   private var pendingPromise: (any Promise<Double>)?
   var numberValue: Double = 0.0
 

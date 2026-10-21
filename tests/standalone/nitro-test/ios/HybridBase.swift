@@ -9,6 +9,10 @@ import NitroModules
 import NitroTestExternal
 
 class HybridBase: HybridBaseSpec {
+  required override init() {
+    super.init()
+  }
+
   static func createAlternativeBase() -> any HybridBaseSpec {
     return HybridAlternativeBase()
   }

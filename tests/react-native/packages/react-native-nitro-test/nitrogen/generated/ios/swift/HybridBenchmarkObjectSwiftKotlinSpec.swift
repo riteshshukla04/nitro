@@ -9,6 +9,9 @@ public import NitroModules
 
 /// See ``HybridBenchmarkObjectSwiftKotlinSpec``
 public protocol HybridBenchmarkObjectSwiftKotlinSpec_protocol: HybridObject {
+  // Constructor
+  init() throws
+
   // Properties
   var numberValue: Double { get set }
   var thisObject: (any HybridBenchmarkObjectSwiftKotlinSpec) { get }
@@ -29,6 +32,12 @@ public protocol HybridBenchmarkObjectSwiftKotlinSpec_protocol: HybridObject {
   func createPendingPromise() throws -> any Promise<Double>
   func resolvePendingPromiseOnWorker() throws -> Void
   func newBenchmarkObject() throws -> (any HybridBenchmarkObjectSwiftKotlinSpec)
+
+  // Static Properties
+
+
+  // Static Methods
+
 }
 
 public extension HybridBenchmarkObjectSwiftKotlinSpec_protocol {

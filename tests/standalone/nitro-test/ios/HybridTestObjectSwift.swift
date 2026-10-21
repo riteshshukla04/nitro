@@ -13,6 +13,10 @@ import NitroTestExternal
 import os
 
 class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
+  required override init() {
+    super.init()
+  }
+
   static let readonlyNumber: Double = 42.0
   private static let sharedNumberStorage = OSAllocatedUnfairLock(initialState: 0.0)
   static var sharedNumber: Double {

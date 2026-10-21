@@ -9,11 +9,20 @@ public import NitroModules
 
 /// See ``HybridChildSpec``
 public protocol HybridChildSpec_protocol: HybridObject, HybridBaseSpec_protocol {
+  // Constructor
+  init() throws
+
   // Properties
   var childValue: Double { get }
 
   // Methods
   func bounceVariant(variant: NamedVariant) throws -> NamedVariant
+
+  // Static Properties
+
+
+  // Static Methods
+
 }
 
 public extension HybridChildSpec_protocol {

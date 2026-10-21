@@ -9,6 +9,10 @@ import NitroModules
 import NitroTestExternal
 
 class HybridSomeInternalObject: HybridSomeExternalObjectSpec {
+  required override init() {
+    super.init()
+  }
+
   func getValue() throws -> String {
     return "This is overridden!"
   }

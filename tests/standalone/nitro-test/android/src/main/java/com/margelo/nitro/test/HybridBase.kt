@@ -9,12 +9,12 @@ import com.margelo.nitro.test.external.HybridSomeExternalObjectSpec
 @Keep
 @DoNotStrip
 open class HybridBase : HybridBaseSpec() {
-  companion object {
+  companion object : HybridBaseSpec.Companion {
     @JvmStatic
-    fun createAlternativeBase(): HybridBaseSpec = HybridAlternativeBase()
+    override fun createAlternativeBase(): HybridBaseSpec = HybridAlternativeBase()
 
     @JvmStatic
-    fun createInternalExternalObject(): HybridSomeExternalObjectSpec = HybridSomeInternalObject()
+    override fun createInternalExternalObject(): HybridSomeExternalObjectSpec = HybridSomeInternalObject()
   }
 
   override val baseValue: Double

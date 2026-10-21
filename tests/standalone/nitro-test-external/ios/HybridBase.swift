@@ -1,6 +1,10 @@
 import NitroModules
 
 class HybridBase: HybridBaseSpec {
+  required override init() {
+    super.init()
+  }
+
   var baseValue: Double {
     return 20
   }

@@ -8,6 +8,10 @@
 import NitroModules
 
 class HybridSomeExternalObject: HybridSomeExternalObjectSpec {
+  required override init() {
+    super.init()
+  }
+
   func getValue() throws -> String {
     return "Hello world!"
   }

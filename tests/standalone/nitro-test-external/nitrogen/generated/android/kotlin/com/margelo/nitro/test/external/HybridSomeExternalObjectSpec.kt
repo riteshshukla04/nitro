@@ -60,7 +60,15 @@ abstract class HybridSomeExternalObjectSpec: HybridObject() {
     return CxxPart(this)
   }
 
-  companion object {
+  interface Companion {
+    // Static Properties
+
+
+    // Static Methods
+
+  }
+
+  protected companion object Bridge {
     protected const val TAG = "HybridSomeExternalObjectSpec"
 
     // Constructor

@@ -2,6 +2,8 @@ import type { Language } from '../getPlatformSpecs.js'
 import { Method, type MethodOptions, type MethodSignatureOptions } from './Method.js'
 
 export interface StaticMethodOptions extends MethodOptions {
+  /** Swift only: declare a static protocol requirement rather than a class method. */
+  readonly protocolRequirement?: boolean
   /** Swift only: overrides the superclass's `class func` with the same signature. */
   readonly override?: boolean
   readonly virtual?: never
@@ -29,9 +31,8 @@ export class StaticMethod extends Method<StaticMethodOptions> {
       case 'swift': {
         let throws = ''
         if (options.throwing !== false) throws = ' throws'
-        // Swift only declares static methods on classes, where a subclass can
-        // override a `class func` with the same signature.
-        let signature = `class func ${this.name}(${parameters.join(', ')})${throws} -> ${returnType}`
+        const keyword = options.protocolRequirement ? 'static' : 'class'
+        let signature = `${keyword} func ${this.name}(${parameters.join(', ')})${throws} -> ${returnType}`
         if (options.override) signature = `override ${signature}`
         if (options.access != null) signature = `${options.access} ${signature}`
         if (options.inline) {

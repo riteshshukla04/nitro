@@ -6,6 +6,7 @@ import { createFileMetadataString } from '../helpers.js'
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
 import type { SourceFile } from '../SourceFile.js'
 import { HybridObjectType } from '../types/HybridObjectType.js'
+import { StaticMethod } from '../StaticMethod.js'
 import { createSwiftHybridObjectCxxBridge } from './SwiftHybridObjectBridge.js'
 import { getImportsCode } from '../getImportCode.js'
 import { getAllTypes } from '../getAllTypes.js'
@@ -18,8 +19,19 @@ export function createSwiftHybridObject(spec: HybridObjectSpec<'swift'>): Source
   const conformances = swiftType.getProtocolConformances()
   const name = getHybridObjectName(spec.name)
   const protocolName = name.HybridTSpec
+  const constructor = spec.constructor?.getDeclaration('swift') ?? ''
   const properties = spec.properties.map((p) => p.getCode('swift')).join('\n')
   const methods = spec.methods.map((method) => method.getDeclaration('swift')).join('\n')
+  const staticProperties = spec.staticProperties.map((property) => property.getCode('swift')).join('\n')
+  const staticMethods = spec.staticMethods
+    .map((method) => {
+      const requirement = new StaticMethod(method.name, method.returnType, method.parameters, {
+        ...method.options,
+        protocolRequirement: true,
+      })
+      return requirement.getDeclaration('swift')
+    })
+    .join('\n')
   const extraImports = [
     ...spec.properties.flatMap((p) => p.getRequiredImports('swift')),
     ...spec.staticProperties.flatMap((p) => p.getRequiredImports('swift')),
@@ -86,11 +98,20 @@ ${imports}
 
 /// See \`\`${protocolName}\`\`
 public protocol ${protocolName}_protocol: ${protocolBaseClasses.join(', ')} {
+  // Constructor
+  ${indent(constructor, '  ')}
+
   // Properties
   ${indent(properties, '  ')}
 
   // Methods
   ${indent(methods, '  ')}
+
+  // Static Properties
+  ${indent(staticProperties, '  ')}
+
+  // Static Methods
+  ${indent(staticMethods, '  ')}
 }
 
 public extension ${protocolName}_protocol {

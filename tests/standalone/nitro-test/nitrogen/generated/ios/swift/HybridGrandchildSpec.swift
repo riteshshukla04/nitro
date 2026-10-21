@@ -9,10 +9,19 @@ public import NitroModules
 
 /// See ``HybridGrandchildSpec``
 public protocol HybridGrandchildSpec_protocol: HybridObject, HybridChildSpec_protocol {
+  // Constructor
+  init() throws
+
   // Properties
   var grandchildValue: Double { get }
 
   // Methods
+
+
+  // Static Properties
+
+
+  // Static Methods
 
 }
 

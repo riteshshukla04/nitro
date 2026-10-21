@@ -10,6 +10,9 @@ public import NitroTestExternal
 
 /// See ``HybridTestObjectSwiftKotlinSpec``
 public protocol HybridTestObjectSwiftKotlinSpec_protocol: HybridObject {
+  // Constructor
+  init() throws
+
   // Properties
   var numberValue: Double { get set }
   var boolValue: Bool { get set }
@@ -158,6 +161,13 @@ public protocol HybridTestObjectSwiftKotlinSpec_protocol: HybridObject {
   func newTestObject() throws -> (any HybridTestObjectSwiftKotlinSpec)
   func newTestObjectAsync() throws -> any Promise<(any HybridTestObjectSwiftKotlinSpec)>
   func getVariantHybrid(variant: Variant__any_HybridTestObjectSwiftKotlinSpec__Person) throws -> Variant__any_HybridTestObjectSwiftKotlinSpec__Person
+
+  // Static Properties
+  static var readonlyNumber: Double { get }
+  static var sharedNumber: Double { get set }
+
+  // Static Methods
+
 }
 
 public extension HybridTestObjectSwiftKotlinSpec_protocol {

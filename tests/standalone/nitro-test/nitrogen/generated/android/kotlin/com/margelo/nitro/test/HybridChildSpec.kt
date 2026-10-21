@@ -53,7 +53,15 @@ abstract class HybridChildSpec: HybridBaseSpec() {
     return CxxPart(this)
   }
 
-  companion object {
+  interface Companion {
+    // Static Properties
+
+
+    // Static Methods
+
+  }
+
+  protected companion object Bridge {
     protected const val TAG = "HybridChildSpec"
 
     // Constructor

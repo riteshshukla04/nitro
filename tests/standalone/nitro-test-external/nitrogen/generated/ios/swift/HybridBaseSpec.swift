@@ -9,6 +9,9 @@ public import NitroModules
 
 /// See ``HybridBaseSpec``
 public protocol HybridBaseSpec_protocol: HybridObject {
+  // Constructor
+  init() throws
+
   // Properties
   var baseValue: Double { get }
 
@@ -16,6 +19,12 @@ public protocol HybridBaseSpec_protocol: HybridObject {
   func bounceSize(size: Size) throws -> Size
   func bounceSizeUnit(unit: SizeUnit) throws -> SizeUnit
   func mapSize(size: Size, callback: any Callback<(/* size */ Size), Size>) throws -> any Promise<Size>
+
+  // Static Properties
+
+
+  // Static Methods
+
 }
 
 public extension HybridBaseSpec_protocol {

@@ -9,6 +9,10 @@ import NitroModules
 import Foundation
 
 class HybridPlatformObject: HybridPlatformObjectSpec {
+  required override init() {
+    super.init()
+  }
+
   func getOSVersion() -> String {
     let version = ProcessInfo.processInfo.operatingSystemVersion
     let baseVersion = "\(version.majorVersion).\(version.minorVersion)"
