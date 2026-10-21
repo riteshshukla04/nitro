@@ -56,7 +56,6 @@ class ArrayBuffer {
    * but the returned `ByteBuffer` is only valid as long as its parent `ArrayBuffer` is alive.
    */
   val isByteBuffer: Boolean
-    get() = getIsByteBuffer()
 
   /**
    * Whether this `ArrayBuffer` is holding a `HardwareBuffer`, or not.
@@ -91,7 +90,8 @@ class ArrayBuffer {
    * its `position`, `limit`, or `mark` will not affect the `ArrayBuffer`'s internal `ByteBuffer`.
    */
   fun getBuffer(copyIfNeeded: Boolean): ByteBuffer {
-    return getByteBuffer(copyIfNeeded).arrayBufferView()
+    val buffer = getByteBuffer(copyIfNeeded)
+    return if (isByteBuffer) buffer.arrayBufferView() else buffer
   }
 
   /**
@@ -153,6 +153,7 @@ class ArrayBuffer {
       )
     }
     mHybridData = initHybrid(byteBuffer)
+    isByteBuffer = true
   }
 
   /**
@@ -165,6 +166,7 @@ class ArrayBuffer {
       throw Error("Cannot create ArrayBuffer from an already-closed HardwareBuffer!")
     }
     mHybridData = initHybridBoxedHardwareBuffer(hardwareBuffer)
+    isByteBuffer = false
   }
 
   /**
@@ -175,6 +177,7 @@ class ArrayBuffer {
   @DoNotStrip
   private constructor(hybridData: HybridData) {
     mHybridData = hybridData
+    isByteBuffer = getIsByteBuffer()
   }
 
   @FastNative
@@ -218,7 +221,11 @@ class ArrayBuffer {
         // Fast Path: Try copying the C++ HardwareBuffer
         try {
           val hardwareBuffer = other.getHardwareBuffer()
-          return copy(hardwareBuffer)
+          try {
+            return copy(hardwareBuffer)
+          } finally {
+            hardwareBuffer.close()
+          }
         } catch (error: Throwable) {
           Log.w("ArrayBuffer", "Failed to copy HardwareBuffer, falling back to ByteBuffer copy...", error)
           // fallthrough
@@ -264,7 +271,11 @@ class ArrayBuffer {
     @RequiresApi(Build.VERSION_CODES.O)
     fun copy(hardwareBuffer: HardwareBuffer): ArrayBuffer {
       val copy = HardwareBufferUtils.copyHardwareBuffer(hardwareBuffer)
-      return ArrayBuffer(copy)
+      try {
+        return ArrayBuffer(copy)
+      } finally {
+        copy.close()
+      }
     }
 
     /**
