@@ -8,7 +8,7 @@
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
-#include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
+#include <NitroTestExternal/private/JOptionalPrimitivesHolder.hpp>
 #include <optional>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
@@ -17,7 +17,6 @@
 #include <NitroModules/JUInt64.hpp>
 #include <memory>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
-#include <NitroTestExternal/private/JOptionalPrimitivesHolder.hpp>
 
 namespace margelo::nitro::test::external {
 
@@ -81,10 +80,10 @@ namespace margelo::nitro::test::external {
     auto __result = __method(_javaPart);
     return __result;
   }
-  OptionalPrimitivesHolderKotlin JHybridSomeExternalObjectSpec::createOptionalPrimitivesHolder(const jni::local_ref<JOptional<jni::JDouble>>& optionalNumber, const jni::local_ref<JOptional<jni::JBoolean>>& optionalBoolean, const jni::local_ref<JOptional<JUInt64>>& optionalUInt64, const jni::local_ref<JOptional<jni::JLong>>& optionalInt64) {
+  jni::local_ref<JOptionalPrimitivesHolder> JHybridSomeExternalObjectSpec::createOptionalPrimitivesHolder(const jni::local_ref<JOptional<jni::JDouble>>& optionalNumber, const jni::local_ref<JOptional<jni::JBoolean>>& optionalBoolean, const jni::local_ref<JOptional<JUInt64>>& optionalUInt64, const jni::local_ref<JOptional<jni::JLong>>& optionalInt64) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOptionalPrimitivesHolder>(jni::alias_ref<JOptional<jni::JDouble>> /* optionalNumber */, jni::alias_ref<JOptional<jni::JBoolean>> /* optionalBoolean */, jni::alias_ref<JOptional<JUInt64>> /* optionalUInt64 */, jni::alias_ref<JOptional<jni::JLong>> /* optionalInt64 */)>("createOptionalPrimitivesHolder_cxx");
     auto __result = __method(_javaPart, CxxPart::getClass(), optionalNumber, optionalBoolean, optionalUInt64, optionalInt64);
-    return __result->toCpp();
+    return __result;
   }
 
 } // namespace margelo::nitro::test::external

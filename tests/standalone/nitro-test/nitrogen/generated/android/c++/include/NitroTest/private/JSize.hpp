@@ -8,33 +8,53 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/SizeKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroTest/private/JSizeUnit.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "Size" and the Kotlin data class "Size".
-   */
+  /** JNI access to the Kotlin data class Size. */
   struct JSize final : public jni::JavaClass<JSize> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Size;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct Size by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    SizeKotlin toCpp() const;
+    static jni::local_ref<JSize> create(jdouble width, jdouble height, jni::alias_ref<JSizeUnit> unit) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JSize(jdouble, jdouble, jni::alias_ref<JSizeUnit>)>("fromCpp");
+      return create(clazz, width, height, unit);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JSize::javaobject> fromCpp(const SizeKotlin& value);
+    jdouble getWidth() const {
+      static const auto field = javaClassStatic()->getField<jdouble>("width");
+      return getFieldValue(field);
+    }
+
+    jdouble getHeight() const {
+      static const auto field = javaClassStatic()->getField<jdouble>("height");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JSizeUnit> getUnit() const {
+      static const auto field = javaClassStatic()->getField<JSizeUnit>("unit");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JSize>> {
+    static jni::local_ref<margelo::nitro::test::JSize> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JSize> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

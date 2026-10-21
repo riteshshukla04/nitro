@@ -6,44 +6,33 @@
 ///
 
 #include <NitroTestExternal/private/JSize.hpp>
-
-#include <NitroTestExternal/private/SizeKotlin.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTestExternal/private/JSizeUnit.hpp>
-#include <NitroTestExternal/private/SizeUnit+Kotlin+NitroTestExternal.hpp>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/JSIHelpers.hpp>
 
-namespace margelo::nitro::test::external {
+namespace margelo::nitro {
 
-  SizeKotlin JSize::toCpp() const {
-    static const auto clazz = javaClassStatic();
-    static const auto fieldWidth = clazz->getField<jdouble>("width");
-    jdouble width = this->getFieldValue(fieldWidth);
-    static const auto fieldHeight = clazz->getField<jdouble>("height");
-    jdouble height = this->getFieldValue(fieldHeight);
-    static const auto fieldUnit = clazz->getField<JSizeUnit>("unit");
-    jni::local_ref<JSizeUnit> unit = this->getFieldValue(fieldUnit);
-    static const auto fieldScale = clazz->getField<jdouble>("scale");
-    jdouble scale = this->getFieldValue(fieldScale);
-    return SizeKotlin(
-      JNIConverter<double, jdouble>::fromJNI(width),
-      JNIConverter<double, jdouble>::fromJNI(height),
-      JNIConverter<margelo::nitro::test::external::SizeUnit, jni::local_ref<margelo::nitro::test::external::JSizeUnit>>::fromJNI(unit),
-      JNIConverter<double, jdouble>::fromJNI(scale)
-    );
+  jni::local_ref<margelo::nitro::test::external::JSize> JSIConverter<jni::local_ref<margelo::nitro::test::external::JSize>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto object = value.asObject(runtime);
+    return margelo::nitro::test::external::JSize::create(JSIConverter<jdouble>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "width"))), JSIConverter<jdouble>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "height"))), JSIConverter<jni::local_ref<margelo::nitro::test::external::JSizeUnit>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "unit"))), JSIConverter<jdouble>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "scale"))));
   }
 
-  jni::local_ref<JSize::javaobject> JSize::fromCpp(const SizeKotlin& value) {
-    using JSignature = JSize(jdouble, jdouble, jni::alias_ref<JSizeUnit>, jdouble);
-    static const auto clazz = javaClassStatic();
-    static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
-    return create(
-      clazz,
-      JNIConverter<double, jdouble>::toJNI(value.width),
-      JNIConverter<double, jdouble>::toJNI(value.height),
-      JNIConverter<margelo::nitro::test::external::SizeUnit, jni::local_ref<margelo::nitro::test::external::JSizeUnit>>::toJNI(value.unit),
-      JNIConverter<double, jdouble>::toJNI(value.scale)
-    );
+  jsi::Value JSIConverter<jni::local_ref<margelo::nitro::test::external::JSize>>::toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::external::JSize> value) {
+    jsi::Object object(runtime);
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "width"), JSIConverter<jdouble>::toJSI(runtime, value->getWidth()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "height"), JSIConverter<jdouble>::toJSI(runtime, value->getHeight()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "unit"), JSIConverter<jni::local_ref<margelo::nitro::test::external::JSizeUnit>>::toJSI(runtime, value->getUnit()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "scale"), JSIConverter<jdouble>::toJSI(runtime, value->getScale()));
+    return object;
   }
 
-} // namespace margelo::nitro::test::external
+  bool JSIConverter<jni::local_ref<margelo::nitro::test::external::JSize>>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (!value.isObject()) return false;
+    auto object = value.getObject(runtime);
+    if (!isPlainObject(runtime, object)) return false;
+    return JSIConverter<jdouble>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "width"))) && JSIConverter<jdouble>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "height"))) && JSIConverter<jni::local_ref<margelo::nitro::test::external::JSizeUnit>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "unit"))) && JSIConverter<jdouble>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "scale")));
+  }
+
+} // namespace margelo::nitro

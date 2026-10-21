@@ -6,8 +6,6 @@
 ///
 
 #include <NitroTest/private/JPartialPerson.hpp>
-
-#include <NitroTest/private/PartialPersonKotlin.hpp>
 #include <string>
 #include <optional>
 #include <NitroModules/JNIConverter+String.hpp>
@@ -16,30 +14,28 @@
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/JSIHelpers.hpp>
 
-namespace margelo::nitro::test {
+namespace margelo::nitro {
 
-  PartialPersonKotlin JPartialPerson::toCpp() const {
-    static const auto clazz = javaClassStatic();
-    static const auto fieldName = clazz->getField<JOptional<jni::JString>>("name");
-    jni::local_ref<JOptional<jni::JString>> name = this->getFieldValue(fieldName);
-    static const auto fieldAge = clazz->getField<JOptional<jni::JDouble>>("age");
-    jni::local_ref<JOptional<jni::JDouble>> age = this->getFieldValue(fieldAge);
-    return PartialPersonKotlin(
-      JNIConverter<std::optional<std::string>, jni::local_ref<JOptional<jni::JString>>>::fromJNI(name),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(age)
-    );
+  jni::local_ref<margelo::nitro::test::JPartialPerson> JSIConverter<jni::local_ref<margelo::nitro::test::JPartialPerson>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto object = value.asObject(runtime);
+    return margelo::nitro::test::JPartialPerson::create(JSIConverter<jni::local_ref<JOptional<jni::JString>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "name"))), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "age"))));
   }
 
-  jni::local_ref<JPartialPerson::javaobject> JPartialPerson::fromCpp(const PartialPersonKotlin& value) {
-    using JSignature = JPartialPerson(jni::alias_ref<JOptional<jni::JString>>, jni::alias_ref<JOptional<jni::JDouble>>);
-    static const auto clazz = javaClassStatic();
-    static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
-    return create(
-      clazz,
-      JNIConverter<std::optional<std::string>, jni::local_ref<JOptional<jni::JString>>>::toJNI(value.name),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.age)
-    );
+  jsi::Value JSIConverter<jni::local_ref<margelo::nitro::test::JPartialPerson>>::toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JPartialPerson> value) {
+    jsi::Object object(runtime);
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "name"), JSIConverter<jni::local_ref<JOptional<jni::JString>>>::toJSI(runtime, value->getName()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "age"), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::toJSI(runtime, value->getAge()));
+    return object;
   }
 
-} // namespace margelo::nitro::test
+  bool JSIConverter<jni::local_ref<margelo::nitro::test::JPartialPerson>>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (!value.isObject()) return false;
+    auto object = value.getObject(runtime);
+    if (!isPlainObject(runtime, object)) return false;
+    return JSIConverter<jni::local_ref<JOptional<jni::JString>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "name"))) && JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "age")));
+  }
+
+} // namespace margelo::nitro

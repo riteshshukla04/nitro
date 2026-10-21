@@ -6,34 +6,33 @@
 ///
 
 #include <NitroTest/private/JSecondMapWrapper.hpp>
-
-#include <NitroTest/private/SecondMapWrapperKotlin.hpp>
 #include <string>
 #include <unordered_map>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Map.hpp>
 #include <NitroModules/JSIConverter+JMap.hpp>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/JSIHelpers.hpp>
 
-namespace margelo::nitro::test {
+namespace margelo::nitro {
 
-  SecondMapWrapperKotlin JSecondMapWrapper::toCpp() const {
-    static const auto clazz = javaClassStatic();
-    static const auto fieldSecond = clazz->getField<jni::JMap<jni::JString, jni::JString>>("second");
-    jni::local_ref<jni::JMap<jni::JString, jni::JString>> second = this->getFieldValue(fieldSecond);
-    return SecondMapWrapperKotlin(
-      JNIConverter<std::unordered_map<std::string, std::string>, jni::local_ref<jni::JMap<jni::JString, jni::JString>>>::fromJNI(second)
-    );
+  jni::local_ref<margelo::nitro::test::JSecondMapWrapper> JSIConverter<jni::local_ref<margelo::nitro::test::JSecondMapWrapper>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto object = value.asObject(runtime);
+    return margelo::nitro::test::JSecondMapWrapper::create(JSIConverter<jni::local_ref<jni::JMap<jni::JString, jni::JString>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "second"))));
   }
 
-  jni::local_ref<JSecondMapWrapper::javaobject> JSecondMapWrapper::fromCpp(const SecondMapWrapperKotlin& value) {
-    using JSignature = JSecondMapWrapper(jni::alias_ref<jni::JMap<jni::JString, jni::JString>>);
-    static const auto clazz = javaClassStatic();
-    static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
-    return create(
-      clazz,
-      JNIConverter<std::unordered_map<std::string, std::string>, jni::local_ref<jni::JMap<jni::JString, jni::JString>>>::toJNI(value.second)
-    );
+  jsi::Value JSIConverter<jni::local_ref<margelo::nitro::test::JSecondMapWrapper>>::toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JSecondMapWrapper> value) {
+    jsi::Object object(runtime);
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "second"), JSIConverter<jni::local_ref<jni::JMap<jni::JString, jni::JString>>>::toJSI(runtime, value->getSecond()));
+    return object;
   }
 
-} // namespace margelo::nitro::test
+  bool JSIConverter<jni::local_ref<margelo::nitro::test::JSecondMapWrapper>>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (!value.isObject()) return false;
+    auto object = value.getObject(runtime);
+    if (!isPlainObject(runtime, object)) return false;
+    return JSIConverter<jni::local_ref<jni::JMap<jni::JString, jni::JString>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "second")));
+  }
+
+} // namespace margelo::nitro

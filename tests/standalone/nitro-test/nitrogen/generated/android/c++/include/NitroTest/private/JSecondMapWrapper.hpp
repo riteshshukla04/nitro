@@ -8,33 +8,46 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/SecondMapWrapperKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <string>
+#include <unordered_map>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Map.hpp>
+#include <NitroModules/JSIConverter+JMap.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "SecondMapWrapper" and the Kotlin data class "SecondMapWrapper".
-   */
+  /** JNI access to the Kotlin data class SecondMapWrapper. */
   struct JSecondMapWrapper final : public jni::JavaClass<JSecondMapWrapper> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/SecondMapWrapper;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct SecondMapWrapper by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    SecondMapWrapperKotlin toCpp() const;
+    static jni::local_ref<JSecondMapWrapper> create(jni::alias_ref<jni::JMap<jni::JString, jni::JString>> second) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JSecondMapWrapper(jni::alias_ref<jni::JMap<jni::JString, jni::JString>>)>("fromCpp");
+      return create(clazz, second);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JSecondMapWrapper::javaobject> fromCpp(const SecondMapWrapperKotlin& value);
+    jni::local_ref<jni::JMap<jni::JString, jni::JString>> getSecond() const {
+      static const auto field = javaClassStatic()->getField<jni::JMap<jni::JString, jni::JString>>("second");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JSecondMapWrapper>> {
+    static jni::local_ref<margelo::nitro::test::JSecondMapWrapper> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JSecondMapWrapper> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

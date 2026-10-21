@@ -24,9 +24,6 @@
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JWrappedJsStruct.hpp>
-#include <NitroTest/private/JsStyleStructKotlin.hpp>
-#include <NitroTest/private/JJsStyleStruct.hpp>
-#include <vector>
 #include <NitroModules/JNIConverter+Promise.hpp>
 #include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroModules/JAnyJSON.hpp>

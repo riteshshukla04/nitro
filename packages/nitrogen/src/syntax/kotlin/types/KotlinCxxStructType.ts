@@ -1,59 +1,52 @@
-import { NitroConfig } from '../../../config/NitroConfig.js'
-import type { Language } from '../../../getPlatformSpecs.js'
-import { getForwardDeclaration } from '../../c++/getForwardDeclaration.js'
-import type { SourceFile, SourceImport } from '../../SourceFile.js'
+import { capitalizeName } from '../../../utils.js'
 import { StructType } from '../../types/StructType.js'
-import type { GetCodeOptions, NamedType } from '../../types/Type.js'
+import { getTypeAs } from '../../types/getTypeAs.js'
+import type { Type } from '../../types/Type.js'
+import { createKotlinCxxValueConverter } from '../KotlinCxxValueConverter.js'
+import { getKotlinConverter, type KotlinCppConverter } from '../KotlinConverter.js'
+import { KotlinCxxType } from './KotlinCxxType.js'
+import type { KotlinStructType } from './KotlinStructType.js'
 
-/** Keeps Kotlin fallback fields independent of the public C++ struct projection. */
-export class KotlinCxxStructType extends StructType {
-  readonly config: NitroConfig
-
+/** On-demand native C++ interop for a Kotlin data class. */
+export class KotlinCxxStructType extends KotlinCxxType {
   constructor(
-    structName: string,
-    properties: NamedType[],
-    sourceConfig: NitroConfig = NitroConfig.current,
-    config: NitroConfig = NitroConfig.current
+    cppType: Type,
+    override readonly kotlinType: KotlinStructType
   ) {
-    super(structName, properties, sourceConfig, { cppName: `${structName}Kotlin`, platform: 'android', headerVisibility: 'private' })
-    this.config = config
+    super(cppType, kotlinType)
   }
 
-  override getCode(language: Language, options: GetCodeOptions): string {
-    switch (language) {
-      case 'c++': {
-        let name: string
-        if (options.fullyQualified || this.config.isExternalConfig) {
-          name = this.config.getCxxNamespace('c++', this.cppName)
-        } else {
-          name = this.cppName
-        }
-        return options.context === 'parameter' ? `const ${name}&` : name
-      }
-      default:
-        return super.getCode(language, options)
-    }
-  }
-
-  override getRequiredImports(language: Language): SourceImport[] {
-    switch (language) {
-      case 'c++':
-        return [
-          {
-            language: 'c++',
-            declaration: {
-              ...this.config.getCxxHeader(`${this.cppName}.hpp`, 'private'),
-              forwardDeclaration: getForwardDeclaration('struct', this.cppName, this.config.getCxxNamespace('c++')),
-            },
-          },
-        ]
-      default:
-        return super.getRequiredImports(language)
-    }
-  }
-
-  override getExtraFiles(): SourceFile[] {
-    if (this.config.isExternalConfig) return []
-    return super.getExtraFiles()
+  getConverter(): KotlinCppConverter {
+    const cppType = getTypeAs(this.cppType, StructType)
+    const fields = cppType.properties.map((property) => {
+      const kotlinProperty = this.kotlinType.properties.find((candidate) => candidate.name === property.name)
+      if (kotlinProperty == null) throw new Error(`Missing Kotlin property ${this.kotlinType.structName}.${property.name}`)
+      return { cpp: property, kotlin: kotlinProperty.type }
+    })
+    const cppCode = cppType.getCode('c++', { context: 'value', fullyQualified: true })
+    const jniClass = this.kotlinType.getCode('c++', { context: 'type-argument', fullyQualified: true })
+    const toJNIFields = fields.map(({ cpp, kotlin }) => {
+      const converter = getKotlinConverter({ cppType: cpp, kotlinType: kotlin })
+      return `${converter}::toJNI(value.${cpp.escapedName})`
+    })
+    const fromJNIFields = fields.map(({ cpp, kotlin }) => {
+      const converter = getKotlinConverter({ cppType: cpp, kotlinType: kotlin })
+      return `${converter}::fromJNI(value->get${capitalizeName(cpp.escapedName)}())`
+    })
+    const cppToKotlinConverterCode = `
+return ${jniClass}::create(${toJNIFields.join(', ')});
+`.trim()
+    const kotlinToCppConverterCode = `
+return ${cppCode}(${fromJNIFields.join(', ')});
+`.trim()
+    const dependencies = fields.map(({ cpp, kotlin }) => kotlin.getCppConverter?.(cpp))
+    return createKotlinCxxValueConverter({
+      name: cppType.cppName,
+      cppType: cppType,
+      kotlinType: this.kotlinType,
+      toJNI: cppToKotlinConverterCode,
+      fromJNI: kotlinToCppConverterCode,
+      dependencies: dependencies.filter((dependency) => dependency != null),
+    })
   }
 }

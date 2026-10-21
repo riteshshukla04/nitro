@@ -6,32 +6,30 @@
 ///
 
 #include <NitroTest/private/JExternalObjectStruct.hpp>
-
-#include <NitroTest/private/ExternalObjectStructKotlin.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
-#include <memory>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/JSIHelpers.hpp>
 
-namespace margelo::nitro::test {
+namespace margelo::nitro {
 
-  ExternalObjectStructKotlin JExternalObjectStruct::toCpp() const {
-    static const auto clazz = javaClassStatic();
-    static const auto fieldSomeExternal = clazz->getField<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>("someExternal");
-    jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> someExternal = this->getFieldValue(fieldSomeExternal);
-    return ExternalObjectStructKotlin(
-      JNIConverter<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::fromJNI(someExternal)
-    );
+  jni::local_ref<margelo::nitro::test::JExternalObjectStruct> JSIConverter<jni::local_ref<margelo::nitro::test::JExternalObjectStruct>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto object = value.asObject(runtime);
+    return margelo::nitro::test::JExternalObjectStruct::create(JSIConverter<jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "someExternal"))));
   }
 
-  jni::local_ref<JExternalObjectStruct::javaobject> JExternalObjectStruct::fromCpp(const ExternalObjectStructKotlin& value) {
-    using JSignature = JExternalObjectStruct(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>);
-    static const auto clazz = javaClassStatic();
-    static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
-    return create(
-      clazz,
-      JNIConverter<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::toJNI(value.someExternal)
-    );
+  jsi::Value JSIConverter<jni::local_ref<margelo::nitro::test::JExternalObjectStruct>>::toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JExternalObjectStruct> value) {
+    jsi::Object object(runtime);
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "someExternal"), JSIConverter<jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::toJSI(runtime, value->getSomeExternal()));
+    return object;
   }
 
-} // namespace margelo::nitro::test
+  bool JSIConverter<jni::local_ref<margelo::nitro::test::JExternalObjectStruct>>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (!value.isObject()) return false;
+    auto object = value.getObject(runtime);
+    if (!isPlainObject(runtime, object)) return false;
+    return JSIConverter<jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "someExternal")));
+  }
+
+} // namespace margelo::nitro

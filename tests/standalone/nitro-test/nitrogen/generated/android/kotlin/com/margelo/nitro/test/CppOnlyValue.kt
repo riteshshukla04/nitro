@@ -25,7 +25,7 @@ data class CppOnlyValue(
   @Keep
   val kind: CppOnlyValueKind
 ) {
-  /* primary constructor */
+
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

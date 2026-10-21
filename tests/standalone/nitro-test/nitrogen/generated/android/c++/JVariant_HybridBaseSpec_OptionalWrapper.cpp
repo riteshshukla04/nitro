@@ -13,15 +13,7 @@
 #include <variant>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTest/private/JOptionalWrapper.hpp>
-#include <NitroModules/ArrayBuffer.hpp>
-#include <optional>
-#include <NitroModules/JNIConverter+ArrayBuffer.hpp>
-#include <NitroModules/JSIConverter+JArrayBuffer.hpp>
-#include <NitroModules/JNIConverter+Optional.hpp>
-#include <NitroModules/JSIConverter+JOptional.hpp>
-#include <string>
-#include <NitroModules/JNIConverter+String.hpp>
-#include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroTest/private/OptionalWrapperKotlin+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> JVariant_HybridBaseSpec_OptionalWrapper::create_0(jni::alias_ref<JHybridBaseSpecJavaPart> value) {
@@ -37,7 +29,7 @@ namespace margelo::nitro::test {
   jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> JVariant_HybridBaseSpec_OptionalWrapper::fromCpp(const std::variant<std::shared_ptr<JHybridBaseSpec>, OptionalWrapperKotlin>& variant) {
     switch (variant.index()) {
       case 0: return create_0(JNIConverter<std::shared_ptr<JHybridBaseSpec>, jni::local_ref<JHybridBaseSpecJavaPart>>::toJNI(std::get<0>(variant)));
-      case 1: return create_1(JOptionalWrapper::fromCpp(std::get<1>(variant)));
+      case 1: return create_1(JNIConverter<margelo::nitro::test::OptionalWrapperKotlin, jni::local_ref<margelo::nitro::test::JOptionalWrapper>>::toJNI(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
   }
@@ -63,7 +55,7 @@ namespace margelo::nitro::test {
     } else if (isInstanceOf(JVariant_HybridBaseSpec_OptionalWrapper_impl::Second::javaClassStatic())) {
       // It's a `OptionalWrapperKotlin`
       auto jniValue = static_cast<const JVariant_HybridBaseSpec_OptionalWrapper_impl::Second*>(this)->getValue();
-      return jniValue->toCpp();
+      return JNIConverter<margelo::nitro::test::OptionalWrapperKotlin, jni::local_ref<margelo::nitro::test::JOptionalWrapper>>::fromJNI(jniValue);
     }
     throw std::invalid_argument("Variant is unknown Kotlin instance!");
   }

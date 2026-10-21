@@ -10,14 +10,12 @@
 #include <fbjni/fbjni.h>
 #include <functional>
 
+#include <NitroTestExternal/private/SizeKotlin+Kotlin+NitroTestExternal.hpp>
 #include <NitroTestExternal/private/SizeKotlin.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
 #include <NitroTestExternal/private/JSize.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTestExternal/private/JSizeUnit.hpp>
 
 namespace margelo::nitro::test::external {
 

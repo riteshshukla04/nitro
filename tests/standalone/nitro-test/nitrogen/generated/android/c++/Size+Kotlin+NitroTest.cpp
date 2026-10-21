@@ -6,25 +6,20 @@
 ///
 
 #include <NitroTest/private/Size+Kotlin+NitroTest.hpp>
+#include <NitroModules/JNIConverter.hpp>
 #include <NitroTest/Size.hpp>
-#include <NitroTest/private/SizeKotlin.hpp>
+#include <NitroTest/private/JSize.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroTest/private/SizeUnit+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro {
 
-  margelo::nitro::test::SizeKotlin JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::toJNI(const margelo::nitro::test::Size& value) {
-    return margelo::nitro::test::SizeKotlin(
-      JNIConverter<double, double>::toJNI(value.width),
-      JNIConverter<double, double>::toJNI(value.height),
-      JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::toJNI(value.unit)
-    );
+  jni::local_ref<margelo::nitro::test::JSize> JNIConverter<margelo::nitro::test::Size, jni::local_ref<margelo::nitro::test::JSize>>::toJNI(const margelo::nitro::test::Size& value) {
+    return margelo::nitro::test::JSize::create(JNIConverter<double, jdouble>::toJNI(value.width), JNIConverter<double, jdouble>::toJNI(value.height), JNIConverter<margelo::nitro::test::SizeUnit, jni::local_ref<margelo::nitro::test::JSizeUnit>>::toJNI(value.unit));
   }
 
-  margelo::nitro::test::Size JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::fromJNI(const margelo::nitro::test::SizeKotlin& value) {
-    return margelo::nitro::test::Size(
-      JNIConverter<double, double>::fromJNI(value.width),
-      JNIConverter<double, double>::fromJNI(value.height),
-      JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::fromJNI(value.unit)
-    );
+  margelo::nitro::test::Size JNIConverter<margelo::nitro::test::Size, jni::local_ref<margelo::nitro::test::JSize>>::fromJNI(jni::alias_ref<margelo::nitro::test::JSize> value) {
+    return margelo::nitro::test::Size(JNIConverter<double, jdouble>::fromJNI(value->getWidth()), JNIConverter<double, jdouble>::fromJNI(value->getHeight()), JNIConverter<margelo::nitro::test::SizeUnit, jni::local_ref<margelo::nitro::test::JSizeUnit>>::fromJNI(value->getUnit()));
   }
 
 } // namespace margelo::nitro

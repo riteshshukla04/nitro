@@ -9,57 +9,22 @@
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <optional>
 #include <vector>
+#include <NitroTest/private/JPerson.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <NitroTest/private/JPerson.hpp>
-#include <NitroModules/JNIConverter+String.hpp>
-#include <NitroModules/JSIConverter+JString.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
   std::vector<std::vector<std::optional<PersonKotlin>>> JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___::invoke(const std::vector<std::vector<std::optional<PersonKotlin>>>& value) const {
-    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JPerson>>>(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JPerson>>> /* value */)>("invoke_jni");
-    auto __result = __method(self(), [&](auto&& __input) {
-      size_t __size = __input.size();
-      jni::local_ref<jni::JArrayClass<jni::JArrayClass<JPerson>>> __array = jni::JArrayClass<jni::JArrayClass<JPerson>>::newArray(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        const auto& __element = __input[__i];
-        auto __elementJni = [&](auto&& __input) {
-          size_t __size = __input.size();
-          jni::local_ref<jni::JArrayClass<JPerson>> __array = jni::JArrayClass<JPerson>::newArray(__size);
-          for (size_t __i = 0; __i < __size; __i++) {
-            const auto& __element = __input[__i];
-            auto __elementJni = __element.has_value() ? JPerson::fromCpp(__element.value()) : nullptr;
-            __array->setElement(__i, *__elementJni);
-          }
-          return __array;
-        }(__element);
-        __array->setElement(__i, *__elementJni);
-      }
-      return __array;
-    }(value));
-    return [&](auto&& __input) {
-      size_t __size = __input->size();
-      std::vector<std::vector<std::optional<PersonKotlin>>> __vector;
-      __vector.reserve(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        auto __element = __input->getElement(__i);
-        __vector.push_back([&](auto&& __input) {
-          size_t __size = __input->size();
-          std::vector<std::optional<PersonKotlin>> __vector;
-          __vector.reserve(__size);
-          for (size_t __i = 0; __i < __size; __i++) {
-            auto __element = __input->getElement(__i);
-            __vector.push_back(__element != nullptr ? std::make_optional(__element->toCpp()) : std::nullopt);
-          }
-          return __vector;
-        }(__element));
-      }
-      return __vector;
-    }(__result);
+    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> /* value */)>("invoke_jni");
+    auto __result = __method(self(), JNIConverter<std::vector<std::vector<std::optional<PersonKotlin>>>, jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>>::toJNI(value));
+    return JNIConverter<std::vector<std::vector<std::optional<PersonKotlin>>>, jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>>::fromJNI(__result);
   }
 
   jni::local_ref<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___::javaobject> JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::fromCpp(const Callback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)>& callback) {
@@ -70,45 +35,9 @@ namespace margelo::nitro::test {
     return newObjectCxxArgs(callback.escape(), true);
   }
 
-  jni::local_ref<jni::JArrayClass<jni::JArrayClass<JPerson>>> JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::invoke_cxx(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JPerson>>> value) {
-    std::vector<std::vector<std::optional<PersonKotlin>>> __result = _callback.callSync([&](auto&& __input) {
-      size_t __size = __input->size();
-      std::vector<std::vector<std::optional<PersonKotlin>>> __vector;
-      __vector.reserve(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        auto __element = __input->getElement(__i);
-        __vector.push_back([&](auto&& __input) {
-          size_t __size = __input->size();
-          std::vector<std::optional<PersonKotlin>> __vector;
-          __vector.reserve(__size);
-          for (size_t __i = 0; __i < __size; __i++) {
-            auto __element = __input->getElement(__i);
-            __vector.push_back(__element != nullptr ? std::make_optional(__element->toCpp()) : std::nullopt);
-          }
-          return __vector;
-        }(__element));
-      }
-      return __vector;
-    }(value));
-    return [&](auto&& __input) {
-      size_t __size = __input.size();
-      jni::local_ref<jni::JArrayClass<jni::JArrayClass<JPerson>>> __array = jni::JArrayClass<jni::JArrayClass<JPerson>>::newArray(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        const auto& __element = __input[__i];
-        auto __elementJni = [&](auto&& __input) {
-          size_t __size = __input.size();
-          jni::local_ref<jni::JArrayClass<JPerson>> __array = jni::JArrayClass<JPerson>::newArray(__size);
-          for (size_t __i = 0; __i < __size; __i++) {
-            const auto& __element = __input[__i];
-            auto __elementJni = __element.has_value() ? JPerson::fromCpp(__element.value()) : nullptr;
-            __array->setElement(__i, *__elementJni);
-          }
-          return __array;
-        }(__element);
-        __array->setElement(__i, *__elementJni);
-      }
-      return __array;
-    }(__result);
+  jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::invoke_cxx(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> value) {
+    std::vector<std::vector<std::optional<PersonKotlin>>> __result = _callback.callSync(JNIConverter<std::vector<std::vector<std::optional<PersonKotlin>>>, jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>>::fromJNI(value));
+    return JNIConverter<std::vector<std::vector<std::optional<PersonKotlin>>>, jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>>::toJNI(__result);
   }
 
   void JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::registerNatives() {

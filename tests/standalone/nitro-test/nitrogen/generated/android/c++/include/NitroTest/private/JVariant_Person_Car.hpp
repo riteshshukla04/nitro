@@ -14,20 +14,21 @@
 #include <NitroTest/private/CarKotlin.hpp>
 #include <variant>
 #include <NitroTest/private/JPerson.hpp>
-#include <NitroModules/JNIConverter+String.hpp>
-#include <NitroModules/JSIConverter+JString.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JCar.hpp>
-#include <NitroTest/private/JPowertrain.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 #include <optional>
-#include <vector>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
-#include <string>
+#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
+#include <vector>
 #include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <string>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
-#include <NitroTest/private/JVariant_Double_String.hpp>
 
 namespace margelo::nitro::test {
 

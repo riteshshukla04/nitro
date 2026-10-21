@@ -8,33 +8,43 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/ExternalObjectStructKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <NitroTestExternal/private/JHybridSomeExternalObjectSpecJavaPart.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "ExternalObjectStruct" and the Kotlin data class "ExternalObjectStruct".
-   */
+  /** JNI access to the Kotlin data class ExternalObjectStruct. */
   struct JExternalObjectStruct final : public jni::JavaClass<JExternalObjectStruct> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/ExternalObjectStruct;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct ExternalObjectStruct by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    ExternalObjectStructKotlin toCpp() const;
+    static jni::local_ref<JExternalObjectStruct> create(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> someExternal) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JExternalObjectStruct(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>)>("fromCpp");
+      return create(clazz, someExternal);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JExternalObjectStruct::javaobject> fromCpp(const ExternalObjectStructKotlin& value);
+    jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> getSomeExternal() const {
+      static const auto field = javaClassStatic()->getField<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>("someExternal");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JExternalObjectStruct>> {
+    static jni::local_ref<margelo::nitro::test::JExternalObjectStruct> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JExternalObjectStruct> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

@@ -13,14 +13,15 @@
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <optional>
 #include <vector>
+#include <NitroTest/private/JPerson.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <NitroTest/private/JPerson.hpp>
-#include <NitroModules/JNIConverter+String.hpp>
-#include <NitroModules/JSIConverter+JString.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -53,7 +54,7 @@ namespace margelo::nitro::test {
     /**
      * Invokes the C++ `Callback<...>` this `JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx` instance holds.
      */
-    jni::local_ref<jni::JArrayClass<jni::JArrayClass<JPerson>>> invoke_cxx(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JPerson>>> value);
+    jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> invoke_cxx(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> value);
 
   public:
     [[nodiscard]]

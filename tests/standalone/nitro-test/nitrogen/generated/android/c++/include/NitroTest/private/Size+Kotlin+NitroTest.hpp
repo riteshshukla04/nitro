@@ -10,15 +10,14 @@
 #include <NitroModules/JNIConverter.hpp>
 // Forward declaration of `Size` to properly resolve imports.
 namespace margelo::nitro::test { struct Size; }
-// Forward declaration of `SizeKotlin` to properly resolve imports.
-namespace margelo::nitro::test { struct SizeKotlin; }
+#include <NitroTest/private/JSize.hpp>
 
 namespace margelo::nitro {
 
   template <>
-  struct JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin> final {
-    static margelo::nitro::test::SizeKotlin toJNI(const margelo::nitro::test::Size& value);
-    static margelo::nitro::test::Size fromJNI(const margelo::nitro::test::SizeKotlin& value);
+  struct JNIConverter<margelo::nitro::test::Size, jni::local_ref<margelo::nitro::test::JSize>> final {
+    static jni::local_ref<margelo::nitro::test::JSize> toJNI(const margelo::nitro::test::Size& value);
+    static margelo::nitro::test::Size fromJNI(jni::alias_ref<margelo::nitro::test::JSize> value);
   };
 
 } // namespace margelo::nitro

@@ -8,33 +8,54 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/OptionalWrapperKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <NitroModules/ArrayBuffer.hpp>
+#include <optional>
+#include <NitroModules/JNIConverter+ArrayBuffer.hpp>
+#include <NitroModules/JSIConverter+JArrayBuffer.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "OptionalWrapper" and the Kotlin data class "OptionalWrapper".
-   */
+  /** JNI access to the Kotlin data class OptionalWrapper. */
   struct JOptionalWrapper final : public jni::JavaClass<JOptionalWrapper> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/OptionalWrapper;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct OptionalWrapper by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    OptionalWrapperKotlin toCpp() const;
+    static jni::local_ref<JOptionalWrapper> create(jni::alias_ref<JOptional<JArrayBuffer::JavaPart>> optionalArrayBuffer, jni::alias_ref<JOptional<jni::JString>> optionalString) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JOptionalWrapper(jni::alias_ref<JOptional<JArrayBuffer::JavaPart>>, jni::alias_ref<JOptional<jni::JString>>)>("fromCpp");
+      return create(clazz, optionalArrayBuffer, optionalString);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JOptionalWrapper::javaobject> fromCpp(const OptionalWrapperKotlin& value);
+    jni::local_ref<JOptional<JArrayBuffer::JavaPart>> getOptionalArrayBuffer() const {
+      static const auto field = javaClassStatic()->getField<JOptional<JArrayBuffer::JavaPart>>("optionalArrayBuffer");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JString>> getOptionalString() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JString>>("optionalString");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalWrapper>> {
+    static jni::local_ref<margelo::nitro::test::JOptionalWrapper> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JOptionalWrapper> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

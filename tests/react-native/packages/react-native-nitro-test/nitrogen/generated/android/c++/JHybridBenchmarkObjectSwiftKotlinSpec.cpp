@@ -34,12 +34,13 @@
 #include <functional>
 #include <memory>
 #include <NitroTest/private/JCar.hpp>
-#include <NitroTest/private/JPowertrain.hpp>
+#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <NitroTest/private/JPerson.hpp>
+#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
 #include <NitroTest/private/JVariant_Double_String.hpp>
 #include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
-#include <NitroModules/JSIConverter+JArrayClass.hpp>
 #include <NitroTest/private/JCallback_double.hpp>
 #include <NitroModules/JNICallable.hpp>
 

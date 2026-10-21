@@ -8,33 +8,49 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/PersonKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "Person" and the Kotlin data class "Person".
-   */
+  /** JNI access to the Kotlin data class Person. */
   struct JPerson final : public jni::JavaClass<JPerson> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Person;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct Person by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    PersonKotlin toCpp() const;
+    static jni::local_ref<JPerson> create(jni::alias_ref<jni::JString> name, jdouble age) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JPerson(jni::alias_ref<jni::JString>, jdouble)>("fromCpp");
+      return create(clazz, name, age);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JPerson::javaobject> fromCpp(const PersonKotlin& value);
+    jni::local_ref<jni::JString> getName() const {
+      static const auto field = javaClassStatic()->getField<jni::JString>("name");
+      return getFieldValue(field);
+    }
+
+    jdouble getAge() const {
+      static const auto field = javaClassStatic()->getField<jdouble>("age");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JPerson>> {
+    static jni::local_ref<margelo::nitro::test::JPerson> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JPerson> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

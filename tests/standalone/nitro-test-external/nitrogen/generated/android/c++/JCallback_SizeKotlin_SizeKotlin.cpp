@@ -6,21 +6,19 @@
 ///
 
 #include <NitroTestExternal/private/JCallback_SizeKotlin_SizeKotlin.hpp>
+#include <NitroTestExternal/private/SizeKotlin+Kotlin+NitroTestExternal.hpp>
 #include <NitroTestExternal/private/SizeKotlin.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
 #include <NitroTestExternal/private/JSize.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTestExternal/private/JSizeUnit.hpp>
 
 namespace margelo::nitro::test::external {
 
   SizeKotlin JCallback_SizeKotlin_SizeKotlin::invoke(const SizeKotlin& size) const {
     static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JSize>(jni::alias_ref<JSize> /* size */)>("invoke_jni");
-    auto __result = __method(self(), JSize::fromCpp(size));
-    return __result->toCpp();
+    auto __result = __method(self(), JNIConverter<margelo::nitro::test::external::SizeKotlin, jni::local_ref<margelo::nitro::test::external::JSize>>::toJNI(size));
+    return JNIConverter<margelo::nitro::test::external::SizeKotlin, jni::local_ref<margelo::nitro::test::external::JSize>>::fromJNI(__result);
   }
 
   jni::local_ref<JCallback_SizeKotlin_SizeKotlin::javaobject> JCallback_SizeKotlin_SizeKotlin_cxx::fromCpp(const Callback<SizeKotlin(const SizeKotlin& /* size */)>& callback) {
@@ -32,8 +30,8 @@ namespace margelo::nitro::test::external {
   }
 
   jni::local_ref<JSize> JCallback_SizeKotlin_SizeKotlin_cxx::invoke_cxx(jni::alias_ref<JSize> size) {
-    SizeKotlin __result = _callback.callSync(size->toCpp());
-    return JSize::fromCpp(__result);
+    SizeKotlin __result = _callback.callSync(JNIConverter<margelo::nitro::test::external::SizeKotlin, jni::local_ref<margelo::nitro::test::external::JSize>>::fromJNI(size));
+    return JNIConverter<margelo::nitro::test::external::SizeKotlin, jni::local_ref<margelo::nitro::test::external::JSize>>::toJNI(__result);
   }
 
   void JCallback_SizeKotlin_SizeKotlin_cxx::registerNatives() {

@@ -13,20 +13,20 @@ import { TupleType } from '../types/TupleType.js'
 import type { Type } from '../types/Type.js'
 import { VariantType } from '../types/VariantType.js'
 import { KotlinCxxHybridObjectType } from './types/KotlinCxxHybridObjectType.js'
-import { KotlinCxxStructType } from './types/KotlinCxxStructType.js'
+import { KotlinFallbackStructType } from './types/KotlinFallbackStructType.js'
 
 /** The C++ types used inside Kotlin's private JNI bridge, independent of the public C++ API. */
 export function getKotlinNativeType(type: Type, config: NitroConfig = NitroConfig.current): Type {
   if (type instanceof NamedWrappingType) {
     return new NamedWrappingType(type.name, getKotlinNativeType(type.type, config))
   }
-  if (type instanceof KotlinCxxHybridObjectType || type instanceof KotlinCxxStructType || type instanceof KotlinFallbackEnumType)
+  if (type instanceof KotlinCxxHybridObjectType || type instanceof KotlinFallbackStructType || type instanceof KotlinFallbackEnumType)
     return type
   if (type instanceof EnumType) return new KotlinFallbackEnumType(type, config)
   if (type instanceof HybridObjectType) return new KotlinCxxHybridObjectType(type)
   if (type instanceof StructType) {
     const properties = type.properties.map((property) => new NamedWrappingType(property.name, getKotlinNativeType(property, config)))
-    return new KotlinCxxStructType(type.structName, properties, type.sourceConfig, config)
+    return new KotlinFallbackStructType(type.structName, properties, type.sourceConfig, config)
   }
   if (type instanceof ArrayType) return new ArrayType(getKotlinNativeType(type.itemType, config))
   if (type instanceof OptionalType) return new OptionalType(getKotlinNativeType(type.wrappingType, config))

@@ -31,7 +31,7 @@ data class Size(
   @Keep
   val scale: Double
 ) {
-  /* primary constructor */
+
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

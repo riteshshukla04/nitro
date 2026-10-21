@@ -26,16 +26,17 @@ data class OptionalPrimitivesHolder(
   val optionalBoolean: Boolean?,
   @DoNotStrip
   @Keep
-  val optionalUInt64: Long?,
+  val optionalUInt64: ULong?,
   @DoNotStrip
   @Keep
   val optionalInt64: Long?
 ) {
-  /**
-   * Create a new instance of OptionalPrimitivesHolder from Kotlin
-   */
-  constructor(optionalNumber: Double?, optionalBoolean: Boolean?, optionalUInt64: ULong?, optionalInt64: Long?):
-         this(optionalNumber, optionalBoolean, optionalUInt64?.let { it.toLong() }, optionalInt64)
+  @DoNotStrip
+  @Keep
+  @Suppress("unused", "FunctionName")
+  private fun getOptionalUInt64_cxx(): Long? {
+    return optionalUInt64?.let { it.toLong() }
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -64,7 +65,7 @@ data class OptionalPrimitivesHolder(
     @Suppress("unused")
     @JvmStatic
     private fun fromCpp(optionalNumber: Double?, optionalBoolean: Boolean?, optionalUInt64: Long?, optionalInt64: Long?): OptionalPrimitivesHolder {
-      return OptionalPrimitivesHolder(optionalNumber, optionalBoolean, optionalUInt64, optionalInt64)
+      return OptionalPrimitivesHolder(optionalNumber, optionalBoolean, optionalUInt64?.let { it.toULong() }, optionalInt64)
     }
   }
 }

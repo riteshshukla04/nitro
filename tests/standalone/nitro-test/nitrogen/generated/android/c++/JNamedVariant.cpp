@@ -13,17 +13,18 @@
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JCar.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTest/private/JPowertrain.hpp>
+#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <optional>
 #include <NitroTest/private/JPerson.hpp>
-#include <vector>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
+#include <vector>
 #include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
-#include <NitroTest/private/JVariant_Double_String.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JNamedVariant> JNamedVariant::create_0(jni::alias_ref<jni::JString> value) {

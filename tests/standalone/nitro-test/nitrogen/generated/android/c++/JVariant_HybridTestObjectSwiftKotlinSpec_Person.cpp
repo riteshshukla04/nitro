@@ -13,10 +13,7 @@
 #include <variant>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTest/private/JPerson.hpp>
-#include <NitroModules/JNIConverter+String.hpp>
-#include <NitroModules/JSIConverter+JString.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JVariant_HybridTestObjectSwiftKotlinSpec_Person> JVariant_HybridTestObjectSwiftKotlinSpec_Person::create_0(jni::alias_ref<JHybridTestObjectSwiftKotlinSpecJavaPart> value) {
@@ -32,7 +29,7 @@ namespace margelo::nitro::test {
   jni::local_ref<JVariant_HybridTestObjectSwiftKotlinSpec_Person> JVariant_HybridTestObjectSwiftKotlinSpec_Person::fromCpp(const std::variant<std::shared_ptr<JHybridTestObjectSwiftKotlinSpec>, PersonKotlin>& variant) {
     switch (variant.index()) {
       case 0: return create_0(JNIConverter<std::shared_ptr<JHybridTestObjectSwiftKotlinSpec>, jni::local_ref<JHybridTestObjectSwiftKotlinSpecJavaPart>>::toJNI(std::get<0>(variant)));
-      case 1: return create_1(JPerson::fromCpp(std::get<1>(variant)));
+      case 1: return create_1(JNIConverter<margelo::nitro::test::PersonKotlin, jni::local_ref<margelo::nitro::test::JPerson>>::toJNI(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
   }
@@ -58,7 +55,7 @@ namespace margelo::nitro::test {
     } else if (isInstanceOf(JVariant_HybridTestObjectSwiftKotlinSpec_Person_impl::Second::javaClassStatic())) {
       // It's a `PersonKotlin`
       auto jniValue = static_cast<const JVariant_HybridTestObjectSwiftKotlinSpec_Person_impl::Second*>(this)->getValue();
-      return jniValue->toCpp();
+      return JNIConverter<margelo::nitro::test::PersonKotlin, jni::local_ref<margelo::nitro::test::JPerson>>::fromJNI(jniValue);
     }
     throw std::invalid_argument("Variant is unknown Kotlin instance!");
   }

@@ -8,33 +8,61 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <optional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/JUInt64.hpp>
 
 namespace margelo::nitro::test::external {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "OptionalPrimitivesHolder" and the Kotlin data class "OptionalPrimitivesHolder".
-   */
+  /** JNI access to the Kotlin data class OptionalPrimitivesHolder. */
   struct JOptionalPrimitivesHolder final : public jni::JavaClass<JOptionalPrimitivesHolder> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/OptionalPrimitivesHolder;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct OptionalPrimitivesHolder by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    OptionalPrimitivesHolderKotlin toCpp() const;
+    static jni::local_ref<JOptionalPrimitivesHolder> create(jni::alias_ref<JOptional<jni::JDouble>> optionalNumber, jni::alias_ref<JOptional<jni::JBoolean>> optionalBoolean, jni::alias_ref<JOptional<JUInt64>> optionalUInt64, jni::alias_ref<JOptional<jni::JLong>> optionalInt64) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JOptionalPrimitivesHolder(jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<JUInt64>>, jni::alias_ref<JOptional<jni::JLong>>)>("fromCpp");
+      return create(clazz, optionalNumber, optionalBoolean, optionalUInt64, optionalInt64);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JOptionalPrimitivesHolder::javaobject> fromCpp(const OptionalPrimitivesHolderKotlin& value);
+    jni::local_ref<JOptional<jni::JDouble>> getOptionalNumber() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("optionalNumber");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JBoolean>> getOptionalBoolean() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JBoolean>>("optionalBoolean");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<JUInt64>> getOptionalUInt64() const {
+      static const auto method = javaClassStatic()->getMethod<JOptional<JUInt64>()>("getOptionalUInt64_cxx");
+      return method(this->self());
+    }
+
+    jni::local_ref<JOptional<jni::JLong>> getOptionalInt64() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JLong>>("optionalInt64");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test::external
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::external::JOptionalPrimitivesHolder>> {
+    static jni::local_ref<margelo::nitro::test::external::JOptionalPrimitivesHolder> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::external::JOptionalPrimitivesHolder> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

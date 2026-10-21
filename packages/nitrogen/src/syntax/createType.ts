@@ -13,7 +13,7 @@ import { ArrayBufferType } from './types/ArrayBufferType.js'
 import { EnumType } from './types/EnumType.js'
 import { HybridObjectType } from './types/HybridObjectType.js'
 import { StructType } from './types/StructType.js'
-import { KotlinCxxStructType } from './kotlin/types/KotlinCxxStructType.js'
+import { KotlinFallbackStructType } from './kotlin/types/KotlinFallbackStructType.js'
 import { KotlinCxxHybridObjectType } from './kotlin/types/KotlinCxxHybridObjectType.js'
 import { OptionalType } from './types/OptionalType.js'
 import { NamedWrappingType } from './types/NamedWrappingType.js'
@@ -392,7 +392,7 @@ export function createType(
       const typename = symbol.getName()
       const properties = getInterfaceProperties(target, type)
       const sourceConfig = getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
-      if (language === 'kotlin') return new KotlinCxxStructType(typename, properties, sourceConfig)
+      if (language === 'kotlin') return new KotlinFallbackStructType(typename, properties, sourceConfig)
       return new StructType(typename, properties, sourceConfig)
     } else if (type.isObject()) {
       // It is an object. If it has a symbol/name, it is a `type T = ...` declaration, so a `struct`.
@@ -403,7 +403,7 @@ export function createType(
         const typename = symbol.getName()
         const properties = getInterfaceProperties(target, type)
         const sourceConfig = getHybridObjectNitroModuleConfig(type) ?? NitroConfig.current
-        if (language === 'kotlin') return new KotlinCxxStructType(typename, properties, sourceConfig)
+        if (language === 'kotlin') return new KotlinFallbackStructType(typename, properties, sourceConfig)
         return new StructType(typename, properties, sourceConfig)
       } else {
         // It's an anonymous object (`{ ... }`)

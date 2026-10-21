@@ -10,14 +10,12 @@
 #include <fbjni/fbjni.h>
 #include <functional>
 
+#include <NitroTest/private/SizeKotlin+Kotlin+NitroTest.hpp>
 #include <NitroTest/private/SizeKotlin.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
 #include <NitroTest/private/JSize.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTest/private/JSizeUnit.hpp>
 
 namespace margelo::nitro::test {
 

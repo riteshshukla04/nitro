@@ -6,36 +6,31 @@
 ///
 
 #include <NitroTest/private/JCppOnlyValue.hpp>
-
-#include <NitroTest/private/CppOnlyValueKotlin.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JCppOnlyValueKind.hpp>
-#include <NitroTest/private/CppOnlyValueKind+Kotlin+NitroTest.hpp>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/JSIHelpers.hpp>
 
-namespace margelo::nitro::test {
+namespace margelo::nitro {
 
-  CppOnlyValueKotlin JCppOnlyValue::toCpp() const {
-    static const auto clazz = javaClassStatic();
-    static const auto fieldLabel = clazz->getField<jni::JString>("label");
-    jni::local_ref<jni::JString> label = this->getFieldValue(fieldLabel);
-    static const auto fieldKind = clazz->getField<JCppOnlyValueKind>("kind");
-    jni::local_ref<JCppOnlyValueKind> kind = this->getFieldValue(fieldKind);
-    return CppOnlyValueKotlin(
-      JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(label),
-      JNIConverter<margelo::nitro::test::CppOnlyValueKind, jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>>::fromJNI(kind)
-    );
+  jni::local_ref<margelo::nitro::test::JCppOnlyValue> JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValue>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto object = value.asObject(runtime);
+    return margelo::nitro::test::JCppOnlyValue::create(JSIConverter<jni::local_ref<jni::JString>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "label"))), JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "kind"))));
   }
 
-  jni::local_ref<JCppOnlyValue::javaobject> JCppOnlyValue::fromCpp(const CppOnlyValueKotlin& value) {
-    using JSignature = JCppOnlyValue(jni::alias_ref<jni::JString>, jni::alias_ref<JCppOnlyValueKind>);
-    static const auto clazz = javaClassStatic();
-    static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
-    return create(
-      clazz,
-      JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.label),
-      JNIConverter<margelo::nitro::test::CppOnlyValueKind, jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>>::toJNI(value.kind)
-    );
+  jsi::Value JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValue>>::toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JCppOnlyValue> value) {
+    jsi::Object object(runtime);
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "label"), JSIConverter<jni::local_ref<jni::JString>>::toJSI(runtime, value->getLabel()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "kind"), JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>>::toJSI(runtime, value->getKind()));
+    return object;
   }
 
-} // namespace margelo::nitro::test
+  bool JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValue>>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (!value.isObject()) return false;
+    auto object = value.getObject(runtime);
+    if (!isPlainObject(runtime, object)) return false;
+    return JSIConverter<jni::local_ref<jni::JString>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "label"))) && JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "kind")));
+  }
+
+} // namespace margelo::nitro

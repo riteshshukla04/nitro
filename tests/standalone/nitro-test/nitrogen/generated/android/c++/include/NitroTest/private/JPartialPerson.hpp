@@ -8,33 +8,53 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/PartialPersonKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <string>
+#include <optional>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "PartialPerson" and the Kotlin data class "PartialPerson".
-   */
+  /** JNI access to the Kotlin data class PartialPerson. */
   struct JPartialPerson final : public jni::JavaClass<JPartialPerson> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/PartialPerson;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct PartialPerson by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    PartialPersonKotlin toCpp() const;
+    static jni::local_ref<JPartialPerson> create(jni::alias_ref<JOptional<jni::JString>> name, jni::alias_ref<JOptional<jni::JDouble>> age) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JPartialPerson(jni::alias_ref<JOptional<jni::JString>>, jni::alias_ref<JOptional<jni::JDouble>>)>("fromCpp");
+      return create(clazz, name, age);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JPartialPerson::javaobject> fromCpp(const PartialPersonKotlin& value);
+    jni::local_ref<JOptional<jni::JString>> getName() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JString>>("name");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JDouble>> getAge() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("age");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JPartialPerson>> {
+    static jni::local_ref<margelo::nitro::test::JPartialPerson> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JPartialPerson> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

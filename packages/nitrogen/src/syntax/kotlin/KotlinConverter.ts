@@ -12,7 +12,7 @@ import type { Type, TypeContext } from '../types/Type.js'
 import { getKotlinNativeType } from './getKotlinNativeType.js'
 import { wrapKotlinType } from './wrapKotlinType.js'
 import { getKotlinJSIType } from './getKotlinJSIType.js'
-import { KotlinCxxStructType } from './types/KotlinCxxStructType.js'
+import { KotlinFallbackStructType } from './types/KotlinFallbackStructType.js'
 
 interface KotlinConverterOptions {
   cppType: Type
@@ -48,7 +48,7 @@ function getConverterFileName(type: ForeignHybridObjectType | StructType | EnumT
 function isSpecialized(type: Type, config: NitroConfig): type is ForeignHybridObjectType | StructType | EnumType {
   return (
     type instanceof ForeignHybridObjectType ||
-    (type instanceof StructType && !(type instanceof KotlinCxxStructType)) ||
+    (type instanceof StructType && !(type instanceof KotlinFallbackStructType)) ||
     (type instanceof EnumType && config.isExternalConfig)
   )
 }

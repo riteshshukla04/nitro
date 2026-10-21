@@ -8,33 +8,48 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/CppOnlyValueKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroTest/private/JCppOnlyValueKind.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "CppOnlyValue" and the Kotlin data class "CppOnlyValue".
-   */
+  /** JNI access to the Kotlin data class CppOnlyValue. */
   struct JCppOnlyValue final : public jni::JavaClass<JCppOnlyValue> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/CppOnlyValue;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct CppOnlyValue by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    CppOnlyValueKotlin toCpp() const;
+    static jni::local_ref<JCppOnlyValue> create(jni::alias_ref<jni::JString> label, jni::alias_ref<JCppOnlyValueKind> kind) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JCppOnlyValue(jni::alias_ref<jni::JString>, jni::alias_ref<JCppOnlyValueKind>)>("fromCpp");
+      return create(clazz, label, kind);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JCppOnlyValue::javaobject> fromCpp(const CppOnlyValueKotlin& value);
+    jni::local_ref<jni::JString> getLabel() const {
+      static const auto field = javaClassStatic()->getField<jni::JString>("label");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JCppOnlyValueKind> getKind() const {
+      static const auto field = javaClassStatic()->getField<JCppOnlyValueKind>("kind");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValue>> {
+    static jni::local_ref<margelo::nitro::test::JCppOnlyValue> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JCppOnlyValue> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

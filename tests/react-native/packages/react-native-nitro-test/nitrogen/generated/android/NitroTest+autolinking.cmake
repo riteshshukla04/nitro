@@ -27,6 +27,7 @@ target_sources(NitroTest PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JPowertrain.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JVariant_Boolean_DoubleArray_Array_String__Double_String.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JVariant_Double_String.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/../android/c++/PersonKotlin+Kotlin+NitroTest.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/PersonKotlin.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/Powertrain+Kotlin+NitroTest.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/views/JHybridRecyclableTestViewStateUpdater.cpp"

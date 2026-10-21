@@ -6,8 +6,6 @@
 ///
 
 #include <NitroTest/private/JOptionalWrapper.hpp>
-
-#include <NitroTest/private/OptionalWrapperKotlin.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <optional>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
@@ -17,30 +15,28 @@
 #include <string>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/JSIHelpers.hpp>
 
-namespace margelo::nitro::test {
+namespace margelo::nitro {
 
-  OptionalWrapperKotlin JOptionalWrapper::toCpp() const {
-    static const auto clazz = javaClassStatic();
-    static const auto fieldOptionalArrayBuffer = clazz->getField<JOptional<JArrayBuffer::JavaPart>>("optionalArrayBuffer");
-    jni::local_ref<JOptional<JArrayBuffer::JavaPart>> optionalArrayBuffer = this->getFieldValue(fieldOptionalArrayBuffer);
-    static const auto fieldOptionalString = clazz->getField<JOptional<jni::JString>>("optionalString");
-    jni::local_ref<JOptional<jni::JString>> optionalString = this->getFieldValue(fieldOptionalString);
-    return OptionalWrapperKotlin(
-      JNIConverter<std::optional<ArrayBuffer>, jni::local_ref<JOptional<JArrayBuffer::JavaPart>>>::fromJNI(optionalArrayBuffer),
-      JNIConverter<std::optional<std::string>, jni::local_ref<JOptional<jni::JString>>>::fromJNI(optionalString)
-    );
+  jni::local_ref<margelo::nitro::test::JOptionalWrapper> JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalWrapper>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto object = value.asObject(runtime);
+    return margelo::nitro::test::JOptionalWrapper::create(JSIConverter<jni::local_ref<JOptional<JArrayBuffer::JavaPart>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalArrayBuffer"))), JSIConverter<jni::local_ref<JOptional<jni::JString>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalString"))));
   }
 
-  jni::local_ref<JOptionalWrapper::javaobject> JOptionalWrapper::fromCpp(const OptionalWrapperKotlin& value) {
-    using JSignature = JOptionalWrapper(jni::alias_ref<JOptional<JArrayBuffer::JavaPart>>, jni::alias_ref<JOptional<jni::JString>>);
-    static const auto clazz = javaClassStatic();
-    static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
-    return create(
-      clazz,
-      JNIConverter<std::optional<ArrayBuffer>, jni::local_ref<JOptional<JArrayBuffer::JavaPart>>>::toJNI(value.optionalArrayBuffer),
-      JNIConverter<std::optional<std::string>, jni::local_ref<JOptional<jni::JString>>>::toJNI(value.optionalString)
-    );
+  jsi::Value JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalWrapper>>::toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JOptionalWrapper> value) {
+    jsi::Object object(runtime);
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "optionalArrayBuffer"), JSIConverter<jni::local_ref<JOptional<JArrayBuffer::JavaPart>>>::toJSI(runtime, value->getOptionalArrayBuffer()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "optionalString"), JSIConverter<jni::local_ref<JOptional<jni::JString>>>::toJSI(runtime, value->getOptionalString()));
+    return object;
   }
 
-} // namespace margelo::nitro::test
+  bool JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalWrapper>>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (!value.isObject()) return false;
+    auto object = value.getObject(runtime);
+    if (!isPlainObject(runtime, object)) return false;
+    return JSIConverter<jni::local_ref<JOptional<JArrayBuffer::JavaPart>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalArrayBuffer"))) && JSIConverter<jni::local_ref<JOptional<jni::JString>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalString")));
+  }
+
+} // namespace margelo::nitro

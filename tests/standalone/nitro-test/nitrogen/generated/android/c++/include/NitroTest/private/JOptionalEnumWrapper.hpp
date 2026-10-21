@@ -8,33 +8,132 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/OptionalEnumWrapperKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <optional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroTest/Powertrain.hpp>
+#include <NitroTest/private/JPowertrain.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "OptionalEnumWrapper" and the Kotlin data class "OptionalEnumWrapper".
-   */
+  /** JNI access to the Kotlin data class OptionalEnumWrapper. */
   struct JOptionalEnumWrapper final : public jni::JavaClass<JOptionalEnumWrapper> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/OptionalEnumWrapper;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct OptionalEnumWrapper by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    OptionalEnumWrapperKotlin toCpp() const;
+    static jni::local_ref<JOptionalEnumWrapper> create(jni::alias_ref<JOptional<jni::JDouble>> count, jni::alias_ref<JOptional<jni::JDouble>> weight, jni::alias_ref<JOptional<jni::JDouble>> ttl, jni::alias_ref<JOptional<jni::JDouble>> jitter, jni::alias_ref<JOptional<jni::JDouble>> retries, jni::alias_ref<JOptional<jni::JDouble>> delayMs, jni::alias_ref<JOptional<jni::JDouble>> timeoutMs, jni::alias_ref<JOptional<jni::JDouble>> ratio, jni::alias_ref<JOptional<jni::JDouble>> threshold, jni::alias_ref<JOptional<jni::JBoolean>> enabled, jni::alias_ref<JOptional<jni::JBoolean>> active, jni::alias_ref<JOptional<jni::JBoolean>> shouldBuffer, jni::alias_ref<JOptional<jni::JBoolean>> shouldRetry, jni::alias_ref<JOptional<jni::JBoolean>> verbose, jni::alias_ref<JOptional<JPowertrain>> tier, jni::alias_ref<JOptional<JPowertrain>> region, jni::alias_ref<JOptional<JPowertrain>> stage, jni::alias_ref<JOptional<JPowertrain>> tone) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JOptionalEnumWrapper(jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<JPowertrain>>, jni::alias_ref<JOptional<JPowertrain>>, jni::alias_ref<JOptional<JPowertrain>>, jni::alias_ref<JOptional<JPowertrain>>)>("fromCpp");
+      return create(clazz, count, weight, ttl, jitter, retries, delayMs, timeoutMs, ratio, threshold, enabled, active, shouldBuffer, shouldRetry, verbose, tier, region, stage, tone);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JOptionalEnumWrapper::javaobject> fromCpp(const OptionalEnumWrapperKotlin& value);
+    jni::local_ref<JOptional<jni::JDouble>> getCount() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("count");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JDouble>> getWeight() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("weight");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JDouble>> getTtl() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("ttl");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JDouble>> getJitter() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("jitter");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JDouble>> getRetries() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("retries");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JDouble>> getDelayMs() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("delayMs");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JDouble>> getTimeoutMs() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("timeoutMs");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JDouble>> getRatio() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("ratio");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JDouble>> getThreshold() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JDouble>>("threshold");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JBoolean>> getEnabled() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JBoolean>>("enabled");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JBoolean>> getActive() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JBoolean>>("active");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JBoolean>> getShouldBuffer() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JBoolean>>("shouldBuffer");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JBoolean>> getShouldRetry() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JBoolean>>("shouldRetry");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<jni::JBoolean>> getVerbose() const {
+      static const auto field = javaClassStatic()->getField<JOptional<jni::JBoolean>>("verbose");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<JPowertrain>> getTier() const {
+      static const auto field = javaClassStatic()->getField<JOptional<JPowertrain>>("tier");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<JPowertrain>> getRegion() const {
+      static const auto field = javaClassStatic()->getField<JOptional<JPowertrain>>("region");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<JPowertrain>> getStage() const {
+      static const auto field = javaClassStatic()->getField<JOptional<JPowertrain>>("stage");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<JOptional<JPowertrain>> getTone() const {
+      static const auto field = javaClassStatic()->getField<JOptional<JPowertrain>>("tone");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalEnumWrapper>> {
+    static jni::local_ref<margelo::nitro::test::JOptionalEnumWrapper> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JOptionalEnumWrapper> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

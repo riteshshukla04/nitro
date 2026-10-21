@@ -6,8 +6,6 @@
 ///
 
 #include <NitroTest/private/JOptionalEnumWrapper.hpp>
-
-#include <NitroTest/private/OptionalEnumWrapperKotlin.hpp>
 #include <optional>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
@@ -15,95 +13,44 @@
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
-#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/JSIHelpers.hpp>
 
-namespace margelo::nitro::test {
+namespace margelo::nitro {
 
-  OptionalEnumWrapperKotlin JOptionalEnumWrapper::toCpp() const {
-    static const auto clazz = javaClassStatic();
-    static const auto fieldCount = clazz->getField<JOptional<jni::JDouble>>("count");
-    jni::local_ref<JOptional<jni::JDouble>> count = this->getFieldValue(fieldCount);
-    static const auto fieldWeight = clazz->getField<JOptional<jni::JDouble>>("weight");
-    jni::local_ref<JOptional<jni::JDouble>> weight = this->getFieldValue(fieldWeight);
-    static const auto fieldTtl = clazz->getField<JOptional<jni::JDouble>>("ttl");
-    jni::local_ref<JOptional<jni::JDouble>> ttl = this->getFieldValue(fieldTtl);
-    static const auto fieldJitter = clazz->getField<JOptional<jni::JDouble>>("jitter");
-    jni::local_ref<JOptional<jni::JDouble>> jitter = this->getFieldValue(fieldJitter);
-    static const auto fieldRetries = clazz->getField<JOptional<jni::JDouble>>("retries");
-    jni::local_ref<JOptional<jni::JDouble>> retries = this->getFieldValue(fieldRetries);
-    static const auto fieldDelayMs = clazz->getField<JOptional<jni::JDouble>>("delayMs");
-    jni::local_ref<JOptional<jni::JDouble>> delayMs = this->getFieldValue(fieldDelayMs);
-    static const auto fieldTimeoutMs = clazz->getField<JOptional<jni::JDouble>>("timeoutMs");
-    jni::local_ref<JOptional<jni::JDouble>> timeoutMs = this->getFieldValue(fieldTimeoutMs);
-    static const auto fieldRatio = clazz->getField<JOptional<jni::JDouble>>("ratio");
-    jni::local_ref<JOptional<jni::JDouble>> ratio = this->getFieldValue(fieldRatio);
-    static const auto fieldThreshold = clazz->getField<JOptional<jni::JDouble>>("threshold");
-    jni::local_ref<JOptional<jni::JDouble>> threshold = this->getFieldValue(fieldThreshold);
-    static const auto fieldEnabled = clazz->getField<JOptional<jni::JBoolean>>("enabled");
-    jni::local_ref<JOptional<jni::JBoolean>> enabled = this->getFieldValue(fieldEnabled);
-    static const auto fieldActive = clazz->getField<JOptional<jni::JBoolean>>("active");
-    jni::local_ref<JOptional<jni::JBoolean>> active = this->getFieldValue(fieldActive);
-    static const auto fieldShouldBuffer = clazz->getField<JOptional<jni::JBoolean>>("shouldBuffer");
-    jni::local_ref<JOptional<jni::JBoolean>> shouldBuffer = this->getFieldValue(fieldShouldBuffer);
-    static const auto fieldShouldRetry = clazz->getField<JOptional<jni::JBoolean>>("shouldRetry");
-    jni::local_ref<JOptional<jni::JBoolean>> shouldRetry = this->getFieldValue(fieldShouldRetry);
-    static const auto fieldVerbose = clazz->getField<JOptional<jni::JBoolean>>("verbose");
-    jni::local_ref<JOptional<jni::JBoolean>> verbose = this->getFieldValue(fieldVerbose);
-    static const auto fieldTier = clazz->getField<JOptional<JPowertrain>>("tier");
-    jni::local_ref<JOptional<JPowertrain>> tier = this->getFieldValue(fieldTier);
-    static const auto fieldRegion = clazz->getField<JOptional<JPowertrain>>("region");
-    jni::local_ref<JOptional<JPowertrain>> region = this->getFieldValue(fieldRegion);
-    static const auto fieldStage = clazz->getField<JOptional<JPowertrain>>("stage");
-    jni::local_ref<JOptional<JPowertrain>> stage = this->getFieldValue(fieldStage);
-    static const auto fieldTone = clazz->getField<JOptional<JPowertrain>>("tone");
-    jni::local_ref<JOptional<JPowertrain>> tone = this->getFieldValue(fieldTone);
-    return OptionalEnumWrapperKotlin(
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(count),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(weight),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(ttl),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(jitter),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(retries),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(delayMs),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(timeoutMs),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(ratio),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(threshold),
-      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::fromJNI(enabled),
-      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::fromJNI(active),
-      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::fromJNI(shouldBuffer),
-      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::fromJNI(shouldRetry),
-      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::fromJNI(verbose),
-      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::fromJNI(tier),
-      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::fromJNI(region),
-      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::fromJNI(stage),
-      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::fromJNI(tone)
-    );
+  jni::local_ref<margelo::nitro::test::JOptionalEnumWrapper> JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalEnumWrapper>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto object = value.asObject(runtime);
+    return margelo::nitro::test::JOptionalEnumWrapper::create(JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "count"))), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "weight"))), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "ttl"))), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "jitter"))), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "retries"))), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "delayMs"))), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "timeoutMs"))), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "ratio"))), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "threshold"))), JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "enabled"))), JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "active"))), JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "shouldBuffer"))), JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "shouldRetry"))), JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "verbose"))), JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "tier"))), JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "region"))), JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "stage"))), JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "tone"))));
   }
 
-  jni::local_ref<JOptionalEnumWrapper::javaobject> JOptionalEnumWrapper::fromCpp(const OptionalEnumWrapperKotlin& value) {
-    using JSignature = JOptionalEnumWrapper(jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<JPowertrain>>, jni::alias_ref<JOptional<JPowertrain>>, jni::alias_ref<JOptional<JPowertrain>>, jni::alias_ref<JOptional<JPowertrain>>);
-    static const auto clazz = javaClassStatic();
-    static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
-    return create(
-      clazz,
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.count),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.weight),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.ttl),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.jitter),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.retries),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.delayMs),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.timeoutMs),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.ratio),
-      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.threshold),
-      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::toJNI(value.enabled),
-      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::toJNI(value.active),
-      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::toJNI(value.shouldBuffer),
-      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::toJNI(value.shouldRetry),
-      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::toJNI(value.verbose),
-      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::toJNI(value.tier),
-      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::toJNI(value.region),
-      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::toJNI(value.stage),
-      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::toJNI(value.tone)
-    );
+  jsi::Value JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalEnumWrapper>>::toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JOptionalEnumWrapper> value) {
+    jsi::Object object(runtime);
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "count"), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::toJSI(runtime, value->getCount()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "weight"), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::toJSI(runtime, value->getWeight()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "ttl"), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::toJSI(runtime, value->getTtl()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "jitter"), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::toJSI(runtime, value->getJitter()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "retries"), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::toJSI(runtime, value->getRetries()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "delayMs"), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::toJSI(runtime, value->getDelayMs()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "timeoutMs"), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::toJSI(runtime, value->getTimeoutMs()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "ratio"), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::toJSI(runtime, value->getRatio()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "threshold"), JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::toJSI(runtime, value->getThreshold()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "enabled"), JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::toJSI(runtime, value->getEnabled()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "active"), JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::toJSI(runtime, value->getActive()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "shouldBuffer"), JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::toJSI(runtime, value->getShouldBuffer()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "shouldRetry"), JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::toJSI(runtime, value->getShouldRetry()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "verbose"), JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::toJSI(runtime, value->getVerbose()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "tier"), JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::toJSI(runtime, value->getTier()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "region"), JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::toJSI(runtime, value->getRegion()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "stage"), JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::toJSI(runtime, value->getStage()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "tone"), JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::toJSI(runtime, value->getTone()));
+    return object;
   }
 
-} // namespace margelo::nitro::test
+  bool JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalEnumWrapper>>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (!value.isObject()) return false;
+    auto object = value.getObject(runtime);
+    if (!isPlainObject(runtime, object)) return false;
+    return JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "count"))) && JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "weight"))) && JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "ttl"))) && JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "jitter"))) && JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "retries"))) && JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "delayMs"))) && JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "timeoutMs"))) && JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "ratio"))) && JSIConverter<jni::local_ref<JOptional<jni::JDouble>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "threshold"))) && JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "enabled"))) && JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "active"))) && JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "shouldBuffer"))) && JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "shouldRetry"))) && JSIConverter<jni::local_ref<JOptional<jni::JBoolean>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "verbose"))) && JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "tier"))) && JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "region"))) && JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "stage"))) && JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JPowertrain>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "tone")));
+  }
+
+} // namespace margelo::nitro
