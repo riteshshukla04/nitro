@@ -13,6 +13,8 @@
 #include <string>
 #include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
 #include <optional>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 
 namespace margelo::nitro::test::external {
@@ -60,7 +62,7 @@ namespace margelo::nitro::test::external {
 
   public:
     // Methods
-    std::string getValue();
+    jni::local_ref<jni::JString> getValue();
     OptionalPrimitivesHolderKotlin createOptionalPrimitivesHolder(const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64);
 
   public:

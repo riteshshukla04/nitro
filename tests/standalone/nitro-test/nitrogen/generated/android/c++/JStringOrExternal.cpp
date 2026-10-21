@@ -10,6 +10,8 @@
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 #include <string>
 #include <variant>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JStringOrExternal> JStringOrExternal::create_0(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpec::JavaPart> value) {
@@ -25,7 +27,7 @@ namespace margelo::nitro::test {
   jni::local_ref<JStringOrExternal> JStringOrExternal::fromCpp(const std::variant<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, std::string>& variant) {
     switch (variant.index()) {
       case 0: return create_0(std::get<0>(variant)->getJavaPart());
-      case 1: return create_1(jni::make_jstring(std::get<1>(variant)));
+      case 1: return create_1(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
   }
@@ -51,7 +53,7 @@ namespace margelo::nitro::test {
     } else if (isInstanceOf(JStringOrExternal_impl::Second::javaClassStatic())) {
       // It's a `std::string`
       auto jniValue = static_cast<const JStringOrExternal_impl::Second*>(this)->getValue();
-      return jniValue->toStdString();
+      return JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(jniValue);
     }
     throw std::invalid_argument("Variant is unknown Kotlin instance!");
   }

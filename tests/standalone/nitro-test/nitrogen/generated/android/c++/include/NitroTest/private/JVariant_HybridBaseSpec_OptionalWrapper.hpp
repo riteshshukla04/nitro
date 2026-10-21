@@ -21,6 +21,8 @@ namespace margelo::nitro::test { class JHybridBaseSpec; }
 #include <optional>
 #include <NitroModules/JArrayBuffer.hpp>
 #include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 

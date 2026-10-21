@@ -9,6 +9,8 @@
 #include <string>
 #include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
 #include <optional>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTestExternal/private/JOptionalPrimitivesHolder.hpp>
 
 namespace margelo::nitro::test::external {
@@ -68,10 +70,10 @@ namespace margelo::nitro::test::external {
 
 
   // Methods
-  std::string JHybridSomeExternalObjectSpec::getValue() {
+  jni::local_ref<jni::JString> JHybridSomeExternalObjectSpec::getValue() {
     static const auto __method = CxxPart::getClass()->getMethod<jni::local_ref<jni::JString>()>("getValue");
     auto __result = __method(_javaPart);
-    return __result->toStdString();
+    return __result;
   }
   OptionalPrimitivesHolderKotlin JHybridSomeExternalObjectSpec::createOptionalPrimitivesHolder(const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOptionalPrimitivesHolder>(jni::alias_ref<jni::JDouble> /* optionalNumber */, jni::alias_ref<jni::JBoolean> /* optionalBoolean */, jni::alias_ref<jni::JLong> /* optionalUInt64 */, jni::alias_ref<jni::JLong> /* optionalInt64 */)>("createOptionalPrimitivesHolder_cxx");

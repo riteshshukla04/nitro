@@ -8,6 +8,8 @@
 #include <NitroTest/private/JVariant_Double_String.hpp>
 #include <string>
 #include <variant>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JVariant_Double_String> JVariant_Double_String::create_0(double value) {
@@ -23,7 +25,7 @@ namespace margelo::nitro::test {
   jni::local_ref<JVariant_Double_String> JVariant_Double_String::fromCpp(const std::variant<double, std::string>& variant) {
     switch (variant.index()) {
       case 0: return create_0(std::get<0>(variant));
-      case 1: return create_1(jni::make_jstring(std::get<1>(variant)));
+      case 1: return create_1(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
   }
@@ -49,7 +51,7 @@ namespace margelo::nitro::test {
     } else if (isInstanceOf(JVariant_Double_String_impl::Second::javaClassStatic())) {
       // It's a `std::string`
       auto jniValue = static_cast<const JVariant_Double_String_impl::Second*>(this)->getValue();
-      return jniValue->toStdString();
+      return JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(jniValue);
     }
     throw std::invalid_argument("Variant is unknown Kotlin instance!");
   }

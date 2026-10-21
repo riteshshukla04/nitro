@@ -10,6 +10,8 @@
 #include <NitroTest/private/CarKotlin.hpp>
 #include <variant>
 #include <NitroTest/private/JNamedVariant.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JCar.hpp>
 #include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>

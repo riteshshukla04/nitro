@@ -12,6 +12,8 @@
 #include <optional>
 #include <NitroModules/JArrayBuffer.hpp>
 #include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 
@@ -23,7 +25,7 @@ namespace margelo::nitro::test {
     jni::local_ref<jni::JString> optionalString = this->getFieldValue(fieldOptionalString);
     return OptionalWrapperKotlin(
       optionalArrayBuffer != nullptr ? std::make_optional(optionalArrayBuffer->cthis()->getArrayBuffer()) : std::nullopt,
-      optionalString != nullptr ? std::make_optional(optionalString->toStdString()) : std::nullopt
+      optionalString != nullptr ? std::make_optional(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(optionalString)) : std::nullopt
     );
   }
 
@@ -34,7 +36,7 @@ namespace margelo::nitro::test {
     return create(
       clazz,
       value.optionalArrayBuffer.has_value() ? JArrayBuffer::wrap(value.optionalArrayBuffer.value()) : nullptr,
-      value.optionalString.has_value() ? jni::make_jstring(value.optionalString.value()) : nullptr
+      value.optionalString.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.optionalString.value()) : nullptr
     );
   }
 

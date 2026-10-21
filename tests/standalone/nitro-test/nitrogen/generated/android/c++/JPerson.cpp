@@ -8,7 +8,8 @@
 #include <NitroTest/private/JPerson.hpp>
 
 #include <NitroTest/private/PersonKotlin.hpp>
-#include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 
@@ -19,7 +20,7 @@ namespace margelo::nitro::test {
     static const auto fieldAge = clazz->getField<double>("age");
     double age = this->getFieldValue(fieldAge);
     return PersonKotlin(
-      name->toStdString(),
+      JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(name),
       age
     );
   }
@@ -30,7 +31,7 @@ namespace margelo::nitro::test {
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      jni::make_jstring(value.name),
+      JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.name),
       value.age
     );
   }

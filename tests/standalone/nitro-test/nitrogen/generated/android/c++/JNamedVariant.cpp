@@ -9,6 +9,8 @@
 #include <string>
 #include <NitroTest/private/CarKotlin.hpp>
 #include <variant>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JCar.hpp>
 #include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
@@ -31,7 +33,7 @@ namespace margelo::nitro::test {
 
   jni::local_ref<JNamedVariant> JNamedVariant::fromCpp(const std::variant<std::string, CarKotlin>& variant) {
     switch (variant.index()) {
-      case 0: return create_0(jni::make_jstring(std::get<0>(variant)));
+      case 0: return create_0(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<0>(variant)));
       case 1: return create_1(JCar::fromCpp(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
@@ -54,7 +56,7 @@ namespace margelo::nitro::test {
     if (isInstanceOf(JNamedVariant_impl::First::javaClassStatic())) {
       // It's a `std::string`
       auto jniValue = static_cast<const JNamedVariant_impl::First*>(this)->getValue();
-      return jniValue->toStdString();
+      return JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(jniValue);
     } else if (isInstanceOf(JNamedVariant_impl::Second::javaClassStatic())) {
       // It's a `CarKotlin`
       auto jniValue = static_cast<const JNamedVariant_impl::Second*>(this)->getValue();

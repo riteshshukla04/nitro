@@ -14,6 +14,7 @@
 #include <NitroModules/JNIConverter.hpp>
 #include <memory>
 #include <NitroTest/private/HybridSomeExternalObjectSpecCxx+NitroTestExternal+Kotlin.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
 #include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
 #include <NitroTest/private/OptionalPrimitivesHolder+Kotlin+NitroTestExternal.hpp>
 
@@ -36,7 +37,7 @@ namespace margelo::nitro::test::adapters::NitroTestExternal {
       throw std::invalid_argument("Cannot call SomeExternalObject.getValue on an empty or incompatible C++ adapter.");
     }
     auto __result = __implementation->getValue();
-    return JNIConverter<std::string, std::string>::fromJNI(__result);
+    return JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__result);
   }
 
   margelo::nitro::test::OptionalPrimitivesHolder HybridSomeExternalObjectSpecCxx::createOptionalPrimitivesHolder(const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64) const {

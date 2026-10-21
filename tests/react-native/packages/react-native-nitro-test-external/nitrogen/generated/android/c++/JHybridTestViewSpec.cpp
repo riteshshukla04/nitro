@@ -9,6 +9,8 @@
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTestExternal/private/JCallback_void.hpp>
 #include <NitroModules/JNICallable.hpp>
 
@@ -97,10 +99,10 @@ namespace margelo::nitro::test::external {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void()>("someMethod");
     __method(_javaPart, CxxPart::getClass());
   }
-  std::string JHybridTestViewSpec::getModuleName() {
+  jni::local_ref<jni::JString> JHybridTestViewSpec::getModuleName() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>()>("getModuleName");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return __result->toStdString();
+    return __result;
   }
 
 } // namespace margelo::nitro::test::external

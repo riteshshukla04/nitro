@@ -8,13 +8,15 @@
 #include <NitroTest/private/JCar.hpp>
 
 #include <NitroTest/private/CarKotlin.hpp>
-#include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <optional>
 #include <NitroTest/private/JPerson.hpp>
 #include <vector>
+#include <string>
 #include <variant>
 #include <NitroTest/private/JVariant_Double_String.hpp>
 
@@ -46,8 +48,8 @@ namespace margelo::nitro::test {
     jni::local_ref<JVariant_Double_String> someVariant = this->getFieldValue(fieldSomeVariant);
     return CarKotlin(
       year,
-      make->toStdString(),
-      model->toStdString(),
+      JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(make),
+      JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(model),
       power,
       powertrain->toCpp(),
       driver != nullptr ? std::make_optional(driver->toCpp()) : std::nullopt,
@@ -62,7 +64,7 @@ namespace margelo::nitro::test {
         return __vector;
       }(passengers),
       isFast != nullptr ? std::make_optional(static_cast<bool>(isFast->value())) : std::nullopt,
-      favouriteTrack != nullptr ? std::make_optional(favouriteTrack->toStdString()) : std::nullopt,
+      favouriteTrack != nullptr ? std::make_optional(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(favouriteTrack)) : std::nullopt,
       [&]() {
         size_t __size = performanceScores->size();
         std::vector<double> __vector(__size);
@@ -80,8 +82,8 @@ namespace margelo::nitro::test {
     return create(
       clazz,
       value.year,
-      jni::make_jstring(value.make),
-      jni::make_jstring(value.model),
+      JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.make),
+      JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.model),
       value.power,
       JPowertrain::fromCpp(value.powertrain),
       value.driver.has_value() ? JPerson::fromCpp(value.driver.value()) : nullptr,
@@ -96,7 +98,7 @@ namespace margelo::nitro::test {
         return __array;
       }(value.passengers),
       value.isFast.has_value() ? jni::JBoolean::valueOf(value.isFast.value()) : nullptr,
-      value.favouriteTrack.has_value() ? jni::make_jstring(value.favouriteTrack.value()) : nullptr,
+      value.favouriteTrack.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.favouriteTrack.value()) : nullptr,
       [&]() {
         size_t __size = value.performanceScores.size();
         jni::local_ref<jni::JArrayDouble> __array = jni::JArrayDouble::newArray(__size);

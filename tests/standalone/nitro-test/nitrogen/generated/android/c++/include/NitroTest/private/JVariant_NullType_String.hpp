@@ -14,6 +14,8 @@
 #include <string>
 #include <variant>
 #include <NitroModules/JNull.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 

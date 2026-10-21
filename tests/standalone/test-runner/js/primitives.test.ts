@@ -209,10 +209,6 @@ export const cases = {
       expect(Object.is(testObject.stringValue, 'line 1\nline 2\r\n\tindented')).to.equal(true)
     },
 
-    // TODO: Fix in Nitro - on Android the generated JNI code passes std::string to
-    // Kotlin via jni::make_jstring(std::string), which uses c_str() and cuts the
-    // string at the first '\0' (TestObjectSwiftKotlin.stringValue becomes 'before').
-
     'stringValue roundtrips an embedded NUL character': (testObject) => {
       testObject.stringValue = 'before\0after'
       expect(Object.is(testObject.stringValue, 'before\0after')).to.equal(true)
@@ -234,9 +230,6 @@ export const cases = {
     'addStrings("", "") returns an empty string': (testObject) => {
       expect(Object.is(testObject.addStrings('', ''), '')).to.equal(true)
     },
-
-    // TODO: Fix in Nitro - on Android jni::make_jstring(std::string) cuts both
-    // arguments at the first '\0', so TestObjectSwiftKotlin returns 'a'.
 
     'addStrings(...) keeps NUL characters': (testObject) => {
       expect(Object.is(testObject.addStrings('a\0', '\0b'), 'a\0\0b')).to.equal(true)
@@ -431,13 +424,4 @@ export const cases = {
   }),
 }
 
-export const skips = {
-  'String edge cases / TestObjectSwiftKotlin / stringValue roundtrips an embedded NUL character': {
-    android:
-      "Fix in Nitro - on Android the generated JNI code passes std::string to Kotlin via jni::make_jstring(std::string), which uses c_str() and cuts the string at the first '\\0' (TestObjectSwiftKotlin.stringValue becomes 'before').",
-  },
-  'String edge cases / TestObjectSwiftKotlin / addStrings(...) keeps NUL characters': {
-    android:
-      "Fix in Nitro - on Android jni::make_jstring(std::string) cuts both arguments at the first '\\0', so TestObjectSwiftKotlin returns 'a'.",
-  },
-} as const
+export const skips = {} as const

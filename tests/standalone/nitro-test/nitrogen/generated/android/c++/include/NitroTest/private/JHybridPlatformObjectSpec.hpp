@@ -11,6 +11,8 @@
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
 #include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JHybridPlatformObjectSpec.hpp>
 
 namespace margelo::nitro::test {
@@ -58,7 +60,7 @@ namespace margelo::nitro::test {
 
   public:
     // Methods
-    std::string getOSVersion();
+    jni::local_ref<jni::JString> getOSVersion();
 
   public:
     // Constructor and static members

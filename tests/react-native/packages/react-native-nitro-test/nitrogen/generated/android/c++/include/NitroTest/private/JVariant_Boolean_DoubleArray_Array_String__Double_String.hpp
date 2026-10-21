@@ -13,6 +13,8 @@
 #include <vector>
 #include <string>
 #include <variant>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 

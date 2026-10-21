@@ -13,6 +13,8 @@
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test::external {
 
@@ -63,7 +65,7 @@ namespace margelo::nitro::test::external {
   public:
     // Methods
     void someMethod();
-    std::string getModuleName();
+    jni::local_ref<jni::JString> getModuleName();
 
   public:
     // Constructor and static members

@@ -15,11 +15,13 @@
 #include <variant>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <NitroTest/private/JCar.hpp>
-#include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <optional>
 #include <NitroTest/private/JPerson.hpp>
 #include <vector>
+#include <string>
 #include <NitroTest/private/JVariant_Double_String.hpp>
 
 namespace margelo::nitro::test {

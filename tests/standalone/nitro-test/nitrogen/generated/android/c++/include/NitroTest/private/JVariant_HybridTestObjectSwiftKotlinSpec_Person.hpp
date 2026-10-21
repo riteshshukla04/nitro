@@ -17,7 +17,8 @@ namespace margelo::nitro::test { class JHybridTestObjectSwiftKotlinSpec; }
 #include <variant>
 #include <NitroTest/private/JHybridTestObjectSwiftKotlinSpec.hpp>
 #include <NitroTest/private/JPerson.hpp>
-#include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 

@@ -10,6 +10,8 @@
 #include <NitroTest/private/MapWrapperKotlin.hpp>
 #include <string>
 #include <unordered_map>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/SecondMapWrapperKotlin.hpp>
 #include <NitroTest/private/JSecondMapWrapper.hpp>
 
@@ -26,7 +28,7 @@ namespace margelo::nitro::test {
         std::unordered_map<std::string, std::string> __map;
         __map.reserve(__input->size());
         for (const auto& __entry : *__input) {
-          __map.emplace(__entry.first->toStdString(), __entry.second->toStdString());
+          __map.emplace(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.first), JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.second));
         }
         return __map;
       }(map),
@@ -43,7 +45,7 @@ namespace margelo::nitro::test {
       [&](const auto& __input) -> jni::local_ref<jni::JMap<jni::JString, jni::JString>> {
         auto __map = jni::JHashMap<jni::JString, jni::JString>::create(__input.size());
         for (const auto& __entry : __input) {
-          __map->put(jni::make_jstring(__entry.first), jni::make_jstring(__entry.second));
+          __map->put(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.first), JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.second));
         }
         return __map;
       }(value.map),

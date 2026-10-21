@@ -10,6 +10,8 @@
 #include <NitroTest/private/PartialPersonKotlin.hpp>
 #include <string>
 #include <optional>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 
@@ -20,7 +22,7 @@ namespace margelo::nitro::test {
     static const auto fieldAge = clazz->getField<jni::JDouble>("age");
     jni::local_ref<jni::JDouble> age = this->getFieldValue(fieldAge);
     return PartialPersonKotlin(
-      name != nullptr ? std::make_optional(name->toStdString()) : std::nullopt,
+      name != nullptr ? std::make_optional(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(name)) : std::nullopt,
       age != nullptr ? std::make_optional(age->value()) : std::nullopt
     );
   }
@@ -31,7 +33,7 @@ namespace margelo::nitro::test {
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      value.name.has_value() ? jni::make_jstring(value.name.value()) : nullptr,
+      value.name.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.name.value()) : nullptr,
       value.age.has_value() ? jni::JDouble::valueOf(value.age.value()) : nullptr
     );
   }

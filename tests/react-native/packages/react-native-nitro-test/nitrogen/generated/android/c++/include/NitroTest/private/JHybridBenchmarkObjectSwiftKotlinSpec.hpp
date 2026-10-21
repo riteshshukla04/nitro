@@ -23,6 +23,8 @@ namespace margelo::nitro::test { class JHybridBenchmarkObjectSwiftKotlinSpec; }
 #include <optional>
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JHybridBenchmarkObjectSwiftKotlinSpec.hpp>
 
 namespace margelo::nitro::test {
@@ -74,11 +76,11 @@ namespace margelo::nitro::test {
     // Methods
     void simpleFunc();
     double addNumbers(double a, double b);
-    std::string addStrings(const std::string& a, const std::string& b);
+    jni::local_ref<jni::JString> addStrings(const jni::local_ref<jni::JString>& a, const jni::local_ref<jni::JString>& b);
     std::vector<double> bounceNumbers(const std::vector<double>& array);
     CarKotlin bounceCar(const CarKotlin& car);
     std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map);
-    std::string tryOptionalParams(double num, bool boo, const std::optional<std::string>& str);
+    jni::local_ref<jni::JString> tryOptionalParams(double num, bool boo, const std::optional<std::string>& str);
     std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either);
     ArrayBuffer bounceArrayBuffer(const ArrayBuffer& buffer);
     ArrayBuffer copyBuffer(const ArrayBuffer& buffer);

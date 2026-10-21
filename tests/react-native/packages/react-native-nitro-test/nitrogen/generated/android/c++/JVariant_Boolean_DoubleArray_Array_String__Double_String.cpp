@@ -9,6 +9,8 @@
 #include <vector>
 #include <string>
 #include <variant>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String::create_0(jboolean value) {
@@ -50,13 +52,13 @@ namespace margelo::nitro::test {
         jni::local_ref<jni::JArrayClass<jni::JString>> __array = jni::JArrayClass<jni::JString>::newArray(__size);
         for (size_t __i = 0; __i < __size; __i++) {
           const auto& __element = __input[__i];
-          auto __elementJni = jni::make_jstring(__element);
+          auto __elementJni = JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__element);
           __array->setElement(__i, *__elementJni);
         }
         return __array;
       }(std::get<2>(variant)));
       case 3: return create_3(std::get<3>(variant));
-      case 4: return create_4(jni::make_jstring(std::get<4>(variant)));
+      case 4: return create_4(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<4>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
   }
@@ -112,7 +114,7 @@ namespace margelo::nitro::test {
         __vector.reserve(__size);
         for (size_t __i = 0; __i < __size; __i++) {
           auto __element = __input->getElement(__i);
-          __vector.push_back(__element->toStdString());
+          __vector.push_back(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__element));
         }
         return __vector;
       }(jniValue);
@@ -123,7 +125,7 @@ namespace margelo::nitro::test {
     } else if (isInstanceOf(JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth::javaClassStatic())) {
       // It's a `std::string`
       auto jniValue = static_cast<const JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth*>(this)->getValue();
-      return jniValue->toStdString();
+      return JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(jniValue);
     }
     throw std::invalid_argument("Variant is unknown Kotlin instance!");
   }

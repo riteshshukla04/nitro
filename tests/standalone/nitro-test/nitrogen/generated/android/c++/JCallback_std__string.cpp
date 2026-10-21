@@ -10,13 +10,15 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 
   std::string JCallback_std__string::invoke() const {
     static const auto __method = javaClassStatic()->getMethod<jni::local_ref<jni::JString>()>("invoke_jni");
     auto __result = __method(self());
-    return __result->toStdString();
+    return JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__result);
   }
 
   jni::local_ref<JCallback_std__string::javaobject> JCallback_std__string_cxx::fromCpp(const Callback<std::string()>& callback) {
@@ -29,7 +31,7 @@ namespace margelo::nitro::test {
 
   jni::local_ref<jni::JString> JCallback_std__string_cxx::invoke_cxx() {
     std::string __result = _callback.callSync();
-    return jni::make_jstring(__result);
+    return JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__result);
   }
 
   void JCallback_std__string_cxx::registerNatives() {

@@ -10,12 +10,14 @@
 #include <NitroTest/private/CarKotlin.hpp>
 #include <variant>
 #include <NitroTest/private/JPerson.hpp>
-#include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JCar.hpp>
 #include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <optional>
 #include <vector>
+#include <string>
 #include <NitroTest/private/JVariant_Double_String.hpp>
 
 namespace margelo::nitro::test {

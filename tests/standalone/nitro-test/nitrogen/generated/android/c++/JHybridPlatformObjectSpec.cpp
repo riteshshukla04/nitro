@@ -7,6 +7,8 @@
 
 #include <NitroTest/private/JHybridPlatformObjectSpec.hpp>
 #include <string>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 
@@ -66,10 +68,10 @@ namespace margelo::nitro::test {
 
 
   // Methods
-  std::string JHybridPlatformObjectSpec::getOSVersion() {
+  jni::local_ref<jni::JString> JHybridPlatformObjectSpec::getOSVersion() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>()>("getOSVersion");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return __result->toStdString();
+    return __result;
   }
 
 } // namespace margelo::nitro::test

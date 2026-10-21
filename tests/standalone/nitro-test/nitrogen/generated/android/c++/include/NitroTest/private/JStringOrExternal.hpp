@@ -16,6 +16,8 @@ namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; 
 #include <string>
 #include <variant>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 
