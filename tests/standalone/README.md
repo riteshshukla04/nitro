@@ -118,6 +118,21 @@ Suites with exclusions export a literal `skips` object with `as const`. Each key
 or `release` to the exclusion reason. JUnit reports these as assumptions; Swift Testing puts them in a separate disabled parameterized test.
 They are never counted as successful behavior checks. New regressions should fail normally.
 
+## Native coverage gaps
+
+Add behavior tests in `test-runner/js/` through the `nitro-test` and `nitro-test-external` HybridObjects. Use both the C++ and Swift/Kotlin
+fixtures when the behavior applies to all three languages.
+
+The shared JS tests do not directly check:
+
+- Whether a retained JNI handle is a global reference, or whether a conversion creates unnecessary local references.
+- JNI attachment and cleanup on detached native workers, including which code owns the attachment.
+- Android `HardwareBuffer` boxing, explicit `close()`, and native reference counts on allocation or copy failures.
+- Concurrent first access to JNI singleton caches and disposal races that require control over native thread scheduling.
+
+These need platform tests or native probes if we add coverage later. End-to-end tests can check returned values and observable lifetimes,
+but cannot prove these ownership and scheduling details.
+
 ## Execution and failures
 
 Each native case creates a fresh Hermes runtime, installs Nitro, loads the bundle, and calls `runNitroTest(name)`. The runner eagerly

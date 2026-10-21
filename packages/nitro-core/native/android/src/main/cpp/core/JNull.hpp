@@ -11,7 +11,7 @@
 
 namespace margelo::nitro {
 
-using namespace facebook;
+namespace jni = facebook::jni;
 
 /**
  * Represents a `Null` from Kotlin.
@@ -21,12 +21,13 @@ public:
   static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/core/NullType;";
 
 public:
-  static jni::global_ref<JNull> null() {
-    static const auto clazz = javaClassStatic();
-    static const auto nullField = clazz->getStaticField<JNull>("NULL");
-    static const auto nullValue = clazz->getStaticFieldValue(nullField);
-    static const auto globalNullValue = jni::make_global(nullValue);
-    return globalNullValue;
+  static jni::alias_ref<JNull> null() {
+    static const auto value = [] {
+      const auto clazz = javaClassStatic();
+      const auto field = clazz->getStaticField<JNull>("NULL");
+      return jni::make_global(clazz->getStaticFieldValue(field));
+    }();
+    return value;
   }
 };
 

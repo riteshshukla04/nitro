@@ -9,6 +9,8 @@ object NitroCore {
     // fbjni's HybridData loads libfbjni through NativeLoader. Use Android's
     // standard System.loadLibrary in this standalone host.
     NativeLoader.initIfUninitialized(SystemDelegate())
+    // Run fbjni's JNI_OnLoad before a native worker needs ThreadScopeSupport.
+    System.loadLibrary("fbjni")
     JNIOnLoad.initializeNativeNitro()
   }
 
