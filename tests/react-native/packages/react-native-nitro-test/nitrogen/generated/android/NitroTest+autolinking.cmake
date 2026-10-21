@@ -13,7 +13,6 @@ target_include_directories(NitroTest PRIVATE
 )
 target_sources(NitroTest PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/NitroTestOnLoad.cpp"
-  "${CMAKE_CURRENT_LIST_DIR}/../android/c++/ColorScheme+Kotlin+NitroTest.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/HybridBenchmarkObjectCppSpecClass.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JCallback_double.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JCallback_void.cpp"

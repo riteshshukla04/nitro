@@ -22,8 +22,8 @@ namespace margelo::nitro::test::views {
                                                                const HybridRecyclableTestViewProps& sourceProps,
                                                                const react::RawProps& rawProps):
     react::ViewProps(context, sourceProps, rawProps, filterObjectKeys),
-    isBlue(nitro::ReactProp<bool>::fromRawValue("RecyclableTestView", "isBlue", rawProps, sourceProps.isBlue)),
-    nativeDefaultValue(nitro::ReactProp<std::optional<double>>::fromRawValue("RecyclableTestView", "nativeDefaultValue", rawProps, sourceProps.nativeDefaultValue)),
+    isBlue(nitro::ReactProp<jboolean>::fromRawValue("RecyclableTestView", "isBlue", rawProps, sourceProps.isBlue)),
+    nativeDefaultValue(nitro::ReactProp<jni::global_ref<JOptional<jni::JDouble>>>::fromRawValue("RecyclableTestView", "nativeDefaultValue", rawProps, sourceProps.nativeDefaultValue)),
     hybridRef(nitro::ReactProp<std::optional<Callback<void(const std::shared_ptr<HybridObject>& /* ref */)>>>::fromRawValue("RecyclableTestView", "hybridRef", rawProps, sourceProps.hybridRef)) {
 #ifdef ANDROID
     nitro::RawPropsCompat::initializeDynamicProps(*this, sourceProps, rawProps, filterObjectKeys);

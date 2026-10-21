@@ -162,14 +162,7 @@ export function getHybridObjectSpec(
     if (Node.isPropertyDeclaration(member)) {
       const memberType = member.getType()
       const isOptional = memberSymbol.isOptional() || memberType.getUnionTypes().some((unionType) => unionType.isUndefined())
-      // Android Fabric props still use public C++ storage.
-      let propertyTarget: TypeParsingTarget
-      if (view && language === 'kotlin' && !member.isReadonly()) {
-        propertyTarget = { ...target, language: 'c++' }
-      } else {
-        propertyTarget = target
-      }
-      const propType = createType(propertyTarget, memberType, isOptional, member.getTypeNode())
+      const propType = createType(target, memberType, isOptional, member.getTypeNode())
       properties.push(new Property(memberName, propType, member.isReadonly()))
     } else if (Node.isMethodDeclaration(member)) {
       methods.push(new InstanceMethod(member, target))

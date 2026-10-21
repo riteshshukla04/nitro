@@ -22,12 +22,12 @@ namespace margelo::nitro::test::views {
                                            const HybridTestViewProps& sourceProps,
                                            const react::RawProps& rawProps):
     react::ViewProps(context, sourceProps, rawProps, filterObjectKeys),
-    isBlue(nitro::ReactProp<bool>::fromRawValue("TestView", "isBlue", rawProps, sourceProps.isBlue)),
-    hasBeenCalled(nitro::ReactProp<bool>::fromRawValue("TestView", "hasBeenCalled", rawProps, sourceProps.hasBeenCalled)),
-    int64Value(nitro::ReactProp<int64_t>::fromRawValue("TestView", "int64Value", rawProps, sourceProps.int64Value)),
-    colorScheme(nitro::ReactProp<ColorScheme>::fromRawValue("TestView", "colorScheme", rawProps, sourceProps.colorScheme)),
-    someCallback(nitro::ReactProp<Callback<void()>>::fromRawValue("TestView", "someCallback", rawProps, sourceProps.someCallback)),
-    nativeDefaultValue(nitro::ReactProp<std::optional<double>>::fromRawValue("TestView", "nativeDefaultValue", rawProps, sourceProps.nativeDefaultValue)),
+    isBlue(nitro::ReactProp<jboolean>::fromRawValue("TestView", "isBlue", rawProps, sourceProps.isBlue)),
+    hasBeenCalled(nitro::ReactProp<jboolean>::fromRawValue("TestView", "hasBeenCalled", rawProps, sourceProps.hasBeenCalled)),
+    int64Value(nitro::ReactProp<jlong>::fromRawValue("TestView", "int64Value", rawProps, sourceProps.int64Value)),
+    colorScheme(nitro::ReactProp<jni::global_ref<JColorScheme>>::fromRawValue("TestView", "colorScheme", rawProps, sourceProps.colorScheme)),
+    someCallback(nitro::ReactProp<jni::global_ref<margelo::nitro::test::JCallback_void>>::fromRawValue("TestView", "someCallback", rawProps, sourceProps.someCallback)),
+    nativeDefaultValue(nitro::ReactProp<jni::global_ref<JOptional<jni::JDouble>>>::fromRawValue("TestView", "nativeDefaultValue", rawProps, sourceProps.nativeDefaultValue)),
     hybridRef(nitro::ReactProp<std::optional<Callback<void(const std::shared_ptr<HybridObject>& /* ref */)>>>::fromRawValue("TestView", "hybridRef", rawProps, sourceProps.hybridRef)) {
 #ifdef ANDROID
     nitro::RawPropsCompat::initializeDynamicProps(*this, sourceProps, rawProps, filterObjectKeys);

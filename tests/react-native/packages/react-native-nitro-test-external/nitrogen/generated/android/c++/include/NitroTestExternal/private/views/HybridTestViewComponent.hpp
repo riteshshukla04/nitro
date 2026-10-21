@@ -17,10 +17,15 @@
 
 #include <string>
 
-#include <NitroModules/Callback.hpp>
-#include <functional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroTestExternal/private/JCallback_void.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
+#include <NitroModules/JSIConverter+JNIGlobalRef.hpp>
 #include <memory>
 #include <NitroModules/HybridObject.hpp>
+#include <NitroModules/Callback.hpp>
+#include <functional>
 #include <optional>
 
 namespace margelo::nitro::test::external::views {
@@ -44,8 +49,8 @@ namespace margelo::nitro::test::external::views {
                         const react::RawProps& rawProps);
 
   public:
-    nitro::ReactProp<bool> isBlue;
-    nitro::ReactProp<Callback<void()>> someCallback;
+    nitro::ReactProp<jboolean> isBlue;
+    nitro::ReactProp<jni::global_ref<margelo::nitro::test::external::JCallback_void>> someCallback;
     nitro::ReactProp<std::optional<Callback<void(const std::shared_ptr<HybridObject>& /* ref */)>>> hybridRef;
 
     [[nodiscard]]

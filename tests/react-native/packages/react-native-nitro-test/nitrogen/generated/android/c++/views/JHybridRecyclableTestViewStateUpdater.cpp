@@ -7,11 +7,6 @@
 
 #include <NitroTest/private/views/JHybridRecyclableTestViewStateUpdater.hpp>
 #include <NitroTest/private/views/HybridRecyclableTestViewComponent.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <optional>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroModules/JNIConverter+Optional.hpp>
-#include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <react/fabric/StateWrapperImpl.h>
 #include <stdexcept>
@@ -71,12 +66,14 @@ void JHybridRecyclableTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::
     if (oldProps == nullptr
           ? newProps->isBlue.isProvided()
           : !newProps->isBlue.hasSameValue(oldProps->isBlue)) {
-      hybridView->setIsBlue(JNIConverter<bool, jboolean>::toJNI(newProps->isBlue.get()));
+      static const auto __setter = JHybridRecyclableTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jboolean)>("setBlue");
+      __setter(javaView, newProps->isBlue.get());
     }
     if (oldProps == nullptr
           ? newProps->nativeDefaultValue.isProvided()
           : !newProps->nativeDefaultValue.hasSameValue(oldProps->nativeDefaultValue)) {
-      hybridView->setNativeDefaultValue(JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(newProps->nativeDefaultValue.get()));
+      static const auto __setter = JHybridRecyclableTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jni::alias_ref<JOptional<jni::JDouble>>)>("setNativeDefaultValue");
+      __setter(javaView, newProps->nativeDefaultValue.get().get());
     }
 
     if (oldProps == nullptr

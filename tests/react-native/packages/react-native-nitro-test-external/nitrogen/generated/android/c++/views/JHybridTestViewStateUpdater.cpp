@@ -7,11 +7,6 @@
 
 #include <NitroTestExternal/private/views/JHybridTestViewStateUpdater.hpp>
 #include <NitroTestExternal/private/views/HybridTestViewComponent.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
-#include <NitroTestExternal/private/JCallback_void.hpp>
-#include <NitroModules/JNIConverter+Callback.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <react/fabric/StateWrapperImpl.h>
 #include <stdexcept>
@@ -71,12 +66,14 @@ void JHybridTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /*
     if (oldProps == nullptr
           ? newProps->isBlue.isProvided()
           : !newProps->isBlue.hasSameValue(oldProps->isBlue)) {
-      hybridView->setIsBlue(JNIConverter<bool, jboolean>::toJNI(newProps->isBlue.get()));
+      static const auto __setter = JHybridTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jboolean)>("setBlue");
+      __setter(javaView, newProps->isBlue.get());
     }
     if (oldProps == nullptr
           ? newProps->someCallback.isProvided()
           : !newProps->someCallback.hasSameValue(oldProps->someCallback)) {
-      hybridView->setSomeCallback(JNIConverter<margelo::nitro::Callback<void()>, jni::local_ref<margelo::nitro::test::external::JCallback_void>>::toJNI(newProps->someCallback.get()));
+      static const auto __setter = JHybridTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jni::alias_ref<margelo::nitro::test::external::JCallback_void>)>("setSomeCallback_cxx");
+      __setter(javaView, newProps->someCallback.get().get());
     }
 
     if (oldProps == nullptr

@@ -17,12 +17,19 @@
 
 #include <string>
 
-#include <NitroTest/ColorScheme.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroTest/private/JColorScheme.hpp>
+#include <NitroModules/JSIConverter+JNIGlobalRef.hpp>
+#include <NitroTest/private/JCallback_void.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <memory>
+#include <NitroModules/HybridObject.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <optional>
-#include <memory>
-#include <NitroModules/HybridObject.hpp>
 
 namespace margelo::nitro::test::views {
 
@@ -45,12 +52,12 @@ namespace margelo::nitro::test::views {
                         const react::RawProps& rawProps);
 
   public:
-    nitro::ReactProp<bool> isBlue;
-    nitro::ReactProp<bool> hasBeenCalled;
-    nitro::ReactProp<int64_t> int64Value;
-    nitro::ReactProp<ColorScheme> colorScheme;
-    nitro::ReactProp<Callback<void()>> someCallback;
-    nitro::ReactProp<std::optional<double>> nativeDefaultValue;
+    nitro::ReactProp<jboolean> isBlue;
+    nitro::ReactProp<jboolean> hasBeenCalled;
+    nitro::ReactProp<jlong> int64Value;
+    nitro::ReactProp<jni::global_ref<JColorScheme>> colorScheme;
+    nitro::ReactProp<jni::global_ref<margelo::nitro::test::JCallback_void>> someCallback;
+    nitro::ReactProp<jni::global_ref<JOptional<jni::JDouble>>> nativeDefaultValue;
     nitro::ReactProp<std::optional<Callback<void(const std::shared_ptr<HybridObject>& /* ref */)>>> hybridRef;
 
     [[nodiscard]]

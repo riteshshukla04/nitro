@@ -1,4 +1,4 @@
-import { wrapKotlinType } from '../../syntax/kotlin/wrapKotlinType.js'
+import { getJniCode } from '../../syntax/kotlin/types/KotlinType.js'
 import type { SourceFile } from '../../syntax/SourceFile.js'
 import type { HybridObjectSpec } from '../../syntax/HybridObjectSpec.js'
 import {
@@ -6,13 +6,15 @@ import {
   getViewComponentNames,
   getHybridViewComponentName,
   getHybridViewProperties,
+  type HybridViewPropertyStorage,
 } from '../CppHybridViewComponent.js'
 import { createFileMetadataString, escapeCppName } from '../../syntax/helpers.js'
 import { getHybridObjectName } from '../../syntax/getHybridObjectName.js'
 import { indent } from '../../utils.js'
 import { getImportsCode, getImportCode } from '../../syntax/getImportCode.js'
 import { getKotlinImplementation } from '../../syntax/kotlin/KotlinMethodHelpers.js'
-import { createKotlinConverters, getKotlinConverter } from '../../syntax/kotlin/KotlinConverter.js'
+import { KotlinInstanceMethod } from '../../syntax/kotlin/KotlinInstanceMethod.js'
+import { KotlinStoredType } from '../../syntax/kotlin/types/KotlinStoredType.js'
 import { KotlinHybridViewType } from './KotlinHybridViewType.js'
 
 export function createKotlinHybridViewManager(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {
@@ -25,22 +27,19 @@ export function createKotlinHybridViewManager(spec: HybridObjectSpec<'kotlin'>):
   const implementation = getKotlinImplementation(spec)
   const viewImplementation = implementation.className
   const implementationImport = getImportCode(implementation.kotlinImport)
-  const viewProperties = getHybridViewProperties(spec)
-  const cppFiles = createViewComponentShadowNodeFiles(spec, {
-    platform: 'android',
-    properties: viewProperties.map(({ property, config }) => ({ property: property, config: config, type: property.type })),
-  })
-  const propertyFiles = viewProperties.flatMap(({ property }) => property.type.getExtraFiles())
-  const propertyConverters = viewProperties.map(({ property, config }) => createKotlinConverters(property.type, config))
-  const converterFiles = propertyConverters.flatMap((converter) => converter.files)
-  const converterImports = propertyConverters.flatMap((converter) => converter.imports)
+  const viewProperties = getHybridViewProperties(spec).map(({ property, config }) => ({
+    property: property,
+    config: config,
+    type: new KotlinStoredType(property.type, config),
+  })) satisfies readonly HybridViewPropertyStorage[]
+  const cppFiles = createViewComponentShadowNodeFiles(spec, { platform: 'android', properties: viewProperties })
+  const propertyFiles = viewProperties.flatMap(({ type }) => type.getExtraFiles())
   const componentName = getHybridViewComponentName(spec)
   const componentHeader = spec.config.getCxxHeader(`views/${component}.hpp`, 'private')
   const updaterHeader = spec.config.getCxxHeader(`views/J${stateUpdaterName}.hpp`, 'private')
   const updaterIncludes = getImportsCode([
     { language: 'c++', declaration: updaterHeader },
     { language: 'c++', declaration: componentHeader },
-    ...converterImports,
   ])
   const declarationIncludes = getImportsCode([
     {
@@ -222,18 +221,21 @@ public:
 } // namespace ${cxxNamespace}
   `.trim()
 
-  const propsUpdaterCalls = viewProperties.map(({ property, config }) => {
+  const propsUpdaterCalls = viewProperties.map(({ property, type }) => {
     const name = escapeCppName(property.name)
-    const setter = property.getSetterName('other')
-    const converter = getKotlinConverter({
-      cppType: property.type,
-      kotlinType: wrapKotlinType(property.type, { config: config }),
-    })
+    const setter = property.cppSetter
+    if (setter == null) {
+      throw new Error(`HybridView property ${spec.name}.${property.name} requires a setter.`)
+    }
+    const kotlinSetter = new KotlinInstanceMethod({ method: setter, accessor: { kind: 'setter', property: property } })
+    const jniParameterType = getJniCode(type.type, { context: 'parameter', fullyQualified: true })
+    const jniValue = type.getJniValue(`newProps->${name}.get()`)
     return `
 if (oldProps == nullptr
       ? newProps->${name}.isProvided()
       : !newProps->${name}.hasSameValue(oldProps->${name})) {
-  hybridView->${setter}(${converter}::toJNI(newProps->${name}.get()));
+  static const auto __setter = ${JHybridTSpec}::JavaPart::javaClassStatic()->getMethod<void(${jniParameterType})>("${kotlinSetter.name}");
+  __setter(javaView, ${jniValue});
 }
     `.trim()
   })
@@ -318,7 +320,6 @@ void J${stateUpdaterName}::updateViewProps(jni::alias_ref<jni::JClass> /* class 
   return [
     ...cppFiles,
     ...propertyFiles,
-    ...converterFiles,
     {
       content: viewManagerCode,
       language: 'kotlin',
