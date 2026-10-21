@@ -6,14 +6,17 @@ import { wrapKotlinType } from '../wrapKotlinType.js'
 import type { KotlinCppConverter } from '../KotlinConverter.js'
 import { KotlinCxxOptionalType } from './KotlinCxxOptionalType.js'
 import { getTypeAs } from '../../types/getTypeAs.js'
-import { getJniReferenceCode, type JniValueKind, type KotlinConversion, type KotlinType } from './KotlinType.js'
+import { getJniReferenceCode, type JniValueKind, type KotlinConversion, type KotlinType, type KotlinTypeOptions } from './KotlinType.js'
 
 /** JNI represents an optional as a nullable reference to its boxed value. */
 export class KotlinOptionalType extends OptionalType implements KotlinType {
   override readonly wrappingType: KotlinType
 
-  constructor(readonly type: OptionalType) {
-    const wrappingType = wrapKotlinType(type.wrappingType, { boxed: true })
+  constructor(
+    readonly type: OptionalType,
+    options: KotlinTypeOptions = {}
+  ) {
+    const wrappingType = wrapKotlinType(type.wrappingType, { boxed: true, config: options.config })
     super(wrappingType)
     this.wrappingType = wrappingType
   }

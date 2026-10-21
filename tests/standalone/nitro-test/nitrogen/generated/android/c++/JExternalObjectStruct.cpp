@@ -11,6 +11,7 @@
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
+#include <memory>
 
 namespace margelo::nitro::test {
 

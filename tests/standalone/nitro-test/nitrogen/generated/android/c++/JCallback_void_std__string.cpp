@@ -6,11 +6,11 @@
 ///
 
 #include <NitroTest/private/JCallback_void_std__string.hpp>
+#include <NitroModules/JNIConverter+String.hpp>
 #include <string>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {

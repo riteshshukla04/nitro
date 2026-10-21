@@ -1,4 +1,3 @@
-import { NitroConfig } from '../../config/NitroConfig.js'
 import { capitalizeName, indent } from '../../utils.js'
 import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
@@ -23,7 +22,7 @@ data class ${innerName}(@DoNotStrip val value: ${valueType}): ${kotlinName}()
       `.trim()
   })
 
-  const packageName = NitroConfig.current.getAndroidPackage('java/kotlin')
+  const packageName = variant.config.getAndroidPackage('java/kotlin')
   const isFunctions = variant.kotlinCases.map(({ label }) => {
     const innerName = capitalizeName(label)
     return `
@@ -139,8 +138,8 @@ sealed class ${kotlinName} {
 }
   `.trim()
 
-  const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
-  const jniClassDescriptor = NitroConfig.current.getAndroidPackage('c++/jni', kotlinName)
+  const cxxNamespace = variant.config.getCxxNamespace('c++')
+  const jniClassDescriptor = variant.config.getAndroidPackage('c++/jni', kotlinName)
   const cppCreateDeclarations = variant.kotlinCases.map(({ type }, i) => {
     const jniType = type.getCode('c++', { context: 'parameter' })
     return `static jni::local_ref<${jniName}> create_${i}(${jniType} value);`
@@ -181,7 +180,7 @@ if (isInstanceOf(${namespace}::${innerName}::javaClassStatic())) {
   const cppInnerClasses = variant.kotlinCases.map(({ label, type }) => {
     const innerName = capitalizeName(label)
     const jniType = type.getCode('c++', { context: 'return' })
-    const descriptor = NitroConfig.current.getAndroidPackage('c++/jni', `${kotlinName}$${innerName}`)
+    const descriptor = variant.config.getAndroidPackage('c++/jni', `${kotlinName}$${innerName}`)
     return `
 class ${innerName} final : public jni::JavaClass<${innerName}, ${jniName}> {
 public:
@@ -204,13 +203,17 @@ ${jniType} ${namespace}::${innerName}::getValue() const {
     `.trim()
   })
 
-  const imports = [...publicVariant.getRequiredImports('c++'), ...variant.variants.flatMap((v) => v.getRequiredImports('c++'))]
+  const imports = [
+    ...publicVariant.getRequiredImports('c++'),
+    ...variant.variants.flatMap((v) => v.getRequiredImports('c++')),
+    ...variant.getCppConverterDependencies().imports,
+  ]
   const declarationIncludes = imports.map((i) => getImportCode(i, 'declaration')).filter(isNotDuplicate)
   const implementationIncludes = getImportsCode(
     [
       {
         language: 'c++',
-        declaration: NitroConfig.current.getCxxHeader(`${jniName}.hpp`, 'private'),
+        declaration: variant.config.getCxxHeader(`${jniName}.hpp`, 'private'),
       },
       ...imports,
     ],
@@ -287,7 +290,7 @@ namespace ${cxxNamespace} {
     content: code,
     language: 'kotlin',
     name: `${kotlinName}.kt`,
-    subdirectory: NitroConfig.current.getAndroidPackageDirectory(),
+    subdirectory: variant.config.getAndroidPackageDirectory(),
     platform: 'android',
   })
   files.push({

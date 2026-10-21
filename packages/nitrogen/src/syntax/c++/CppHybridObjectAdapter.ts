@@ -183,7 +183,7 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec, platform: P
           const converter = getKotlinConverter({
             cppType: parameter.type,
             context: 'parameter-type',
-            kotlinType: getKotlinJSIType(getKotlinNativeType(parameter.type, spec.config)),
+            kotlinType: getKotlinJSIType(getKotlinNativeType(parameter.type, spec.config), { config: spec.config }),
           })
           return `${converter}::toJNI(${parameter.type.escapedName})`
         }
@@ -216,7 +216,7 @@ return ${converter}::fromSwift(__result);
       case 'kotlin': {
         const converter = getKotlinConverter({
           cppType: method.returnType,
-          kotlinType: getKotlinJSIType(getKotlinNativeType(method.returnType, spec.config)),
+          kotlinType: getKotlinJSIType(getKotlinNativeType(method.returnType, spec.config), { config: spec.config }),
         })
         return `
 auto __result = ${call};

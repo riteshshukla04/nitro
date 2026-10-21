@@ -7,7 +7,7 @@ import { wrapKotlinType } from '../wrapKotlinType.js'
 import type { KotlinCppConverter } from '../KotlinConverter.js'
 import { KotlinCxxRecordType } from './KotlinCxxRecordType.js'
 import { getTypeAs } from '../../types/getTypeAs.js'
-import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType, type KotlinTypeOptions } from './KotlinType.js'
 
 /** JNI represents a record as a `java.util.Map` of boxed keys and values. */
 export class KotlinRecordType extends RecordType implements KotlinType {
@@ -15,9 +15,12 @@ export class KotlinRecordType extends RecordType implements KotlinType {
   override readonly valueType: KotlinType
   readonly jniValueKind = 'wrapper'
 
-  constructor(readonly type: RecordType) {
-    const keyType = wrapKotlinType(type.keyType, { boxed: true })
-    const valueType = wrapKotlinType(type.valueType, { boxed: true })
+  constructor(
+    readonly type: RecordType,
+    options: KotlinTypeOptions = {}
+  ) {
+    const keyType = wrapKotlinType(type.keyType, { boxed: true, config: options.config })
+    const valueType = wrapKotlinType(type.valueType, { boxed: true, config: options.config })
     super(keyType, valueType)
     this.keyType = keyType
     this.valueType = valueType

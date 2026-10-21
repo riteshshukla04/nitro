@@ -1,3 +1,4 @@
+import { combineKotlinCppConverters, type KotlinCppConverter } from '../KotlinConverter.js'
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { GetCodeOptions } from '../../types/Type.js'
@@ -13,8 +14,11 @@ export class KotlinStructType extends StructType implements KotlinType {
   readonly jniValueKind = 'wrapper'
   readonly needsKotlinConversion = false
 
-  constructor(readonly type: StructType) {
-    const properties = type.properties.map((p) => new KotlinNamedType(p.name, wrapKotlinType(p)))
+  constructor(
+    readonly type: StructType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
+    const properties = type.properties.map((p) => new KotlinNamedType(p.name, wrapKotlinType(p, { config: config })))
     super(type.structName, properties, type.sourceConfig)
     this.properties = properties
   }
@@ -46,8 +50,18 @@ export class KotlinStructType extends StructType implements KotlinType {
     }
   }
 
+  getCppConverterDependencies(): KotlinCppConverter {
+    const dependencies = this.properties.map((property, index) => {
+      const original = this.type.properties[index]
+      if (original == null) throw new Error('Mismatched struct property count')
+      return property.type.getCppConverter?.(original)
+    })
+    return combineKotlinCppConverters(dependencies)
+  }
+
   override getExtraFiles(): SourceFile[] {
-    return [...this.properties.flatMap((p) => p.getExtraFiles()), ...createKotlinStruct(this)]
+    if (this.config.isExternalConfig) return []
+    return [...this.getCppConverterDependencies().files, ...this.properties.flatMap((p) => p.getExtraFiles()), ...createKotlinStruct(this)]
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
@@ -56,7 +70,7 @@ export class KotlinStructType extends StructType implements KotlinType {
       case 'c++':
         imports.push({
           language: language,
-          declaration: NitroConfig.current.getCxxHeader(`${this.jniName}.hpp`, 'private'),
+          declaration: this.config.getCxxHeader(`${this.jniName}.hpp`, 'private'),
         })
         break
     }

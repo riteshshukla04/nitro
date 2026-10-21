@@ -231,6 +231,7 @@ return ${cppResult};
   const kotlinCallbackType = publicType.getCode('kotlin', { context: 'value' })
 
   const imports = [
+    ...callbackType.getCppConverterDependencies().imports,
     ...inlineType.getRequiredImports('c++'),
     ...returnType.getRequiredImports('c++'),
     ...callbackType.parameters.flatMap((p) => p.getRequiredImports('c++')),

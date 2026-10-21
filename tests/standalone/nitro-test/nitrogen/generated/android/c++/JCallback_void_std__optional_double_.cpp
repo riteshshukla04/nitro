@@ -7,13 +7,13 @@
 
 #include <NitroTest/private/JCallback_void_std__optional_double_.hpp>
 #include <optional>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/Callback.hpp>
+#include <NitroModules/InlineCallback.hpp>
+#include <functional>
 
 namespace margelo::nitro::test {
 

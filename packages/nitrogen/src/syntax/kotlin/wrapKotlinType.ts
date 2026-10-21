@@ -57,23 +57,23 @@ export function wrapKotlinType(type: Type, options: KotlinTypeOptions = {}): Kot
     case 'error':
       return new KotlinErrorType()
     case 'enum':
-      return new KotlinEnumType(getTypeAs(type, EnumType))
+      return new KotlinEnumType(getTypeAs(type, EnumType), options.config)
     case 'struct':
-      return new KotlinStructType(getTypeAs(type, StructType))
+      return new KotlinStructType(getTypeAs(type, StructType), options.config)
     case 'variant':
-      return new KotlinVariantType(getTypeAs(type, VariantType))
+      return new KotlinVariantType(getTypeAs(type, VariantType), options.config)
     case 'callback':
-      return new KotlinCallbackType(getTypeAs(type, CallbackType))
+      return new KotlinCallbackType(getTypeAs(type, CallbackType), options.config)
     case 'hybrid-object':
       return new KotlinHybridObjectType(getTypeAs(type, HybridObjectType))
     case 'optional':
-      return new KotlinOptionalType(getTypeAs(type, OptionalType))
+      return new KotlinOptionalType(getTypeAs(type, OptionalType), options)
     case 'array':
-      return new KotlinArrayType(getTypeAs(type, ArrayType))
+      return new KotlinArrayType(getTypeAs(type, ArrayType), options)
     case 'record':
-      return new KotlinRecordType(getTypeAs(type, RecordType))
+      return new KotlinRecordType(getTypeAs(type, RecordType), options)
     case 'promise':
-      return new KotlinPromiseType(getTypeAs(type, PromiseType))
+      return new KotlinPromiseType(getTypeAs(type, PromiseType), options)
     case 'tuple': {
       const tuple = getTypeAs(type, TupleType)
       return new KotlinUnsupportedType(

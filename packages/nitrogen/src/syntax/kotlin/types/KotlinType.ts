@@ -1,3 +1,5 @@
+import type { NitroConfig } from '../../../config/NitroConfig.js'
+import type { Language } from '../../../getPlatformSpecs.js'
 import type { KotlinCppConverter } from '../KotlinConverter.js'
 import type { SourceImport } from '../../SourceFile.js'
 import type { GetCodeOptions, Type } from '../../types/Type.js'
@@ -10,6 +12,8 @@ export interface JNINativeRegistration {
 }
 
 export interface KotlinTypeOptions {
+  /** Module owning nested Kotlin declarations and their JNI registrations. */
+  config?: NitroConfig
   /**
    * Whether JNI holds the value as an object, as in optionals, records, promise
    * results and callback results. Only primitives box, e.g. `double` as `jni::JDouble`.
@@ -57,6 +61,7 @@ export interface GetKotlinCodeOptions extends GetCodeOptions {
 }
 
 export interface KotlinType extends Type {
+  getCode(language: Language, options: GetKotlinCodeOptions): string
   readonly jniValueKind: JniValueKind
   /**
    * The fbjni type a native method returns for a value converted from C++,

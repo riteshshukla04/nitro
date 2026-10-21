@@ -1,3 +1,4 @@
+import { combineKotlinCppConverters, type KotlinCppConverter } from '../KotlinConverter.js'
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
@@ -21,11 +22,14 @@ export class KotlinVariantType extends VariantType implements KotlinType {
   readonly jniValueKind = 'wrapper'
   readonly needsKotlinConversion = false
 
-  constructor(readonly type: VariantType) {
+  constructor(
+    readonly type: VariantType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
     const kotlinCases = type.cases.map(([label, publicType]) => ({
       label: label,
       publicType: publicType,
-      type: wrapKotlinType(publicType),
+      type: wrapKotlinType(publicType, { config: config }),
     }))
     const variants = kotlinCases.map((c) => c.type)
     super(variants, type.aliasName)
@@ -68,8 +72,18 @@ export class KotlinVariantType extends VariantType implements KotlinType {
     return this.type.getAliasName(language, options)
   }
 
+  getCppConverterDependencies(): KotlinCppConverter {
+    const dependencies = this.variants.map((variant, index) => {
+      const original = this.type.variants[index]
+      if (original == null) throw new Error('Mismatched variant case count')
+      return variant.getCppConverter?.(original)
+    })
+    return combineKotlinCppConverters(dependencies)
+  }
+
   override getExtraFiles(): SourceFile[] {
-    return [...this.variants.flatMap((v) => v.getExtraFiles()), ...createKotlinVariant(this)]
+    if (this.config.isExternalConfig) return []
+    return [...this.getCppConverterDependencies().files, ...this.variants.flatMap((v) => v.getExtraFiles()), ...createKotlinVariant(this)]
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
@@ -78,7 +92,7 @@ export class KotlinVariantType extends VariantType implements KotlinType {
       case 'c++':
         imports.push({
           language: language,
-          declaration: NitroConfig.current.getCxxHeader(`${this.jniName}.hpp`, 'private'),
+          declaration: this.config.getCxxHeader(`${this.jniName}.hpp`, 'private'),
         })
         break
     }

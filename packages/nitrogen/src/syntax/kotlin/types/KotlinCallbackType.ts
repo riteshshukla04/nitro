@@ -1,3 +1,4 @@
+import { combineKotlinCppConverters, type KotlinCppConverter } from '../KotlinConverter.js'
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
@@ -21,8 +22,8 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     readonly type: CallbackType,
     readonly config: NitroConfig = NitroConfig.current
   ) {
-    const returnType = wrapKotlinType(type.returnType)
-    const parameters = type.parameters.map((p) => new KotlinNamedType(p.name, wrapKotlinType(p)))
+    const returnType = wrapKotlinType(type.returnType, { config: config })
+    const parameters = type.parameters.map((p) => new KotlinNamedType(p.name, wrapKotlinType(p, { config: config })))
     super(returnType, parameters, type.isInline)
     this.returnType = returnType
     this.parameters = parameters
@@ -87,6 +88,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
   }
 
   getJniNativeRegistrations(): readonly JNINativeRegistration[] {
+    if (this.config.isExternalConfig) return []
     return [
       {
         namespace: this.config.getCxxNamespace('c++').split('::'),
@@ -99,8 +101,18 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     ]
   }
 
+  getCppConverterDependencies(): KotlinCppConverter {
+    const parameters = this.parameters.map((parameter, index) => {
+      const original = this.type.parameters[index]
+      if (original == null) throw new Error('Mismatched callback parameter count')
+      return parameter.type.getCppConverter?.(original)
+    })
+    return combineKotlinCppConverters([this.returnType.getCppConverter?.(this.type.returnType), ...parameters])
+  }
+
   override getExtraFiles(): SourceFile[] {
-    return [...super.getExtraFiles(), ...createKotlinCallback(this)]
+    if (this.config.isExternalConfig) return []
+    return [...this.getCppConverterDependencies().files, ...super.getExtraFiles(), ...createKotlinCallback(this)]
   }
 
   override getRequiredImports(language: Language): SourceImport[] {

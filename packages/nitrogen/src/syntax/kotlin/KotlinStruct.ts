@@ -1,4 +1,3 @@
-import { NitroConfig } from '../../config/NitroConfig.js'
 import { capitalizeName, indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
@@ -7,7 +6,7 @@ import { getImportCode, getImportsCode } from '../getImportCode.js'
 
 export function createKotlinStruct(structType: KotlinStructType): SourceFile[] {
   const publicType = structType.type
-  const packageName = NitroConfig.current.getAndroidPackage('java/kotlin')
+  const packageName = structType.config.getAndroidPackage('java/kotlin')
 
   const properties = structType.properties
     .map((p) => {
@@ -83,19 +82,22 @@ data class ${structType.structName}(
 }
   `.trim()
 
-  const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
-  const jniClassDescriptor = NitroConfig.current.getAndroidPackage('c++/jni', structType.structName)
+  const cxxNamespace = structType.config.getCxxNamespace('c++')
+  const jniClassDescriptor = structType.config.getAndroidPackage('c++/jni', structType.structName)
   const jniStructInitializerBody = createJNIStructInitializer(structType)
   const cppStructInitializerBody = createCppStructInitializer({ cppValueName: 'value', structType: structType })
   const cppReturnType = publicType.getCode('c++', { context: 'return' })
   const cppParameterType = publicType.getCode('c++', { context: 'parameter' })
   const nativeImports = publicType.getRequiredImports('c++')
   const propertyImports = structType.properties.flatMap((property) => property.getRequiredImports('c++'))
-  const implementationIncludes = getImportsCode([...nativeImports, ...propertyImports], 'implementation')
+  const implementationIncludes = getImportsCode(
+    [...nativeImports, ...propertyImports, ...structType.getCppConverterDependencies().imports],
+    'implementation'
+  )
   const publicTypeInclude = getImportsCode(nativeImports, 'declaration')
   const jniTypeInclude = getImportCode({
     language: 'c++',
-    declaration: NitroConfig.current.getCxxHeader(`${structType.jniName}.hpp`, 'private'),
+    declaration: structType.config.getCxxHeader(`${structType.jniName}.hpp`, 'private'),
   })
 
   const fbjniCode = `
@@ -161,7 +163,7 @@ namespace ${cxxNamespace} {
     content: code,
     language: 'kotlin',
     name: `${structType.structName}.kt`,
-    subdirectory: NitroConfig.current.getAndroidPackageDirectory(),
+    subdirectory: structType.config.getAndroidPackageDirectory(),
     platform: 'android',
   })
   files.push({

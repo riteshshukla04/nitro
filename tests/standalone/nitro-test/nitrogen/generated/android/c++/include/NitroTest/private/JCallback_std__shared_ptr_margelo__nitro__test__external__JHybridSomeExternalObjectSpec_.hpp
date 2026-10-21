@@ -14,11 +14,11 @@
 #include <NitroModules/JNIConverter+HybridObject.hpp>
 // Forward declaration of `JHybridSomeExternalObjectSpec` to properly resolve imports.
 namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; }
+#include <NitroTestExternal/private/JHybridSomeExternalObjectSpecJavaPart.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <NitroTestExternal/private/JHybridSomeExternalObjectSpecJavaPart.hpp>
-#include <NitroModules/JSIConverter+JHybridObject.hpp>
 
 namespace margelo::nitro::test {
 

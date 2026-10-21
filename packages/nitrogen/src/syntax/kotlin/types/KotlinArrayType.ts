@@ -7,14 +7,17 @@ import { wrapKotlinType } from '../wrapKotlinType.js'
 import type { KotlinCppConverter } from '../KotlinConverter.js'
 import { KotlinCxxArrayType } from './KotlinCxxArrayType.js'
 import { getTypeAs } from '../../types/getTypeAs.js'
-import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType, type KotlinTypeOptions } from './KotlinType.js'
 
 export class KotlinArrayType extends ArrayType implements KotlinType {
   override readonly itemType: KotlinType
   readonly jniValueKind = 'wrapper'
 
-  constructor(readonly type: ArrayType) {
-    const itemType = wrapKotlinType(type.itemType)
+  constructor(
+    readonly type: ArrayType,
+    options: KotlinTypeOptions = {}
+  ) {
+    const itemType = wrapKotlinType(type.itemType, { config: options.config })
     super(itemType)
     this.itemType = itemType
   }

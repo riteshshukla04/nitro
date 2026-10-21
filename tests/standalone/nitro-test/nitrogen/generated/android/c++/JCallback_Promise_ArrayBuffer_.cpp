@@ -8,13 +8,13 @@
 #include <NitroTest/private/JCallback_Promise_ArrayBuffer_.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <NitroModules/Promise.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 #include <NitroModules/JNIConverter+Promise.hpp>
 #include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
+#include <NitroModules/Callback.hpp>
+#include <NitroModules/InlineCallback.hpp>
+#include <functional>
 
 namespace margelo::nitro::test {
 

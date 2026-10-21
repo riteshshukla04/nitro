@@ -10,6 +10,13 @@ export class KotlinEnumType extends EnumType implements KotlinType {
   readonly jniValueKind = 'wrapper'
   readonly needsKotlinConversion = false
 
+  constructor(
+    readonly type: EnumType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
+    super(type)
+  }
+
   get jniName(): string {
     return `J${this.enumName}`
   }

@@ -7,7 +7,7 @@ import { getTypeAs } from '../../types/getTypeAs.js'
 import type { KotlinCppConverter } from '../KotlinConverter.js'
 import { KotlinCxxPromiseType } from './KotlinCxxPromiseType.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
-import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
+import { getJniReferenceCode, type KotlinConversion, type KotlinType, type KotlinTypeOptions } from './KotlinType.js'
 
 export class KotlinPromiseType extends PromiseType implements KotlinType {
   override readonly resultingType: KotlinType
@@ -16,9 +16,12 @@ export class KotlinPromiseType extends PromiseType implements KotlinType {
     return this.resultingType.needsKotlinConversion
   }
 
-  constructor(readonly type: PromiseType) {
+  constructor(
+    readonly type: PromiseType,
+    options: KotlinTypeOptions = {}
+  ) {
     // JNI resolves promises with objects, so primitive results are boxed.
-    const resultingType = wrapKotlinType(type.resultingType, { boxed: true })
+    const resultingType = wrapKotlinType(type.resultingType, { boxed: true, config: options.config })
     super(resultingType)
     this.resultingType = resultingType
   }

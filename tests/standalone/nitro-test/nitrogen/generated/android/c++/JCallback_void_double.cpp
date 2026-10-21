@@ -6,10 +6,10 @@
 ///
 
 #include <NitroTest/private/JCallback_void_double.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
