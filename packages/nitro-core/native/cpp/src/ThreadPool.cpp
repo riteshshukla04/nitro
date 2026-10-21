@@ -9,6 +9,10 @@
 #include <NitroModules/ThreadPool.hpp>
 #include <NitroModules/ThreadUtils.hpp>
 
+#ifdef ANDROID
+#include <fbjni/fbjni.h>
+#endif
+
 namespace margelo::nitro {
 
 ThreadPool::ThreadPool(const char* name, size_t initialThreadsCount, size_t maxThreadsCount)
@@ -32,27 +36,34 @@ void ThreadPool::addThread(std::unique_lock<std::mutex>&) {
 
   std::string threadName = std::string(_name) + "-" + std::to_string(i);
   _workers.emplace_back([this, threadName] {
-    // Set the Thread's name
-    ThreadUtils::setThreadName(threadName);
+    auto runLoop = [this, &threadName] {
+      // Set the Thread's name
+      ThreadUtils::setThreadName(threadName);
 
-    // Start the run-loop
-    while (true) {
-      std::function<void()> task;
-      {
-        // Lock on the mutex so only one Worker receives the condition signal at a time
-        std::unique_lock<std::mutex> lock(_queueMutex);
-        this->_condition.wait(lock, [this] { return !_isAlive || !_tasks.empty(); });
-        if (!_isAlive && _tasks.empty()) {
-          // ThreadPool is dead - stop run-loop.
-          return;
+      // Start the run-loop
+      while (true) {
+        std::function<void()> task;
+        {
+          // Lock on the mutex so only one Worker receives the condition signal at a time
+          std::unique_lock<std::mutex> lock(_queueMutex);
+          this->_condition.wait(lock, [this] { return !_isAlive || !_tasks.empty(); });
+          if (!_isAlive && _tasks.empty()) {
+            // ThreadPool is dead - stop run-loop.
+            return;
+          }
+          // Schedule the oldest task
+          task = std::move(_tasks.front());
+          _tasks.pop();
         }
-        // Schedule the oldest task
-        task = std::move(_tasks.front());
-        _tasks.pop();
+        // Run it (outside of the mutex so others can run in parallel)
+        task();
       }
-      // Run it (outside of the mutex so others can run in parallel)
-      task();
-    }
+    };
+#ifdef ANDROID
+    facebook::jni::ThreadScope::WithClassLoader(runLoop);
+#else
+    runLoop();
+#endif
   });
   _condition.notify_all();
 }

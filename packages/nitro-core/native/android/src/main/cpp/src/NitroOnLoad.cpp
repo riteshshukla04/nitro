@@ -8,6 +8,7 @@
 namespace margelo::nitro {
 
 void registerNatives() {
+  facebook::jni::ThreadScope::OnLoad();
   JArrayBuffer::registerNatives();
   JHardwareBufferUtils::registerNatives();
   JPromise::registerNatives();
