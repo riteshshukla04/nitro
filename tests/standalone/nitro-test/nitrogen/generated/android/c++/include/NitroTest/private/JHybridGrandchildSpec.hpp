@@ -10,6 +10,8 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JHybridGrandchildSpec.hpp>
 #include <NitroTest/private/JHybridChildSpec.hpp>
 
@@ -54,7 +56,7 @@ namespace margelo::nitro::test {
 
   public:
     // Properties
-    double getGrandchildValue();
+    jdouble getGrandchildValue();
 
   public:
     // Methods

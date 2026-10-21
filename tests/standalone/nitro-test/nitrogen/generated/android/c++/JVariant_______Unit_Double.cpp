@@ -11,6 +11,8 @@
 #include <variant>
 #include <NitroTest/private/JCallback_void.hpp>
 #include <NitroModules/JNICallable.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JVariant_______Unit_Double> JVariant_______Unit_Double::create_0(jni::alias_ref<JCallback_void::javaobject> value) {
@@ -18,15 +20,15 @@ namespace margelo::nitro::test {
     return method(javaClassStatic(), value);
   }
 
-  jni::local_ref<JVariant_______Unit_Double> JVariant_______Unit_Double::create_1(double value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_______Unit_Double(double)>("fromCpp_1");
+  jni::local_ref<JVariant_______Unit_Double> JVariant_______Unit_Double::create_1(jdouble value) {
+    static const auto method = javaClassStatic()->getStaticMethod<JVariant_______Unit_Double(jdouble)>("fromCpp_1");
     return method(javaClassStatic(), value);
   }
 
   jni::local_ref<JVariant_______Unit_Double> JVariant_______Unit_Double::fromCpp(const std::variant<Callback<void()>, double>& variant) {
     switch (variant.index()) {
       case 0: return create_0(JCallback_void_cxx::fromCpp(std::get<0>(variant)));
-      case 1: return create_1(std::get<1>(variant));
+      case 1: return create_1(JNIConverter<double, jdouble>::toJNI(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
   }
@@ -36,8 +38,8 @@ namespace margelo::nitro::test {
     return getFieldValue(field);
   }
 
-  double JVariant_______Unit_Double_impl::Second::getValue() const {
-    static const auto field = javaClassStatic()->getField<double>("value");
+  jdouble JVariant_______Unit_Double_impl::Second::getValue() const {
+    static const auto field = javaClassStatic()->getField<jdouble>("value");
     return getFieldValue(field);
   }
 
@@ -60,7 +62,7 @@ namespace margelo::nitro::test {
     } else if (isInstanceOf(JVariant_______Unit_Double_impl::Second::javaClassStatic())) {
       // It's a `double`
       auto jniValue = static_cast<const JVariant_______Unit_Double_impl::Second*>(this)->getValue();
-      return jniValue;
+      return JNIConverter<double, jdouble>::fromJNI(jniValue);
     }
     throw std::invalid_argument("Variant is unknown Kotlin instance!");
   }

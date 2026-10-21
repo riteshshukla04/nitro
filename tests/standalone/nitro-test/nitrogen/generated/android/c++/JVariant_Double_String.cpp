@@ -8,12 +8,14 @@
 #include <NitroTest/private/JVariant_Double_String.hpp>
 #include <string>
 #include <variant>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JVariant_Double_String> JVariant_Double_String::create_0(double value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Double_String(double)>("fromCpp_0");
+  jni::local_ref<JVariant_Double_String> JVariant_Double_String::create_0(jdouble value) {
+    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Double_String(jdouble)>("fromCpp_0");
     return method(javaClassStatic(), value);
   }
 
@@ -24,14 +26,14 @@ namespace margelo::nitro::test {
 
   jni::local_ref<JVariant_Double_String> JVariant_Double_String::fromCpp(const std::variant<double, std::string>& variant) {
     switch (variant.index()) {
-      case 0: return create_0(std::get<0>(variant));
+      case 0: return create_0(JNIConverter<double, jdouble>::toJNI(std::get<0>(variant)));
       case 1: return create_1(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
   }
 
-  double JVariant_Double_String_impl::First::getValue() const {
-    static const auto field = javaClassStatic()->getField<double>("value");
+  jdouble JVariant_Double_String_impl::First::getValue() const {
+    static const auto field = javaClassStatic()->getField<jdouble>("value");
     return getFieldValue(field);
   }
 
@@ -47,7 +49,7 @@ namespace margelo::nitro::test {
     if (isInstanceOf(JVariant_Double_String_impl::First::javaClassStatic())) {
       // It's a `double`
       auto jniValue = static_cast<const JVariant_Double_String_impl::First*>(this)->getValue();
-      return jniValue;
+      return JNIConverter<double, jdouble>::fromJNI(jniValue);
     } else if (isInstanceOf(JVariant_Double_String_impl::Second::javaClassStatic())) {
       // It's a `std::string`
       auto jniValue = static_cast<const JVariant_Double_String_impl::Second*>(this)->getValue();

@@ -8,6 +8,8 @@
 #include <NitroTest/private/JCar.hpp>
 
 #include <NitroTest/private/CarKotlin.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/Powertrain.hpp>
@@ -24,14 +26,14 @@ namespace margelo::nitro::test {
 
   CarKotlin JCar::toCpp() const {
     static const auto clazz = javaClassStatic();
-    static const auto fieldYear = clazz->getField<double>("year");
-    double year = this->getFieldValue(fieldYear);
+    static const auto fieldYear = clazz->getField<jdouble>("year");
+    jdouble year = this->getFieldValue(fieldYear);
     static const auto fieldMake = clazz->getField<jni::JString>("make");
     jni::local_ref<jni::JString> make = this->getFieldValue(fieldMake);
     static const auto fieldModel = clazz->getField<jni::JString>("model");
     jni::local_ref<jni::JString> model = this->getFieldValue(fieldModel);
-    static const auto fieldPower = clazz->getField<double>("power");
-    double power = this->getFieldValue(fieldPower);
+    static const auto fieldPower = clazz->getField<jdouble>("power");
+    jdouble power = this->getFieldValue(fieldPower);
     static const auto fieldPowertrain = clazz->getField<JPowertrain>("powertrain");
     jni::local_ref<JPowertrain> powertrain = this->getFieldValue(fieldPowertrain);
     static const auto fieldDriver = clazz->getField<JPerson>("driver");
@@ -47,10 +49,10 @@ namespace margelo::nitro::test {
     static const auto fieldSomeVariant = clazz->getField<JVariant_Double_String>("someVariant");
     jni::local_ref<JVariant_Double_String> someVariant = this->getFieldValue(fieldSomeVariant);
     return CarKotlin(
-      year,
+      JNIConverter<double, jdouble>::fromJNI(year),
       JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(make),
       JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(model),
-      power,
+      JNIConverter<double, jdouble>::fromJNI(power),
       powertrain->toCpp(),
       driver != nullptr ? std::make_optional(driver->toCpp()) : std::nullopt,
       [&](auto&& __input) {
@@ -76,15 +78,15 @@ namespace margelo::nitro::test {
   }
 
   jni::local_ref<JCar::javaobject> JCar::fromCpp(const CarKotlin& value) {
-    using JSignature = JCar(double, jni::alias_ref<jni::JString>, jni::alias_ref<jni::JString>, double, jni::alias_ref<JPowertrain>, jni::alias_ref<JPerson>, jni::alias_ref<jni::JArrayClass<JPerson>>, jni::alias_ref<jni::JBoolean>, jni::alias_ref<jni::JString>, jni::alias_ref<jni::JArrayDouble>, jni::alias_ref<JVariant_Double_String>);
+    using JSignature = JCar(jdouble, jni::alias_ref<jni::JString>, jni::alias_ref<jni::JString>, jdouble, jni::alias_ref<JPowertrain>, jni::alias_ref<JPerson>, jni::alias_ref<jni::JArrayClass<JPerson>>, jni::alias_ref<jni::JBoolean>, jni::alias_ref<jni::JString>, jni::alias_ref<jni::JArrayDouble>, jni::alias_ref<JVariant_Double_String>);
     static const auto clazz = javaClassStatic();
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      value.year,
+      JNIConverter<double, jdouble>::toJNI(value.year),
       JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.make),
       JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.model),
-      value.power,
+      JNIConverter<double, jdouble>::toJNI(value.power),
       JPowertrain::fromCpp(value.powertrain),
       value.driver.has_value() ? JPerson::fromCpp(value.driver.value()) : nullptr,
       [&](auto&& __input) {

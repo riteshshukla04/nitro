@@ -17,6 +17,8 @@
 #include <memory>
 // Forward declaration of `JHybridTestViewSpec` to properly resolve imports.
 namespace margelo::nitro::test { class JHybridTestViewSpec; }
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -75,9 +77,9 @@ namespace margelo::nitro::test {
   public:
     // Methods
     bool getIsViewBlue(const std::shared_ptr<JHybridTestViewSpec>& view);
-    double getOnDropViewCount();
-    double getIsBlueSetterCallCount();
-    double getNativeDefaultValueSetterCallCount();
+    jdouble getOnDropViewCount();
+    jdouble getIsBlueSetterCallCount();
+    jdouble getNativeDefaultValueSetterCallCount();
     void someMethod();
 
   public:

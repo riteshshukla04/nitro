@@ -9,6 +9,8 @@
 
 #include <NitroTest/private/OptionalEnumWrapperKotlin.hpp>
 #include <optional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 
@@ -53,15 +55,15 @@ namespace margelo::nitro::test {
     static const auto fieldTone = clazz->getField<JPowertrain>("tone");
     jni::local_ref<JPowertrain> tone = this->getFieldValue(fieldTone);
     return OptionalEnumWrapperKotlin(
-      count != nullptr ? std::make_optional(count->value()) : std::nullopt,
-      weight != nullptr ? std::make_optional(weight->value()) : std::nullopt,
-      ttl != nullptr ? std::make_optional(ttl->value()) : std::nullopt,
-      jitter != nullptr ? std::make_optional(jitter->value()) : std::nullopt,
-      retries != nullptr ? std::make_optional(retries->value()) : std::nullopt,
-      delayMs != nullptr ? std::make_optional(delayMs->value()) : std::nullopt,
-      timeoutMs != nullptr ? std::make_optional(timeoutMs->value()) : std::nullopt,
-      ratio != nullptr ? std::make_optional(ratio->value()) : std::nullopt,
-      threshold != nullptr ? std::make_optional(threshold->value()) : std::nullopt,
+      count != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(count)) : std::nullopt,
+      weight != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(weight)) : std::nullopt,
+      ttl != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(ttl)) : std::nullopt,
+      jitter != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(jitter)) : std::nullopt,
+      retries != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(retries)) : std::nullopt,
+      delayMs != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(delayMs)) : std::nullopt,
+      timeoutMs != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(timeoutMs)) : std::nullopt,
+      ratio != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(ratio)) : std::nullopt,
+      threshold != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(threshold)) : std::nullopt,
       enabled != nullptr ? std::make_optional(static_cast<bool>(enabled->value())) : std::nullopt,
       active != nullptr ? std::make_optional(static_cast<bool>(active->value())) : std::nullopt,
       shouldBuffer != nullptr ? std::make_optional(static_cast<bool>(shouldBuffer->value())) : std::nullopt,
@@ -80,15 +82,15 @@ namespace margelo::nitro::test {
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      value.count.has_value() ? jni::JDouble::valueOf(value.count.value()) : nullptr,
-      value.weight.has_value() ? jni::JDouble::valueOf(value.weight.value()) : nullptr,
-      value.ttl.has_value() ? jni::JDouble::valueOf(value.ttl.value()) : nullptr,
-      value.jitter.has_value() ? jni::JDouble::valueOf(value.jitter.value()) : nullptr,
-      value.retries.has_value() ? jni::JDouble::valueOf(value.retries.value()) : nullptr,
-      value.delayMs.has_value() ? jni::JDouble::valueOf(value.delayMs.value()) : nullptr,
-      value.timeoutMs.has_value() ? jni::JDouble::valueOf(value.timeoutMs.value()) : nullptr,
-      value.ratio.has_value() ? jni::JDouble::valueOf(value.ratio.value()) : nullptr,
-      value.threshold.has_value() ? jni::JDouble::valueOf(value.threshold.value()) : nullptr,
+      value.count.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.count.value()) : nullptr,
+      value.weight.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.weight.value()) : nullptr,
+      value.ttl.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.ttl.value()) : nullptr,
+      value.jitter.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.jitter.value()) : nullptr,
+      value.retries.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.retries.value()) : nullptr,
+      value.delayMs.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.delayMs.value()) : nullptr,
+      value.timeoutMs.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.timeoutMs.value()) : nullptr,
+      value.ratio.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.ratio.value()) : nullptr,
+      value.threshold.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.threshold.value()) : nullptr,
       value.enabled.has_value() ? jni::JBoolean::valueOf(value.enabled.value()) : nullptr,
       value.active.has_value() ? jni::JBoolean::valueOf(value.active.value()) : nullptr,
       value.shouldBuffer.has_value() ? jni::JBoolean::valueOf(value.shouldBuffer.value()) : nullptr,

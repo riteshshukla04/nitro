@@ -9,6 +9,8 @@
 #include <vector>
 #include <string>
 #include <variant>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
@@ -28,8 +30,8 @@ namespace margelo::nitro::test {
     return method(javaClassStatic(), value);
   }
 
-  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String::create_3(double value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Boolean_DoubleArray_Array_String__Double_String(double)>("fromCpp_3");
+  jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String::create_3(jdouble value) {
+    static const auto method = javaClassStatic()->getStaticMethod<JVariant_Boolean_DoubleArray_Array_String__Double_String(jdouble)>("fromCpp_3");
     return method(javaClassStatic(), value);
   }
 
@@ -57,7 +59,7 @@ namespace margelo::nitro::test {
         }
         return __array;
       }(std::get<2>(variant)));
-      case 3: return create_3(std::get<3>(variant));
+      case 3: return create_3(JNIConverter<double, jdouble>::toJNI(std::get<3>(variant)));
       case 4: return create_4(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<4>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
@@ -78,8 +80,8 @@ namespace margelo::nitro::test {
     return getFieldValue(field);
   }
 
-  double JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth::getValue() const {
-    static const auto field = javaClassStatic()->getField<double>("value");
+  jdouble JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth::getValue() const {
+    static const auto field = javaClassStatic()->getField<jdouble>("value");
     return getFieldValue(field);
   }
 
@@ -121,7 +123,7 @@ namespace margelo::nitro::test {
     } else if (isInstanceOf(JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth::javaClassStatic())) {
       // It's a `double`
       auto jniValue = static_cast<const JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth*>(this)->getValue();
-      return jniValue;
+      return JNIConverter<double, jdouble>::fromJNI(jniValue);
     } else if (isInstanceOf(JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth::javaClassStatic())) {
       // It's a `std::string`
       auto jniValue = static_cast<const JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fifth*>(this)->getValue();

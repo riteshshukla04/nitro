@@ -15,6 +15,8 @@
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTestExternal/private/JHybridBaseSpec.hpp>
 
 namespace margelo::nitro::test::external {
@@ -58,7 +60,7 @@ namespace margelo::nitro::test::external {
 
   public:
     // Properties
-    double getBaseValue();
+    jdouble getBaseValue();
 
   public:
     // Methods

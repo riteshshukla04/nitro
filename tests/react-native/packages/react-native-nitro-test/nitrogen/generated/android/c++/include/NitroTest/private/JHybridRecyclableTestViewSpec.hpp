@@ -11,6 +11,8 @@
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
 #include <optional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -60,10 +62,10 @@ namespace margelo::nitro::test {
 
   public:
     // Methods
-    double getInvalidLifecycleOrderCount();
-    double getOnDropViewCount();
-    double getPrepareForRecycleCount();
-    double getNativeDefaultValueSetterCallCount();
+    jdouble getInvalidLifecycleOrderCount();
+    jdouble getOnDropViewCount();
+    jdouble getPrepareForRecycleCount();
+    jdouble getNativeDefaultValueSetterCallCount();
 
   public:
     // Constructor and static members

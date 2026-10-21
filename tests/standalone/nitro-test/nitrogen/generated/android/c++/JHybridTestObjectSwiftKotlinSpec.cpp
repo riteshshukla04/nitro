@@ -40,6 +40,8 @@
 #include <NitroModules/InlineCallback.hpp>
 #include <NitroTest/private/JsStyleStructKotlin.hpp>
 #include <NitroTest/HardwareBufferFormat.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Null.hpp>
@@ -120,20 +122,20 @@ namespace margelo::nitro::test {
     return __result->getJHybridTestObjectSwiftKotlinSpec();
   }
 
-  double JHybridTestObjectSwiftKotlinSpec::getReadonlyNumber() {
-    static const auto __method = JHybridTestObjectSwiftKotlinSpec::JavaPart::javaClassStatic()->getStaticMethod<double()>("getReadonlyNumber_cxx");
+  jdouble JHybridTestObjectSwiftKotlinSpec::getReadonlyNumber() {
+    static const auto __method = JHybridTestObjectSwiftKotlinSpec::JavaPart::javaClassStatic()->getStaticMethod<jdouble()>("getReadonlyNumber_cxx");
     auto __result = __method(JHybridTestObjectSwiftKotlinSpec::JavaPart::javaClassStatic());
     return __result;
   }
 
-  double JHybridTestObjectSwiftKotlinSpec::getSharedNumber() {
-    static const auto __method = JHybridTestObjectSwiftKotlinSpec::JavaPart::javaClassStatic()->getStaticMethod<double()>("getSharedNumber_cxx");
+  jdouble JHybridTestObjectSwiftKotlinSpec::getSharedNumber() {
+    static const auto __method = JHybridTestObjectSwiftKotlinSpec::JavaPart::javaClassStatic()->getStaticMethod<jdouble()>("getSharedNumber_cxx");
     auto __result = __method(JHybridTestObjectSwiftKotlinSpec::JavaPart::javaClassStatic());
     return __result;
   }
 
-  void JHybridTestObjectSwiftKotlinSpec::setSharedNumber(double sharedNumber) {
-    static const auto __method = JHybridTestObjectSwiftKotlinSpec::JavaPart::javaClassStatic()->getStaticMethod<void(double /* sharedNumber */)>("setSharedNumber_cxx");
+  void JHybridTestObjectSwiftKotlinSpec::setSharedNumber(jdouble sharedNumber) {
+    static const auto __method = JHybridTestObjectSwiftKotlinSpec::JavaPart::javaClassStatic()->getStaticMethod<void(jdouble /* sharedNumber */)>("setSharedNumber_cxx");
     __method(JHybridTestObjectSwiftKotlinSpec::JavaPart::javaClassStatic(), sharedNumber);
   }
 
@@ -325,13 +327,13 @@ namespace margelo::nitro::test {
   }
 
   // Properties
-  double JHybridTestObjectSwiftKotlinSpec::getNumberValue() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double()>("getNumberValue");
+  jdouble JHybridTestObjectSwiftKotlinSpec::getNumberValue() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble()>("getNumberValue");
     auto __result = __method(_javaPart, CxxPart::getClass());
     return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setNumberValue(double numberValue) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(double /* numberValue */)>("setNumberValue");
+  void JHybridTestObjectSwiftKotlinSpec::setNumberValue(jdouble numberValue) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jdouble /* numberValue */)>("setNumberValue");
     __method(_javaPart, CxxPart::getClass(), numberValue);
   }
   bool JHybridTestObjectSwiftKotlinSpec::getBoolValue() {
@@ -552,8 +554,8 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void()>("simpleFunc");
     __method(_javaPart, CxxPart::getClass());
   }
-  double JHybridTestObjectSwiftKotlinSpec::addNumbers(double a, double b) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double(double /* a */, double /* b */)>("addNumbers");
+  jdouble JHybridTestObjectSwiftKotlinSpec::addNumbers(jdouble a, jdouble b) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble(jdouble /* a */, jdouble /* b */)>("addNumbers");
     auto __result = __method(_javaPart, CxxPart::getClass(), a, b);
     return __result;
   }
@@ -562,8 +564,8 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), a, b);
     return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::multipleArguments(double num, const jni::local_ref<jni::JString>& str, bool boo) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(double /* num */, jni::alias_ref<jni::JString> /* str */, jboolean /* boo */)>("multipleArguments");
+  void JHybridTestObjectSwiftKotlinSpec::multipleArguments(jdouble num, const jni::local_ref<jni::JString>& str, bool boo) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jdouble /* num */, jni::alias_ref<jni::JString> /* str */, jboolean /* boo */)>("multipleArguments");
     __method(_javaPart, CxxPart::getClass(), num, str, boo);
   }
   jni::local_ref<JNull> JHybridTestObjectSwiftKotlinSpec::bounceNull(const jni::local_ref<JNull>& value) {
@@ -990,7 +992,7 @@ namespace margelo::nitro::test {
             jni::ThreadScope::WithClassLoader([&] {
               std::optional<jni::local_ref<jni::JDouble>> __converted;
               try {
-                __converted.emplace(jni::JDouble::valueOf(__result));
+                __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(__result));
               } catch (...) {
                 __promise->reject(std::current_exception());
                 return;
@@ -1021,7 +1023,7 @@ namespace margelo::nitro::test {
             std::optional<double> __converted;
             try {
               auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-              __converted.emplace(__result->value());
+              __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
             } catch (...) {
               __promise.reject(std::current_exception());
               return;
@@ -1196,7 +1198,7 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), [&](const auto& __input) -> jni::local_ref<jni::JMap<jni::JString, jni::JDouble>> {
       auto __map = jni::JHashMap<jni::JString, jni::JDouble>::create(__input.size());
       for (const auto& __entry : __input) {
-        __map->put(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.first), jni::JDouble::valueOf(__entry.second));
+        __map->put(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.first), JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(__entry.second));
       }
       return __map;
     }(map));
@@ -1204,7 +1206,7 @@ namespace margelo::nitro::test {
       std::unordered_map<std::string, double> __map;
       __map.reserve(__input->size());
       for (const auto& __entry : *__input) {
-        __map.emplace(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.first), __entry.second->value());
+        __map.emplace(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.first), JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__entry.second));
       }
       return __map;
     }(__result);
@@ -1275,8 +1277,8 @@ namespace margelo::nitro::test {
       return __map;
     }(__result);
   }
-  double JHybridTestObjectSwiftKotlinSpec::funcThatThrows() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double()>("funcThatThrows");
+  jdouble JHybridTestObjectSwiftKotlinSpec::funcThatThrows() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble()>("funcThatThrows");
     auto __result = __method(_javaPart, CxxPart::getClass());
     return __result;
   }
@@ -1299,13 +1301,13 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<jni::JThrowable> /* error */)>("throwError");
     __method(_javaPart, CxxPart::getClass(), error);
   }
-  jni::local_ref<jni::JString> JHybridTestObjectSwiftKotlinSpec::tryOptionalParams(double num, bool boo, const std::optional<std::string>& str) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(double /* num */, jboolean /* boo */, jni::alias_ref<jni::JString> /* str */)>("tryOptionalParams");
+  jni::local_ref<jni::JString> JHybridTestObjectSwiftKotlinSpec::tryOptionalParams(jdouble num, bool boo, const std::optional<std::string>& str) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(jdouble /* num */, jboolean /* boo */, jni::alias_ref<jni::JString> /* str */)>("tryOptionalParams");
     auto __result = __method(_javaPart, CxxPart::getClass(), num, boo, str.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(str.value()) : nullptr);
     return __result;
   }
-  jni::local_ref<jni::JString> JHybridTestObjectSwiftKotlinSpec::tryMiddleParam(double num, const std::optional<bool>& boo, const jni::local_ref<jni::JString>& str) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(double /* num */, jni::alias_ref<jni::JBoolean> /* boo */, jni::alias_ref<jni::JString> /* str */)>("tryMiddleParam");
+  jni::local_ref<jni::JString> JHybridTestObjectSwiftKotlinSpec::tryMiddleParam(jdouble num, const std::optional<bool>& boo, const jni::local_ref<jni::JString>& str) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(jdouble /* num */, jni::alias_ref<jni::JBoolean> /* boo */, jni::alias_ref<jni::JString> /* str */)>("tryMiddleParam");
     auto __result = __method(_javaPart, CxxPart::getClass(), num, boo.has_value() ? jni::JBoolean::valueOf(boo.value()) : nullptr, str);
     return __result;
   }
@@ -1314,18 +1316,18 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), value.has_value() ? JPowertrain::fromCpp(value.value()) : nullptr);
     return __result != nullptr ? std::make_optional(__result->toCpp()) : std::nullopt;
   }
-  bool JHybridTestObjectSwiftKotlinSpec::tryTrailingOptional(double num, const jni::local_ref<jni::JString>& str, const std::optional<bool>& boo) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean(double /* num */, jni::alias_ref<jni::JString> /* str */, jni::alias_ref<jni::JBoolean> /* boo */)>("tryTrailingOptional");
+  bool JHybridTestObjectSwiftKotlinSpec::tryTrailingOptional(jdouble num, const jni::local_ref<jni::JString>& str, const std::optional<bool>& boo) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean(jdouble /* num */, jni::alias_ref<jni::JString> /* str */, jni::alias_ref<jni::JBoolean> /* boo */)>("tryTrailingOptional");
     auto __result = __method(_javaPart, CxxPart::getClass(), num, str, boo.has_value() ? jni::JBoolean::valueOf(boo.value()) : nullptr);
     return static_cast<bool>(__result);
   }
-  int64_t JHybridTestObjectSwiftKotlinSpec::calculateFibonacciSync(double value) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<int64_t(double /* value */)>("calculateFibonacciSync");
+  int64_t JHybridTestObjectSwiftKotlinSpec::calculateFibonacciSync(jdouble value) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<int64_t(jdouble /* value */)>("calculateFibonacciSync");
     auto __result = __method(_javaPart, CxxPart::getClass(), value);
     return __result;
   }
-  Promise<int64_t> JHybridTestObjectSwiftKotlinSpec::calculateFibonacciAsync(double value) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::javaobject>(double /* value */)>("calculateFibonacciAsync");
+  Promise<int64_t> JHybridTestObjectSwiftKotlinSpec::calculateFibonacciAsync(jdouble value) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::javaobject>(jdouble /* value */)>("calculateFibonacciAsync");
     auto __result = __method(_javaPart, CxxPart::getClass(), value);
     return [&]() {
       auto __promise = Promise<int64_t>::pending();
@@ -1347,8 +1349,8 @@ namespace margelo::nitro::test {
       return __promise;
     }();
   }
-  Promise<void> JHybridTestObjectSwiftKotlinSpec::wait(double seconds) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::javaobject>(double /* seconds */)>("wait");
+  Promise<void> JHybridTestObjectSwiftKotlinSpec::wait(jdouble seconds) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::javaobject>(jdouble /* seconds */)>("wait");
     auto __result = __method(_javaPart, CxxPart::getClass(), seconds);
     return [&]() {
       auto __promise = Promise<void>::pending();
@@ -1386,7 +1388,7 @@ namespace margelo::nitro::test {
         std::optional<double> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -1409,7 +1411,7 @@ namespace margelo::nitro::test {
         std::optional<double> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -1432,7 +1434,7 @@ namespace margelo::nitro::test {
         std::optional<double> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -1474,7 +1476,7 @@ namespace margelo::nitro::test {
         std::optional<std::optional<double>> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result != nullptr ? std::make_optional(__result->value()) : std::nullopt);
+          __converted.emplace(__result != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result)) : std::nullopt);
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -1497,7 +1499,7 @@ namespace margelo::nitro::test {
         std::optional<std::optional<double>> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result != nullptr ? std::make_optional(__result->value()) : std::nullopt);
+          __converted.emplace(__result != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result)) : std::nullopt);
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -1520,7 +1522,7 @@ namespace margelo::nitro::test {
         jni::ThreadScope::WithClassLoader([&] {
           std::optional<jni::local_ref<jni::JDouble>> __converted;
           try {
-            __converted.emplace(jni::JDouble::valueOf(__result));
+            __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(__result));
           } catch (...) {
             __promise->reject(std::current_exception());
             return;
@@ -1541,7 +1543,7 @@ namespace margelo::nitro::test {
         std::optional<double> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -1636,8 +1638,8 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JCallback_void::javaobject> /* callback */)>("callInlineCallback_cxx");
     __method(_javaPart, CxxPart::getClass(), JCallback_void_cxx::fromCpp(callback));
   }
-  double JHybridTestObjectSwiftKotlinSpec::callInlineCallbackWithValue(double value, const InlineCallback<double(double /* value */)>& callback) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double(double /* value */, jni::alias_ref<JCallback_double_double::javaobject> /* callback */)>("callInlineCallbackWithValue_cxx");
+  jdouble JHybridTestObjectSwiftKotlinSpec::callInlineCallbackWithValue(jdouble value, const InlineCallback<double(double /* value */)>& callback) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble(jdouble /* value */, jni::alias_ref<JCallback_double_double::javaobject> /* callback */)>("callInlineCallbackWithValue_cxx");
     auto __result = __method(_javaPart, CxxPart::getClass(), value, JCallback_double_double_cxx::fromCpp(callback));
     return __result;
   }
@@ -1662,10 +1664,10 @@ namespace margelo::nitro::test {
   }
   void JHybridTestObjectSwiftKotlinSpec::callWithOptional(const std::optional<double>& value, const Callback<void(const std::optional<double>& /* maybe */)>& callback) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<jni::JDouble> /* value */, jni::alias_ref<JCallback_void_std__optional_double_::javaobject> /* callback */)>("callWithOptional_cxx");
-    __method(_javaPart, CxxPart::getClass(), value.has_value() ? jni::JDouble::valueOf(value.value()) : nullptr, JCallback_void_std__optional_double__cxx::fromCpp(callback));
+    __method(_javaPart, CxxPart::getClass(), value.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.value()) : nullptr, JCallback_void_std__optional_double__cxx::fromCpp(callback));
   }
-  Promise<double> JHybridTestObjectSwiftKotlinSpec::callSumUpNTimes(const Callback<double()>& callback, double n) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<JCallback_double::javaobject> /* callback */, double /* n */)>("callSumUpNTimes_cxx");
+  Promise<double> JHybridTestObjectSwiftKotlinSpec::callSumUpNTimes(const Callback<double()>& callback, jdouble n) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<JCallback_double::javaobject> /* callback */, jdouble /* n */)>("callSumUpNTimes_cxx");
     auto __result = __method(_javaPart, CxxPart::getClass(), JCallback_double_cxx::fromCpp(callback), n);
     return [&]() {
       auto __promise = Promise<double>::pending();
@@ -1673,7 +1675,7 @@ namespace margelo::nitro::test {
         std::optional<double> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -1696,7 +1698,7 @@ namespace margelo::nitro::test {
         std::optional<double> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -1746,8 +1748,8 @@ namespace margelo::nitro::test {
       }
     }();
   }
-  void JHybridTestObjectSwiftKotlinSpec::twoOptionalCallbacks(double value, const std::optional<Callback<void(double /* value */)>>& first, const std::optional<Callback<void(const std::string& /* value */)>>& second) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(double /* value */, jni::alias_ref<JCallback_void_double::javaobject> /* first */, jni::alias_ref<JCallback_void_std__string::javaobject> /* second */)>("twoOptionalCallbacks_cxx");
+  void JHybridTestObjectSwiftKotlinSpec::twoOptionalCallbacks(jdouble value, const std::optional<Callback<void(double /* value */)>>& first, const std::optional<Callback<void(const std::string& /* value */)>>& second) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jdouble /* value */, jni::alias_ref<JCallback_void_double::javaobject> /* first */, jni::alias_ref<JCallback_void_std__string::javaobject> /* second */)>("twoOptionalCallbacks_cxx");
     __method(_javaPart, CxxPart::getClass(), value, first.has_value() ? JCallback_void_double_cxx::fromCpp(first.value()) : nullptr, second.has_value() ? JCallback_void_std__string_cxx::fromCpp(second.value()) : nullptr);
   }
   void JHybridTestObjectSwiftKotlinSpec::errorCallback(const Callback<void(const std::exception_ptr& /* error */)>& onError) {
@@ -1776,7 +1778,7 @@ namespace margelo::nitro::test {
         std::optional<double> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -1864,8 +1866,8 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), copy);
     return __result;
   }
-  jni::local_ref<JArrayBuffer::JavaPart> JHybridTestObjectSwiftKotlinSpec::createHardwareBuffer(double width, double height, double layers, HardwareBufferFormat format) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JArrayBuffer::JavaPart>(double /* width */, double /* height */, double /* layers */, jni::alias_ref<JHardwareBufferFormat> /* format */)>("createHardwareBuffer");
+  jni::local_ref<JArrayBuffer::JavaPart> JHybridTestObjectSwiftKotlinSpec::createHardwareBuffer(jdouble width, jdouble height, jdouble layers, HardwareBufferFormat format) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JArrayBuffer::JavaPart>(jdouble /* width */, jdouble /* height */, jdouble /* layers */, jni::alias_ref<JHardwareBufferFormat> /* format */)>("createHardwareBuffer");
     auto __result = __method(_javaPart, CxxPart::getClass(), width, height, layers, JHardwareBufferFormat::fromCpp(format));
     return __result;
   }
@@ -1874,13 +1876,13 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), buffer);
     return __result;
   }
-  double JHybridTestObjectSwiftKotlinSpec::getBufferLastItem(const jni::local_ref<JArrayBuffer::JavaPart>& buffer) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double(jni::alias_ref<JArrayBuffer::JavaPart> /* buffer */)>("getBufferLastItem");
+  jdouble JHybridTestObjectSwiftKotlinSpec::getBufferLastItem(const jni::local_ref<JArrayBuffer::JavaPart>& buffer) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble(jni::alias_ref<JArrayBuffer::JavaPart> /* buffer */)>("getBufferLastItem");
     auto __result = __method(_javaPart, CxxPart::getClass(), buffer);
     return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setAllValuesTo(const jni::local_ref<JArrayBuffer::JavaPart>& buffer, double value) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JArrayBuffer::JavaPart> /* buffer */, double /* value */)>("setAllValuesTo");
+  void JHybridTestObjectSwiftKotlinSpec::setAllValuesTo(const jni::local_ref<JArrayBuffer::JavaPart>& buffer, jdouble value) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JArrayBuffer::JavaPart> /* buffer */, jdouble /* value */)>("setAllValuesTo");
     __method(_javaPart, CxxPart::getClass(), buffer, value);
   }
   Promise<ArrayBuffer> JHybridTestObjectSwiftKotlinSpec::createArrayBufferAsync() {
@@ -2006,8 +2008,8 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), base->getJavaPart());
     return __result->getJHybridChildSpec();
   }
-  double JHybridTestObjectSwiftKotlinSpec::callbackSync(const Callback<double()>& callback) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double(jni::alias_ref<JCallback_double::javaobject> /* callback */)>("callbackSync_cxx");
+  jdouble JHybridTestObjectSwiftKotlinSpec::callbackSync(const Callback<double()>& callback) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble(jni::alias_ref<JCallback_double::javaobject> /* callback */)>("callbackSync_cxx");
     auto __result = __method(_javaPart, CxxPart::getClass(), JCallback_double_cxx::fromCpp(callback));
     return __result;
   }

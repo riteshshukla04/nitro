@@ -13,6 +13,8 @@
 #include <optional>
 #include <NitroModules/JPromise.hpp>
 #include <NitroModules/JNISharedPtr.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -25,7 +27,7 @@ namespace margelo::nitro::test {
         std::optional<double> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -57,7 +59,7 @@ namespace margelo::nitro::test {
         jni::ThreadScope::WithClassLoader([&] {
           std::optional<jni::local_ref<jni::JDouble>> __converted;
           try {
-            __converted.emplace(jni::JDouble::valueOf(__result));
+            __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(__result));
           } catch (...) {
             __promise->reject(std::current_exception());
             return;

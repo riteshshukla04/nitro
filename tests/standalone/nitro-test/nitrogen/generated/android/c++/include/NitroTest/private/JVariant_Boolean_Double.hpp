@@ -11,6 +11,8 @@
 #include <variant>
 
 #include <variant>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -24,7 +26,7 @@ namespace margelo::nitro::test {
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Boolean_Double;";
 
     static jni::local_ref<JVariant_Boolean_Double> create_0(jboolean value);
-    static jni::local_ref<JVariant_Boolean_Double> create_1(double value);
+    static jni::local_ref<JVariant_Boolean_Double> create_1(jdouble value);
 
     static jni::local_ref<JVariant_Boolean_Double> fromCpp(const std::variant<bool, double>& variant);
 
@@ -43,7 +45,7 @@ namespace margelo::nitro::test {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Boolean_Double$Second;";
 
-      [[nodiscard]] double getValue() const;
+      [[nodiscard]] jdouble getValue() const;
     };
   } // namespace JVariant_Boolean_Double_impl
 } // namespace margelo::nitro::test

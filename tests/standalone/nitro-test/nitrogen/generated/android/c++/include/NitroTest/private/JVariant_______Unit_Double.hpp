@@ -15,6 +15,8 @@
 #include <variant>
 #include <NitroTest/private/JCallback_void.hpp>
 #include <NitroModules/JNICallable.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -28,7 +30,7 @@ namespace margelo::nitro::test {
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_______Unit_Double;";
 
     static jni::local_ref<JVariant_______Unit_Double> create_0(jni::alias_ref<JCallback_void::javaobject> value);
-    static jni::local_ref<JVariant_______Unit_Double> create_1(double value);
+    static jni::local_ref<JVariant_______Unit_Double> create_1(jdouble value);
 
     static jni::local_ref<JVariant_______Unit_Double> fromCpp(const std::variant<Callback<void()>, double>& variant);
 
@@ -47,7 +49,7 @@ namespace margelo::nitro::test {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_______Unit_Double$Second;";
 
-      [[nodiscard]] double getValue() const;
+      [[nodiscard]] jdouble getValue() const;
     };
   } // namespace JVariant_______Unit_Double_impl
 } // namespace margelo::nitro::test

@@ -10,6 +10,8 @@
 #include <NitroTest/private/WrappedJsStructKotlin.hpp>
 #include <NitroTest/private/JsStyleStructKotlin.hpp>
 #include <NitroTest/private/JJsStyleStruct.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <NitroTest/private/JCallback_void_double.hpp>

@@ -13,6 +13,8 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -45,7 +47,7 @@ namespace margelo::nitro::test {
     /**
      * Invokes the C++ `Callback<...>` this `JCallback_double_double_cxx` instance holds.
      */
-    double invoke_cxx(double value);
+    jdouble invoke_cxx(jdouble value);
 
   public:
     [[nodiscard]]

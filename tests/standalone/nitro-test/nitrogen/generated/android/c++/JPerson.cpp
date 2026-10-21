@@ -10,6 +10,8 @@
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -17,22 +19,22 @@ namespace margelo::nitro::test {
     static const auto clazz = javaClassStatic();
     static const auto fieldName = clazz->getField<jni::JString>("name");
     jni::local_ref<jni::JString> name = this->getFieldValue(fieldName);
-    static const auto fieldAge = clazz->getField<double>("age");
-    double age = this->getFieldValue(fieldAge);
+    static const auto fieldAge = clazz->getField<jdouble>("age");
+    jdouble age = this->getFieldValue(fieldAge);
     return PersonKotlin(
       JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(name),
-      age
+      JNIConverter<double, jdouble>::fromJNI(age)
     );
   }
 
   jni::local_ref<JPerson::javaobject> JPerson::fromCpp(const PersonKotlin& value) {
-    using JSignature = JPerson(jni::alias_ref<jni::JString>, double);
+    using JSignature = JPerson(jni::alias_ref<jni::JString>, jdouble);
     static const auto clazz = javaClassStatic();
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
       JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.name),
-      value.age
+      JNIConverter<double, jdouble>::toJNI(value.age)
     );
   }
 

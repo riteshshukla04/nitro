@@ -20,6 +20,8 @@ namespace margelo::nitro::test { class JHybridBaseSpec; }
 namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; }
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JHybridBaseSpec.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 
@@ -64,7 +66,7 @@ namespace margelo::nitro::test {
 
   public:
     // Properties
-    double getBaseValue();
+    jdouble getBaseValue();
 
   public:
     // Methods

@@ -50,6 +50,8 @@ namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; 
 #include <NitroModules/InlineCallback.hpp>
 #include <NitroTest/private/JsStyleStructKotlin.hpp>
 #include <NitroTest/HardwareBufferFormat.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Null.hpp>
@@ -104,8 +106,8 @@ namespace margelo::nitro::test {
 
   public:
     // Properties
-    double getNumberValue();
-    void setNumberValue(double numberValue);
+    jdouble getNumberValue();
+    void setNumberValue(jdouble numberValue);
     bool getBoolValue();
     void setBoolValue(bool boolValue);
     jni::local_ref<jni::JString> getStringValue();
@@ -151,9 +153,9 @@ namespace margelo::nitro::test {
   public:
     // Methods
     void simpleFunc();
-    double addNumbers(double a, double b);
+    jdouble addNumbers(jdouble a, jdouble b);
     jni::local_ref<jni::JString> addStrings(const jni::local_ref<jni::JString>& a, const jni::local_ref<jni::JString>& b);
-    void multipleArguments(double num, const jni::local_ref<jni::JString>& str, bool boo);
+    void multipleArguments(jdouble num, const jni::local_ref<jni::JString>& str, bool boo);
     jni::local_ref<JNull> bounceNull(const jni::local_ref<JNull>& value);
     std::vector<std::string> bounceStrings(const std::vector<std::string>& array);
     std::vector<double> bounceNumbers(const std::vector<double>& array);
@@ -187,16 +189,16 @@ namespace margelo::nitro::test {
     std::unordered_map<std::string, std::variant<nitro::NullType, std::string>> bounceNullMap(const std::unordered_map<std::string, std::variant<nitro::NullType, std::string>>& map);
     std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>> bounceOptionalNullMap(const std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>>& map);
     std::unordered_map<std::string, std::string> extractMap(const MapWrapperKotlin& mapWrapper);
-    double funcThatThrows();
+    jdouble funcThatThrows();
     Promise<void> funcThatThrowsBeforePromise();
     void throwError(const jni::local_ref<jni::JThrowable>& error);
-    jni::local_ref<jni::JString> tryOptionalParams(double num, bool boo, const std::optional<std::string>& str);
-    jni::local_ref<jni::JString> tryMiddleParam(double num, const std::optional<bool>& boo, const jni::local_ref<jni::JString>& str);
+    jni::local_ref<jni::JString> tryOptionalParams(jdouble num, bool boo, const std::optional<std::string>& str);
+    jni::local_ref<jni::JString> tryMiddleParam(jdouble num, const std::optional<bool>& boo, const jni::local_ref<jni::JString>& str);
     std::optional<Powertrain> tryOptionalEnum(const std::optional<Powertrain>& value);
-    bool tryTrailingOptional(double num, const jni::local_ref<jni::JString>& str, const std::optional<bool>& boo);
-    int64_t calculateFibonacciSync(double value);
-    Promise<int64_t> calculateFibonacciAsync(double value);
-    Promise<void> wait(double seconds);
+    bool tryTrailingOptional(jdouble num, const jni::local_ref<jni::JString>& str, const std::optional<bool>& boo);
+    int64_t calculateFibonacciSync(jdouble value);
+    Promise<int64_t> calculateFibonacciAsync(jdouble value);
+    Promise<void> wait(jdouble seconds);
     Promise<void> promiseThrows();
     Promise<double> promiseReturnsInstantly();
     Promise<double> promiseReturnsInstantlyAsync();
@@ -210,15 +212,15 @@ namespace margelo::nitro::test {
     Promise<void> awaitPromise(const Promise<void>& promise);
     void callCallback(const Callback<void()>& callback);
     void callInlineCallback(const InlineCallback<void()>& callback);
-    double callInlineCallbackWithValue(double value, const InlineCallback<double(double /* value */)>& callback);
+    jdouble callInlineCallbackWithValue(jdouble value, const InlineCallback<double(double /* value */)>& callback);
     Promise<void> callCallbackThatReturnsPromiseVoid(const Callback<Promise<void>()>& callback);
     void callAll(const Callback<void()>& first, const Callback<void()>& second, const Callback<void()>& third);
     void callWithOptional(const std::optional<double>& value, const Callback<void(const std::optional<double>& /* maybe */)>& callback);
-    Promise<double> callSumUpNTimes(const Callback<double()>& callback, double n);
+    Promise<double> callSumUpNTimes(const Callback<double()>& callback, jdouble n);
     Promise<double> callbackAsyncPromise(const Callback<Promise<double>()>& callback);
     Promise<ArrayBuffer> callbackAsyncPromiseBuffer(const Callback<Promise<ArrayBuffer>()>& callback);
     Callback<void(double /* value */)> getComplexCallback();
-    void twoOptionalCallbacks(double value, const std::optional<Callback<void(double /* value */)>>& first, const std::optional<Callback<void(const std::string& /* value */)>>& second);
+    void twoOptionalCallbacks(jdouble value, const std::optional<Callback<void(double /* value */)>>& first, const std::optional<Callback<void(const std::string& /* value */)>>& second);
     void errorCallback(const Callback<void(const std::exception_ptr& /* error */)>& onError);
     Callback<void(double /* num */)> createNativeCallback(const Callback<void(double /* num */)>& wrappingJsCallback);
     Promise<double> getValueFromJSCallbackAndWait(const Callback<double()>& getValue);
@@ -235,10 +237,10 @@ namespace margelo::nitro::test {
     std::optional<OptionalEnumWrapperKotlin> bounceOptionalEnumStruct(const std::optional<OptionalEnumWrapperKotlin>& value);
     jni::local_ref<JArrayBuffer::JavaPart> createArrayBuffer();
     jni::local_ref<JArrayBuffer::JavaPart> createArrayBufferFromNativeBuffer(bool copy);
-    jni::local_ref<JArrayBuffer::JavaPart> createHardwareBuffer(double width, double height, double layers, HardwareBufferFormat format);
+    jni::local_ref<JArrayBuffer::JavaPart> createHardwareBuffer(jdouble width, jdouble height, jdouble layers, HardwareBufferFormat format);
     jni::local_ref<JArrayBuffer::JavaPart> copyBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
-    double getBufferLastItem(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
-    void setAllValuesTo(const jni::local_ref<JArrayBuffer::JavaPart>& buffer, double value);
+    jdouble getBufferLastItem(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
+    void setAllValuesTo(const jni::local_ref<JArrayBuffer::JavaPart>& buffer, jdouble value);
     Promise<ArrayBuffer> createArrayBufferAsync();
     jni::local_ref<JArrayBuffer::JavaPart> bounceArrayBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
     std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either);
@@ -260,7 +262,7 @@ namespace margelo::nitro::test {
     std::shared_ptr<JHybridBaseSpec> bounceBase(const std::shared_ptr<JHybridBaseSpec>& base);
     std::shared_ptr<JHybridBaseSpec> bounceChildBase(const std::shared_ptr<JHybridChildSpec>& child);
     std::shared_ptr<JHybridChildSpec> castBase(const std::shared_ptr<JHybridBaseSpec>& base);
-    double callbackSync(const Callback<double()>& callback);
+    jdouble callbackSync(const Callback<double()>& callback);
     Callback<double()> getSyncNumberCallback();
     Callback<int64_t(int64_t /* value */)> bounceSyncInt64Callback(const Callback<int64_t(int64_t /* value */)>& callback);
     std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec> bounceExternalHybrid(const std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>& externalObject);
@@ -276,9 +278,9 @@ namespace margelo::nitro::test {
   public:
     // Constructor and static members
     static std::shared_ptr<JHybridTestObjectSwiftKotlinSpec> constructor();
-    static double getReadonlyNumber();
-    static double getSharedNumber();
-    static void setSharedNumber(double sharedNumber);
+    static jdouble getReadonlyNumber();
+    static jdouble getSharedNumber();
+    static void setSharedNumber(jdouble sharedNumber);
 
   protected:
     const std::shared_ptr<const HybridClass>& getHybridClass() override {

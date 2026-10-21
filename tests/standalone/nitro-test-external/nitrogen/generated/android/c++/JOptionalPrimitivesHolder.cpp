@@ -9,6 +9,8 @@
 
 #include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
 #include <optional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test::external {
 
@@ -23,7 +25,7 @@ namespace margelo::nitro::test::external {
     static const auto fieldOptionalInt64 = clazz->getField<jni::JLong>("optionalInt64");
     jni::local_ref<jni::JLong> optionalInt64 = this->getFieldValue(fieldOptionalInt64);
     return OptionalPrimitivesHolderKotlin(
-      optionalNumber != nullptr ? std::make_optional(optionalNumber->value()) : std::nullopt,
+      optionalNumber != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(optionalNumber)) : std::nullopt,
       optionalBoolean != nullptr ? std::make_optional(static_cast<bool>(optionalBoolean->value())) : std::nullopt,
       optionalUInt64 != nullptr ? std::make_optional(static_cast<uint64_t>(optionalUInt64->value())) : std::nullopt,
       optionalInt64 != nullptr ? std::make_optional(optionalInt64->value()) : std::nullopt
@@ -36,7 +38,7 @@ namespace margelo::nitro::test::external {
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      value.optionalNumber.has_value() ? jni::JDouble::valueOf(value.optionalNumber.value()) : nullptr,
+      value.optionalNumber.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.optionalNumber.value()) : nullptr,
       value.optionalBoolean.has_value() ? jni::JBoolean::valueOf(value.optionalBoolean.value()) : nullptr,
       value.optionalUInt64.has_value() ? jni::JLong::valueOf(value.optionalUInt64.value()) : nullptr,
       value.optionalInt64.has_value() ? jni::JLong::valueOf(value.optionalInt64.value()) : nullptr

@@ -13,6 +13,8 @@
 #include <NitroTest/private/JPerson.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JVariant_HybridTestObjectSwiftKotlinSpec_Person> JVariant_HybridTestObjectSwiftKotlinSpec_Person::create_0(jni::alias_ref<JHybridTestObjectSwiftKotlinSpec::JavaPart> value) {

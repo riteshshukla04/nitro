@@ -8,6 +8,8 @@
 #include <NitroTest/private/JJsStyleStruct.hpp>
 
 #include <NitroTest/private/JsStyleStructKotlin.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <NitroTest/private/JCallback_void_double.hpp>
@@ -17,12 +19,12 @@ namespace margelo::nitro::test {
 
   JsStyleStructKotlin JJsStyleStruct::toCpp() const {
     static const auto clazz = javaClassStatic();
-    static const auto fieldValue = clazz->getField<double>("value");
-    double value = this->getFieldValue(fieldValue);
+    static const auto fieldValue = clazz->getField<jdouble>("value");
+    jdouble value = this->getFieldValue(fieldValue);
     static const auto fieldOnChanged = clazz->getField<JCallback_void_double::javaobject>("onChanged");
     jni::local_ref<JCallback_void_double::javaobject> onChanged = this->getFieldValue(fieldOnChanged);
     return JsStyleStructKotlin(
-      value,
+      JNIConverter<double, jdouble>::fromJNI(value),
       [&]() -> Callback<void(double /* num */)> {
         if (onChanged->isInstanceOf(JCallback_void_double_cxx::javaClassStatic())) [[likely]] {
           auto downcast = jni::static_ref_cast<JCallback_void_double_cxx::javaobject>(onChanged);
@@ -36,12 +38,12 @@ namespace margelo::nitro::test {
   }
 
   jni::local_ref<JJsStyleStruct::javaobject> JJsStyleStruct::fromCpp(const JsStyleStructKotlin& value) {
-    using JSignature = JJsStyleStruct(double, jni::alias_ref<JCallback_void_double::javaobject>);
+    using JSignature = JJsStyleStruct(jdouble, jni::alias_ref<JCallback_void_double::javaobject>);
     static const auto clazz = javaClassStatic();
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      value.value,
+      JNIConverter<double, jdouble>::toJNI(value.value),
       JCallback_void_double_cxx::fromCpp(value.onChanged)
     );
   }

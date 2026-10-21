@@ -8,6 +8,8 @@
 #include <NitroTest/private/JSize.hpp>
 
 #include <NitroTest/private/SizeKotlin.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/SizeUnit.hpp>
 #include <NitroTest/private/JSizeUnit.hpp>
 
@@ -15,27 +17,27 @@ namespace margelo::nitro::test {
 
   SizeKotlin JSize::toCpp() const {
     static const auto clazz = javaClassStatic();
-    static const auto fieldWidth = clazz->getField<double>("width");
-    double width = this->getFieldValue(fieldWidth);
-    static const auto fieldHeight = clazz->getField<double>("height");
-    double height = this->getFieldValue(fieldHeight);
+    static const auto fieldWidth = clazz->getField<jdouble>("width");
+    jdouble width = this->getFieldValue(fieldWidth);
+    static const auto fieldHeight = clazz->getField<jdouble>("height");
+    jdouble height = this->getFieldValue(fieldHeight);
     static const auto fieldUnit = clazz->getField<JSizeUnit>("unit");
     jni::local_ref<JSizeUnit> unit = this->getFieldValue(fieldUnit);
     return SizeKotlin(
-      width,
-      height,
+      JNIConverter<double, jdouble>::fromJNI(width),
+      JNIConverter<double, jdouble>::fromJNI(height),
       unit->toCpp()
     );
   }
 
   jni::local_ref<JSize::javaobject> JSize::fromCpp(const SizeKotlin& value) {
-    using JSignature = JSize(double, double, jni::alias_ref<JSizeUnit>);
+    using JSignature = JSize(jdouble, jdouble, jni::alias_ref<JSizeUnit>);
     static const auto clazz = javaClassStatic();
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      value.width,
-      value.height,
+      JNIConverter<double, jdouble>::toJNI(value.width),
+      JNIConverter<double, jdouble>::toJNI(value.height),
       JSizeUnit::fromCpp(value.unit)
     );
   }

@@ -10,12 +10,14 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
   void JCallback_void_std__optional_double_::invoke(const std::optional<double>& maybe) const {
     static const auto __method = javaClassStatic()->getMethod<void(jni::alias_ref<jni::JDouble> /* maybe */)>("invoke_jni");
-    __method(self(), maybe.has_value() ? jni::JDouble::valueOf(maybe.value()) : nullptr);
+    __method(self(), maybe.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(maybe.value()) : nullptr);
   }
 
   jni::local_ref<JCallback_void_std__optional_double_::javaobject> JCallback_void_std__optional_double__cxx::fromCpp(const Callback<void(const std::optional<double>& /* maybe */)>& callback) {
@@ -28,9 +30,9 @@ namespace margelo::nitro::test {
 
   void JCallback_void_std__optional_double__cxx::invoke_cxx(jni::alias_ref<jni::JDouble> maybe) {
     if (_isInline) {
-      _callback.callSync(maybe != nullptr ? std::make_optional(maybe->value()) : std::nullopt);
+      _callback.callSync(maybe != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(maybe)) : std::nullopt);
     } else {
-      _callback.callAndForget(maybe != nullptr ? std::make_optional(maybe->value()) : std::nullopt);
+      _callback.callAndForget(maybe != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(maybe)) : std::nullopt);
     }
   }
 

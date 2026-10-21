@@ -17,6 +17,7 @@
 #include <NitroModules/JNIConverter.hpp>
 #include <memory>
 #include <NitroTest/private/HybridBaseSpecCxx+Kotlin.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroTest/private/SizeKotlin.hpp>
 #include <NitroTest/private/Size+Kotlin+NitroTest.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
@@ -41,7 +42,7 @@ namespace margelo::nitro::test {
       throw std::invalid_argument("Cannot call Base.getBaseValue on an empty or incompatible C++ adapter.");
     }
     auto __result = __implementation->getBaseValue();
-    return JNIConverter<double, double>::fromJNI(__result);
+    return JNIConverter<double, jdouble>::fromJNI(__result);
   }
 
   margelo::nitro::test::Size HybridBaseSpecCxx::bounceSize(const Size& size) const {

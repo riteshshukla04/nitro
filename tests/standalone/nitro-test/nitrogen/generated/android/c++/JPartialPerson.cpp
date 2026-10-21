@@ -12,6 +12,8 @@
 #include <optional>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -23,7 +25,7 @@ namespace margelo::nitro::test {
     jni::local_ref<jni::JDouble> age = this->getFieldValue(fieldAge);
     return PartialPersonKotlin(
       name != nullptr ? std::make_optional(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(name)) : std::nullopt,
-      age != nullptr ? std::make_optional(age->value()) : std::nullopt
+      age != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(age)) : std::nullopt
     );
   }
 
@@ -34,7 +36,7 @@ namespace margelo::nitro::test {
     return create(
       clazz,
       value.name.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.name.value()) : nullptr,
-      value.age.has_value() ? jni::JDouble::valueOf(value.age.value()) : nullptr
+      value.age.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.age.value()) : nullptr
     );
   }
 

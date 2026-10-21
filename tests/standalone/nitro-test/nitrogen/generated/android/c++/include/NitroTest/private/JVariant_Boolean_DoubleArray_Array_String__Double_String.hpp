@@ -13,6 +13,8 @@
 #include <vector>
 #include <string>
 #include <variant>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
@@ -30,7 +32,7 @@ namespace margelo::nitro::test {
     static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_0(jboolean value);
     static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_1(jni::alias_ref<jni::JArrayDouble> value);
     static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_2(jni::alias_ref<jni::JArrayClass<jni::JString>> value);
-    static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_3(double value);
+    static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_3(jdouble value);
     static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> create_4(jni::alias_ref<jni::JString> value);
 
     static jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> fromCpp(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& variant);
@@ -64,7 +66,7 @@ namespace margelo::nitro::test {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Boolean_DoubleArray_Array_String__Double_String$Fourth;";
 
-      [[nodiscard]] double getValue() const;
+      [[nodiscard]] jdouble getValue() const;
     };
 
     class Fifth final : public jni::JavaClass<Fifth, JVariant_Boolean_DoubleArray_Array_String__Double_String> {

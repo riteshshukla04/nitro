@@ -6,6 +6,8 @@
 ///
 
 #include <NitroTest/private/JHybridGrandchildSpec.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -62,8 +64,8 @@ namespace margelo::nitro::test {
   }
 
   // Properties
-  double JHybridGrandchildSpec::getGrandchildValue() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double()>("getGrandchildValue");
+  jdouble JHybridGrandchildSpec::getGrandchildValue() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble()>("getGrandchildValue");
     auto __result = __method(_javaPart, CxxPart::getClass());
     return __result;
   }

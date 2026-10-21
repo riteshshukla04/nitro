@@ -13,6 +13,8 @@
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JSize.hpp>
 #include <NitroTest/private/JSizeUnit.hpp>
 #include <optional>
@@ -91,8 +93,8 @@ namespace margelo::nitro::test {
   }
 
   // Properties
-  double JHybridBaseSpec::getBaseValue() {
-    static const auto __method = CxxPart::getClass()->getMethod<double()>("getBaseValue");
+  jdouble JHybridBaseSpec::getBaseValue() {
+    static const auto __method = CxxPart::getClass()->getMethod<jdouble()>("getBaseValue");
     auto __result = __method(_javaPart);
     return __result;
   }

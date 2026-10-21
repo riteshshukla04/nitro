@@ -14,6 +14,7 @@
 #include <NitroModules/JNIConverter.hpp>
 #include <memory>
 #include <NitroTest/private/HybridChildSpecCxx+Kotlin.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroTest/private/CarKotlin.hpp>
 #include <NitroTest/private/Car+Kotlin+NitroTest.hpp>
 #include <NitroTest/private/Person+Kotlin+NitroTest.hpp>
@@ -37,7 +38,7 @@ namespace margelo::nitro::test {
       throw std::invalid_argument("Cannot call Child.getChildValue on an empty or incompatible C++ adapter.");
     }
     auto __result = __implementation->getChildValue();
-    return JNIConverter<double, double>::fromJNI(__result);
+    return JNIConverter<double, jdouble>::fromJNI(__result);
   }
 
   std::variant<std::string, margelo::nitro::test::Car> HybridChildSpecCxx::bounceVariant(const std::variant<std::string, Car>& variant) const {

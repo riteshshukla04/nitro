@@ -9,13 +9,15 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
   double JCallback_double_double::invoke(double value) const {
-    static const auto __method = javaClassStatic()->getMethod<double(double /* value */)>("invoke_jni");
-    auto __result = __method(self(), value);
-    return __result;
+    static const auto __method = javaClassStatic()->getMethod<jdouble(jdouble /* value */)>("invoke_jni");
+    auto __result = __method(self(), JNIConverter<double, jdouble>::toJNI(value));
+    return JNIConverter<double, jdouble>::fromJNI(__result);
   }
 
   jni::local_ref<JCallback_double_double::javaobject> JCallback_double_double_cxx::fromCpp(const Callback<double(double /* value */)>& callback) {
@@ -26,9 +28,9 @@ namespace margelo::nitro::test {
     return newObjectCxxArgs(callback.escape(), true);
   }
 
-  double JCallback_double_double_cxx::invoke_cxx(double value) {
-    double __result = _callback.callSync(value);
-    return __result;
+  jdouble JCallback_double_double_cxx::invoke_cxx(jdouble value) {
+    double __result = _callback.callSync(JNIConverter<double, jdouble>::fromJNI(value));
+    return JNIConverter<double, jdouble>::toJNI(__result);
   }
 
   void JCallback_double_double_cxx::registerNatives() {

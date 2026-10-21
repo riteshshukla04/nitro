@@ -1,14 +1,10 @@
 import type { Language } from '../../../getPlatformSpecs.js'
-import type { GetCodeOptions } from '../../types/Type.js'
+import type { SourceImport } from '../../SourceFile.js'
+import type { GetCodeOptions, Type } from '../../types/Type.js'
 import { NumberType } from '../../types/NumberType.js'
-import {
-  convertJniPrimitive,
-  getJniPrimitiveCode,
-  type JniValueKind,
-  type KotlinConversion,
-  type KotlinType,
-  type KotlinTypeOptions,
-} from './KotlinType.js'
+import { KotlinCxxPrimitiveType } from './KotlinCxxPrimitiveType.js'
+import type { KotlinCppConverter } from '../KotlinConverter.js'
+import { getJniPrimitiveCode, type JniValueKind, type KotlinConversion, type KotlinType, type KotlinTypeOptions } from './KotlinType.js'
 
 export class KotlinNumberType extends NumberType implements KotlinType {
   readonly needsKotlinConversion = false
@@ -22,20 +18,55 @@ export class KotlinNumberType extends NumberType implements KotlinType {
   get jniValueKind(): JniValueKind {
     return this.boxed ? 'wrapper' : 'primitive'
   }
-  private get jniPrimitive() {
-    return { boxedType: 'jni::JDouble', boxed: this.boxed }
+
+  getCppConverter(cppType: Type): KotlinCppConverter {
+    return new KotlinCxxPrimitiveType(cppType, this).getConverter()
+  }
+
+  getJSIType(): this {
+    return this
   }
 
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniPrimitiveCode(super.getCode(language, options), options, this.jniPrimitive)
-      default:
+        return getJniPrimitiveCode('jdouble', options, { boxedType: 'jni::JDouble', boxed: this.boxed })
+      case 'kotlin':
+      case 'swift':
         return super.getCode(language, options)
     }
   }
 
   convert(value: string, conversion: KotlinConversion): string {
-    return convertJniPrimitive(value, conversion, this.jniPrimitive)
+    switch (conversion.in) {
+      case 'kotlin':
+        return value
+      case 'c++': {
+        const jniType = this.getCode('c++', { context: 'value' })
+        const converter = `JNIConverter<double, ${jniType}>`
+        switch (conversion.from) {
+          case 'c++':
+            return `${converter}::toJNI(${value})`
+          case 'kotlin':
+            return `${converter}::fromJNI(${value})`
+        }
+      }
+    }
+  }
+
+  override getRequiredImports(language: Language = 'c++'): SourceImport[] {
+    const imports = super.getRequiredImports()
+    switch (language) {
+      case 'c++':
+        imports.push(
+          { language: language, declaration: { header: 'NitroModules/JNIConverter+Primitives.hpp', space: 'system' } },
+          { language: language, declaration: { header: 'NitroModules/JSIConverter+JNIPrimitives.hpp', space: 'system' } }
+        )
+        break
+      case 'kotlin':
+      case 'swift':
+        break
+    }
+    return imports
   }
 }

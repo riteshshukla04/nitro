@@ -12,6 +12,8 @@
 
 #include <string>
 #include <variant>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
@@ -26,7 +28,7 @@ namespace margelo::nitro::test {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Double_String;";
 
-    static jni::local_ref<JVariant_Double_String> create_0(double value);
+    static jni::local_ref<JVariant_Double_String> create_0(jdouble value);
     static jni::local_ref<JVariant_Double_String> create_1(jni::alias_ref<jni::JString> value);
 
     static jni::local_ref<JVariant_Double_String> fromCpp(const std::variant<double, std::string>& variant);
@@ -39,7 +41,7 @@ namespace margelo::nitro::test {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_Double_String$First;";
 
-      [[nodiscard]] double getValue() const;
+      [[nodiscard]] jdouble getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JVariant_Double_String> {

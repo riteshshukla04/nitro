@@ -15,6 +15,8 @@
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
 #include <NitroTestExternal/private/JSize.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTestExternal/SizeUnit.hpp>
 #include <NitroTestExternal/private/JSizeUnit.hpp>
 

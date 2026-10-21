@@ -11,6 +11,7 @@
 #include <NitroModules/JNIConverter.hpp>
 #include <memory>
 #include <NitroTest/private/HybridGrandchildSpecCxx+Kotlin.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
 
 namespace margelo::nitro::test {
 
@@ -31,7 +32,7 @@ namespace margelo::nitro::test {
       throw std::invalid_argument("Cannot call Grandchild.getGrandchildValue on an empty or incompatible C++ adapter.");
     }
     auto __result = __implementation->getGrandchildValue();
-    return JNIConverter<double, double>::fromJNI(__result);
+    return JNIConverter<double, jdouble>::fromJNI(__result);
   }
 
 } // namespace margelo::nitro::test

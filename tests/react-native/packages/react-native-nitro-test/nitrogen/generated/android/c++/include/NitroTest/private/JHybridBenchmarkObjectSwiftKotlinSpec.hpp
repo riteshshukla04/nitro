@@ -23,6 +23,8 @@ namespace margelo::nitro::test { class JHybridBenchmarkObjectSwiftKotlinSpec; }
 #include <optional>
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
@@ -70,23 +72,23 @@ namespace margelo::nitro::test {
 
   public:
     // Properties
-    double getNumberValue();
-    void setNumberValue(double numberValue);
+    jdouble getNumberValue();
+    void setNumberValue(jdouble numberValue);
     std::shared_ptr<JHybridBenchmarkObjectSwiftKotlinSpec> getThisObject();
 
   public:
     // Methods
     void simpleFunc();
-    double addNumbers(double a, double b);
+    jdouble addNumbers(jdouble a, jdouble b);
     jni::local_ref<jni::JString> addStrings(const jni::local_ref<jni::JString>& a, const jni::local_ref<jni::JString>& b);
     std::vector<double> bounceNumbers(const std::vector<double>& array);
     CarKotlin bounceCar(const CarKotlin& car);
     std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map);
-    jni::local_ref<jni::JString> tryOptionalParams(double num, bool boo, const std::optional<std::string>& str);
+    jni::local_ref<jni::JString> tryOptionalParams(jdouble num, bool boo, const std::optional<std::string>& str);
     std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either);
     jni::local_ref<JArrayBuffer::JavaPart> bounceArrayBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
     jni::local_ref<JArrayBuffer::JavaPart> copyBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
-    double callbackSync(const Callback<double()>& callback);
+    jdouble callbackSync(const Callback<double()>& callback);
     Promise<double> promiseReturnsInstantly();
     Promise<double> createPendingPromise();
     void resolvePendingPromiseOnWorker();

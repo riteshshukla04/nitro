@@ -13,6 +13,8 @@
 #include <string>
 #include <NitroTest/private/CarKotlin.hpp>
 #include <variant>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JHybridChildSpec.hpp>
 #include <NitroTest/private/JHybridBaseSpec.hpp>
 
@@ -57,7 +59,7 @@ namespace margelo::nitro::test {
 
   public:
     // Properties
-    double getChildValue();
+    jdouble getChildValue();
 
   public:
     // Methods

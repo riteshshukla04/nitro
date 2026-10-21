@@ -17,6 +17,8 @@
 #include <optional>
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
@@ -104,13 +106,13 @@ namespace margelo::nitro::test {
   }
 
   // Properties
-  double JHybridBenchmarkObjectSwiftKotlinSpec::getNumberValue() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double()>("getNumberValue");
+  jdouble JHybridBenchmarkObjectSwiftKotlinSpec::getNumberValue() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble()>("getNumberValue");
     auto __result = __method(_javaPart, CxxPart::getClass());
     return __result;
   }
-  void JHybridBenchmarkObjectSwiftKotlinSpec::setNumberValue(double numberValue) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(double /* numberValue */)>("setNumberValue");
+  void JHybridBenchmarkObjectSwiftKotlinSpec::setNumberValue(jdouble numberValue) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jdouble /* numberValue */)>("setNumberValue");
     __method(_javaPart, CxxPart::getClass(), numberValue);
   }
   std::shared_ptr<JHybridBenchmarkObjectSwiftKotlinSpec> JHybridBenchmarkObjectSwiftKotlinSpec::getThisObject() {
@@ -124,8 +126,8 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void()>("simpleFunc");
     __method(_javaPart, CxxPart::getClass());
   }
-  double JHybridBenchmarkObjectSwiftKotlinSpec::addNumbers(double a, double b) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double(double /* a */, double /* b */)>("addNumbers");
+  jdouble JHybridBenchmarkObjectSwiftKotlinSpec::addNumbers(jdouble a, jdouble b) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble(jdouble /* a */, jdouble /* b */)>("addNumbers");
     auto __result = __method(_javaPart, CxxPart::getClass(), a, b);
     return __result;
   }
@@ -159,7 +161,7 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), [&](const auto& __input) -> jni::local_ref<jni::JMap<jni::JString, jni::JDouble>> {
       auto __map = jni::JHashMap<jni::JString, jni::JDouble>::create(__input.size());
       for (const auto& __entry : __input) {
-        __map->put(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.first), jni::JDouble::valueOf(__entry.second));
+        __map->put(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.first), JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(__entry.second));
       }
       return __map;
     }(map));
@@ -167,13 +169,13 @@ namespace margelo::nitro::test {
       std::unordered_map<std::string, double> __map;
       __map.reserve(__input->size());
       for (const auto& __entry : *__input) {
-        __map.emplace(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.first), __entry.second->value());
+        __map.emplace(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.first), JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__entry.second));
       }
       return __map;
     }(__result);
   }
-  jni::local_ref<jni::JString> JHybridBenchmarkObjectSwiftKotlinSpec::tryOptionalParams(double num, bool boo, const std::optional<std::string>& str) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(double /* num */, jboolean /* boo */, jni::alias_ref<jni::JString> /* str */)>("tryOptionalParams");
+  jni::local_ref<jni::JString> JHybridBenchmarkObjectSwiftKotlinSpec::tryOptionalParams(jdouble num, bool boo, const std::optional<std::string>& str) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(jdouble /* num */, jboolean /* boo */, jni::alias_ref<jni::JString> /* str */)>("tryOptionalParams");
     auto __result = __method(_javaPart, CxxPart::getClass(), num, boo, str.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(str.value()) : nullptr);
     return __result;
   }
@@ -192,8 +194,8 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), buffer);
     return __result;
   }
-  double JHybridBenchmarkObjectSwiftKotlinSpec::callbackSync(const Callback<double()>& callback) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double(jni::alias_ref<JCallback_double::javaobject> /* callback */)>("callbackSync_cxx");
+  jdouble JHybridBenchmarkObjectSwiftKotlinSpec::callbackSync(const Callback<double()>& callback) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble(jni::alias_ref<JCallback_double::javaobject> /* callback */)>("callbackSync_cxx");
     auto __result = __method(_javaPart, CxxPart::getClass(), JCallback_double_cxx::fromCpp(callback));
     return __result;
   }
@@ -206,7 +208,7 @@ namespace margelo::nitro::test {
         std::optional<double> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -229,7 +231,7 @@ namespace margelo::nitro::test {
         std::optional<double> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
