@@ -100,6 +100,10 @@ if (!destination) {
     )
   destination = `platform=iOS Simulator,id=${device.udid}`
   simulator = device.udid
+  // Experiment: boot first, so the simulator settles while the build runs.
+  run('xcrun', ['simctl', 'bootstatus', simulator, '-b'])
+  console.log(`Simulator booted after ${elapsed()}`)
+  simulator = undefined
 }
 if (values['skip-hermes-build']) {
   const framework = path.join(root, 'tests/standalone/.build/hermes/NitroTestHermes.xcframework')
