@@ -63,6 +63,13 @@ static NSString* toNSString(const std::string& string) {
           NSMutableArray* failedCases = [NSMutableArray arrayWithCapacity:report.failedCases.size()];
           for (const auto& [name, failure] : report.failedCases)
             [failedCases addObject:@{@"name" : toNSString(name), @"failure" : toNSString(failure)}];
+          NSMutableArray* slowCases = [NSMutableArray array];
+          for (const auto& slow : report.slowCases) {
+            NSMutableArray* callbacks = [NSMutableArray array];
+            for (double ms : slow.callbacksMs)
+              [callbacks addObject:@(std::round(ms))];
+            [slowCases addObject:@{@"name" : toNSString(slow.name), @"ms" : @(std::round(slow.durationMs)), @"callbacksMs" : callbacks}];
+          }
           NSDictionary* fields = @{
             @"name" : toNSString(report.name),
             @"cases" : @(report.cases),
@@ -74,6 +81,12 @@ static NSString* toNSString(const std::string& string) {
             @"workers" : @(workers),
             @"timeoutMs" : @(timeoutMs),
             @"failedCases" : failedCases,
+            @"startMs" : @(std::round(report.startMs)),
+            @"endMs" : @(std::round(report.endMs)),
+            @"requestsAtStart" : @(report.requestsAtStart),
+            @"requestsAtEnd" : @(report.requestsAtEnd),
+            @"lastRequestMs" : @(std::round(report.lastRequestMs)),
+            @"slowCases" : slowCases,
           };
           NSData* json = [NSJSONSerialization dataWithJSONObject:fields options:NSJSONWritingSortedKeys error:nil];
           block([[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding]);

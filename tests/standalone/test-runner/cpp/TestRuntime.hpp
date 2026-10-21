@@ -45,6 +45,22 @@ struct TestGroupReport {
   double teardownMs = 0;
   // Each failed case with the first line of its failure.
   std::vector<std::pair<std::string, std::string>> failedCases = {};
+  // DIAGNOSTIC: milliseconds since the scheduler was created.
+  double startMs = 0;
+  double endMs = 0;
+  // DIAGNOSTIC: cases Swift Testing had requested when the group started/ended.
+  size_t requestsAtStart = 0;
+  size_t requestsAtEnd = 0;
+  // DIAGNOSTIC: time of the latest request so far, since scheduler creation.
+  double lastRequestMs = 0;
+  // DIAGNOSTIC: cases slower than one second, with the arrival times of their
+  // native callbacks in milliseconds since the case started.
+  struct SlowCase {
+    std::string name;
+    double durationMs = 0;
+    std::vector<double> callbacksMs;
+  };
+  std::vector<SlowCase> slowCases = {};
 };
 
 struct TestSchedulerOptions {

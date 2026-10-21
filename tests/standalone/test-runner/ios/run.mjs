@@ -225,7 +225,28 @@ if (status === 0 && simulator) {
   console.log(`Simulator booted after ${elapsed()}`)
 }
 if (status === 0) {
+  // DIAGNOSTIC: system-wide CPU use while the tests run. Each `top` run
+  // prints two samples; the second one has CPU percentages.
+  const top = spawn(
+    'sh',
+    ['-c', 'while :; do date +%T; top -l 2 -s 1 -o cpu -n 10 -stats pid,command,cpu,th,pri,state | tail -11; done'],
+    { stdio: ['ignore', openSync(path.join(results, 'top.txt'), 'w'), 'ignore'], detached: true }
+  )
+  // DIAGNOSTIC: what the test process does during its first 40 seconds.
+  const sampler = spawn(
+    'sh',
+    [
+      '-c',
+      `for i in $(seq 600); do pid=$(pgrep -x xctest | head -1); [ -n "$pid" ] && break; sleep 0.2; done; ` +
+        `[ -n "$pid" ] && { sudo -n sample "$pid" 40 5 -mayDie -file '${path.join(results, 'sample.txt')}' || sample "$pid" 40 5 -mayDie -file '${path.join(results, 'sample.txt')}'; }`,
+    ],
+    { stdio: ['ignore', openSync(path.join(results, 'sampler.log'), 'w'), 'inherit'], detached: true }
+  )
   status = await xcodebuild(argumentsForTests())
+  process.kill(-top.pid)
+  try {
+    process.kill(-sampler.pid)
+  } catch {}
   console.log(`Tests finished after ${elapsed()}`)
 }
 closeSync(log)

@@ -139,7 +139,73 @@ private final class GroupReportLog: @unchecked Sendable {
 
 private let groupReports = GroupReportLog(path: ProcessInfo.processInfo.environment["NITRO_TEST_REPORT"])
 
+/// DIAGNOSTIC: measures how long a new unstructured Task waits before it runs,
+/// from a thread at the given QoS, the way `Promise.async` creates its Tasks.
+private final class TaskLatencyProbe: @unchecked Sendable {
+  private let log: GroupReportLog
+  private let start = DispatchTime.now().uptimeNanoseconds
+  private let lock = NSLock()
+  private var worst: [String: Double] = [:]
+
+  init(path: String?) {
+    log = GroupReportLog(path: path)
+  }
+
+  private static func ms(_ nanoseconds: UInt64) -> Double { Double(nanoseconds) / 1_000_000 }
+
+  private func record(_ label: String, _ latency: Double) {
+    lock.withLock { worst[label] = max(worst[label] ?? 0, latency) }
+  }
+
+  private func takeWorst(_ label: String) -> Double {
+    lock.withLock { worst.removeValue(forKey: label) ?? -1 }
+  }
+
+  private var reportedWorker = false
+
+  /// Logs the QoS of the first worker that starts a case, and the priority a
+  /// Task created there inherits.
+  func reportWorker() {
+    guard lock.withLock({ () -> Bool in
+      defer { reportedWorker = true }
+      return !reportedWorker
+    }) else { return }
+    log.append("worker qos=\(qos_class_self().rawValue)")
+    Task { self.log.append("workerTask priority=\(Task.currentPriority.rawValue)") }
+  }
+
+  func start(_ label: String, qos: QualityOfService) {
+    let thread = Thread { [self] in
+      var windowStart = DispatchTime.now().uptimeNanoseconds
+      while true {
+        let created = DispatchTime.now().uptimeNanoseconds
+        Task {
+          self.record(label, Self.ms(DispatchTime.now().uptimeNanoseconds - created))
+        }
+        Thread.sleep(forTimeInterval: 0.025)
+        let now = DispatchTime.now().uptimeNanoseconds
+        if now - windowStart >= 500_000_000 {
+          // -1 means no probe Task of this window has run yet.
+          log.append("\(label) \(Int(Self.ms(windowStart - start))) \(Int(takeWorst(label).rounded()))")
+          windowStart = now
+        }
+      }
+    }
+    thread.qualityOfService = qos
+    thread.start()
+  }
+}
+
+private let taskLatencyProbe: TaskLatencyProbe? = {
+  guard let report = ProcessInfo.processInfo.environment["NITRO_TEST_REPORT"] else { return nil }
+  let probe = TaskLatencyProbe(path: report + ".tasks")
+  probe.start("default", qos: .default)
+  probe.start("userInitiated", qos: .userInitiated)
+  return probe
+}()
+
 private let behaviorScheduler = Result {
+  _ = taskLatencyProbe
   let manifest = try Manifest.shared.get()
   guard let url = testResources.url(forResource: "runtime-tests", withExtension: "js") else {
     throw JavaScriptFailure(description: "Missing runtime-tests.js. Run bun test:prepare.")
@@ -150,7 +216,7 @@ private let behaviorScheduler = Result {
   }
   return try NitroTestScheduler(
     bundle: String(contentsOf: url, encoding: .utf8), groups: manifest.groups, workers: UInt(workerCount),
-    timeoutMs: defaultTimeoutMs, sourceMap: sourceMap, onCaseStarted: nil,
+    timeoutMs: defaultTimeoutMs, sourceMap: sourceMap, onCaseStarted: { _ in taskLatencyProbe?.reportWorker() },
     onGroupFinished: { groupReports.append($0) })
 }
 

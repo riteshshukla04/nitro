@@ -70,6 +70,14 @@ namespace {
       return true;
     }
 
+    // DIAGNOSTIC: arrival times of tasks enqueued from other threads.
+    std::vector<Clock::time_point> takeArrivals() {
+      std::lock_guard lock(mutex);
+      std::vector<Clock::time_point> result;
+      result.swap(arrivals);
+      return result;
+    }
+
     void close() {
       std::queue<std::function<void()>> discarded;
       {
@@ -98,6 +106,7 @@ namespace {
         if (closed)
           return false;
         tasks.push(std::move(task));
+        arrivals.push_back(Clock::now());
       }
       changed.notify_one();
       return true;
@@ -107,6 +116,7 @@ namespace {
     std::mutex mutex;
     std::condition_variable changed;
     std::queue<std::function<void()>> tasks;
+    std::vector<Clock::time_point> arrivals;
     bool closed = false;
   };
 
@@ -229,6 +239,8 @@ namespace {
 
         if (onStarted)
           onStarted();
+        dispatcher->takeArrivals();
+        caseStart = Clock::now();
         const auto timeoutMessage = "Timed out after " + std::to_string(testTimeoutMs) + "ms";
         const auto deadline = Clock::now() + std::chrono::milliseconds(testTimeoutMs);
         runtime->watchTimeLimit(testTimeoutMs);
@@ -268,7 +280,17 @@ namespace {
       }
     }
 
+    // DIAGNOSTIC: callback arrivals of the last case, in ms since it started.
+    std::vector<double> lastArrivalsMs() {
+      std::vector<double> result;
+      for (auto arrival : dispatcher->takeArrivals())
+        result.push_back(std::chrono::duration<double, std::milli>(arrival - caseStart).count());
+      return result;
+    }
+
   private:
+    Clock::time_point caseStart;
+
     HermesSession() {
       auto config = ::hermes::vm::RuntimeConfig::Builder()
                         .withMicrotaskQueue(true)
@@ -413,6 +435,21 @@ struct TestScheduler::State {
   bool stopping = false;
   size_t running = 0;
   size_t peak = 0;
+  // DIAGNOSTIC
+  const Clock::time_point created = Clock::now();
+  size_t requests = 0;
+  Clock::time_point lastRequest = created;
+
+  double sinceCreated(Clock::time_point time) const {
+    return std::chrono::duration<double, std::milli>(time - created).count();
+  }
+  void stamp(double& atMs, size_t& count, double* lastMs = nullptr) {
+    std::lock_guard lock(mutex);
+    atMs = sinceCreated(Clock::now());
+    count = requests;
+    if (lastMs)
+      *lastMs = sinceCreated(lastRequest);
+  }
 
   // Requires `mutex`. Swift Testing requests cases in no particular order, so
   // queued groups start in the order the manifest lists them: slowest first.
@@ -439,6 +476,7 @@ struct TestScheduler::State {
 
   void runGroup(const TestGroup& group) {
     TestGroupReport report{group.name, group.cases.size()};
+    stamp(report.startMs, report.requestsAtStart);
     std::unique_ptr<HermesSession> session;
     std::string setupFailure;
     auto destroySession = [&] {
@@ -472,6 +510,9 @@ struct TestScheduler::State {
           });
           durationMs = millisecondsSince(start);
           report.casesMs += durationMs;
+          auto arrivals = session->lastArrivalsMs();
+          if (durationMs > 1000)
+            report.slowCases.push_back({name, durationMs, std::move(arrivals)});
         } else {
           failure = setupFailure;
         }
@@ -507,6 +548,7 @@ struct TestScheduler::State {
       options.caseScope(destroySession);
     else
       destroySession();
+    stamp(report.endMs, report.requestsAtEnd, &report.lastRequestMs);
     if (options.onGroupFinished)
       options.onGroupFinished(report);
     if (lastResult)
@@ -567,6 +609,8 @@ TestScheduler::~TestScheduler() {
 
 void TestScheduler::request(const std::string& name, std::function<void(const TestCaseResult&)> callback) {
   std::unique_lock lock(state_->mutex);
+  state_->requests++;
+  state_->lastRequest = Clock::now();
   if (auto result = state_->results.find(name); result != state_->results.end()) {
     auto copy = result->second;
     lock.unlock();
