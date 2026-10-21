@@ -116,6 +116,11 @@ if (values['skip-hermes-build']) {
 const buildDirectory = path.join(root, 'tests/standalone/.build/ios', values.sanitizer)
 const results = path.join(buildDirectory, 'results', `RuntimeTests-${Date.now()}-${process.pid}`)
 mkdirSync(results, { recursive: true })
+// Sanitizer builds run several times slower, and CI runs them on 3-core
+// machines. Cases that take milliseconds there occasionally waited longer than
+// 10 seconds for the CPU. Their own explicit budgets (withTestTimeout) and the
+// runner contract tests are unaffected.
+environment.TEST_RUNNER_NITRO_TEST_TIMEOUT_MS = String({ none: 10_000, address: 30_000, thread: 30_000 }[values.sanitizer])
 if (values.sanitizer !== 'none') {
   const option = values.sanitizer === 'address' ? 'ASAN_OPTIONS' : 'TSAN_OPTIONS'
   // xcodebuild forwards TEST_RUNNER_ variables to every test process. Preserve

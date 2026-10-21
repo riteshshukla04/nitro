@@ -70,6 +70,9 @@ runs with one cooperative worker.
 
 The `static-properties` cases write shared native storage. They run in order in their file's runtime, so they never overlap each other.
 
+The default budget for runtime setup and for each case is 10 seconds, or 30 seconds with `--sanitizer address` or `--sanitizer thread`;
+`run.mjs` passes it as `NITRO_TEST_TIMEOUT_MS`. Explicit `withTestTimeout` budgets and the runner contract tests do not change.
+
 The Objective-C++ bridge converts a failed assertion or native exception into a Swift error. Handwritten tests check error propagation,
 cached bytecode with fresh runtime state, cases of a file sharing one runtime, a fresh runtime after a failed or timed out case, per-case
 timeout overrides, independent setup and execution budgets, and timeouts for unresolved promises, synchronous loops, and endless microtask
