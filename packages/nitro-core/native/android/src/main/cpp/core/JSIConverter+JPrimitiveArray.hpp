@@ -2,6 +2,7 @@
 
 #include "JSIConverter+JNIPrimitives.hpp"
 #include <NitroModules/JSIArrayHelpers.hpp>
+#include <algorithm>
 #include <array>
 #include <concepts>
 #include <type_traits>
@@ -20,12 +21,17 @@ struct JSIConverter<jni::local_ref<JavaArray>> {
     auto array = value.asObject(runtime).asArray(runtime);
     const jsize size = static_cast<jsize>(array.size(runtime));
     auto result = JavaArray::newArray(size);
-    if (size != 0) {
-      // pin() permits JNI/JSI calls while borrowed; pinCritical() does not.
-      auto elements = result->pin();
-      for (jsize i = 0; i < size; ++i) {
-        elements[i] = JNIConverter<Element, Primitive>::toJNI(JSIConverter<Element>::fromJSI(runtime, array.getValueAtIndex(runtime, i)));
+    // Fill bounded regions without first reading the new Java array's zeroed storage.
+    constexpr jsize capacity = 256;
+    std::array<Primitive, capacity> elements;
+    for (jsize start = 0; start < size;) {
+      const jsize count = std::min(capacity, size - start);
+      for (jsize i = 0; i < count; ++i) {
+        elements[i] =
+            JNIConverter<Element, Primitive>::toJNI(JSIConverter<Element>::fromJSI(runtime, array.getValueAtIndex(runtime, start + i)));
       }
+      result->setRegion(start, count, elements.data());
+      start += count;
     }
     return result;
   }
@@ -36,9 +42,19 @@ struct JSIConverter<jni::local_ref<JavaArray>> {
     if (size == 0) {
       return jsi::Array(runtime, 0);
     }
-    auto elements = value->pin();
+    // Region reads do not copy unchanged values back to the Java array.
+    constexpr size_t capacity = 256;
+    std::array<Primitive, capacity> elements;
+    size_t start = 0;
+    size_t end = 0;
     return createJSIArray(runtime, size, [&](size_t i) {
-      return JSIConverter<Element>::toJSI(runtime, JNIConverter<Element, Primitive>::fromJNI(elements[i]));
+      if (i == end) {
+        start = i;
+        const size_t count = std::min(capacity, size - i);
+        value->getRegion(static_cast<jsize>(start), static_cast<jsize>(count), elements.data());
+        end = start + count;
+      }
+      return JSIConverter<Element>::toJSI(runtime, JNIConverter<Element, Primitive>::fromJNI(elements[i - start]));
     });
   }
   static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value)
