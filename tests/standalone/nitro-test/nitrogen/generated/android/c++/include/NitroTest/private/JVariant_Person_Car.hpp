@@ -24,6 +24,8 @@
 #include <optional>
 #include <vector>
 #include <string>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <NitroTest/private/JVariant_Double_String.hpp>
 
 namespace margelo::nitro::test {

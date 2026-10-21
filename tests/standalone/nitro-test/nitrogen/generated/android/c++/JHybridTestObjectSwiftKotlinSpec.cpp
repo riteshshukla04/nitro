@@ -46,6 +46,8 @@
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Null.hpp>
 #include <NitroModules/JSIConverter+JNull.hpp>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+AnyJSON.hpp>
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
@@ -597,20 +599,10 @@ namespace margelo::nitro::test {
       return __vector;
     }(__result);
   }
-  std::vector<double> JHybridTestObjectSwiftKotlinSpec::bounceNumbers(const std::vector<double>& array) {
+  jni::local_ref<jni::JArrayDouble> JHybridTestObjectSwiftKotlinSpec::bounceNumbers(const jni::local_ref<jni::JArrayDouble>& array) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JArrayDouble>(jni::alias_ref<jni::JArrayDouble> /* array */)>("bounceNumbers");
-    auto __result = __method(_javaPart, CxxPart::getClass(), [&]() {
-      size_t __size = array.size();
-      jni::local_ref<jni::JArrayDouble> __array = jni::JArrayDouble::newArray(__size);
-      __array->setRegion(0, __size, array.data());
-      return __array;
-    }());
-    return [&]() {
-      size_t __size = __result->size();
-      std::vector<double> __vector(__size);
-      __result->getRegion(0, __size, __vector.data());
-      return __vector;
-    }();
+    auto __result = __method(_javaPart, CxxPart::getClass(), array);
+    return __result;
   }
   std::vector<PersonKotlin> JHybridTestObjectSwiftKotlinSpec::bounceStructs(const std::vector<PersonKotlin>& array) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JArrayClass<JPerson>>(jni::alias_ref<jni::JArrayClass<JPerson>> /* array */)>("bounceStructs");

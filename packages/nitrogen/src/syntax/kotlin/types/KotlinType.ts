@@ -68,7 +68,7 @@ export interface KotlinType extends Type {
   /** The owned JNI representation consumed by direct JSI conversions, when supported. */
   getJSIType?(): Type | undefined
   /** Native conversion requirements requested only by a C++ consumer. */
-  getCppConverter?(cppType: Type): KotlinCppConverter
+  getCppConverter?(cppType: Type): KotlinCppConverter | undefined
   /** Native methods required by this type, owned by the module that declares them. */
   getJniNativeRegistrations?(): readonly JNINativeRegistration[]
   /** Converts `value` across JNI, see `KotlinConversion`. */

@@ -19,6 +19,8 @@
 #include <NitroTest/private/JPerson.hpp>
 #include <vector>
 #include <string>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <variant>
 #include <NitroTest/private/JVariant_Double_String.hpp>
 
@@ -67,12 +69,7 @@ namespace margelo::nitro::test {
       }(passengers),
       isFast != nullptr ? std::make_optional(JNIConverter<bool, jni::local_ref<jni::JBoolean>>::fromJNI(isFast)) : std::nullopt,
       favouriteTrack != nullptr ? std::make_optional(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(favouriteTrack)) : std::nullopt,
-      [&]() {
-        size_t __size = performanceScores->size();
-        std::vector<double> __vector(__size);
-        performanceScores->getRegion(0, __size, __vector.data());
-        return __vector;
-      }(),
+      JNIConverter<std::vector<double>, jni::local_ref<jni::JArrayDouble>>::fromJNI(performanceScores),
       someVariant != nullptr ? std::make_optional(someVariant->toCpp()) : std::nullopt
     );
   }
@@ -101,12 +98,7 @@ namespace margelo::nitro::test {
       }(value.passengers),
       value.isFast.has_value() ? JNIConverter<bool, jni::local_ref<jni::JBoolean>>::toJNI(value.isFast.value()) : nullptr,
       value.favouriteTrack.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.favouriteTrack.value()) : nullptr,
-      [&]() {
-        size_t __size = value.performanceScores.size();
-        jni::local_ref<jni::JArrayDouble> __array = jni::JArrayDouble::newArray(__size);
-        __array->setRegion(0, __size, value.performanceScores.data());
-        return __array;
-      }(),
+      JNIConverter<std::vector<double>, jni::local_ref<jni::JArrayDouble>>::toJNI(value.performanceScores),
       value.someVariant.has_value() ? JVariant_Double_String::fromCpp(value.someVariant.value()) : nullptr
     );
   }

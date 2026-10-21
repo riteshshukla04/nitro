@@ -56,6 +56,8 @@ namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; 
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Null.hpp>
 #include <NitroModules/JSIConverter+JNull.hpp>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+AnyJSON.hpp>
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
@@ -158,7 +160,7 @@ namespace margelo::nitro::test {
     void multipleArguments(jdouble num, const jni::local_ref<jni::JString>& str, jboolean boo);
     jni::local_ref<JNull> bounceNull(const jni::local_ref<JNull>& value);
     std::vector<std::string> bounceStrings(const std::vector<std::string>& array);
-    std::vector<double> bounceNumbers(const std::vector<double>& array);
+    jni::local_ref<jni::JArrayDouble> bounceNumbers(const jni::local_ref<jni::JArrayDouble>& array);
     std::vector<PersonKotlin> bounceStructs(const std::vector<PersonKotlin>& array);
     std::vector<std::vector<PersonKotlin>> bounceNestedArray(const std::vector<std::vector<PersonKotlin>>& array);
     PartialPersonKotlin bouncePartialStruct(const PartialPersonKotlin& person);
