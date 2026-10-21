@@ -354,13 +354,13 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<jni::JString> /* stringValue */)>("setStringValue");
     __method(_javaPart, CxxPart::getClass(), stringValue);
   }
-  int64_t JHybridTestObjectSwiftKotlinSpec::getInt64Value() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<int64_t()>("getInt64Value");
+  jlong JHybridTestObjectSwiftKotlinSpec::getInt64Value() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jlong()>("getInt64Value");
     auto __result = __method(_javaPart, CxxPart::getClass());
     return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setInt64Value(int64_t int64Value) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(int64_t /* int64Value */)>("setInt64Value");
+  void JHybridTestObjectSwiftKotlinSpec::setInt64Value(jlong int64Value) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jlong /* int64Value */)>("setInt64Value");
     __method(_javaPart, CxxPart::getClass(), int64Value);
   }
   uint64_t JHybridTestObjectSwiftKotlinSpec::getUint64Value() {
@@ -1321,8 +1321,8 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), num, str, boo.has_value() ? JNIConverter<bool, jni::local_ref<jni::JBoolean>>::toJNI(boo.value()) : nullptr);
     return __result;
   }
-  int64_t JHybridTestObjectSwiftKotlinSpec::calculateFibonacciSync(jdouble value) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<int64_t(jdouble /* value */)>("calculateFibonacciSync");
+  jlong JHybridTestObjectSwiftKotlinSpec::calculateFibonacciSync(jdouble value) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jlong(jdouble /* value */)>("calculateFibonacciSync");
     auto __result = __method(_javaPart, CxxPart::getClass(), value);
     return __result;
   }
@@ -1335,7 +1335,7 @@ namespace margelo::nitro::test {
         std::optional<int64_t> __converted;
         try {
           auto __result = jni::static_ref_cast<jni::JLong>(__boxedResult);
-          __converted.emplace(__result->value());
+          __converted.emplace(JNIConverter<int64_t, jni::local_ref<jni::JLong>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;

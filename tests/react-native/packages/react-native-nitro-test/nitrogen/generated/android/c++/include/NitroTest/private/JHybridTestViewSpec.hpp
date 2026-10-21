@@ -65,8 +65,8 @@ namespace margelo::nitro::test {
     void setIsBlue(jboolean isBlue);
     jboolean getHasBeenCalled();
     void setHasBeenCalled(jboolean hasBeenCalled);
-    int64_t getInt64Value();
-    void setInt64Value(int64_t int64Value);
+    jlong getInt64Value();
+    void setInt64Value(jlong int64Value);
     ColorScheme getColorScheme();
     void setColorScheme(ColorScheme colorScheme);
     Callback<void()> getSomeCallback();

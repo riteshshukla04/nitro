@@ -9,13 +9,15 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
   int64_t JCallback_int64_t_int64_t::invoke(int64_t value) const {
-    static const auto __method = javaClassStatic()->getMethod<int64_t(int64_t /* value */)>("invoke_jni");
-    auto __result = __method(self(), value);
-    return __result;
+    static const auto __method = javaClassStatic()->getMethod<jlong(jlong /* value */)>("invoke_jni");
+    auto __result = __method(self(), JNIConverter<int64_t, jlong>::toJNI(value));
+    return JNIConverter<int64_t, jlong>::fromJNI(__result);
   }
 
   jni::local_ref<JCallback_int64_t_int64_t::javaobject> JCallback_int64_t_int64_t_cxx::fromCpp(const Callback<int64_t(int64_t /* value */)>& callback) {
@@ -26,9 +28,9 @@ namespace margelo::nitro::test {
     return newObjectCxxArgs(callback.escape(), true);
   }
 
-  int64_t JCallback_int64_t_int64_t_cxx::invoke_cxx(int64_t value) {
-    int64_t __result = _callback.callSync(value);
-    return __result;
+  jlong JCallback_int64_t_int64_t_cxx::invoke_cxx(jlong value) {
+    int64_t __result = _callback.callSync(JNIConverter<int64_t, jlong>::fromJNI(value));
+    return JNIConverter<int64_t, jlong>::toJNI(__result);
   }
 
   void JCallback_int64_t_int64_t_cxx::registerNatives() {

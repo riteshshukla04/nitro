@@ -31,6 +31,16 @@ struct JNIConverter<int32_t, jint> {
 };
 
 template <>
+struct JNIConverter<int64_t, jlong> {
+  static jlong toJNI(int64_t value) {
+    return static_cast<jlong>(value);
+  }
+  static int64_t fromJNI(jlong value) {
+    return static_cast<int64_t>(value);
+  }
+};
+
+template <>
 struct JNIConverter<float, jfloat> {
   static jfloat toJNI(float value) {
     return value;
@@ -67,6 +77,9 @@ struct JNIConverter<bool, jni::local_ref<jni::JBoolean>> : JNIBoxedPrimitiveConv
 
 template <>
 struct JNIConverter<int32_t, jni::local_ref<jni::JInteger>> : JNIBoxedPrimitiveConverter<int32_t, jni::JInteger> {};
+
+template <>
+struct JNIConverter<int64_t, jni::local_ref<jni::JLong>> : JNIBoxedPrimitiveConverter<int64_t, jni::JLong> {};
 
 template <>
 struct JNIConverter<float, jni::local_ref<jni::JFloat>> : JNIBoxedPrimitiveConverter<float, jni::JFloat> {};

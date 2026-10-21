@@ -112,8 +112,8 @@ namespace margelo::nitro::test {
     void setBoolValue(jboolean boolValue);
     jni::local_ref<jni::JString> getStringValue();
     void setStringValue(const jni::local_ref<jni::JString>& stringValue);
-    int64_t getInt64Value();
-    void setInt64Value(int64_t int64Value);
+    jlong getInt64Value();
+    void setInt64Value(jlong int64Value);
     uint64_t getUint64Value();
     void setUint64Value(uint64_t uint64Value);
     jni::local_ref<JNull> getNullValue();
@@ -196,7 +196,7 @@ namespace margelo::nitro::test {
     jni::local_ref<jni::JString> tryMiddleParam(jdouble num, const std::optional<bool>& boo, const jni::local_ref<jni::JString>& str);
     std::optional<Powertrain> tryOptionalEnum(const std::optional<Powertrain>& value);
     jboolean tryTrailingOptional(jdouble num, const jni::local_ref<jni::JString>& str, const std::optional<bool>& boo);
-    int64_t calculateFibonacciSync(jdouble value);
+    jlong calculateFibonacciSync(jdouble value);
     Promise<int64_t> calculateFibonacciAsync(jdouble value);
     Promise<void> wait(jdouble seconds);
     Promise<void> promiseThrows();

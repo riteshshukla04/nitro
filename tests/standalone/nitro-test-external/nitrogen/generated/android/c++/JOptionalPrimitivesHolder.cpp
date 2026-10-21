@@ -28,7 +28,7 @@ namespace margelo::nitro::test::external {
       optionalNumber != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(optionalNumber)) : std::nullopt,
       optionalBoolean != nullptr ? std::make_optional(JNIConverter<bool, jni::local_ref<jni::JBoolean>>::fromJNI(optionalBoolean)) : std::nullopt,
       optionalUInt64 != nullptr ? std::make_optional(static_cast<uint64_t>(optionalUInt64->value())) : std::nullopt,
-      optionalInt64 != nullptr ? std::make_optional(optionalInt64->value()) : std::nullopt
+      optionalInt64 != nullptr ? std::make_optional(JNIConverter<int64_t, jni::local_ref<jni::JLong>>::fromJNI(optionalInt64)) : std::nullopt
     );
   }
 
@@ -41,7 +41,7 @@ namespace margelo::nitro::test::external {
       value.optionalNumber.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.optionalNumber.value()) : nullptr,
       value.optionalBoolean.has_value() ? JNIConverter<bool, jni::local_ref<jni::JBoolean>>::toJNI(value.optionalBoolean.value()) : nullptr,
       value.optionalUInt64.has_value() ? jni::JLong::valueOf(value.optionalUInt64.value()) : nullptr,
-      value.optionalInt64.has_value() ? jni::JLong::valueOf(value.optionalInt64.value()) : nullptr
+      value.optionalInt64.has_value() ? JNIConverter<int64_t, jni::local_ref<jni::JLong>>::toJNI(value.optionalInt64.value()) : nullptr
     );
   }
 

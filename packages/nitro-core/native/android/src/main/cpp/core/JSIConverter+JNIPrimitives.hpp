@@ -24,6 +24,11 @@ struct JSIPrimitiveJNIConverter {
 template <>
 struct JSIConverter<jboolean> : JSIPrimitiveJNIConverter<bool, jboolean> {};
 
+// jlong and int64_t are aliases on some Android ABIs. Reuse the existing converter there.
+template <typename T>
+  requires(std::is_same_v<T, jlong> && !std::is_same_v<T, int64_t>)
+struct JSIConverter<T> : JSIPrimitiveJNIConverter<int64_t, T> {};
+
 template <typename Cpp, typename JavaBox>
 struct JSIBoxedJNIConverter {
   using JNI = jni::local_ref<JavaBox>;
@@ -44,6 +49,9 @@ struct JSIConverter<jni::local_ref<jni::JBoolean>> : JSIBoxedJNIConverter<bool, 
 
 template <>
 struct JSIConverter<jni::local_ref<jni::JInteger>> : JSIBoxedJNIConverter<int32_t, jni::JInteger> {};
+
+template <>
+struct JSIConverter<jni::local_ref<jni::JLong>> : JSIBoxedJNIConverter<int64_t, jni::JLong> {};
 
 template <>
 struct JSIConverter<jni::local_ref<jni::JFloat>> : JSIBoxedJNIConverter<float, jni::JFloat> {};
