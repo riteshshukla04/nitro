@@ -27,6 +27,8 @@ export interface HybridObjectName {
    * @example "JHybridImage"
    */
   JHybridTSpec: string
+  /** The stateless fbjni Java class, independent of the native bridge definition. */
+  JHybridTSpecJavaPart: string
   /**
    * The name of the C++ class that extends the Hybrid Object and bridges over to the Swift C++ wrapper class.
    * @example "HybridImageSwift"
@@ -41,6 +43,7 @@ export function getHybridObjectName(hybridObjectName: string): HybridObjectName 
     HybridTSpec: `Hybrid${hybridObjectName}Spec`,
     HybridTSpecCxx: `Hybrid${hybridObjectName}Spec_cxx`,
     JHybridTSpec: `JHybrid${hybridObjectName}Spec`,
+    JHybridTSpecJavaPart: `JHybrid${hybridObjectName}SpecJavaPart`,
     HybridTSpecSwift: `Hybrid${hybridObjectName}SpecSwift`,
   }
 }

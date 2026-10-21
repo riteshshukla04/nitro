@@ -31,12 +31,18 @@ export interface KotlinMethodInfo {
   nativeMethod: Method
   returnType: KotlinType
   cppReturnType: Type
+  hasDirectReturn: boolean
   parameters: KotlinMethodParameter[]
   /** Whether any value needs conversion between the public Kotlin API and JNI. */
   needsKotlinConversion: boolean
 }
 
-export function prepareKotlinMethod(nativeMethod: Method): KotlinMethodInfo {
+interface PrepareKotlinMethodOptions {
+  /** Constructor factories keep their native shared_ptr return for C++ adapters. */
+  directReturn?: boolean
+}
+
+export function prepareKotlinMethod(nativeMethod: Method, { directReturn = true }: PrepareKotlinMethodOptions = {}): KotlinMethodInfo {
   const returnType = wrapKotlinType(nativeMethod.returnType)
   const cppParameterOptions: GetKotlinCodeOptions = { context: 'parameter', representation: 'jsi', ownership: 'owned' }
   const parameters = nativeMethod.parameters.map((parameter) => {
@@ -48,11 +54,13 @@ export function prepareKotlinMethod(nativeMethod: Method): KotlinMethodInfo {
       type: kotlinType,
     }
   })
+  const directReturnType = directReturn ? returnType.getJSIType?.() : undefined
   const needsKotlinConversion = returnType.needsKotlinConversion || parameters.some((parameter) => parameter.type.needsKotlinConversion)
   return {
     nativeMethod: nativeMethod,
     returnType: returnType,
-    cppReturnType: returnType.getJSIType?.() ?? nativeMethod.returnType,
+    cppReturnType: directReturnType ?? nativeMethod.returnType,
+    hasDirectReturn: directReturnType != null,
     parameters: parameters,
     needsKotlinConversion: needsKotlinConversion,
   }
@@ -142,7 +150,7 @@ __method(${jniArguments.join(', ')});
 `.trim()
   }
   let cppResult: string
-  if (callable.returnType.getJSIType?.() != null) {
+  if (callable.hasDirectReturn) {
     cppResult = '__result'
   } else {
     cppResult = callable.returnType.convert('__result', {

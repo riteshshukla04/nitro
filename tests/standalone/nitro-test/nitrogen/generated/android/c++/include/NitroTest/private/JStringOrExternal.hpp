@@ -11,11 +11,13 @@
 #include <variant>
 
 #include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 // Forward declaration of `JHybridSomeExternalObjectSpec` to properly resolve imports.
 namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; }
 #include <string>
 #include <variant>
-#include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
+#include <NitroTestExternal/private/JHybridSomeExternalObjectSpecJavaPart.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
@@ -30,7 +32,7 @@ namespace margelo::nitro::test {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/StringOrExternal;";
 
-    static jni::local_ref<JStringOrExternal> create_0(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpec::JavaPart> value);
+    static jni::local_ref<JStringOrExternal> create_0(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> value);
     static jni::local_ref<JStringOrExternal> create_1(jni::alias_ref<jni::JString> value);
 
     static jni::local_ref<JStringOrExternal> fromCpp(const std::variant<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, std::string>& variant);
@@ -43,7 +45,7 @@ namespace margelo::nitro::test {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/StringOrExternal$First;";
 
-      [[nodiscard]] jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpec::JavaPart> getValue() const;
+      [[nodiscard]] jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JStringOrExternal> {

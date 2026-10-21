@@ -6,11 +6,10 @@
 ///
 
 #include <NitroTestExternal/private/JHybridTestViewSpec.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
-#include <string>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/Callback.hpp>
+#include <functional>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTestExternal/private/JCallback_void.hpp>
@@ -35,7 +34,7 @@ namespace margelo::nitro::test::external {
     return hybridClass;
   }
 
-  std::shared_ptr<JHybridTestViewSpec> JHybridTestViewSpec::JavaPart::getJHybridTestViewSpec() {
+  std::shared_ptr<JHybridTestViewSpec> JHybridTestViewSpecJavaPart::getJHybridTestViewSpec() {
     auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
     auto castHybridObject = std::dynamic_pointer_cast<JHybridTestViewSpec>(hybridObject);
     if (castHybridObject == nullptr) [[unlikely]] {

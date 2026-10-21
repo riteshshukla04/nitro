@@ -10,17 +10,21 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
-#include <string>
-#include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
-#include <optional>
+#include <NitroTestExternal/private/JHybridSomeExternalObjectSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
+#include <optional>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JUInt64.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
+#include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+// Forward declaration of `JHybridSomeExternalObjectSpec` to properly resolve imports.
+namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; }
 
 namespace margelo::nitro::test::external {
 
@@ -35,10 +39,7 @@ namespace margelo::nitro::test::external {
     };
 
   public:
-    struct JavaPart : public jni::JavaClass<JavaPart, JHybridObject::JavaPart> {
-      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/HybridSomeExternalObjectSpec;";
-      std::shared_ptr<JHybridSomeExternalObjectSpec> getJHybridSomeExternalObjectSpec();
-    };
+    using JavaPart = JHybridSomeExternalObjectSpecJavaPart;
     struct CxxPart : public jni::HybridClass<CxxPart, JHybridObject::CxxPart> {
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/HybridSomeExternalObjectSpec$CxxPart;";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);

@@ -7,9 +7,11 @@
 
 #include <NitroTest/private/JVariant_HybridBaseSpec_OptionalWrapper.hpp>
 #include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroTest/private/JHybridBaseSpec.hpp>
 #include <NitroTest/private/OptionalWrapperKotlin.hpp>
 #include <variant>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTest/private/JOptionalWrapper.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <optional>
@@ -22,8 +24,8 @@
 #include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> JVariant_HybridBaseSpec_OptionalWrapper::create_0(jni::alias_ref<JHybridBaseSpec::JavaPart> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JVariant_HybridBaseSpec_OptionalWrapper(jni::alias_ref<JHybridBaseSpec::JavaPart>)>("fromCpp_0");
+  jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> JVariant_HybridBaseSpec_OptionalWrapper::create_0(jni::alias_ref<JHybridBaseSpecJavaPart> value) {
+    static const auto method = javaClassStatic()->getStaticMethod<JVariant_HybridBaseSpec_OptionalWrapper(jni::alias_ref<JHybridBaseSpecJavaPart>)>("fromCpp_0");
     return method(javaClassStatic(), value);
   }
 
@@ -34,14 +36,14 @@ namespace margelo::nitro::test {
 
   jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> JVariant_HybridBaseSpec_OptionalWrapper::fromCpp(const std::variant<std::shared_ptr<JHybridBaseSpec>, OptionalWrapperKotlin>& variant) {
     switch (variant.index()) {
-      case 0: return create_0(std::get<0>(variant)->getJavaPart());
+      case 0: return create_0(JNIConverter<std::shared_ptr<JHybridBaseSpec>, jni::local_ref<JHybridBaseSpecJavaPart>>::toJNI(std::get<0>(variant)));
       case 1: return create_1(JOptionalWrapper::fromCpp(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
   }
 
-  jni::local_ref<JHybridBaseSpec::JavaPart> JVariant_HybridBaseSpec_OptionalWrapper_impl::First::getValue() const {
-    static const auto field = javaClassStatic()->getField<JHybridBaseSpec::JavaPart>("value");
+  jni::local_ref<JHybridBaseSpecJavaPart> JVariant_HybridBaseSpec_OptionalWrapper_impl::First::getValue() const {
+    static const auto field = javaClassStatic()->getField<JHybridBaseSpecJavaPart>("value");
     return getFieldValue(field);
   }
 
@@ -57,7 +59,7 @@ namespace margelo::nitro::test {
     if (isInstanceOf(JVariant_HybridBaseSpec_OptionalWrapper_impl::First::javaClassStatic())) {
       // It's a `std::shared_ptr<JHybridBaseSpec>`
       auto jniValue = static_cast<const JVariant_HybridBaseSpec_OptionalWrapper_impl::First*>(this)->getValue();
-      return jniValue->getJHybridBaseSpec();
+      return JNIConverter<std::shared_ptr<JHybridBaseSpec>, jni::local_ref<JHybridBaseSpecJavaPart>>::fromJNI(jniValue);
     } else if (isInstanceOf(JVariant_HybridBaseSpec_OptionalWrapper_impl::Second::javaClassStatic())) {
       // It's a `OptionalWrapperKotlin`
       auto jniValue = static_cast<const JVariant_HybridBaseSpec_OptionalWrapper_impl::Second*>(this)->getValue();

@@ -6,9 +6,9 @@
 ///
 
 #include <NitroTest/private/JHybridRecyclableTestViewSpec.hpp>
-#include <optional>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <optional>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
 
@@ -33,7 +33,7 @@ namespace margelo::nitro::test {
     return hybridClass;
   }
 
-  std::shared_ptr<JHybridRecyclableTestViewSpec> JHybridRecyclableTestViewSpec::JavaPart::getJHybridRecyclableTestViewSpec() {
+  std::shared_ptr<JHybridRecyclableTestViewSpec> JHybridRecyclableTestViewSpecJavaPart::getJHybridRecyclableTestViewSpec() {
     auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
     auto castHybridObject = std::dynamic_pointer_cast<JHybridRecyclableTestViewSpec>(hybridObject);
     if (castHybridObject == nullptr) [[unlikely]] {

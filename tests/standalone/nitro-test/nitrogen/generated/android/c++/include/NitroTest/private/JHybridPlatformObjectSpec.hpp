@@ -10,10 +10,14 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
-#include <string>
+#include <NitroTest/private/JHybridPlatformObjectSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JHybridPlatformObjectSpec.hpp>
+#include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+// Forward declaration of `JHybridPlatformObjectSpec` to properly resolve imports.
+namespace margelo::nitro::test { class JHybridPlatformObjectSpec; }
 
 namespace margelo::nitro::test {
 
@@ -28,10 +32,7 @@ namespace margelo::nitro::test {
     };
 
   public:
-    struct JavaPart : public jni::JavaClass<JavaPart, JHybridObject::JavaPart> {
-      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/HybridPlatformObjectSpec;";
-      std::shared_ptr<JHybridPlatformObjectSpec> getJHybridPlatformObjectSpec();
-    };
+    using JavaPart = JHybridPlatformObjectSpecJavaPart;
     struct CxxPart : public jni::HybridClass<CxxPart, JHybridObject::CxxPart> {
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/HybridPlatformObjectSpec$CxxPart;";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);

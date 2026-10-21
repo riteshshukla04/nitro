@@ -10,14 +10,19 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
+#include <NitroTestExternal/private/JHybridBaseSpecJavaPart.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTestExternal/private/SizeKotlin.hpp>
 #include <NitroTestExternal/SizeUnit.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTestExternal/private/JHybridBaseSpec.hpp>
+#include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+// Forward declaration of `JHybridBaseSpec` to properly resolve imports.
+namespace margelo::nitro::test::external { class JHybridBaseSpec; }
 
 namespace margelo::nitro::test::external {
 
@@ -32,10 +37,7 @@ namespace margelo::nitro::test::external {
     };
 
   public:
-    struct JavaPart : public jni::JavaClass<JavaPart, JHybridObject::JavaPart> {
-      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/HybridBaseSpec;";
-      std::shared_ptr<JHybridBaseSpec> getJHybridBaseSpec();
-    };
+    using JavaPart = JHybridBaseSpecJavaPart;
     struct CxxPart : public jni::HybridClass<CxxPart, JHybridObject::CxxPart> {
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/HybridBaseSpec$CxxPart;";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);

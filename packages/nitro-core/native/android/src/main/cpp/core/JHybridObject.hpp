@@ -24,6 +24,7 @@ class JHybridObject : public HybridObject {
 public:
   struct JavaPart : jni::JavaClass<JavaPart> {
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/core/HybridObject;";
+    using HybridType = JHybridObject;
     std::shared_ptr<JHybridObject> getJHybridObject();
   };
   struct CxxPart : jni::HybridClass<CxxPart> {
@@ -46,6 +47,10 @@ public:
 public:
   explicit JHybridObject(const jni::local_ref<JavaPart>& javaPart);
   ~JHybridObject() override;
+
+  const jni::global_ref<JavaPart>& getJavaPart() const noexcept {
+    return _javaPart;
+  }
 
 public:
   void dispose() override;

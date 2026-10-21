@@ -8,6 +8,8 @@
 #include <NitroTest/private/JHybridGrandchildSpec.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 
 namespace margelo::nitro::test {
 
@@ -17,9 +19,9 @@ namespace margelo::nitro::test {
   }
 
   std::shared_ptr<JHybridGrandchildSpec> JHybridGrandchildSpec::constructor() {
-    static const auto __method = JHybridGrandchildSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridGrandchildSpec::JavaPart>()>("constructor_cxx");
+    static const auto __method = JHybridGrandchildSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridGrandchildSpecJavaPart>()>("constructor_cxx");
     auto __result = __method(JHybridGrandchildSpec::JavaPart::javaClassStatic());
-    return __result->getJHybridGrandchildSpec();
+    return JNIConverter<std::shared_ptr<JHybridGrandchildSpec>, jni::local_ref<JHybridGrandchildSpecJavaPart>>::fromJNI(__result);
   }
 
   const std::shared_ptr<const HybridClass>& JHybridGrandchildSpec::Class::get() {
@@ -30,7 +32,7 @@ namespace margelo::nitro::test {
     return hybridClass;
   }
 
-  std::shared_ptr<JHybridGrandchildSpec> JHybridGrandchildSpec::JavaPart::getJHybridGrandchildSpec() {
+  std::shared_ptr<JHybridGrandchildSpec> JHybridGrandchildSpecJavaPart::getJHybridGrandchildSpec() {
     auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
     auto castHybridObject = std::dynamic_pointer_cast<JHybridGrandchildSpec>(hybridObject);
     if (castHybridObject == nullptr) [[unlikely]] {

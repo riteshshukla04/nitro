@@ -10,9 +10,10 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
-#include <optional>
+#include <NitroTest/private/JHybridRecyclableTestViewSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <optional>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
 
@@ -29,10 +30,7 @@ namespace margelo::nitro::test {
     };
 
   public:
-    struct JavaPart : public jni::JavaClass<JavaPart, JHybridObject::JavaPart> {
-      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/HybridRecyclableTestViewSpec;";
-      std::shared_ptr<JHybridRecyclableTestViewSpec> getJHybridRecyclableTestViewSpec();
-    };
+    using JavaPart = JHybridRecyclableTestViewSpecJavaPart;
     struct CxxPart : public jni::HybridClass<CxxPart, JHybridObject::CxxPart> {
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/HybridRecyclableTestViewSpec$CxxPart;";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);

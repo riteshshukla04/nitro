@@ -33,7 +33,7 @@ export class KotlinConstructor extends Constructor {
   constructor({ spec, constructor }: KotlinConstructorOptions) {
     const returnType = new KotlinCxxHybridObjectType(new HybridObjectType(spec))
     const nativeFactory = constructor.toStaticMethod(returnType)
-    const callable = prepareKotlinMethod(nativeFactory)
+    const callable = prepareKotlinMethod(nativeFactory, { directReturn: false })
     const parameters = callable.parameters.map((parameter) => parameter.kotlin)
     super(constructor.name, callable.returnType, parameters, {
       generated: true,

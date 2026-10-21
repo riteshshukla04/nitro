@@ -10,17 +10,17 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
+#include <NitroTest/private/JHybridTestViewSpecJavaPart.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/ColorScheme.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <optional>
-#include <memory>
-// Forward declaration of `JHybridTestViewSpec` to properly resolve imports.
-namespace margelo::nitro::test { class JHybridTestViewSpec; }
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 
 namespace margelo::nitro::test {
 
@@ -35,10 +35,7 @@ namespace margelo::nitro::test {
     };
 
   public:
-    struct JavaPart : public jni::JavaClass<JavaPart, JHybridObject::JavaPart> {
-      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/HybridTestViewSpec;";
-      std::shared_ptr<JHybridTestViewSpec> getJHybridTestViewSpec();
-    };
+    using JavaPart = JHybridTestViewSpecJavaPart;
     struct CxxPart : public jni::HybridClass<CxxPart, JHybridObject::CxxPart> {
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/HybridTestViewSpec$CxxPart;";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
@@ -78,7 +75,7 @@ namespace margelo::nitro::test {
 
   public:
     // Methods
-    jboolean getIsViewBlue(const std::shared_ptr<JHybridTestViewSpec>& view);
+    jboolean getIsViewBlue(const jni::local_ref<JHybridTestViewSpecJavaPart>& view);
     jdouble getOnDropViewCount();
     jdouble getIsBlueSetterCallCount();
     jdouble getNativeDefaultValueSetterCallCount();

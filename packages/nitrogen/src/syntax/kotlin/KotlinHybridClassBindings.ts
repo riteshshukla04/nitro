@@ -67,7 +67,7 @@ export function createKotlinHybridClassBindings(spec: HybridObjectSpec<'kotlin'>
       )
     )
     registrations.push(callable.getCppRegistration(JHybridTSpec))
-    imports.push(...callable.getRequiredImports('c++'))
+    imports.push(...callable.getRequiredImports('c++'), ...cppMethods.flatMap(({ method }) => method.getRequiredImports('c++')))
   }
   return {
     imports: imports,

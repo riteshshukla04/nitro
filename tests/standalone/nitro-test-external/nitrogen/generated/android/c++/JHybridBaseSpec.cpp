@@ -6,13 +6,15 @@
 ///
 
 #include <NitroTestExternal/private/JHybridBaseSpec.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTestExternal/private/SizeKotlin.hpp>
 #include <NitroTestExternal/SizeUnit.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroTestExternal/private/JSize.hpp>
 #include <NitroTestExternal/private/JSizeUnit.hpp>
 #include <optional>
@@ -29,9 +31,9 @@ namespace margelo::nitro::test::external {
   }
 
   std::shared_ptr<JHybridBaseSpec> JHybridBaseSpec::constructor() {
-    static const auto __method = JHybridBaseSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridBaseSpec::JavaPart>()>("constructor_cxx");
+    static const auto __method = JHybridBaseSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridBaseSpecJavaPart>()>("constructor_cxx");
     auto __result = __method(JHybridBaseSpec::JavaPart::javaClassStatic());
-    return __result->getJHybridBaseSpec();
+    return JNIConverter<std::shared_ptr<JHybridBaseSpec>, jni::local_ref<JHybridBaseSpecJavaPart>>::fromJNI(__result);
   }
 
   const std::shared_ptr<const HybridClass>& JHybridBaseSpec::Class::get() {
@@ -45,7 +47,7 @@ namespace margelo::nitro::test::external {
     return hybridClass;
   }
 
-  std::shared_ptr<JHybridBaseSpec> JHybridBaseSpec::JavaPart::getJHybridBaseSpec() {
+  std::shared_ptr<JHybridBaseSpec> JHybridBaseSpecJavaPart::getJHybridBaseSpec() {
     auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
     auto castHybridObject = std::dynamic_pointer_cast<JHybridBaseSpec>(hybridObject);
     if (castHybridObject == nullptr) [[unlikely]] {

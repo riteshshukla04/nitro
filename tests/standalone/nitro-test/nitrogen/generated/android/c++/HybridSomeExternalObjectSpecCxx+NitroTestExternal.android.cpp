@@ -11,10 +11,11 @@
 #include <string>
 #include <NitroTest/OptionalPrimitivesHolder.hpp>
 #include <optional>
-#include <NitroModules/JNIConverter.hpp>
-#include <memory>
-#include <NitroTest/private/HybridSomeExternalObjectSpecCxx+NitroTestExternal+Kotlin.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
+#include <NitroTest/private/HybridSomeExternalObjectSpecCxx+NitroTestExternal+JNI.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
+#include <NitroModules/JNIConverter.hpp>
 #include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
 #include <NitroTest/private/OptionalPrimitivesHolder+Kotlin+NitroTestExternal.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>

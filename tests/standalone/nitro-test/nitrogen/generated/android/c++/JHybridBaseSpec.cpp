@@ -6,15 +6,17 @@
 ///
 
 #include <NitroTest/private/JHybridBaseSpec.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/SizeKotlin.hpp>
 #include <NitroTest/SizeUnit.hpp>
 #include <NitroModules/Promise.hpp>
-#include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <memory>
 #include <NitroTest/private/JSize.hpp>
 #include <NitroTest/private/JSizeUnit.hpp>
 #include <optional>
@@ -31,21 +33,21 @@ namespace margelo::nitro::test {
   }
 
   std::shared_ptr<JHybridBaseSpec> JHybridBaseSpec::constructor() {
-    static const auto __method = JHybridBaseSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridBaseSpec::JavaPart>()>("constructor_cxx");
+    static const auto __method = JHybridBaseSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridBaseSpecJavaPart>()>("constructor_cxx");
     auto __result = __method(JHybridBaseSpec::JavaPart::javaClassStatic());
-    return __result->getJHybridBaseSpec();
+    return JNIConverter<std::shared_ptr<JHybridBaseSpec>, jni::local_ref<JHybridBaseSpecJavaPart>>::fromJNI(__result);
   }
 
-  std::shared_ptr<JHybridBaseSpec> JHybridBaseSpec::createAlternativeBase() {
-    static const auto __method = JHybridBaseSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridBaseSpec::JavaPart>()>("createAlternativeBase_cxx");
+  jni::local_ref<JHybridBaseSpecJavaPart> JHybridBaseSpec::createAlternativeBase() {
+    static const auto __method = JHybridBaseSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridBaseSpecJavaPart>()>("createAlternativeBase_cxx");
     auto __result = __method(JHybridBaseSpec::JavaPart::javaClassStatic());
-    return __result->getJHybridBaseSpec();
+    return __result;
   }
 
-  std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec> JHybridBaseSpec::createInternalExternalObject() {
-    static const auto __method = JHybridBaseSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpec::JavaPart>()>("createInternalExternalObject_cxx");
+  jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> JHybridBaseSpec::createInternalExternalObject() {
+    static const auto __method = JHybridBaseSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>()>("createInternalExternalObject_cxx");
     auto __result = __method(JHybridBaseSpec::JavaPart::javaClassStatic());
-    return __result->getJHybridSomeExternalObjectSpec();
+    return __result;
   }
 
   const std::shared_ptr<const HybridClass>& JHybridBaseSpec::Class::get() {
@@ -61,7 +63,7 @@ namespace margelo::nitro::test {
     return hybridClass;
   }
 
-  std::shared_ptr<JHybridBaseSpec> JHybridBaseSpec::JavaPart::getJHybridBaseSpec() {
+  std::shared_ptr<JHybridBaseSpec> JHybridBaseSpecJavaPart::getJHybridBaseSpec() {
     auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
     auto castHybridObject = std::dynamic_pointer_cast<JHybridBaseSpec>(hybridObject);
     if (castHybridObject == nullptr) [[unlikely]] {

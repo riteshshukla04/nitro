@@ -11,11 +11,13 @@
 #include <variant>
 
 #include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 // Forward declaration of `JHybridBaseSpec` to properly resolve imports.
 namespace margelo::nitro::test { class JHybridBaseSpec; }
 #include <NitroTest/private/OptionalWrapperKotlin.hpp>
 #include <variant>
-#include <NitroTest/private/JHybridBaseSpec.hpp>
+#include <NitroTest/private/JHybridBaseSpecJavaPart.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTest/private/JOptionalWrapper.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <optional>
@@ -38,7 +40,7 @@ namespace margelo::nitro::test {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_HybridBaseSpec_OptionalWrapper;";
 
-    static jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> create_0(jni::alias_ref<JHybridBaseSpec::JavaPart> value);
+    static jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> create_0(jni::alias_ref<JHybridBaseSpecJavaPart> value);
     static jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> create_1(jni::alias_ref<JOptionalWrapper> value);
 
     static jni::local_ref<JVariant_HybridBaseSpec_OptionalWrapper> fromCpp(const std::variant<std::shared_ptr<JHybridBaseSpec>, OptionalWrapperKotlin>& variant);
@@ -51,7 +53,7 @@ namespace margelo::nitro::test {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_HybridBaseSpec_OptionalWrapper$First;";
 
-      [[nodiscard]] jni::local_ref<JHybridBaseSpec::JavaPart> getValue() const;
+      [[nodiscard]] jni::local_ref<JHybridBaseSpecJavaPart> getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JVariant_HybridBaseSpec_OptionalWrapper> {

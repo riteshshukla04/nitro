@@ -6,15 +6,16 @@
 ///
 
 #include <NitroTest/private/JHybridTestViewSpec.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/ColorScheme.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <optional>
-#include <memory>
-#include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTest/private/JColorScheme.hpp>
 #include <NitroTest/private/JCallback_void.hpp>
 #include <NitroModules/JNICallable.hpp>
@@ -45,7 +46,7 @@ namespace margelo::nitro::test {
     return hybridClass;
   }
 
-  std::shared_ptr<JHybridTestViewSpec> JHybridTestViewSpec::JavaPart::getJHybridTestViewSpec() {
+  std::shared_ptr<JHybridTestViewSpec> JHybridTestViewSpecJavaPart::getJHybridTestViewSpec() {
     auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
     auto castHybridObject = std::dynamic_pointer_cast<JHybridTestViewSpec>(hybridObject);
     if (castHybridObject == nullptr) [[unlikely]] {
@@ -143,9 +144,9 @@ namespace margelo::nitro::test {
   }
 
   // Methods
-  jboolean JHybridTestViewSpec::getIsViewBlue(const std::shared_ptr<JHybridTestViewSpec>& view) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean(jni::alias_ref<JHybridTestViewSpec::JavaPart> /* view */)>("getIsViewBlue");
-    auto __result = __method(_javaPart, CxxPart::getClass(), view->getJavaPart());
+  jboolean JHybridTestViewSpec::getIsViewBlue(const jni::local_ref<JHybridTestViewSpecJavaPart>& view) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean(jni::alias_ref<JHybridTestViewSpecJavaPart> /* view */)>("getIsViewBlue");
+    auto __result = __method(_javaPart, CxxPart::getClass(), view);
     return __result;
   }
   jdouble JHybridTestViewSpec::getOnDropViewCount() {

@@ -11,10 +11,11 @@
 #include <string>
 #include <NitroTest/Car.hpp>
 #include <variant>
-#include <NitroModules/JNIConverter.hpp>
-#include <memory>
-#include <NitroTest/private/HybridChildSpecCxx+Kotlin.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
+#include <NitroTest/private/HybridChildSpecCxx+JNI.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JNIConverter.hpp>
 #include <NitroTest/private/CarKotlin.hpp>
 #include <NitroTest/private/Car+Kotlin+NitroTest.hpp>
 #include <NitroTest/private/Person+Kotlin+NitroTest.hpp>

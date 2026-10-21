@@ -1,5 +1,6 @@
 import { indent } from '../../utils.js'
 import { getAllTypes } from '../getAllTypes.js'
+import { getKotlinJSIType } from './getKotlinJSIType.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
@@ -67,7 +68,7 @@ return ${name.JHybridTSpec}::JavaPart::javaClassStatic();
   if (base != null) {
     const baseName = getHybridObjectName(base.name).JHybridTSpec
     cppBaseClass = base.config.getCxxNamespace('c++', baseName)
-    javaPartBaseClass = `${cppBaseClass}::JavaPart`
+    javaPartBaseClass = base.config.getCxxNamespace('c++', getHybridObjectName(base.name).JHybridTSpecJavaPart)
     cxxPartBaseClass = `${cppBaseClass}::CxxPart`
   } else {
     cppBaseClass = 'JHybridObject'
@@ -77,11 +78,16 @@ return ${name.JHybridTSpec}::JavaPart::javaClassStatic();
   const allTypes = getAllTypes(spec)
   const cppMethods = [...propertyDefinitions, ...methodDefinitions]
   const signatureImports = cppMethods.flatMap(({ method }) => method.getRequiredImports('c++'))
-  const nativeImports = [...allTypes.flatMap((type) => type.getRequiredImports('c++')), ...signatureImports, ...bindings.imports]
+  const nativeImports = [
+    ...allTypes.flatMap((type) => getKotlinJSIType(type).getRequiredImports('c++')),
+    ...signatureImports,
+    ...bindings.imports,
+  ]
   const cppImports: SourceImport[] = [
     { language: 'c++', declaration: { header: 'NitroModules/JHybridObject.hpp', space: 'system' } },
     { language: 'c++', declaration: { header: 'NitroModules/HybridClass.hpp', space: 'system' } },
     { language: 'c++', declaration: { header: 'fbjni/fbjni.h', space: 'system' } },
+    { language: 'c++', declaration: spec.config.getCxxHeader(`${name.JHybridTSpecJavaPart}.hpp`, 'private') },
     ...nativeImports,
   ]
   if (base != null) {
@@ -90,6 +96,38 @@ return ${name.JHybridTSpec}::JavaPart::javaClassStatic();
   }
   const cppDeclarationIncludes = getImportsCode(cppImports, 'declaration')
   const classFinality = spec.allowInheritance ? '' : ' final'
+
+  const javaPartImports: SourceImport[] = [
+    { language: 'c++', declaration: { header: 'NitroModules/JHybridObject.hpp', space: 'system' } },
+    { language: 'c++', declaration: { header: 'fbjni/fbjni.h', space: 'system' } },
+    { language: 'c++', declaration: { header: 'memory', space: 'system' } },
+  ]
+  if (base != null) {
+    const baseName = getHybridObjectName(base.name).JHybridTSpecJavaPart
+    javaPartImports.push({ language: 'c++', declaration: base.config.getCxxHeader(`${baseName}.hpp`, 'private') })
+  }
+  const javaPartIncludes = getImportsCode(javaPartImports, 'declaration')
+  const javaPartHeaderCode = `
+${createFileMetadataString(`${name.JHybridTSpecJavaPart}.hpp`)}
+
+#pragma once
+
+${javaPartIncludes}
+
+namespace ${cxxNamespace} {
+
+  namespace jni = facebook::jni;
+
+  class ${name.JHybridTSpec};
+
+  struct ${name.JHybridTSpecJavaPart} : public jni::JavaClass<${name.JHybridTSpecJavaPart}, ${javaPartBaseClass}> {
+    using HybridType = ${name.JHybridTSpec};
+    static constexpr auto kJavaDescriptor = "L${jniClassDescriptor};";
+    std::shared_ptr<${name.JHybridTSpec}> get${name.JHybridTSpec}();
+  };
+
+} // namespace ${cxxNamespace}
+`.trim()
 
   const cppHeaderCode = `
 ${createFileMetadataString(`${name.JHybridTSpec}.hpp`)}
@@ -111,10 +149,7 @@ namespace ${cxxNamespace} {
     };
 
   public:
-    struct JavaPart : public jni::JavaClass<JavaPart, ${javaPartBaseClass}> {
-      static constexpr auto kJavaDescriptor = "L${jniClassDescriptor};";
-      std::shared_ptr<${name.JHybridTSpec}> get${name.JHybridTSpec}();
-    };
+    using JavaPart = ${name.JHybridTSpecJavaPart};
     struct CxxPart : public jni::HybridClass<CxxPart, ${cxxPartBaseClass}> {
       static constexpr auto kJavaDescriptor = "L${cxxPartJniClassDescriptor};";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
@@ -214,7 +249,7 @@ namespace ${cxxNamespace} {
     return hybridClass;
   }
 
-  std::shared_ptr<${name.JHybridTSpec}> ${name.JHybridTSpec}::JavaPart::get${name.JHybridTSpec}() {
+  std::shared_ptr<${name.JHybridTSpec}> ${name.JHybridTSpecJavaPart}::get${name.JHybridTSpec}() {
     auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
     auto castHybridObject = std::dynamic_pointer_cast<${name.JHybridTSpec}>(hybridObject);
     if (castHybridObject == nullptr) [[unlikely]] {
@@ -254,7 +289,16 @@ namespace ${cxxNamespace} {
 } // namespace ${cxxNamespace}
   `.trim()
 
-  const files: SourceFile[] = []
+  const files: SourceFile[] = [
+    {
+      content: javaPartHeaderCode,
+      language: 'c++',
+      name: `${name.JHybridTSpecJavaPart}.hpp`,
+      subdirectory: [],
+      headerVisibility: 'private',
+      platform: 'android',
+    },
+  ]
   files.push({
     content: cppHeaderCode,
     language: 'c++',

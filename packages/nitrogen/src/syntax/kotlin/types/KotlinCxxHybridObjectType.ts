@@ -43,6 +43,7 @@ export class KotlinCxxHybridObjectType extends HybridObjectType {
         const { JHybridTSpec } = getHybridObjectName(this.hybridObjectName)
         return [
           { language: 'c++', declaration: { header: 'memory', space: 'system' } },
+          { language: 'c++', declaration: { header: 'NitroModules/JNIConverter+HybridObject.hpp', space: 'system' } },
           {
             language: 'c++',
             declaration: { forwardDeclaration: getForwardDeclaration('class', JHybridTSpec, this.sourceConfig.getCxxNamespace('c++')) },

@@ -10,11 +10,11 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
-#include <NitroModules/Callback.hpp>
-#include <functional>
-#include <string>
+#include <NitroTestExternal/private/JHybridTestViewSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/Callback.hpp>
+#include <functional>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
@@ -31,10 +31,7 @@ namespace margelo::nitro::test::external {
     };
 
   public:
-    struct JavaPart : public jni::JavaClass<JavaPart, JHybridObject::JavaPart> {
-      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/HybridTestViewSpec;";
-      std::shared_ptr<JHybridTestViewSpec> getJHybridTestViewSpec();
-    };
+    using JavaPart = JHybridTestViewSpecJavaPart;
     struct CxxPart : public jni::HybridClass<CxxPart, JHybridObject::CxxPart> {
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/HybridTestViewSpec$CxxPart;";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);

@@ -8,27 +8,28 @@
 #include <NitroTest/private/JExternalObjectStruct.hpp>
 
 #include <NitroTest/private/ExternalObjectStructKotlin.hpp>
-#include <memory>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 
 namespace margelo::nitro::test {
 
   ExternalObjectStructKotlin JExternalObjectStruct::toCpp() const {
     static const auto clazz = javaClassStatic();
-    static const auto fieldSomeExternal = clazz->getField<margelo::nitro::test::external::JHybridSomeExternalObjectSpec::JavaPart>("someExternal");
-    jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpec::JavaPart> someExternal = this->getFieldValue(fieldSomeExternal);
+    static const auto fieldSomeExternal = clazz->getField<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>("someExternal");
+    jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> someExternal = this->getFieldValue(fieldSomeExternal);
     return ExternalObjectStructKotlin(
-      someExternal->getJHybridSomeExternalObjectSpec()
+      JNIConverter<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::fromJNI(someExternal)
     );
   }
 
   jni::local_ref<JExternalObjectStruct::javaobject> JExternalObjectStruct::fromCpp(const ExternalObjectStructKotlin& value) {
-    using JSignature = JExternalObjectStruct(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpec::JavaPart>);
+    using JSignature = JExternalObjectStruct(jni::alias_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>);
     static const auto clazz = javaClassStatic();
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      value.someExternal->getJavaPart()
+      JNIConverter<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::toJNI(value.someExternal)
     );
   }
 

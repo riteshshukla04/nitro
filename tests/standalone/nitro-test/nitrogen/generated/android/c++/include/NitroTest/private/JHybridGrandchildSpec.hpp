@@ -10,9 +10,14 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
+#include <NitroTest/private/JHybridGrandchildSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JHybridGrandchildSpec.hpp>
+#include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+// Forward declaration of `JHybridGrandchildSpec` to properly resolve imports.
+namespace margelo::nitro::test { class JHybridGrandchildSpec; }
 #include <NitroTest/private/JHybridChildSpec.hpp>
 
 namespace margelo::nitro::test {
@@ -28,10 +33,7 @@ namespace margelo::nitro::test {
     };
 
   public:
-    struct JavaPart : public jni::JavaClass<JavaPart, margelo::nitro::test::JHybridChildSpec::JavaPart> {
-      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/HybridGrandchildSpec;";
-      std::shared_ptr<JHybridGrandchildSpec> getJHybridGrandchildSpec();
-    };
+    using JavaPart = JHybridGrandchildSpecJavaPart;
     struct CxxPart : public jni::HybridClass<CxxPart, margelo::nitro::test::JHybridChildSpec::CxxPart> {
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/HybridGrandchildSpec$CxxPart;";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);

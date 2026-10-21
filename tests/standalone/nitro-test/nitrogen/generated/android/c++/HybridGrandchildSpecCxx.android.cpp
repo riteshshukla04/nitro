@@ -8,9 +8,9 @@
 #include <NitroTest/HybridGrandchildSpecCxx.hpp>
 #include <NitroTest/private/JHybridGrandchildSpec.hpp>
 #include <stdexcept>
-#include <NitroModules/JNIConverter.hpp>
-#include <memory>
-#include <NitroTest/private/HybridGrandchildSpecCxx+Kotlin.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
+#include <NitroTest/private/HybridGrandchildSpecCxx+JNI.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 
 namespace margelo::nitro::test {

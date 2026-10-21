@@ -7,17 +7,19 @@
 
 #include <NitroTest/private/JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_.hpp>
 #include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 
 namespace margelo::nitro::test {
 
   std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec> JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_::invoke() const {
-    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpec::JavaPart>()>("invoke_jni");
+    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>()>("invoke_jni");
     auto __result = __method(self());
-    return __result->getJHybridSomeExternalObjectSpec();
+    return JNIConverter<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::fromJNI(__result);
   }
 
   jni::local_ref<JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_::javaobject> JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::fromCpp(const Callback<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>()>& callback) {
@@ -28,9 +30,9 @@ namespace margelo::nitro::test {
     return newObjectCxxArgs(callback.escape(), true);
   }
 
-  jni::global_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpec::JavaPart> JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::invoke_cxx() {
+  jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::invoke_cxx() {
     std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec> __result = _callback.callSync();
-    return __result->getJavaPart();
+    return JNIConverter<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::toJNI(__result);
   }
 
   void JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::registerNatives() {

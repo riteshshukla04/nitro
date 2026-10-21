@@ -11,12 +11,14 @@
 #include <functional>
 
 #include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 // Forward declaration of `JHybridSomeExternalObjectSpec` to properly resolve imports.
 namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; }
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
+#include <NitroTestExternal/private/JHybridSomeExternalObjectSpecJavaPart.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
 
 namespace margelo::nitro::test {
 
@@ -49,7 +51,7 @@ namespace margelo::nitro::test {
     /**
      * Invokes the C++ `Callback<...>` this `JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx` instance holds.
      */
-    jni::global_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpec::JavaPart> invoke_cxx();
+    jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> invoke_cxx();
 
   public:
     [[nodiscard]]

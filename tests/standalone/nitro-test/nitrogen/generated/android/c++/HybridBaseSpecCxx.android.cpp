@@ -14,14 +14,15 @@
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <NitroTest/HybridSomeExternalObjectSpecCxx+NitroTestExternal.hpp>
-#include <NitroModules/JNIConverter.hpp>
-#include <memory>
-#include <NitroTest/private/HybridBaseSpecCxx+Kotlin.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JSIConverter+JHybridObject.hpp>
+#include <NitroTest/private/HybridBaseSpecCxx+JNI.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JNIConverter.hpp>
 #include <NitroTest/private/SizeKotlin.hpp>
 #include <NitroTest/private/Size+Kotlin+NitroTest.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
-#include <NitroTest/private/HybridSomeExternalObjectSpecCxx+NitroTestExternal+Kotlin.hpp>
+#include <NitroTest/private/HybridSomeExternalObjectSpecCxx+NitroTestExternal+JNI.hpp>
 
 namespace margelo::nitro::test {
 
@@ -74,12 +75,12 @@ namespace margelo::nitro::test {
 
   margelo::nitro::test::HybridBaseSpecCxx HybridBaseSpecCxx::createAlternativeBase() {
     auto __result = margelo::nitro::test::JHybridBaseSpec::createAlternativeBase();
-    return JNIConverter<margelo::nitro::test::HybridBaseSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>>::fromJNI(__result);
+    return JNIConverter<margelo::nitro::test::HybridBaseSpecCxx, jni::local_ref<margelo::nitro::test::JHybridBaseSpecJavaPart>>::fromJNI(__result);
   }
 
   margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx HybridBaseSpecCxx::createInternalExternalObject() {
     auto __result = margelo::nitro::test::JHybridBaseSpec::createInternalExternalObject();
-    return JNIConverter<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>>::fromJNI(__result);
+    return JNIConverter<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::fromJNI(__result);
   }
 
 } // namespace margelo::nitro::test

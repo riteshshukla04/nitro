@@ -9,6 +9,7 @@
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <memory>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 
 namespace margelo::nitro {
