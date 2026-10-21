@@ -80,7 +80,6 @@ function run(command, args, capture = false) {
 }
 
 let destination = values.destination
-let simulator
 if (!destination) {
   const { devices } = JSON.parse(run('xcrun', ['simctl', 'list', 'devices', 'available', '--json'], true))
   const deviceName = values.device ?? defaults.device
@@ -99,7 +98,6 @@ if (!destination) {
       `No available ${deviceName ?? 'iPhone'} simulator matches iOS ${values.os}. Install one or select --os, --device or --destination.`
     )
   destination = `platform=iOS Simulator,id=${device.udid}`
-  simulator = device.udid
 }
 if (values['skip-hermes-build']) {
   const framework = path.join(root, 'tests/standalone/.build/hermes/NitroTestHermes.xcframework')
@@ -125,6 +123,8 @@ mkdirSync(results, { recursive: true })
 const groupReport = path.join(results, 'runtime-groups.jsonl')
 environment.TEST_RUNNER_NITRO_TEST_REPORT = groupReport
 if (values.workers !== 'auto') environment.TEST_RUNNER_NITRO_TEST_WORKERS = values.workers
+// This runner always runs every case.
+environment.TEST_RUNNER_NITRO_TEST_START_ALL_GROUPS = '1'
 // Sanitizer builds run several times slower, and CI runs them on 3-core
 // machines. Cases that take milliseconds there occasionally waited longer than
 // 10 seconds for the CPU. Their own explicit budgets (withTestTimeout) and the
@@ -138,9 +138,11 @@ if (values.sanitizer !== 'none') {
   environment[`TEST_RUNNER_${option}`] = `__CURRENT_VALUE__:halt_on_error=1:abort_on_error=1:log_path=${path.join(results, 'sanitizer')}`
 }
 const derivedData = values['derived-data'] ? path.resolve(values['derived-data']) : path.join(buildDirectory, 'DerivedData')
-// The build targets no particular device. With a freshly booted simulator as
-// the destination, xcodebuild spent minutes starting up and compiled slower
-// while the simulator finished migrating data on 3-core CI machines.
+// The build targets no particular device. After `simctl bootstatus` reports a
+// fresh simulator as booted, its first-boot work keeps 3-core CI machines busy
+// for minutes, and an xcodebuild started then took minutes to print anything.
+// So nothing boots the simulator before the tests: test-without-building
+// starts up first and boots it, and the tests run while the simulator settles.
 const buildSettings = [
   '-project',
   'tests/standalone/test-runner/ios/NitroRuntimeTests.xcodeproj',
@@ -183,12 +185,12 @@ const argumentsForTests = () => [
   // `simctl diagnose`. The result bundle and logs already hold the failure.
   '-collect-test-diagnostics',
   'never',
+  // Parallel testing shuts the booted simulator down and tests on a fresh
+  // clone, which took minutes to start on 3-core CI machines. Without it,
+  // Swift Testing requests cases one at a time, so the tests start every
+  // runtime group up front instead (NITRO_TEST_START_ALL_GROUPS).
   '-parallel-testing-enabled',
-  'YES',
-  // Swift Testing runs cases concurrently inside this one test process.
-  // RuntimeTests.swift runs one runtime group per CPU core but one (see --workers).
-  '-parallel-testing-worker-count',
-  '1',
+  'NO',
 ]
 const log = openSync(path.join(results, 'xcodebuild.log'), 'w')
 let sanitizerFailure = false
@@ -218,12 +220,6 @@ const xcodebuild = (args) =>
   })
 let status = await xcodebuild(['build-for-testing', ...buildSettings])
 console.log(`Built for testing after ${elapsed()}`)
-if (status === 0 && simulator) {
-  // Xcode can start tests while a fresh simulator is still migrating data.
-  // Finish booting before starting the test watchdogs.
-  run('xcrun', ['simctl', 'bootstatus', simulator, '-b'])
-  console.log(`Simulator booted after ${elapsed()}`)
-}
 if (status === 0) {
   status = await xcodebuild(argumentsForTests())
   console.log(`Tests finished after ${elapsed()}`)

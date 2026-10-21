@@ -28,6 +28,12 @@ private let workerCount =
 private let defaultTimeoutMs: UInt32 =
   ProcessInfo.processInfo.environment["NITRO_TEST_TIMEOUT_MS"].flatMap { UInt32($0) }.flatMap { $0 > 0 ? $0 : nil }
   ?? 10_000
+/// Whether to start every runtime group as soon as the first case runs. Swift
+/// Testing requests cases one at a time when parallel testing is off, as with
+/// `run.mjs`, which sets `NITRO_TEST_START_ALL_GROUPS` because it runs every
+/// case. Otherwise a group starts with the first request for one of its cases,
+/// so rerunning one case in Xcode only runs that case's group.
+private let startAllGroups = ProcessInfo.processInfo.environment["NITRO_TEST_START_ALL_GROUPS"] == "1"
 
 extension NitroTestScheduler {
   /// Returns nil when the case passes, otherwise its failure and JS stack.
@@ -148,10 +154,18 @@ private let behaviorScheduler = Result {
   let sourceMap = testResources.url(forResource: "runtime-tests.js", withExtension: "map").flatMap {
     try? String(contentsOf: $0, encoding: .utf8)
   }
-  return try NitroTestScheduler(
+  let scheduler = try NitroTestScheduler(
     bundle: String(contentsOf: url, encoding: .utf8), groups: manifest.groups, workers: UInt(workerCount),
     timeoutMs: defaultTimeoutMs, sourceMap: sourceMap, onCaseStarted: nil,
     onGroupFinished: { groupReports.append($0) })
+  if startAllGroups {
+    // Requesting any case queues its group, and queued groups start in
+    // manifest order. Swift Testing's own requests then await the results.
+    for group in manifest.groups {
+      scheduler.runCase(group.cases[0]) { _, _ in }
+    }
+  }
+  return scheduler
 }
 
 @Suite
