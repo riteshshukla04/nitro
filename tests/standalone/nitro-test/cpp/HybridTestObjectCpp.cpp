@@ -43,6 +43,14 @@ void HybridTestObjectCpp::setSharedNumber(double value) {
 }
 
 // Properties
+double HybridTestObjectCpp::getComputedValue() {
+  return _computedValueStorage * 2;
+}
+
+void HybridTestObjectCpp::setComputedValue(double value) {
+  _computedValueStorage = value + 1;
+}
+
 double HybridTestObjectCpp::getNumberValue() {
   return _number;
 }

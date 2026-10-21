@@ -80,6 +80,7 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridTestObjectCppSpec::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
+      clazz.registerHybridProperty("computedValue", &HybridTestObjectCppSpec::getComputedValue, &HybridTestObjectCppSpec::setComputedValue);
       clazz.registerHybridProperty("numberValue", &HybridTestObjectCppSpec::getNumberValue, &HybridTestObjectCppSpec::setNumberValue);
       clazz.registerHybridProperty("boolValue", &HybridTestObjectCppSpec::getBoolValue, &HybridTestObjectCppSpec::setBoolValue);
       clazz.registerHybridProperty("stringValue", &HybridTestObjectCppSpec::getStringValue, &HybridTestObjectCppSpec::setStringValue);

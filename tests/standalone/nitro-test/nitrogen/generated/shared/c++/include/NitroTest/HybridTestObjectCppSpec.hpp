@@ -92,6 +92,8 @@ namespace margelo::nitro::test {
 
     public:
       // Properties
+      virtual double getComputedValue() = 0;
+      virtual void setComputedValue(double computedValue) = 0;
       virtual double getNumberValue() = 0;
       virtual void setNumberValue(double numberValue) = 0;
       virtual bool getBoolValue() = 0;

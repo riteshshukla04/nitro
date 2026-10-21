@@ -18,6 +18,14 @@ namespace margelo::nitro::test {
 
   // Properties
 
+  double HybridTestObjectSwiftKotlinSpecSwift::getComputedValue() {
+    return _swiftPart.getComputedValue();
+  }
+
+  void HybridTestObjectSwiftKotlinSpecSwift::setComputedValue(double computedValue) {
+    return _swiftPart.setComputedValue(computedValue);
+  }
+
   double HybridTestObjectSwiftKotlinSpecSwift::getNumberValue() {
     return _swiftPart.getNumberValue();
   }
@@ -1303,6 +1311,7 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& HybridTestObjectSwiftKotlinSpecSwift::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
+      clazz.registerHybridProperty("computedValue", &HybridTestObjectSwiftKotlinSpecSwift::getComputedValue, &HybridTestObjectSwiftKotlinSpecSwift::setComputedValue);
       clazz.registerHybridProperty("numberValue", &HybridTestObjectSwiftKotlinSpecSwift::getNumberValue, &HybridTestObjectSwiftKotlinSpecSwift::setNumberValue);
       clazz.registerHybridProperty("boolValue", &HybridTestObjectSwiftKotlinSpecSwift::getBoolValue, &HybridTestObjectSwiftKotlinSpecSwift::setBoolValue);
       clazz.registerHybridProperty("stringValue", &HybridTestObjectSwiftKotlinSpecSwift::getStringValue, &HybridTestObjectSwiftKotlinSpecSwift::setStringValue);

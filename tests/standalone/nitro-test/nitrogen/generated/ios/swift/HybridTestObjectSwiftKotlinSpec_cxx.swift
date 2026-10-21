@@ -128,6 +128,15 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
 
   // Properties
 
+  public final func getComputedValue() -> Double {
+    let value = __implementation.computedValue
+    return value
+  }
+
+  public final func setComputedValue(computedValue: Double) -> Void {
+    __implementation.computedValue = computedValue
+  }
+
   public final func getNumberValue() -> Double {
     let value = __implementation.numberValue
     return value

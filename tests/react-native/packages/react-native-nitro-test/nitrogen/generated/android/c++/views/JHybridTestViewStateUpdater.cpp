@@ -65,38 +65,38 @@ void JHybridTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /*
     if (oldProps == nullptr
           ? newProps->isBlue.isProvided()
           : !newProps->isBlue.hasSameValue(oldProps->isBlue)) {
-      static const auto __setter = JHybridTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jboolean)>("setBlue");
-      __setter(javaView, newProps->isBlue.get());
+      static const auto __setter = JHybridTestViewSpec::CxxPart::getClass()->getNonvirtualMethod<void(jboolean)>("setBlue");
+      __setter(javaView, JHybridTestViewSpec::CxxPart::getClass(), newProps->isBlue.get());
     }
     if (oldProps == nullptr
           ? newProps->hasBeenCalled.isProvided()
           : !newProps->hasBeenCalled.hasSameValue(oldProps->hasBeenCalled)) {
-      static const auto __setter = JHybridTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jboolean)>("setHasBeenCalled");
-      __setter(javaView, newProps->hasBeenCalled.get());
+      static const auto __setter = JHybridTestViewSpec::CxxPart::getClass()->getNonvirtualMethod<void(jboolean)>("setHasBeenCalled");
+      __setter(javaView, JHybridTestViewSpec::CxxPart::getClass(), newProps->hasBeenCalled.get());
     }
     if (oldProps == nullptr
           ? newProps->int64Value.isProvided()
           : !newProps->int64Value.hasSameValue(oldProps->int64Value)) {
-      static const auto __setter = JHybridTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jlong)>("setInt64Value");
-      __setter(javaView, newProps->int64Value.get());
+      static const auto __setter = JHybridTestViewSpec::CxxPart::getClass()->getNonvirtualMethod<void(jlong)>("setInt64Value");
+      __setter(javaView, JHybridTestViewSpec::CxxPart::getClass(), newProps->int64Value.get());
     }
     if (oldProps == nullptr
           ? newProps->colorScheme.isProvided()
           : !newProps->colorScheme.hasSameValue(oldProps->colorScheme)) {
-      static const auto __setter = JHybridTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jni::alias_ref<margelo::nitro::test::JColorScheme>)>("setColorScheme");
-      __setter(javaView, newProps->colorScheme.get().get());
+      static const auto __setter = JHybridTestViewSpec::CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<margelo::nitro::test::JColorScheme>)>("setColorScheme");
+      __setter(javaView, JHybridTestViewSpec::CxxPart::getClass(), newProps->colorScheme.get().get());
     }
     if (oldProps == nullptr
           ? newProps->someCallback.isProvided()
           : !newProps->someCallback.hasSameValue(oldProps->someCallback)) {
-      static const auto __setter = JHybridTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jni::alias_ref<margelo::nitro::test::JCallback_void>)>("setSomeCallback_cxx");
-      __setter(javaView, newProps->someCallback.get().get());
+      static const auto __setter = JHybridTestViewSpec::CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<margelo::nitro::test::JCallback_void>)>("setSomeCallback_cxx");
+      __setter(javaView, JHybridTestViewSpec::CxxPart::getClass(), newProps->someCallback.get().get());
     }
     if (oldProps == nullptr
           ? newProps->nativeDefaultValue.isProvided()
           : !newProps->nativeDefaultValue.hasSameValue(oldProps->nativeDefaultValue)) {
-      static const auto __setter = JHybridTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jni::alias_ref<JOptional<jni::JDouble>>)>("setNativeDefaultValue");
-      __setter(javaView, newProps->nativeDefaultValue.get().get());
+      static const auto __setter = JHybridTestViewSpec::CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JOptional<jni::JDouble>>)>("setNativeDefaultValue");
+      __setter(javaView, JHybridTestViewSpec::CxxPart::getClass(), newProps->nativeDefaultValue.get().get());
     }
 
     if (oldProps == nullptr

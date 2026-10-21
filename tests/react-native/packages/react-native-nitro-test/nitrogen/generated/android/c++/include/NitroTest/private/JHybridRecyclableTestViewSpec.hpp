@@ -10,6 +10,7 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
+#include <stdexcept>
 #include <NitroTest/private/JHybridRecyclableTestViewSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
@@ -43,7 +44,13 @@ namespace margelo::nitro::test {
   public:
     explicit JHybridRecyclableTestViewSpec(jni::alias_ref<JHybridRecyclableTestViewSpec::JavaPart> javaPart):
       JHybridObject(javaPart),
-      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {}
+      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {
+      #ifdef NITRO_DEBUG
+      if (!jni::isSameObject(_javaPart->getClass(), CxxPart::getClass())) [[unlikely]] {
+        throw std::runtime_error("RecyclableTestView requires its configured implementation when inheritance and multiple implementations are disabled.");
+      }
+      #endif
+    }
     // Defined in the owning library so RTTI has one identity across modules.
     ~JHybridRecyclableTestViewSpec() override;
 

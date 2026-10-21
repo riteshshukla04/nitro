@@ -10,6 +10,7 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
+#include <stdexcept>
 #include <NitroTestExternal/private/JHybridTestViewSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
@@ -45,7 +46,13 @@ namespace margelo::nitro::test::external {
   public:
     explicit JHybridTestViewSpec(jni::alias_ref<JHybridTestViewSpec::JavaPart> javaPart):
       JHybridObject(javaPart),
-      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {}
+      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {
+      #ifdef NITRO_DEBUG
+      if (!jni::isSameObject(_javaPart->getClass(), CxxPart::getClass())) [[unlikely]] {
+        throw std::runtime_error("TestView requires its configured implementation when inheritance and multiple implementations are disabled.");
+      }
+      #endif
+    }
     // Defined in the owning library so RTTI has one identity across modules.
     ~JHybridTestViewSpec() override;
 

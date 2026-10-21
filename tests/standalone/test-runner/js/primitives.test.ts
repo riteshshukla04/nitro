@@ -12,6 +12,11 @@ const UINT64_MAX = 18446744073709551615n
 const ONE_MIB = 1024 * 1024
 export const cases = {
   ...casesForTestObjects('Primitive properties', {
+    'computedValue uses native getters and setters': (testObject) => {
+      testObject.computedValue = 20
+      expect(testObject.computedValue).to.equal(42)
+    },
+
     'numberValue roundtrips': (testObject) => {
       testObject.numberValue = 13
       expect(Object.is(testObject.numberValue, 13)).to.equal(true)

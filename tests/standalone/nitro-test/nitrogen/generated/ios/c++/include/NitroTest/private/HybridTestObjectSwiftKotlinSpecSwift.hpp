@@ -56,6 +56,8 @@ namespace margelo::nitro::test {
     std::string toString() override;
 
     // Properties
+    double getComputedValue();
+    void setComputedValue(double computedValue);
     double getNumberValue();
     void setNumberValue(double numberValue);
     bool getBoolValue();

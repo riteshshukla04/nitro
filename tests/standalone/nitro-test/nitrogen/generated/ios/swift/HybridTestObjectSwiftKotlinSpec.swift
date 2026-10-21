@@ -14,6 +14,7 @@ public protocol HybridTestObjectSwiftKotlinSpec_protocol: HybridObject {
   init() throws
 
   // Properties
+  var computedValue: Double { get set }
   var numberValue: Double { get set }
   var boolValue: Bool { get set }
   var stringValue: String { get set }

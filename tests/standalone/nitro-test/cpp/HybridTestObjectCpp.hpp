@@ -38,6 +38,7 @@ protected:
 
 private:
   static inline std::atomic<double> _sharedNumber{0.0};
+  double _computedValueStorage = 0.0;
   double _number = 0.0;
   bool _bool = false;
   std::string _string;
@@ -74,6 +75,8 @@ private:
 
 public:
   // Properties and methods
+  double getComputedValue() override;
+  void setComputedValue(double value) override;
   double getNumberValue() override;
   void setNumberValue(double numberValue) override;
   bool getBoolValue() override;

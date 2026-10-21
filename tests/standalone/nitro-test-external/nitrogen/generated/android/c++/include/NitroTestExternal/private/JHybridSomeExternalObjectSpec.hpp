@@ -10,6 +10,7 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
+#include <stdexcept>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
@@ -52,7 +53,9 @@ namespace margelo::nitro::test::external {
   public:
     explicit JHybridSomeExternalObjectSpec(jni::alias_ref<JHybridSomeExternalObjectSpec::JavaPart> javaPart):
       JHybridObject(javaPart),
-      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {}
+      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {
+
+    }
     // Defined in the owning library so RTTI has one identity across modules.
     ~JHybridSomeExternalObjectSpec() override;
 

@@ -30,6 +30,12 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
 
   var someVariant: Variant_Double_String = .first(55)
 
+  private var computedValueStorage: Double = 0.0
+  var computedValue: Double {
+    get { computedValueStorage * 2 }
+    set { computedValueStorage = newValue + 1 }
+  }
+
   var numberValue: Double = 0.0
 
   var boolValue: Bool = false

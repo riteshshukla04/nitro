@@ -119,6 +119,7 @@ namespace margelo::nitro::test {
 
   const std::shared_ptr<const HybridClass>& JHybridTestObjectSwiftKotlinSpec::Class::get() {
     static const auto hybridClass = HybridClass::create<Class>([](HybridClass& clazz) {
+      clazz.registerHybridProperty("computedValue", &JHybridTestObjectSwiftKotlinSpec::getComputedValue, &JHybridTestObjectSwiftKotlinSpec::setComputedValue);
       clazz.registerHybridProperty("numberValue", &JHybridTestObjectSwiftKotlinSpec::getNumberValue, &JHybridTestObjectSwiftKotlinSpec::setNumberValue);
       clazz.registerHybridProperty("boolValue", &JHybridTestObjectSwiftKotlinSpec::getBoolValue, &JHybridTestObjectSwiftKotlinSpec::setBoolValue);
       clazz.registerHybridProperty("stringValue", &JHybridTestObjectSwiftKotlinSpec::getStringValue, &JHybridTestObjectSwiftKotlinSpec::setStringValue);
@@ -307,6 +308,15 @@ namespace margelo::nitro::test {
   }
 
   // Properties
+  jdouble JHybridTestObjectSwiftKotlinSpec::getComputedValue() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble()>("getComputedValue");
+    auto __result = __method(_javaPart, CxxPart::getClass());
+    return __result;
+  }
+  void JHybridTestObjectSwiftKotlinSpec::setComputedValue(jdouble computedValue) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jdouble /* computedValue */)>("setComputedValue");
+    __method(_javaPart, CxxPart::getClass(), computedValue);
+  }
   jdouble JHybridTestObjectSwiftKotlinSpec::getNumberValue() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble()>("getNumberValue");
     auto __result = __method(_javaPart, CxxPart::getClass());

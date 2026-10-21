@@ -10,6 +10,7 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
+#include <stdexcept>
 #include <NitroTest/private/JHybridTestObjectSwiftKotlinSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
@@ -125,7 +126,13 @@ namespace margelo::nitro::test {
   public:
     explicit JHybridTestObjectSwiftKotlinSpec(jni::alias_ref<JHybridTestObjectSwiftKotlinSpec::JavaPart> javaPart):
       JHybridObject(javaPart),
-      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {}
+      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {
+      #ifdef NITRO_DEBUG
+      if (!jni::isSameObject(_javaPart->getClass(), CxxPart::getClass())) [[unlikely]] {
+        throw std::runtime_error("TestObjectSwiftKotlin requires its configured implementation when inheritance and multiple implementations are disabled.");
+      }
+      #endif
+    }
     // Defined in the owning library so RTTI has one identity across modules.
     ~JHybridTestObjectSwiftKotlinSpec() override;
 
@@ -136,6 +143,8 @@ namespace margelo::nitro::test {
 
   public:
     // Properties
+    jdouble getComputedValue();
+    void setComputedValue(jdouble computedValue);
     jdouble getNumberValue();
     void setNumberValue(jdouble numberValue);
     jboolean getBoolValue();

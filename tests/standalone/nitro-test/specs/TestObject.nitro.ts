@@ -157,6 +157,7 @@ export declare class TestObjectCpp extends HybridObject {
   static sharedNumber: number
 
   // Test Primitives
+  computedValue: number
   numberValue: number
   boolValue: boolean
   stringValue: string
@@ -419,6 +420,7 @@ export declare class TestObjectSwiftKotlin extends HybridObject {
   static sharedNumber: number
 
   // Test Primitives
+  computedValue: number
   numberValue: number
   boolValue: boolean
   stringValue: string

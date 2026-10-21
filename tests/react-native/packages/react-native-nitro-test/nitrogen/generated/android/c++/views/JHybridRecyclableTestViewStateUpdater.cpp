@@ -65,14 +65,14 @@ void JHybridRecyclableTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::
     if (oldProps == nullptr
           ? newProps->isBlue.isProvided()
           : !newProps->isBlue.hasSameValue(oldProps->isBlue)) {
-      static const auto __setter = JHybridRecyclableTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jboolean)>("setBlue");
-      __setter(javaView, newProps->isBlue.get());
+      static const auto __setter = JHybridRecyclableTestViewSpec::CxxPart::getClass()->getNonvirtualMethod<void(jboolean)>("setBlue");
+      __setter(javaView, JHybridRecyclableTestViewSpec::CxxPart::getClass(), newProps->isBlue.get());
     }
     if (oldProps == nullptr
           ? newProps->nativeDefaultValue.isProvided()
           : !newProps->nativeDefaultValue.hasSameValue(oldProps->nativeDefaultValue)) {
-      static const auto __setter = JHybridRecyclableTestViewSpec::JavaPart::javaClassStatic()->getMethod<void(jni::alias_ref<JOptional<jni::JDouble>>)>("setNativeDefaultValue");
-      __setter(javaView, newProps->nativeDefaultValue.get().get());
+      static const auto __setter = JHybridRecyclableTestViewSpec::CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JOptional<jni::JDouble>>)>("setNativeDefaultValue");
+      __setter(javaView, JHybridRecyclableTestViewSpec::CxxPart::getClass(), newProps->nativeDefaultValue.get().get());
     }
 
     if (oldProps == nullptr

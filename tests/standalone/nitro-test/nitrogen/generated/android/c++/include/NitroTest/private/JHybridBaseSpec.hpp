@@ -10,6 +10,7 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
+#include <stdexcept>
 #include <NitroTest/private/JHybridBaseSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
@@ -54,7 +55,9 @@ namespace margelo::nitro::test {
   public:
     explicit JHybridBaseSpec(jni::alias_ref<JHybridBaseSpec::JavaPart> javaPart):
       JHybridObject(javaPart),
-      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {}
+      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {
+
+    }
     // Defined in the owning library so RTTI has one identity across modules.
     ~JHybridBaseSpec() override;
 

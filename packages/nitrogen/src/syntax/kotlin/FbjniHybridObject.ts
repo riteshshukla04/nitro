@@ -86,6 +86,7 @@ return ${name.JHybridTSpec}::JavaPart::javaClassStatic();
     { language: 'c++', declaration: { header: 'NitroModules/JHybridObject.hpp', space: 'system' } },
     { language: 'c++', declaration: { header: 'NitroModules/HybridClass.hpp', space: 'system' } },
     { language: 'c++', declaration: { header: 'fbjni/fbjni.h', space: 'system' } },
+    { language: 'c++', declaration: { header: 'stdexcept', space: 'system' } },
     { language: 'c++', declaration: spec.config.getCxxHeader(`${name.JHybridTSpecJavaPart}.hpp`, 'private') },
     ...nativeImports,
   ]
@@ -95,6 +96,19 @@ return ${name.JHybridTSpec}::JavaPart::javaClassStatic();
   }
   const cppDeclarationIncludes = getImportsCode(cppImports, 'declaration')
   const classFinality = spec.allowInheritance ? '' : ' final'
+
+  let implementationCheck: string
+  if (nonvirtual) {
+    implementationCheck = `
+#ifdef NITRO_DEBUG
+if (!jni::isSameObject(_javaPart->getClass(), CxxPart::getClass())) [[unlikely]] {
+  throw std::runtime_error("${spec.name} requires its configured implementation when inheritance and multiple implementations are disabled.");
+}
+#endif
+`.trim()
+  } else {
+    implementationCheck = ''
+  }
 
   const javaPartImports: SourceImport[] = [
     { language: 'c++', declaration: { header: 'NitroModules/JHybridObject.hpp', space: 'system' } },
@@ -162,7 +176,9 @@ namespace ${cxxNamespace} {
   public:
     explicit ${name.JHybridTSpec}(jni::alias_ref<${name.JHybridTSpec}::JavaPart> javaPart):
       ${cppBaseClass}(javaPart),
-      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {}
+      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {
+      ${indent(implementationCheck, '      ')}
+    }
     // Defined in the owning library so RTTI has one identity across modules.
     ~${name.JHybridTSpec}() override;
 

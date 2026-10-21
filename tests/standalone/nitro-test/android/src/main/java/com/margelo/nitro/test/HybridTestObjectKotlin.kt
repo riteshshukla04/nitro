@@ -39,6 +39,13 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     private val jsonObjectSerializer = MapSerializer(String.serializer(), JsonElement.serializer())
   }
 
+  private var computedValueStorage: Double = 0.0
+  override var computedValue: Double
+    get() = computedValueStorage * 2
+    set(value) {
+      computedValueStorage = value + 1
+    }
+
   override var numberValue: Double = 0.0
   override var boolValue: Boolean = false
   override var stringValue: String = ""
