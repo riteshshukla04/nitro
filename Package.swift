@@ -118,6 +118,7 @@ package.targets += [
     sources: ["ios/Tests/RuntimeTests.swift"],
     resources: [
       .copy("build/runtime-tests.js"),
+      .copy("build/runtime-tests.js.map"),
       .copy("build/runtime-tests.json"),
       .copy("build/runtime-test-skips.json"),
     ],

@@ -15,6 +15,16 @@
 			"isa" = "PBXBuildFile";
 			"fileRef" = "A3100000000000000000001A";
 		};
+		"A3100000000000000000001C" = {
+			"isa" = "PBXFileReference";
+			"path" = "../build/runtime-tests.js.map";
+			"lastKnownFileType" = "text.json";
+			"sourceTree" = "<group>";
+		};
+		"A3100000000000000000001D" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "A3100000000000000000001C";
+		};
 		"E9FAC86F09E7E697F4EC48A4" = {
 			"isa" = "XCSwiftPackageProductDependency";
 			"package" = "01960F0288B41626470E79EC";
@@ -56,6 +66,7 @@
 				"FE7FE366CCF7920C3DC7424B",
 				"74BB83F8671E19014B8EAA57",
 				"A3100000000000000000001B",
+				"A3100000000000000000001D",
 			);
 			"runOnlyForDeploymentPostprocessing" = "0";
 		};
@@ -165,6 +176,7 @@
 				"8C596FAF64219ECB904B4B58",
 				"107B3F486EB8308BCC5A0D11",
 				"A3100000000000000000001A",
+				"A3100000000000000000001C",
 				"6F7199ED7B63CDA338A0FB82",
 			);
 		};

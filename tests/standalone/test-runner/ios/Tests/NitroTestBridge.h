@@ -7,6 +7,7 @@ FOUNDATION_EXPORT NSString* _Nullable NitroRunTest(NSString* _Nonnull bundle, NS
 
 /// Runs the named JS tests of one test file in order, in one Hermes runtime.
 /// Returns the failure of every case that failed, keyed by its name, in the
-/// same format as `NitroRunTest`. Passing cases have no entry.
+/// same format as `NitroRunTest`. Passing cases have no entry. `sourceMap` is
+/// the bundle's source map, which lets failures report TypeScript locations.
 FOUNDATION_EXPORT NSDictionary<NSString*, NSString*>* _Nonnull NitroRunTests(NSString* _Nonnull bundle, NSArray<NSString*>* _Nonnull names,
-                                                                             uint32_t timeoutMs);
+                                                                             uint32_t timeoutMs, NSString* _Nullable sourceMap);

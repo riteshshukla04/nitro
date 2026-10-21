@@ -163,7 +163,7 @@ namespace {
     }
 
     // Installs Nitro and evaluates the bundle. Returns an empty string on success.
-    std::string load(const std::string& bundle, uint32_t timeoutMs) {
+    std::string load(const std::string& bundle, uint32_t timeoutMs, const std::shared_ptr<const std::string>& sourceMap = nullptr) {
       const char* phase = "preparing JS test bundle";
       // JSError owns JSI values. Convert it before destroying their runtime.
       try {
@@ -192,6 +192,15 @@ namespace {
                                                     rt.instrumentation().collectGarbage("Nitro runtime test");
                                                     return jsi::Value::undefined();
                                                   }));
+        if (sourceMap) {
+          // Only failing cases call this, so the map is never copied otherwise.
+          runtime->global().setProperty(
+              *runtime, "__nitroTestSourceMap",
+              jsi::Function::createFromHostFunction(*runtime, jsi::PropNameID::forAscii(*runtime, "__nitroTestSourceMap"), 0,
+                                                    [sourceMap](jsi::Runtime& rt, const jsi::Value&, const jsi::Value*, size_t) {
+                                                      return jsi::String::createFromUtf8(rt, *sourceMap);
+                                                    }));
+        }
         runtime->evaluatePreparedJavaScript(prepared);
         // Stop setup's watchdog before checking elapsed time so an expired
         // interrupt cannot carry over when the execution deadline is reset.
@@ -320,10 +329,13 @@ std::string runTest(const std::string& bundle, const std::string& name, uint32_t
   }
 }
 
-std::vector<std::string> runTests(const std::string& bundle, const std::vector<std::string>& names, uint32_t timeoutMs) {
+std::vector<std::string> runTests(const std::string& bundle, const std::vector<std::string>& names, uint32_t timeoutMs,
+                                  const std::string& sourceMap) {
   std::vector<std::string> results;
   results.reserve(names.size());
   try {
+    // Shared by the runtimes of this file, so each one only copies a pointer.
+    auto sharedSourceMap = sourceMap.empty() ? nullptr : std::make_shared<const std::string>(sourceMap);
     withRuntimeThreadScope([&] {
       std::unique_ptr<TestSession> session;
       // A runtime that cannot load the bundle fails the remaining cases
@@ -333,7 +345,7 @@ std::vector<std::string> runTests(const std::string& bundle, const std::vector<s
         std::string error = loadError;
         if (!session && error.empty()) {
           session = std::make_unique<TestSession>();
-          error = loadError = session->load(bundle, timeoutMs);
+          error = loadError = session->load(bundle, timeoutMs, sharedSourceMap);
         }
         if (error.empty())
           error = session->run(name, timeoutMs, {}, true);

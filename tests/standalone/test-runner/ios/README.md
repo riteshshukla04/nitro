@@ -83,7 +83,8 @@ shared across modes and is not instrumented; these jobs check Core's native code
 Each mode has its own `DerivedData` and timestamped result directories under `tests/standalone/.build/ios/<mode>/`. Results include the
 `.xcresult` bundle, `xcodebuild.log`, and any sanitizer reports; CI uploads them even on failure. Sanitizer findings terminate the test
 process, and the runner also fails on sanitizer diagnostics or report files. Open a result bundle in Xcode to inspect failures and logs. The
-shared JavaScript assertions include the assertion message and JS stack in the native test failure.
+shared JavaScript assertions include the assertion message and JS stack in the native test failure. xcodebuild only names the failed Swift
+test or test file, so after a failed run `run.mjs` prints every failure message from the result bundle, including the failed case's name.
 
 CI caches the completed Hermes XCFramework. The exact cache key includes the Hermes pin, architecture, Xcode/SDK and build-tool versions,
 checkout path, build helpers and iOS defaults. A cache hit passes `--skip-hermes-build`; a toolchain or engine update gets a fresh build.

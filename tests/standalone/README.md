@@ -164,10 +164,11 @@ default, and the override never extends bundle setup. Native runner contracts pa
 interrupts synchronous JS loops and endless microtask chains in either phase; timeout errors identify the phase. Late native callbacks
 cannot re-enter the runtime after it closes.
 
-Chai includes expected/actual values in assertion messages with truncation disabled. There is no custom property-diff reporter or source-map
-symbolicator yet. The unminified bundle and its source map are available as build artifacts; reported stack locations refer to the bundle,
-not the original TypeScript. Tests of the runner's failure and timeout paths ensure failures cannot silently pass. Native fixtures perform
-their Promise work on background threads.
+Chai includes expected/actual values in assertion messages with truncation disabled. There is no custom property-diff reporter yet. On iOS,
+failure stacks point at the TypeScript sources: the runner passes the bundle's source map to `__nitroTestSourceMap()`, and `js/index.ts`
+maps `runtime-tests.js` locations back and drops Hermes' internal Promise frames. Android still reports bundle locations. The unminified
+bundle and its source map are available as build artifacts. Tests of the runner's failure and timeout paths ensure failures cannot silently
+pass. Native fixtures perform their Promise work on background threads.
 
 Cases must return or await all asynchronous work. The host does not track unhandled rejections from work that a test starts and abandons.
 Its JS timeout cannot interrupt a blocking native function; CI also bounds the whole test job.

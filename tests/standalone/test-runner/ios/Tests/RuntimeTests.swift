@@ -33,10 +33,12 @@ private func runNitroTest(_ source: String, _ name: String, _ timeoutMs: UInt32)
 
 /// Runs the cases of one test file in order, in one Hermes runtime, and returns
 /// the failure of every case that failed, keyed by its name.
-private func runNitroTests(_ source: String, _ names: [String], _ timeoutMs: UInt32) async -> [String: String] {
+private func runNitroTests(
+  _ source: String, _ names: [String], _ timeoutMs: UInt32, sourceMap: String? = nil
+) async -> [String: String] {
   await withCheckedContinuation { continuation in
     runtimeQueue.addOperation {
-      continuation.resume(returning: NitroRunTests(source, names, timeoutMs))
+      continuation.resume(returning: NitroRunTests(source, names, timeoutMs, sourceMap))
     }
   }
 }
@@ -108,13 +110,18 @@ struct RuntimeTests {
     return try String(contentsOf: url, encoding: .utf8)
   }
 
+  // Optional: without it, failures report locations in the bundle.
+  private static let sourceMap = testResources.url(forResource: "runtime-tests.js", withExtension: "map").flatMap {
+    try? String(contentsOf: $0, encoding: .utf8)
+  }
+
   // Each test file runs in one Hermes runtime, so destroying it also checks
   // that Nitro releases everything the file created. A case that needs its own
   // runtime belongs in its own file.
   @Test(arguments: try RuntimeTests.testFiles.get().keys.sorted())
   func javaScript(_ file: String) async throws {
     let cases = try #require(try Self.testFiles.get()[file])
-    let failures = await runNitroTests(try Self.bundleSource.get(), cases, 10_000)
+    let failures = await runNitroTests(try Self.bundleSource.get(), cases, 10_000, sourceMap: Self.sourceMap)
     for name in cases {
       if let failure = failures[name] {
         Issue.record(JavaScriptFailure(description: failure))
@@ -205,6 +212,20 @@ struct RuntimeTests {
     let failures = await runNitroTests(source, ["hang", "after"], 1000)
     #expect(Set(failures.keys) == ["hang"], "\(failures)")
     #expect(failures["hang"]?.localizedCaseInsensitiveContains("timed out") == true)
+  }
+
+  @Test func sourceMapReachesJavaScriptOnlyWhenGiven() async throws {
+    let source = """
+      globalThis.runNitroTest = async (name) => {
+        const map = globalThis.__nitroTestSourceMap?.();
+        if (name === 'with-map' && map !== '{"version":3}') throw new Error(`unexpected map ${map}`);
+        if (name === 'without-map' && map !== undefined) throw new Error('map without one being given');
+      };
+      """
+    let withMap = await runNitroTests(source, ["with-map"], 1000, sourceMap: #"{"version":3}"#)
+    #expect(withMap.isEmpty, "\(withMap)")
+    let withoutMap = await runNitroTests(source, ["without-map"], 1000)
+    #expect(withoutMap.isEmpty, "\(withoutMap)")
   }
 
   @Test func filesThatCannotLoadFailEveryCase() async throws {

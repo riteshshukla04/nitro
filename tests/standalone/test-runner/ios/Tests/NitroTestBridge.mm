@@ -26,14 +26,14 @@ NSString* _Nullable NitroRunTest(NSString* bundle, NSString* name, uint32_t time
   }
 }
 
-NSDictionary<NSString*, NSString*>* NitroRunTests(NSString* bundle, NSArray<NSString*>* names, uint32_t timeoutMs) {
+NSDictionary<NSString*, NSString*>* NitroRunTests(NSString* bundle, NSArray<NSString*>* names, uint32_t timeoutMs, NSString* sourceMap) {
   NSMutableDictionary<NSString*, NSString*>* failures = [NSMutableDictionary dictionary];
   try {
     std::vector<std::string> nativeNames;
     nativeNames.reserve(names.count);
     for (NSString* name in names)
       nativeNames.emplace_back(name.UTF8String);
-    auto results = margelo::nitro::testing::runTests(bundle.UTF8String, nativeNames, timeoutMs);
+    auto results = margelo::nitro::testing::runTests(bundle.UTF8String, nativeNames, timeoutMs, sourceMap ? sourceMap.UTF8String : "");
     for (size_t index = 0; index < results.size() && index < names.count; index++) {
       if (!results[index].empty())
         failures[names[index]] = toNSString(results[index]);
