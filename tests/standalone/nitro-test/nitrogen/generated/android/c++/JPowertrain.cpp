@@ -13,11 +13,19 @@
 namespace margelo::nitro {
 
   jni::local_ref<margelo::nitro::test::JPowertrain> JSIConverter<jni::local_ref<margelo::nitro::test::JPowertrain>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::JPowertrain::fromValue(valueFromJSI(runtime, value));
+  }
+
+  jni::alias_ref<margelo::nitro::test::JPowertrain> JSIConverter<jni::alias_ref<margelo::nitro::test::JPowertrain>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::JPowertrain::borrowedFromValue(valueFromJSI(runtime, value));
+  }
+
+  int32_t JSIConverter<jni::local_ref<margelo::nitro::test::JPowertrain>>::valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     const auto string = value.asString(runtime).utf8(runtime);
     switch (hashString(string)) {
-      case hashString("electric"): return margelo::nitro::test::JPowertrain::fromValue(0);
-      case hashString("gas"): return margelo::nitro::test::JPowertrain::fromValue(1);
-      case hashString("hybrid"): return margelo::nitro::test::JPowertrain::fromValue(2);
+      case hashString("electric"): return 0;
+      case hashString("gas"): return 1;
+      case hashString("hybrid"): return 2;
       default: [[unlikely]]
         throw std::invalid_argument("Cannot convert \"" + string + "\" to enum Powertrain - invalid value!");
     }

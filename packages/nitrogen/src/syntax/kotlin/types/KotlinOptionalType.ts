@@ -21,6 +21,10 @@ export class KotlinOptionalType extends OptionalType implements KotlinType {
     this.wrappingType = wrappingType
   }
 
+  get hasStaticJNIReference(): boolean {
+    return this.wrappingType.hasStaticJNIReference ?? false
+  }
+
   get jniValueKind(): JniValueKind {
     return this.wrappingType.jniValueKind
   }

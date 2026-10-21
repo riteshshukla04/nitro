@@ -25,17 +25,21 @@ namespace margelo::nitro::test {
     }
 
     static jni::local_ref<JColorScheme> fromValue(int32_t value) {
+      return jni::make_local(borrowedFromValue(value));
+    }
+
+    static jni::alias_ref<JColorScheme> borrowedFromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
         case 0: {
           static const auto field_LIGHT = clazz->getStaticField<JColorScheme>("LIGHT");
           static const auto instance_LIGHT = jni::make_global(clazz->getStaticFieldValue(field_LIGHT));
-          return jni::make_local(instance_LIGHT);
+          return instance_LIGHT;
         }
         case 1: {
           static const auto field_DARK = clazz->getStaticField<JColorScheme>("DARK");
           static const auto instance_DARK = jni::make_global(clazz->getStaticFieldValue(field_DARK));
-          return jni::make_local(instance_DARK);
+          return instance_DARK;
         }
         default: [[unlikely]]
           throw std::invalid_argument("Invalid ColorScheme value: " + std::to_string(value));
@@ -55,6 +59,14 @@ namespace margelo::nitro {
     static jni::local_ref<margelo::nitro::test::JColorScheme> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
     static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JColorScheme> value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  protected:
+    static int32_t valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+  // These aliases borrow the immutable singleton owners in borrowedFromValue().
+  template <>
+  struct JSIConverter<jni::alias_ref<margelo::nitro::test::JColorScheme>> : JSIConverter<jni::local_ref<margelo::nitro::test::JColorScheme>> {
+    static jni::alias_ref<margelo::nitro::test::JColorScheme> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
   };
 
 } // namespace margelo::nitro

@@ -13,11 +13,19 @@
 namespace margelo::nitro {
 
   jni::local_ref<margelo::nitro::test::JWeirdNumbersEnum> JSIConverter<jni::local_ref<margelo::nitro::test::JWeirdNumbersEnum>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::JWeirdNumbersEnum::fromValue(valueFromJSI(runtime, value));
+  }
+
+  jni::alias_ref<margelo::nitro::test::JWeirdNumbersEnum> JSIConverter<jni::alias_ref<margelo::nitro::test::JWeirdNumbersEnum>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::JWeirdNumbersEnum::borrowedFromValue(valueFromJSI(runtime, value));
+  }
+
+  int32_t JSIConverter<jni::local_ref<margelo::nitro::test::JWeirdNumbersEnum>>::valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     const auto integer = doubleToInt(value.asNumber());
     switch (integer) {
-      case 0: return margelo::nitro::test::JWeirdNumbersEnum::fromValue(0);
-      case 32: return margelo::nitro::test::JWeirdNumbersEnum::fromValue(32);
-      case 64: return margelo::nitro::test::JWeirdNumbersEnum::fromValue(64);
+      case 0: return 0;
+      case 32: return 32;
+      case 64: return 64;
       default: [[unlikely]]
         throw std::invalid_argument("Cannot convert " + value.toString(runtime).utf8(runtime) + " to enum WeirdNumbersEnum - invalid value!");
     }

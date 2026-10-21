@@ -28,7 +28,12 @@ export class KotlinStoredType implements Type {
           return this.type.getCode(language, options)
         }
         const jniClass = this.type.getCode(language, { ...options, context: 'type-argument' })
-        const storedType = `jni::global_ref<${jniClass}>`
+        let storedType: string
+        if (this.type.hasStaticJNIReference) {
+          storedType = `jni::alias_ref<${jniClass}>`
+        } else {
+          storedType = `jni::global_ref<${jniClass}>`
+        }
         if (options.context === 'parameter') return `const ${storedType}&`
         return storedType
       }

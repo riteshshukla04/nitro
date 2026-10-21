@@ -25,27 +25,31 @@ namespace margelo::nitro::test {
     }
 
     static jni::local_ref<JHardwareBufferFormat> fromValue(int32_t value) {
+      return jni::make_local(borrowedFromValue(value));
+    }
+
+    static jni::alias_ref<JHardwareBufferFormat> borrowedFromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
         case 0: {
           static const auto field_RGBA_8888 = clazz->getStaticField<JHardwareBufferFormat>("RGBA_8888");
           static const auto instance_RGBA_8888 = jni::make_global(clazz->getStaticFieldValue(field_RGBA_8888));
-          return jni::make_local(instance_RGBA_8888);
+          return instance_RGBA_8888;
         }
         case 1: {
           static const auto field_RGB_565 = clazz->getStaticField<JHardwareBufferFormat>("RGB_565");
           static const auto instance_RGB_565 = jni::make_global(clazz->getStaticFieldValue(field_RGB_565));
-          return jni::make_local(instance_RGB_565);
+          return instance_RGB_565;
         }
         case 2: {
           static const auto field_RGBA_FP16 = clazz->getStaticField<JHardwareBufferFormat>("RGBA_FP16");
           static const auto instance_RGBA_FP16 = jni::make_global(clazz->getStaticFieldValue(field_RGBA_FP16));
-          return jni::make_local(instance_RGBA_FP16);
+          return instance_RGBA_FP16;
         }
         case 3: {
           static const auto field_BLOB = clazz->getStaticField<JHardwareBufferFormat>("BLOB");
           static const auto instance_BLOB = jni::make_global(clazz->getStaticFieldValue(field_BLOB));
-          return jni::make_local(instance_BLOB);
+          return instance_BLOB;
         }
         default: [[unlikely]]
           throw std::invalid_argument("Invalid HardwareBufferFormat value: " + std::to_string(value));
@@ -65,6 +69,14 @@ namespace margelo::nitro {
     static jni::local_ref<margelo::nitro::test::JHardwareBufferFormat> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
     static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JHardwareBufferFormat> value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  protected:
+    static int32_t valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+  // These aliases borrow the immutable singleton owners in borrowedFromValue().
+  template <>
+  struct JSIConverter<jni::alias_ref<margelo::nitro::test::JHardwareBufferFormat>> : JSIConverter<jni::local_ref<margelo::nitro::test::JHardwareBufferFormat>> {
+    static jni::alias_ref<margelo::nitro::test::JHardwareBufferFormat> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
   };
 
 } // namespace margelo::nitro

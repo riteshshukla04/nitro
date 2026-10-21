@@ -13,10 +13,18 @@
 namespace margelo::nitro {
 
   jni::local_ref<margelo::nitro::test::external::JSizeUnit> JSIConverter<jni::local_ref<margelo::nitro::test::external::JSizeUnit>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::external::JSizeUnit::fromValue(valueFromJSI(runtime, value));
+  }
+
+  jni::alias_ref<margelo::nitro::test::external::JSizeUnit> JSIConverter<jni::alias_ref<margelo::nitro::test::external::JSizeUnit>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::external::JSizeUnit::borrowedFromValue(valueFromJSI(runtime, value));
+  }
+
+  int32_t JSIConverter<jni::local_ref<margelo::nitro::test::external::JSizeUnit>>::valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     const auto integer = doubleToInt(value.asNumber());
     switch (integer) {
-      case 10: return margelo::nitro::test::external::JSizeUnit::fromValue(10);
-      case 20: return margelo::nitro::test::external::JSizeUnit::fromValue(20);
+      case 10: return 10;
+      case 20: return 20;
       default: [[unlikely]]
         throw std::invalid_argument("Cannot convert " + value.toString(runtime).utf8(runtime) + " to enum SizeUnit - invalid value!");
     }

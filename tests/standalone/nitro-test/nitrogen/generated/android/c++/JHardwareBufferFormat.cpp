@@ -13,12 +13,20 @@
 namespace margelo::nitro {
 
   jni::local_ref<margelo::nitro::test::JHardwareBufferFormat> JSIConverter<jni::local_ref<margelo::nitro::test::JHardwareBufferFormat>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::JHardwareBufferFormat::fromValue(valueFromJSI(runtime, value));
+  }
+
+  jni::alias_ref<margelo::nitro::test::JHardwareBufferFormat> JSIConverter<jni::alias_ref<margelo::nitro::test::JHardwareBufferFormat>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::JHardwareBufferFormat::borrowedFromValue(valueFromJSI(runtime, value));
+  }
+
+  int32_t JSIConverter<jni::local_ref<margelo::nitro::test::JHardwareBufferFormat>>::valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     const auto string = value.asString(runtime).utf8(runtime);
     switch (hashString(string)) {
-      case hashString("rgba-8888"): return margelo::nitro::test::JHardwareBufferFormat::fromValue(0);
-      case hashString("rgb-565"): return margelo::nitro::test::JHardwareBufferFormat::fromValue(1);
-      case hashString("rgba-fp16"): return margelo::nitro::test::JHardwareBufferFormat::fromValue(2);
-      case hashString("blob"): return margelo::nitro::test::JHardwareBufferFormat::fromValue(3);
+      case hashString("rgba-8888"): return 0;
+      case hashString("rgb-565"): return 1;
+      case hashString("rgba-fp16"): return 2;
+      case hashString("blob"): return 3;
       default: [[unlikely]]
         throw std::invalid_argument("Cannot convert \"" + string + "\" to enum HardwareBufferFormat - invalid value!");
     }

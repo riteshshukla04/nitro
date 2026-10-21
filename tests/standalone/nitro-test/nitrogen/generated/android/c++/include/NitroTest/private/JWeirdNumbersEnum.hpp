@@ -25,22 +25,26 @@ namespace margelo::nitro::test {
     }
 
     static jni::local_ref<JWeirdNumbersEnum> fromValue(int32_t value) {
+      return jni::make_local(borrowedFromValue(value));
+    }
+
+    static jni::alias_ref<JWeirdNumbersEnum> borrowedFromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
         case 0: {
           static const auto field_A = clazz->getStaticField<JWeirdNumbersEnum>("A");
           static const auto instance_A = jni::make_global(clazz->getStaticFieldValue(field_A));
-          return jni::make_local(instance_A);
+          return instance_A;
         }
         case 32: {
           static const auto field_B = clazz->getStaticField<JWeirdNumbersEnum>("B");
           static const auto instance_B = jni::make_global(clazz->getStaticFieldValue(field_B));
-          return jni::make_local(instance_B);
+          return instance_B;
         }
         case 64: {
           static const auto field_C = clazz->getStaticField<JWeirdNumbersEnum>("C");
           static const auto instance_C = jni::make_global(clazz->getStaticFieldValue(field_C));
-          return jni::make_local(instance_C);
+          return instance_C;
         }
         default: [[unlikely]]
           throw std::invalid_argument("Invalid WeirdNumbersEnum value: " + std::to_string(value));
@@ -60,6 +64,14 @@ namespace margelo::nitro {
     static jni::local_ref<margelo::nitro::test::JWeirdNumbersEnum> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
     static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JWeirdNumbersEnum> value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  protected:
+    static int32_t valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+  // These aliases borrow the immutable singleton owners in borrowedFromValue().
+  template <>
+  struct JSIConverter<jni::alias_ref<margelo::nitro::test::JWeirdNumbersEnum>> : JSIConverter<jni::local_ref<margelo::nitro::test::JWeirdNumbersEnum>> {
+    static jni::alias_ref<margelo::nitro::test::JWeirdNumbersEnum> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
   };
 
 } // namespace margelo::nitro

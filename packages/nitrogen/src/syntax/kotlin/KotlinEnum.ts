@@ -44,7 +44,7 @@ enum class ${enumType.enumName}(@DoNotStrip @Keep val value: Int) {
 case ${member.value}: {
   static const auto ${field} = clazz->getStaticField<${enumType.jniName}>("${member.name}");
   static const auto ${instance} = jni::make_global(clazz->getStaticFieldValue(${field}));
-  return jni::make_local(${instance});
+  return ${instance};
 }
 `.trim()
   })
@@ -52,9 +52,7 @@ case ${member.value}: {
   let toJSI: string
   let canConvert: string
   if (enumType.jsType === 'union') {
-    const fromCases = enumType.enumMembers.map(
-      (member) => `case hashString("${member.stringValue}"): return ${jniClass}::fromValue(${member.value});`
-    )
+    const fromCases = enumType.enumMembers.map((member) => `case hashString("${member.stringValue}"): return ${member.value};`)
     const toCases = enumType.enumMembers.map((member) => `case ${member.value}: return createJSIString<"${member.stringValue}">(runtime);`)
     const checkCases = enumType.enumMembers.map((member) => `case hashString("${member.stringValue}"): return true;`)
     fromJSI = `
@@ -84,7 +82,7 @@ switch (hashString(string)) {
     const minimum = Math.min(...values)
     const maximum = Math.max(...values)
     const isContiguous = maximum - minimum + 1 === values.length
-    const fromCases = values.map((value) => `case ${value}: return ${jniClass}::fromValue(${value});`)
+    const fromCases = values.map((value) => `case ${value}: return ${value};`)
     const checkCases = values.map((value) => `case ${value}: return true;`)
     let checkInteger: string
     if (isContiguous) {
@@ -144,6 +142,10 @@ namespace ${cxxNamespace} {
     }
 
     static jni::local_ref<${enumType.jniName}> fromValue(int32_t value) {
+      return jni::make_local(borrowedFromValue(value));
+    }
+
+    static jni::alias_ref<${enumType.jniName}> borrowedFromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
         ${indent(javaCases.join('\n'), '        ')}
@@ -165,6 +167,14 @@ namespace margelo::nitro {
     static ${nativeType} fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
     static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<${jniClass}> value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  protected:
+    static int32_t valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+  // These aliases borrow the immutable singleton owners in borrowedFromValue().
+  template <>
+  struct JSIConverter<jni::alias_ref<${jniClass}>> : JSIConverter<${nativeType}> {
+    static jni::alias_ref<${jniClass}> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
   };
 
 } // namespace margelo::nitro
@@ -180,6 +190,14 @@ ${ownInclude}
 namespace margelo::nitro {
 
   ${nativeType} JSIConverter<${nativeType}>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return ${jniClass}::fromValue(valueFromJSI(runtime, value));
+  }
+
+  jni::alias_ref<${jniClass}> JSIConverter<jni::alias_ref<${jniClass}>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return ${jniClass}::borrowedFromValue(valueFromJSI(runtime, value));
+  }
+
+  int32_t JSIConverter<${nativeType}>::valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     ${indent(fromJSI, '    ')}
   }
 

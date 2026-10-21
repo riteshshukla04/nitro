@@ -25,27 +25,31 @@ namespace margelo::nitro::test {
     }
 
     static jni::local_ref<JTruckPowertrain> fromValue(int32_t value) {
+      return jni::make_local(borrowedFromValue(value));
+    }
+
+    static jni::alias_ref<JTruckPowertrain> borrowedFromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
         case 0: {
           static const auto field_ELECTRIC = clazz->getStaticField<JTruckPowertrain>("ELECTRIC");
           static const auto instance_ELECTRIC = jni::make_global(clazz->getStaticFieldValue(field_ELECTRIC));
-          return jni::make_local(instance_ELECTRIC);
+          return instance_ELECTRIC;
         }
         case 1: {
           static const auto field_GAS = clazz->getStaticField<JTruckPowertrain>("GAS");
           static const auto instance_GAS = jni::make_global(clazz->getStaticFieldValue(field_GAS));
-          return jni::make_local(instance_GAS);
+          return instance_GAS;
         }
         case 2: {
           static const auto field_HYBRID = clazz->getStaticField<JTruckPowertrain>("HYBRID");
           static const auto instance_HYBRID = jni::make_global(clazz->getStaticFieldValue(field_HYBRID));
-          return jni::make_local(instance_HYBRID);
+          return instance_HYBRID;
         }
         case 3: {
           static const auto field_DIESEL = clazz->getStaticField<JTruckPowertrain>("DIESEL");
           static const auto instance_DIESEL = jni::make_global(clazz->getStaticFieldValue(field_DIESEL));
-          return jni::make_local(instance_DIESEL);
+          return instance_DIESEL;
         }
         default: [[unlikely]]
           throw std::invalid_argument("Invalid TruckPowertrain value: " + std::to_string(value));
@@ -65,6 +69,14 @@ namespace margelo::nitro {
     static jni::local_ref<margelo::nitro::test::JTruckPowertrain> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
     static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JTruckPowertrain> value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  protected:
+    static int32_t valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+  // These aliases borrow the immutable singleton owners in borrowedFromValue().
+  template <>
+  struct JSIConverter<jni::alias_ref<margelo::nitro::test::JTruckPowertrain>> : JSIConverter<jni::local_ref<margelo::nitro::test::JTruckPowertrain>> {
+    static jni::alias_ref<margelo::nitro::test::JTruckPowertrain> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
   };
 
 } // namespace margelo::nitro

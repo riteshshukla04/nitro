@@ -25,17 +25,21 @@ namespace margelo::nitro::test {
     }
 
     static jni::local_ref<JCppOnlyValueKind> fromValue(int32_t value) {
+      return jni::make_local(borrowedFromValue(value));
+    }
+
+    static jni::alias_ref<JCppOnlyValueKind> borrowedFromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
         case 0: {
           static const auto field_FIRST = clazz->getStaticField<JCppOnlyValueKind>("FIRST");
           static const auto instance_FIRST = jni::make_global(clazz->getStaticFieldValue(field_FIRST));
-          return jni::make_local(instance_FIRST);
+          return instance_FIRST;
         }
         case 3: {
           static const auto field_SECOND = clazz->getStaticField<JCppOnlyValueKind>("SECOND");
           static const auto instance_SECOND = jni::make_global(clazz->getStaticFieldValue(field_SECOND));
-          return jni::make_local(instance_SECOND);
+          return instance_SECOND;
         }
         default: [[unlikely]]
           throw std::invalid_argument("Invalid CppOnlyValueKind value: " + std::to_string(value));
@@ -55,6 +59,14 @@ namespace margelo::nitro {
     static jni::local_ref<margelo::nitro::test::JCppOnlyValueKind> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
     static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JCppOnlyValueKind> value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  protected:
+    static int32_t valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+  // These aliases borrow the immutable singleton owners in borrowedFromValue().
+  template <>
+  struct JSIConverter<jni::alias_ref<margelo::nitro::test::JCppOnlyValueKind>> : JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>> {
+    static jni::alias_ref<margelo::nitro::test::JCppOnlyValueKind> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
   };
 
 } // namespace margelo::nitro

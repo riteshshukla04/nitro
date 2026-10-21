@@ -25,17 +25,21 @@ namespace margelo::nitro::test {
     }
 
     static jni::local_ref<JSizeUnit> fromValue(int32_t value) {
+      return jni::make_local(borrowedFromValue(value));
+    }
+
+    static jni::alias_ref<JSizeUnit> borrowedFromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
         case 1: {
           static const auto field_POINTS = clazz->getStaticField<JSizeUnit>("POINTS");
           static const auto instance_POINTS = jni::make_global(clazz->getStaticFieldValue(field_POINTS));
-          return jni::make_local(instance_POINTS);
+          return instance_POINTS;
         }
         case 2: {
           static const auto field_PIXELS = clazz->getStaticField<JSizeUnit>("PIXELS");
           static const auto instance_PIXELS = jni::make_global(clazz->getStaticFieldValue(field_PIXELS));
-          return jni::make_local(instance_PIXELS);
+          return instance_PIXELS;
         }
         default: [[unlikely]]
           throw std::invalid_argument("Invalid SizeUnit value: " + std::to_string(value));
@@ -55,6 +59,14 @@ namespace margelo::nitro {
     static jni::local_ref<margelo::nitro::test::JSizeUnit> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
     static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JSizeUnit> value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  protected:
+    static int32_t valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+  // These aliases borrow the immutable singleton owners in borrowedFromValue().
+  template <>
+  struct JSIConverter<jni::alias_ref<margelo::nitro::test::JSizeUnit>> : JSIConverter<jni::local_ref<margelo::nitro::test::JSizeUnit>> {
+    static jni::alias_ref<margelo::nitro::test::JSizeUnit> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
   };
 
 } // namespace margelo::nitro

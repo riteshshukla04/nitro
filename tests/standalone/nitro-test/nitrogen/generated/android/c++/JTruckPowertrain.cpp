@@ -13,12 +13,20 @@
 namespace margelo::nitro {
 
   jni::local_ref<margelo::nitro::test::JTruckPowertrain> JSIConverter<jni::local_ref<margelo::nitro::test::JTruckPowertrain>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::JTruckPowertrain::fromValue(valueFromJSI(runtime, value));
+  }
+
+  jni::alias_ref<margelo::nitro::test::JTruckPowertrain> JSIConverter<jni::alias_ref<margelo::nitro::test::JTruckPowertrain>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::JTruckPowertrain::borrowedFromValue(valueFromJSI(runtime, value));
+  }
+
+  int32_t JSIConverter<jni::local_ref<margelo::nitro::test::JTruckPowertrain>>::valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     const auto string = value.asString(runtime).utf8(runtime);
     switch (hashString(string)) {
-      case hashString("electric"): return margelo::nitro::test::JTruckPowertrain::fromValue(0);
-      case hashString("gas"): return margelo::nitro::test::JTruckPowertrain::fromValue(1);
-      case hashString("hybrid"): return margelo::nitro::test::JTruckPowertrain::fromValue(2);
-      case hashString("diesel"): return margelo::nitro::test::JTruckPowertrain::fromValue(3);
+      case hashString("electric"): return 0;
+      case hashString("gas"): return 1;
+      case hashString("hybrid"): return 2;
+      case hashString("diesel"): return 3;
       default: [[unlikely]]
         throw std::invalid_argument("Cannot convert \"" + string + "\" to enum TruckPowertrain - invalid value!");
     }

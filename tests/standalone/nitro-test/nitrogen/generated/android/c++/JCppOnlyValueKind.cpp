@@ -13,10 +13,18 @@
 namespace margelo::nitro {
 
   jni::local_ref<margelo::nitro::test::JCppOnlyValueKind> JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::JCppOnlyValueKind::fromValue(valueFromJSI(runtime, value));
+  }
+
+  jni::alias_ref<margelo::nitro::test::JCppOnlyValueKind> JSIConverter<jni::alias_ref<margelo::nitro::test::JCppOnlyValueKind>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    return margelo::nitro::test::JCppOnlyValueKind::borrowedFromValue(valueFromJSI(runtime, value));
+  }
+
+  int32_t JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>>::valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     const auto integer = doubleToInt(value.asNumber());
     switch (integer) {
-      case 0: return margelo::nitro::test::JCppOnlyValueKind::fromValue(0);
-      case 3: return margelo::nitro::test::JCppOnlyValueKind::fromValue(3);
+      case 0: return 0;
+      case 3: return 3;
       default: [[unlikely]]
         throw std::invalid_argument("Cannot convert " + value.toString(runtime).utf8(runtime) + " to enum CppOnlyValueKind - invalid value!");
     }

@@ -25,22 +25,26 @@ namespace margelo::nitro::test {
     }
 
     static jni::local_ref<JOldEnum> fromValue(int32_t value) {
+      return jni::make_local(borrowedFromValue(value));
+    }
+
+    static jni::alias_ref<JOldEnum> borrowedFromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
         case 0: {
           static const auto field_FIRST = clazz->getStaticField<JOldEnum>("FIRST");
           static const auto instance_FIRST = jni::make_global(clazz->getStaticFieldValue(field_FIRST));
-          return jni::make_local(instance_FIRST);
+          return instance_FIRST;
         }
         case 1: {
           static const auto field_SECOND = clazz->getStaticField<JOldEnum>("SECOND");
           static const auto instance_SECOND = jni::make_global(clazz->getStaticFieldValue(field_SECOND));
-          return jni::make_local(instance_SECOND);
+          return instance_SECOND;
         }
         case 2: {
           static const auto field_THIRD = clazz->getStaticField<JOldEnum>("THIRD");
           static const auto instance_THIRD = jni::make_global(clazz->getStaticFieldValue(field_THIRD));
-          return jni::make_local(instance_THIRD);
+          return instance_THIRD;
         }
         default: [[unlikely]]
           throw std::invalid_argument("Invalid OldEnum value: " + std::to_string(value));
@@ -60,6 +64,14 @@ namespace margelo::nitro {
     static jni::local_ref<margelo::nitro::test::JOldEnum> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
     static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JOldEnum> value);
     static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  protected:
+    static int32_t valueFromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+  // These aliases borrow the immutable singleton owners in borrowedFromValue().
+  template <>
+  struct JSIConverter<jni::alias_ref<margelo::nitro::test::JOldEnum>> : JSIConverter<jni::local_ref<margelo::nitro::test::JOldEnum>> {
+    static jni::alias_ref<margelo::nitro::test::JOldEnum> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
   };
 
 } // namespace margelo::nitro
