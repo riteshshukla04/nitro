@@ -64,9 +64,11 @@ case, which can be rerun individually in Xcode. A failed case is recorded as an 
 `js/**/*.test.ts` need no Swift changes. Missing, invalid, empty or duplicate manifest entries fail discovery.
 
 The Swift tests await an operation queue limited to four concurrent test files. Each file runs its cases in one Hermes runtime and executes
-JavaScript and callbacks on its owning worker. This keeps Swift's cooperative executor available for `Promise.async` completions. The shared
-Xcode scheme and command-line runner set `LIBDISPATCH_COOPERATIVE_POOL_STRICT=1` in the test process so the concurrent native Promise case
-runs with one cooperative worker.
+JavaScript and callbacks on its owning worker. This keeps Swift's cooperative executor available for `Promise.async` completions. The queue
+runs at the user-interactive QoS of React Native's JS thread, so the Swift Tasks that `Promise.async` starts get user-initiated priority, as
+in apps. Swift Testing starts and reports its cases at default priority on the cooperative pool, and Tasks at that priority waited behind
+it. The shared Xcode scheme and command-line runner set `LIBDISPATCH_COOPERATIVE_POOL_STRICT=1` in the test process so the concurrent native
+Promise case runs with one cooperative worker.
 
 The `static-properties` cases write shared native storage. They run in order in their file's runtime, so they never overlap each other.
 

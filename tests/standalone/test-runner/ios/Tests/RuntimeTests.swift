@@ -16,6 +16,11 @@ private func makeRuntimeQueue() -> OperationQueue {
   let queue = OperationQueue()
   queue.name = "com.margelo.nitro.tests.runtime"
   queue.maxConcurrentOperationCount = 4
+  // React Native's JS thread runs at user-interactive QoS. Swift Tasks that
+  // `Promise.async` starts inherit it as user-initiated priority, as in apps.
+  // At the default QoS, they waited seconds behind Swift Testing starting and
+  // reporting its cases on the cooperative pool.
+  queue.qualityOfService = .userInteractive
   return queue
 }
 
@@ -161,8 +166,8 @@ struct RuntimeTests {
     #expect(failure.contains("evaluation failure"))
   }
 
-  // A deadlock still times out. The budget only absorbs a busy cooperative
-  // thread, which every Swift Promise of the behavior files also uses.
+  // A deadlock still times out. The budget only absorbs a busy machine while
+  // the behavior files start.
   @Test func swiftTasksCanCompleteDuringNativeRun() async throws {
     let source = """
       globalThis.runNitroTest = async () => {
