@@ -40,8 +40,8 @@ the package tests directly. `NitroTestRunnerBridge` exports the Objective-C++ te
 CI machines, a fresh simulator's first-boot work keeps every core busy for minutes after `simctl bootstatus` reports it booted, and an
 xcodebuild started in that time took minutes to print anything or compiled slower. So nothing boots the simulator before xcodebuild has
 started, and the tests run while the simulator settles. Parallel testing is off: it shuts the simulator down and tests on a fresh clone,
-which boots all over again. `--derived-data PATH` moves DerivedData outside the repository. CI uses it, builds with one job per CPU core, and
-moves `node_modules` out of the repository first: Xcode enumerates every file under a local Swift package, and this package is the
+which boots all over again. `--derived-data PATH` moves DerivedData outside the repository. CI uses it, builds with one job per CPU core,
+and moves `node_modules` out of the repository first: Xcode enumerates every file under a local Swift package, and this package is the
 repository root.
 
 Simulator OS, device, architecture, build jobs and deployment target defaults live in [`config.json`](config.json). By default, the runner
@@ -73,8 +73,8 @@ Swift Testing starts and reports every case at default priority on the cooperati
 shared Xcode scheme and command-line runner set `LIBDISPATCH_COOPERATIVE_POOL_STRICT=1` in the test process so the concurrent native Promise
 case runs with one cooperative worker. A group starts when one of its cases is first requested, so rerunning one case in Xcode runs its
 whole group, which takes about a second. Without parallel testing, Swift Testing requests cases one at a time, so `run.mjs`, which runs
-every case, passes `NITRO_TEST_START_ALL_GROUPS=1` to start every group with the first case. Durations that Xcode reports for a case
-include the time it waited for its group.
+every case, passes `NITRO_TEST_START_ALL_GROUPS=1` to start every group with the first case. Durations that Xcode reports for a case include
+the time it waited for its group.
 
 The `static-properties` cases write shared native storage, so they form a single group whose cases never overlap. Groups of other files can
 run at the same time.
