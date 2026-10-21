@@ -13,8 +13,8 @@
 #include <NitroTestExternal/private/JHybridTestViewSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
+#include <NitroTestExternal/private/JCallback_void.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
@@ -58,8 +58,8 @@ namespace margelo::nitro::test::external {
     // Properties
     jboolean getIsBlue();
     void setIsBlue(jboolean isBlue);
-    Callback<void()> getSomeCallback();
-    void setSomeCallback(const Callback<void()>& someCallback);
+    jni::local_ref<margelo::nitro::test::external::JCallback_void> getSomeCallback();
+    void setSomeCallback(const jni::local_ref<margelo::nitro::test::external::JCallback_void>& someCallback);
 
   public:
     // Methods

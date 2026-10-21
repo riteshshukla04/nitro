@@ -7,36 +7,28 @@
 
 #include <NitroTest/private/JCallback_double.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
-  double JCallback_double::invoke() const {
+  JNIRetainedValue<jdouble>::Type JCallback_double::invoke() const {
     static const auto __method = javaClassStatic()->getMethod<jdouble()>("invoke_jni");
-    auto __result = __method(self());
-    return JNIConverter<double, jdouble>::fromJNI(__result);
+    auto result = __method(self());
+    return JNIRetainedValue<jdouble>::retain(result);
   }
 
-  jni::local_ref<JCallback_double::javaobject> JCallback_double_cxx::fromCpp(const Callback<double()>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_double::javaobject> JCallback_double_cxx::fromCpp(const InlineCallback<double()>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_double> JCallback_double_cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   jdouble JCallback_double_cxx::invoke_cxx() {
-    double __result = _callback.callSync();
-    return JNIConverter<double, jdouble>::toJNI(__result);
+    return _state.invoke();
   }
 
   void JCallback_double_cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_double_cxx::invoke_cxx)});
   }
 
-  JCallback_double_cxx::JCallback_double_cxx(const Callback<double()>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_double_cxx::JCallback_double_cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

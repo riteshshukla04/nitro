@@ -6,38 +6,28 @@
 ///
 
 #include <NitroTest/private/JCallback_SizeKotlin_SizeKotlin.hpp>
-#include <NitroTest/private/SizeKotlin+Kotlin+NitroTest.hpp>
-#include <NitroTest/private/SizeKotlin.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 #include <NitroTest/private/JSize.hpp>
 
 namespace margelo::nitro::test {
 
-  SizeKotlin JCallback_SizeKotlin_SizeKotlin::invoke(const SizeKotlin& size) const {
-    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JSize>(jni::alias_ref<JSize> /* size */)>("invoke_jni");
-    auto __result = __method(self(), JNIConverter<margelo::nitro::test::SizeKotlin, jni::local_ref<margelo::nitro::test::JSize>>::toJNI(size));
-    return JNIConverter<margelo::nitro::test::SizeKotlin, jni::local_ref<margelo::nitro::test::JSize>>::fromJNI(__result);
+  JNIRetainedValue<jni::local_ref<margelo::nitro::test::JSize>>::Type JCallback_SizeKotlin_SizeKotlin::invoke(JNIRetainedValue<jni::local_ref<margelo::nitro::test::JSize>>::Type size) const {
+    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JSize>(jni::alias_ref<JSize>)>("invoke_jni");
+    auto result = __method(self(), JNIRetainedValue<jni::local_ref<margelo::nitro::test::JSize>>::borrow(size));
+    return JNIRetainedValue<jni::local_ref<margelo::nitro::test::JSize>>::retain(result);
   }
 
-  jni::local_ref<JCallback_SizeKotlin_SizeKotlin::javaobject> JCallback_SizeKotlin_SizeKotlin_cxx::fromCpp(const Callback<SizeKotlin(const SizeKotlin& /* size */)>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_SizeKotlin_SizeKotlin::javaobject> JCallback_SizeKotlin_SizeKotlin_cxx::fromCpp(const InlineCallback<SizeKotlin(const SizeKotlin& /* size */)>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_SizeKotlin_SizeKotlin> JCallback_SizeKotlin_SizeKotlin_cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   jni::local_ref<JSize> JCallback_SizeKotlin_SizeKotlin_cxx::invoke_cxx(jni::alias_ref<JSize> size) {
-    SizeKotlin __result = _callback.callSync(JNIConverter<margelo::nitro::test::SizeKotlin, jni::local_ref<margelo::nitro::test::JSize>>::fromJNI(size));
-    return JNIConverter<margelo::nitro::test::SizeKotlin, jni::local_ref<margelo::nitro::test::JSize>>::toJNI(__result);
+    return _state.invoke(size);
   }
 
   void JCallback_SizeKotlin_SizeKotlin_cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_SizeKotlin_SizeKotlin_cxx::invoke_cxx)});
   }
 
-  JCallback_SizeKotlin_SizeKotlin_cxx::JCallback_SizeKotlin_SizeKotlin_cxx(const Callback<SizeKotlin(const SizeKotlin& /* size */)>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_SizeKotlin_SizeKotlin_cxx::JCallback_SizeKotlin_SizeKotlin_cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

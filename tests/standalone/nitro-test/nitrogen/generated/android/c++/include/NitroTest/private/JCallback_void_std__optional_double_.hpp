@@ -7,68 +7,42 @@
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
-
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
 #include <optional>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback `(maybe: Double?) -> Unit`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct JCallback_void_std__optional_double_ : public jni::JavaClass<JCallback_void_std__optional_double_> {
-  public:
-    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_void_std__optional_double_;";
+  class JCallback_void_std__optional_double__cxx;
 
-  public:
-    /**
-     * Invokes the callback this `JCallback_void_std__optional_double_` instance holds through JNI.
-     */
-    void invoke(const std::optional<double>& maybe) const;
+  struct JCallback_void_std__optional_double_ : jni::JavaClass<JCallback_void_std__optional_double_> {
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_void_std__optional_double_;";
+    using CxxPart = JCallback_void_std__optional_double__cxx;
+    using NativeSignature = JNICallbackState<void(jni::local_ref<JOptional<jni::JDouble>>)>::Signature;
+
+    JNIRetainedValue<void>::Type invoke(JNIRetainedValue<jni::local_ref<JOptional<jni::JDouble>>>::Type maybe) const;
   };
 
-  /**
-   * An implementation of Callback_void_std__optional_double_ that is backed by a C++ implementation (using `Callback<...>`)
-   */
   class JCallback_void_std__optional_double__cxx final : public jni::HybridClass<JCallback_void_std__optional_double__cxx, JCallback_void_std__optional_double_> {
   public:
-    static jni::local_ref<JCallback_void_std__optional_double_::javaobject> fromCpp(const Callback<void(const std::optional<double>& /* maybe */)>& callback);
-    static jni::local_ref<JCallback_void_std__optional_double_::javaobject> fromCpp(const InlineCallback<void(const std::optional<double>& /* maybe */)>& callback);
-
-  public:
-    /**
-     * Invokes the C++ `Callback<...>` this `JCallback_void_std__optional_double__cxx` instance holds.
-     */
-    void invoke_cxx(jni::alias_ref<JOptional<jni::JDouble>> maybe);
-
-  public:
-    [[nodiscard]]
-    inline const Callback<void(const std::optional<double>& /* maybe */)>& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<JCallback_void_std__optional_double_::NativeSignature>;
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_void_std__optional_double__cxx;";
+
+    static jni::local_ref<JCallback_void_std__optional_double_> create(CallbackType callback, bool isInline);
+    void invoke_cxx(jni::alias_ref<JOptional<jni::JDouble>> maybe);
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit JCallback_void_std__optional_double__cxx(const Callback<void(const std::optional<double>& /* maybe */)>& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    Callback<void(const std::optional<double>& /* maybe */)> _callback;
-    bool _isInline;
+    explicit JCallback_void_std__optional_double__cxx(CallbackType callback, bool isInline);
+    JNICallbackState<void(jni::local_ref<JOptional<jni::JDouble>>)> _state;
   };
 
 } // namespace margelo::nitro::test

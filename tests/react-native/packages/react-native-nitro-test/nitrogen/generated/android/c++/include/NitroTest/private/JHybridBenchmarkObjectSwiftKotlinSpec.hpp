@@ -37,8 +37,8 @@
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
+#include <NitroTest/private/JCallback_double.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
 #include <NitroTest/private/JHybridBenchmarkObjectSwiftKotlinSpec.hpp>
 #include <memory>
 // Forward declaration of `JHybridBenchmarkObjectSwiftKotlinSpec` to properly resolve imports.
@@ -98,7 +98,7 @@ namespace margelo::nitro::test {
     jni::local_ref<JVariant_Double_String> passVariant(const jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String>& either);
     jni::local_ref<JArrayBuffer::JavaPart> bounceArrayBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
     jni::local_ref<JArrayBuffer::JavaPart> copyBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
-    jdouble callbackSync(const Callback<double()>& callback);
+    jdouble callbackSync(const jni::local_ref<margelo::nitro::test::JCallback_double>& callback);
     jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> promiseReturnsInstantly();
     jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> createPendingPromise();
     void resolvePendingPromiseOnWorker();

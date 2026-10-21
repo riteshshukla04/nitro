@@ -6,37 +6,38 @@
 ///
 
 #include <NitroTest/private/JOptionalCallback.hpp>
-
-#include <NitroTest/private/OptionalCallbackKotlin.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <variant>
 #include <optional>
-#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroTest/private/JVariant_______Unit_Double.hpp>
 #include <NitroTest/private/JCallback_void.hpp>
-#include <NitroModules/JNICallable.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/JSIHelpers.hpp>
 
-namespace margelo::nitro::test {
+namespace margelo::nitro {
 
-  OptionalCallbackKotlin JOptionalCallback::toCpp() const {
-    static const auto clazz = javaClassStatic();
-    static const auto fieldCallback = clazz->getField<JVariant_______Unit_Double>("callback");
-    jni::local_ref<JVariant_______Unit_Double> callback = this->getFieldValue(fieldCallback);
-    return OptionalCallbackKotlin(
-      callback != nullptr ? std::make_optional(callback->toCpp()) : std::nullopt
-    );
+  jni::local_ref<margelo::nitro::test::JOptionalCallback> JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalCallback>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto object = value.asObject(runtime);
+    return margelo::nitro::test::JOptionalCallback::create(JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JVariant_______Unit_Double>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "callback"))));
   }
 
-  jni::local_ref<JOptionalCallback::javaobject> JOptionalCallback::fromCpp(const OptionalCallbackKotlin& value) {
-    using JSignature = JOptionalCallback(jni::alias_ref<JVariant_______Unit_Double>);
-    static const auto clazz = javaClassStatic();
-    static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
-    return create(
-      clazz,
-      value.callback.has_value() ? JVariant_______Unit_Double::fromCpp(value.callback.value()) : nullptr
-    );
+  jsi::Value JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalCallback>>::toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JOptionalCallback> value) {
+    jsi::Object object(runtime);
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "callback"), JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JVariant_______Unit_Double>>>::toJSI(runtime, value->getCallback()));
+    return object;
   }
 
-} // namespace margelo::nitro::test
+  bool JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalCallback>>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (!value.isObject()) return false;
+    auto object = value.getObject(runtime);
+    if (!isPlainObject(runtime, object)) return false;
+    return JSIConverter<jni::local_ref<JOptional<margelo::nitro::test::JVariant_______Unit_Double>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "callback")));
+  }
+
+} // namespace margelo::nitro

@@ -6,39 +6,30 @@
 ///
 
 #include <NitroTest/private/JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_.hpp>
-#include <memory>
-#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
+#include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test {
 
-  std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec> JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_::invoke() const {
+  JNIRetainedValue<jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::Type JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_::invoke() const {
     static const auto __method = javaClassStatic()->getMethod<jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>()>("invoke_jni");
-    auto __result = __method(self());
-    return JNIConverter<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::fromJNI(__result);
+    auto result = __method(self());
+    return JNIRetainedValue<jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::retain(result);
   }
 
-  jni::local_ref<JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_::javaobject> JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::fromCpp(const Callback<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>()>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_::javaobject> JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::fromCpp(const InlineCallback<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>()>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_> JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart> JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::invoke_cxx() {
-    std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec> __result = _callback.callSync();
-    return JNIConverter<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, jni::local_ref<margelo::nitro::test::external::JHybridSomeExternalObjectSpecJavaPart>>::toJNI(__result);
+    return _state.invoke();
   }
 
   void JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::invoke_cxx)});
   }
 
-  JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx(const Callback<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>()>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

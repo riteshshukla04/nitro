@@ -12,35 +12,27 @@
 #include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test {
 
-  Promise<ArrayBuffer> JCallback_Promise_ArrayBuffer_::invoke() const {
+  JNIRetainedValue<jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>>::Type JCallback_Promise_ArrayBuffer_::invoke() const {
     static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>()>("invoke_jni");
-    auto __result = __method(self());
-    return JNIConverter<Promise<ArrayBuffer>, jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>>::fromJNI(__result);
+    auto result = __method(self());
+    return JNIRetainedValue<jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>>::retain(result);
   }
 
-  jni::local_ref<JCallback_Promise_ArrayBuffer_::javaobject> JCallback_Promise_ArrayBuffer__cxx::fromCpp(const Callback<Promise<ArrayBuffer>()>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_Promise_ArrayBuffer_::javaobject> JCallback_Promise_ArrayBuffer__cxx::fromCpp(const InlineCallback<Promise<ArrayBuffer>()>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_Promise_ArrayBuffer_> JCallback_Promise_ArrayBuffer__cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>> JCallback_Promise_ArrayBuffer__cxx::invoke_cxx() {
-    Promise<ArrayBuffer> __result = _callback.callSync();
-    return JNIConverter<Promise<ArrayBuffer>, jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>>::toJNI(__result);
+    return _state.invoke();
   }
 
   void JCallback_Promise_ArrayBuffer__cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_Promise_ArrayBuffer__cxx::invoke_cxx)});
   }
 
-  JCallback_Promise_ArrayBuffer__cxx::JCallback_Promise_ArrayBuffer__cxx(const Callback<Promise<ArrayBuffer>()>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_Promise_ArrayBuffer__cxx::JCallback_Promise_ArrayBuffer__cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

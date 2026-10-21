@@ -8,9 +8,10 @@
 #include <NitroTestExternal/private/views/JHybridTestViewStateUpdater.hpp>
 #include <NitroTestExternal/private/views/HybridTestViewComponent.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JNIConverter.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroTestExternal/private/JCallback_void.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <react/fabric/StateWrapperImpl.h>
 #include <stdexcept>
@@ -75,7 +76,7 @@ void JHybridTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /*
     if (oldProps == nullptr
           ? newProps->someCallback.isProvided()
           : !newProps->someCallback.hasSameValue(oldProps->someCallback)) {
-      hybridView->setSomeCallback(JNIConverter<margelo::nitro::Callback<void()>, margelo::nitro::Callback<void()>>::toJNI(newProps->someCallback.get()));
+      hybridView->setSomeCallback(JNIConverter<margelo::nitro::Callback<void()>, jni::local_ref<margelo::nitro::test::external::JCallback_void>>::toJNI(newProps->someCallback.get()));
     }
 
     if (oldProps == nullptr

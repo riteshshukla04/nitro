@@ -23,13 +23,14 @@ data class JsStyleStruct(
   val value: Double,
   @DoNotStrip
   @Keep
-  val onChanged: Callback_void_double
+  val onChanged: (num: Double) -> Unit
 ) {
-  /**
-   * Create a new instance of JsStyleStruct from Kotlin
-   */
-  constructor(value: Double, onChanged: (num: Double) -> Unit):
-         this(value, onChanged.let { if (it is Callback_void_double) it else Callback_void_double_java(it) })
+  @DoNotStrip
+  @Keep
+  @Suppress("unused", "FunctionName")
+  private fun getOnChanged_cxx(): Callback_void_double {
+    return onChanged.let { if (it is Callback_void_double) it else Callback_void_double_java(it) }
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

@@ -7,66 +7,38 @@
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
-
-#include <NitroTestExternal/private/SizeKotlin+Kotlin+NitroTestExternal.hpp>
-#include <NitroTestExternal/private/SizeKotlin.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
 #include <NitroTestExternal/private/JSize.hpp>
 
 namespace margelo::nitro::test::external {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback `(size: Size) -> Size`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct JCallback_SizeKotlin_SizeKotlin : public jni::JavaClass<JCallback_SizeKotlin_SizeKotlin> {
-  public:
-    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/Callback_SizeKotlin_SizeKotlin;";
+  class JCallback_SizeKotlin_SizeKotlin_cxx;
 
-  public:
-    /**
-     * Invokes the callback this `JCallback_SizeKotlin_SizeKotlin` instance holds through JNI.
-     */
-    SizeKotlin invoke(const SizeKotlin& size) const;
+  struct JCallback_SizeKotlin_SizeKotlin : jni::JavaClass<JCallback_SizeKotlin_SizeKotlin> {
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/Callback_SizeKotlin_SizeKotlin;";
+    using CxxPart = JCallback_SizeKotlin_SizeKotlin_cxx;
+    using NativeSignature = JNICallbackState<jni::local_ref<margelo::nitro::test::external::JSize>(jni::local_ref<margelo::nitro::test::external::JSize>)>::Signature;
+
+    JNIRetainedValue<jni::local_ref<margelo::nitro::test::external::JSize>>::Type invoke(JNIRetainedValue<jni::local_ref<margelo::nitro::test::external::JSize>>::Type size) const;
   };
 
-  /**
-   * An implementation of Callback_SizeKotlin_SizeKotlin that is backed by a C++ implementation (using `Callback<...>`)
-   */
   class JCallback_SizeKotlin_SizeKotlin_cxx final : public jni::HybridClass<JCallback_SizeKotlin_SizeKotlin_cxx, JCallback_SizeKotlin_SizeKotlin> {
   public:
-    static jni::local_ref<JCallback_SizeKotlin_SizeKotlin::javaobject> fromCpp(const Callback<SizeKotlin(const SizeKotlin& /* size */)>& callback);
-    static jni::local_ref<JCallback_SizeKotlin_SizeKotlin::javaobject> fromCpp(const InlineCallback<SizeKotlin(const SizeKotlin& /* size */)>& callback);
-
-  public:
-    /**
-     * Invokes the C++ `Callback<...>` this `JCallback_SizeKotlin_SizeKotlin_cxx` instance holds.
-     */
-    jni::local_ref<JSize> invoke_cxx(jni::alias_ref<JSize> size);
-
-  public:
-    [[nodiscard]]
-    inline const Callback<SizeKotlin(const SizeKotlin& /* size */)>& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<JCallback_SizeKotlin_SizeKotlin::NativeSignature>;
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/Callback_SizeKotlin_SizeKotlin_cxx;";
+
+    static jni::local_ref<JCallback_SizeKotlin_SizeKotlin> create(CallbackType callback, bool isInline);
+    jni::local_ref<JSize> invoke_cxx(jni::alias_ref<JSize> size);
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit JCallback_SizeKotlin_SizeKotlin_cxx(const Callback<SizeKotlin(const SizeKotlin& /* size */)>& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    Callback<SizeKotlin(const SizeKotlin& /* size */)> _callback;
-    bool _isInline;
+    explicit JCallback_SizeKotlin_SizeKotlin_cxx(CallbackType callback, bool isInline);
+    JNICallbackState<jni::local_ref<margelo::nitro::test::external::JSize>(jni::local_ref<margelo::nitro::test::external::JSize>)> _state;
   };
 
 } // namespace margelo::nitro::test::external

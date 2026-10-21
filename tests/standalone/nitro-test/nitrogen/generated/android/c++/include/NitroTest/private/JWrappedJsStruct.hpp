@@ -8,33 +8,50 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/WrappedJsStructKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <NitroTest/private/JJsStyleStruct.hpp>
+#include <NitroTest/private/JsStyleStructKotlin.hpp>
+#include <vector>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "WrappedJsStruct" and the Kotlin data class "WrappedJsStruct".
-   */
+  /** JNI access to the Kotlin data class WrappedJsStruct. */
   struct JWrappedJsStruct final : public jni::JavaClass<JWrappedJsStruct> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/WrappedJsStruct;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct WrappedJsStruct by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    WrappedJsStructKotlin toCpp() const;
+    static jni::local_ref<JWrappedJsStruct> create(jni::alias_ref<JJsStyleStruct> value, jni::alias_ref<jni::JArrayClass<JJsStyleStruct>> items) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JWrappedJsStruct(jni::alias_ref<JJsStyleStruct>, jni::alias_ref<jni::JArrayClass<JJsStyleStruct>>)>("fromCpp");
+      return create(clazz, value, items);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JWrappedJsStruct::javaobject> fromCpp(const WrappedJsStructKotlin& value);
+    jni::local_ref<JJsStyleStruct> getValue() const {
+      static const auto field = javaClassStatic()->getField<JJsStyleStruct>("value");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<jni::JArrayClass<JJsStyleStruct>> getItems() const {
+      static const auto field = javaClassStatic()->getField<jni::JArrayClass<JJsStyleStruct>>("items");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JWrappedJsStruct>> {
+    static jni::local_ref<margelo::nitro::test::JWrappedJsStruct> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JWrappedJsStruct> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

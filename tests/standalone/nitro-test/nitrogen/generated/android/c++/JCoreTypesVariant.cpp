@@ -7,120 +7,76 @@
 
 #include <NitroTest/private/JCoreTypesVariant.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
-#include <NitroTest/private/WrappedJsStructKotlin.hpp>
-#include <NitroModules/Promise.hpp>
-#include <NitroModules/AnyJSON.hpp>
-#include <variant>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 #include <NitroTest/private/JCallback_void_double.hpp>
-#include <NitroModules/JNICallable.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JWrappedJsStruct.hpp>
+#include <NitroModules/Promise.hpp>
 #include <NitroModules/JNIConverter+Promise.hpp>
 #include <NitroModules/JSIConverter+JTypedPromise.hpp>
+#include <NitroModules/AnyJSON.hpp>
 #include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+AnyJSON.hpp>
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant::create_0(jni::alias_ref<JArrayBuffer::JavaPart> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JCoreTypesVariant(jni::alias_ref<JArrayBuffer::JavaPart>)>("fromCpp_0");
-    return method(javaClassStatic(), value);
+
+  size_t JCoreTypesVariant::getIndex() const {
+    static const auto field = javaClassStatic()->getField<jint>("index");
+    return static_cast<size_t>(getFieldValue(field));
   }
 
-  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant::create_1(jni::alias_ref<JCallback_void_double::javaobject> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JCoreTypesVariant(jni::alias_ref<JCallback_void_double::javaobject>)>("fromCpp_1");
-    return method(javaClassStatic(), value);
+  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant_impl::First::create(jni::alias_ref<JArrayBuffer::JavaPart> value) {
+    static const auto method = JCoreTypesVariant::javaClassStatic()->getStaticMethod<jni::local_ref<JCoreTypesVariant>(jni::alias_ref<JArrayBuffer::JavaPart>)>("fromCpp_0");
+    return method(JCoreTypesVariant::javaClassStatic(), value);
   }
 
-  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant::create_2(jni::alias_ref<JWrappedJsStruct> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JCoreTypesVariant(jni::alias_ref<JWrappedJsStruct>)>("fromCpp_2");
-    return method(javaClassStatic(), value);
-  }
-
-  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant::create_3(jni::alias_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JCoreTypesVariant(jni::alias_ref<JTypedPromise<jni::local_ref<jni::JDouble>>>)>("fromCpp_3");
-    return method(javaClassStatic(), value);
-  }
-
-  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant::create_4(jni::alias_ref<JAnyJSON> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JCoreTypesVariant(jni::alias_ref<JAnyJSON>)>("fromCpp_4");
-    return method(javaClassStatic(), value);
-  }
-
-  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant::fromCpp(const std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStructKotlin, Promise<double>, AnyJSON>& variant) {
-    switch (variant.index()) {
-      case 0: return create_0(JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::toJNI(std::get<0>(variant)));
-      case 1: return create_1(JCallback_void_double_cxx::fromCpp(std::get<1>(variant)));
-      case 2: return create_2(JWrappedJsStruct::fromCpp(std::get<2>(variant)));
-      case 3: return create_3(JNIConverter<Promise<double>, jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>>>::toJNI(std::get<3>(variant)));
-      case 4: return create_4(JNIConverter<AnyJSON, jni::local_ref<JAnyJSON>>::toJNI(std::get<4>(variant)));
-      default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
-    }
-  }
-
-  jni::local_ref<JArrayBuffer::JavaPart> JCoreTypesVariant_impl::First::getValue() const {
+  JCoreTypesVariant_impl::First::Value JCoreTypesVariant_impl::First::getValue() const {
     static const auto field = javaClassStatic()->getField<JArrayBuffer::JavaPart>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<JCallback_void_double::javaobject> JCoreTypesVariant_impl::Second::getValue() const {
-    static const auto field = javaClassStatic()->getField<JCallback_void_double::javaobject>("value");
+  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant_impl::Second::create(jni::alias_ref<margelo::nitro::test::JCallback_void_double> value) {
+    static const auto method = JCoreTypesVariant::javaClassStatic()->getStaticMethod<jni::local_ref<JCoreTypesVariant>(jni::alias_ref<margelo::nitro::test::JCallback_void_double>)>("fromCpp_1");
+    return method(JCoreTypesVariant::javaClassStatic(), value);
+  }
+
+  JCoreTypesVariant_impl::Second::Value JCoreTypesVariant_impl::Second::getValue() const {
+    static const auto field = javaClassStatic()->getField<margelo::nitro::test::JCallback_void_double>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<JWrappedJsStruct> JCoreTypesVariant_impl::Third::getValue() const {
+  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant_impl::Third::create(jni::alias_ref<JWrappedJsStruct> value) {
+    static const auto method = JCoreTypesVariant::javaClassStatic()->getStaticMethod<jni::local_ref<JCoreTypesVariant>(jni::alias_ref<JWrappedJsStruct>)>("fromCpp_2");
+    return method(JCoreTypesVariant::javaClassStatic(), value);
+  }
+
+  JCoreTypesVariant_impl::Third::Value JCoreTypesVariant_impl::Third::getValue() const {
     static const auto field = javaClassStatic()->getField<JWrappedJsStruct>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> JCoreTypesVariant_impl::Fourth::getValue() const {
+  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant_impl::Fourth::create(jni::alias_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> value) {
+    static const auto method = JCoreTypesVariant::javaClassStatic()->getStaticMethod<jni::local_ref<JCoreTypesVariant>(jni::alias_ref<JTypedPromise<jni::local_ref<jni::JDouble>>>)>("fromCpp_3");
+    return method(JCoreTypesVariant::javaClassStatic(), value);
+  }
+
+  JCoreTypesVariant_impl::Fourth::Value JCoreTypesVariant_impl::Fourth::getValue() const {
     static const auto field = javaClassStatic()->getField<JTypedPromise<jni::local_ref<jni::JDouble>>>("value");
     return getFieldValue(field);
   }
 
-  jni::local_ref<JAnyJSON> JCoreTypesVariant_impl::Fifth::getValue() const {
+  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant_impl::Fifth::create(jni::alias_ref<JAnyJSON> value) {
+    static const auto method = JCoreTypesVariant::javaClassStatic()->getStaticMethod<jni::local_ref<JCoreTypesVariant>(jni::alias_ref<JAnyJSON>)>("fromCpp_4");
+    return method(JCoreTypesVariant::javaClassStatic(), value);
+  }
+
+  JCoreTypesVariant_impl::Fifth::Value JCoreTypesVariant_impl::Fifth::getValue() const {
     static const auto field = javaClassStatic()->getField<JAnyJSON>("value");
     return getFieldValue(field);
   }
 
-  /**
-   * Converts JCoreTypesVariant to std::variant<ArrayBuffer, Callback<void(double value)>, WrappedJsStructKotlin, Promise<double>, AnyJSON>
-   */
-  std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStructKotlin, Promise<double>, AnyJSON> JCoreTypesVariant::toCpp() const {
-    if (isInstanceOf(JCoreTypesVariant_impl::First::javaClassStatic())) {
-      // It's a `ArrayBuffer`
-      auto jniValue = static_cast<const JCoreTypesVariant_impl::First*>(this)->getValue();
-      return JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::fromJNI(jniValue);
-    } else if (isInstanceOf(JCoreTypesVariant_impl::Second::javaClassStatic())) {
-      // It's a `Callback<void(double /* value */)>`
-      auto jniValue = static_cast<const JCoreTypesVariant_impl::Second*>(this)->getValue();
-      return [&]() -> Callback<void(double /* value */)> {
-        if (jniValue->isInstanceOf(JCallback_void_double_cxx::javaClassStatic())) [[likely]] {
-          auto downcast = jni::static_ref_cast<JCallback_void_double_cxx::javaobject>(jniValue);
-          return downcast->cthis()->getCallback();
-        } else {
-          auto __callbackRef = jni::make_global(jniValue);
-          return Callback<void(double /* value */)>::make(JNICallable<JCallback_void_double, void(double)>(std::move(__callbackRef)));
-        }
-      }();
-    } else if (isInstanceOf(JCoreTypesVariant_impl::Third::javaClassStatic())) {
-      // It's a `WrappedJsStructKotlin`
-      auto jniValue = static_cast<const JCoreTypesVariant_impl::Third*>(this)->getValue();
-      return jniValue->toCpp();
-    } else if (isInstanceOf(JCoreTypesVariant_impl::Fourth::javaClassStatic())) {
-      // It's a `Promise<double>`
-      auto jniValue = static_cast<const JCoreTypesVariant_impl::Fourth*>(this)->getValue();
-      return JNIConverter<Promise<double>, jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>>>::fromJNI(jniValue);
-    } else if (isInstanceOf(JCoreTypesVariant_impl::Fifth::javaClassStatic())) {
-      // It's a `AnyJSON`
-      auto jniValue = static_cast<const JCoreTypesVariant_impl::Fifth*>(this)->getValue();
-      return JNIConverter<AnyJSON, jni::local_ref<JAnyJSON>>::fromJNI(jniValue);
-    }
-    throw std::invalid_argument("Variant is unknown Kotlin instance!");
-  }
 } // namespace margelo::nitro::test

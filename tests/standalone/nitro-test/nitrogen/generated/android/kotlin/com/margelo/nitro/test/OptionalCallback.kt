@@ -22,7 +22,7 @@ data class OptionalCallback(
   @Keep
   val callback: Variant_______Unit_Double?
 ) {
-  /* primary constructor */
+
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

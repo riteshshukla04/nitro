@@ -140,6 +140,7 @@ export function createCppJniCallBody({
         from: 'c++',
         to: 'kotlin',
         in: 'c++',
+        context: 'parameter-type',
       })
     })
   )

@@ -3,7 +3,6 @@ import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { KotlinCallbackType } from './types/KotlinCallbackType.js'
 import { getImportCode, getImportsCode } from '../getImportCode.js'
-import { CallbackType } from '../types/CallbackType.js'
 
 export function createKotlinCallback(callbackType: KotlinCallbackType): SourceFile[] {
   const publicType = callbackType.type
@@ -150,168 +149,85 @@ class ${name}_java(private val callback: ${lambdaSignature}): ${name} {
   const jniClassDescriptor = callbackType.config.getAndroidPackage('c++/jni', `${name}_cxx`)
   const returnType = callbackType.returnType
   const cxxNamespace = callbackType.config.getCxxNamespace('c++')
-  const typename = publicType.getCode('c++', { context: 'value' })
-  // Inline and owning variants of a signature share this file, so it always
-  // accepts an `InlineCallback` and escapes it into the callback it holds.
-  const inlineType = new CallbackType(publicType.returnType, publicType.parameters, true)
-  const inlineParameterType = inlineType.getCode('c++', {
-    context: 'parameter',
+  const valueReturnType = returnType.getCode('c++', { context: 'value', fullyQualified: true, representation: 'jsi' })
+  const valueParameters = callbackType.parameters.map((p) =>
+    p.type.getCode('c++', { context: 'value', fullyQualified: true, representation: 'jsi' })
+  )
+  const valueSignature = `${valueReturnType}(${valueParameters.join(', ')})`
+  const retainedReturnType = `JNIRetainedValue<${valueReturnType}>::Type`
+  const retainedParameters = callbackType.parameters.map((p) => {
+    const type = p.type.getCode('c++', { context: 'value', fullyQualified: true, representation: 'jsi' })
+    return `JNIRetainedValue<${type}>::Type ${p.escapedName}`
   })
-
-  // call() Java -> C++
-  const cppParams = callbackType.parameters.map((p) => {
-    const type = p.getCode('c++', { context: 'parameter' })
-    return `${type} ${p.escapedName}`
+  const nativeParams = callbackType.parameters.map((p) => `${p.getCode('c++', { context: 'parameter' })} ${p.escapedName}`)
+  const paramsForward = callbackType.parameters.map((p) => p.escapedName)
+  const jniParamsForward = callbackType.parameters.map((p) => {
+    const type = p.type.getCode('c++', { context: 'value', fullyQualified: true, representation: 'jsi' })
+    return `JNIRetainedValue<${type}>::borrow(${p.escapedName})`
   })
-  const paramsForward = callbackType.parameters.map((p) => p.convert(p.escapedName, { from: 'kotlin', to: 'c++', in: 'c++' }))
-
-  // call() C++ -> Java
-  const jniParams = publicType.parameters.map((p) => {
-    const type = p.getCode('c++', { context: 'parameter' })
-    return `${type} ${p.escapedName}`
-  })
-  const jniParamsForward = [
-    'self()',
-    ...callbackType.parameters.map((p) => p.convert(p.escapedName, { from: 'c++', to: 'kotlin', in: 'c++' })),
-  ]
-  const jniReturnType = returnType.getCode('c++', {
-    context: 'return',
-  })
-  const jniParamTypes = callbackType.parameters.map((p) => {
-    const type = p.getCode('c++', { context: 'parameter' })
-    return `${type} /* ${p.escapedName} */`
-  })
+  const jniReturnType = returnType.getCode('c++', { context: 'return' })
+  const jniParamTypes = callbackType.parameters.map((p) => p.getCode('c++', { context: 'parameter' }))
   const jniSignature = `${jniReturnType}(${jniParamTypes.join(', ')})`
-
-  let cppCallBody: string
-  let jniCallBody: string
+  let invokeCode: string
   if (returnType.kind === 'void') {
-    // It returns void
-    cppCallBody = `
-if (_isInline) {
-  _callback.callSync(${paramsForward.join(', ')});
-} else {
-  _callback.callAndForget(${paramsForward.join(', ')});
-}
+    const argumentsCode = ['self()', ...jniParamsForward].join(', ')
+    invokeCode = `
+__method(${argumentsCode});
 `.trim()
-    jniCallBody = `
-static const auto __method = javaClassStatic()->getMethod<${jniSignature}>("invoke_jni");
-__method(${jniParamsForward.join(', ')});
-    `.trim()
   } else {
-    // It returns a type!
-    const cppResultType = publicType.returnType.getCode('c++', {
-      context: 'value',
-    })
-    const jniResult = returnType.convert('__result', {
-      from: 'c++',
-      to: 'kotlin',
-      in: 'c++',
-    })
-    const cppResult = returnType.convert('__result', {
-      from: 'kotlin',
-      to: 'c++',
-      in: 'c++',
-    })
-    cppCallBody = `
-${cppResultType} __result = _callback.callSync(${paramsForward.join(', ')});
-return ${jniResult};
+    const argumentsCode = ['self()', ...jniParamsForward].join(', ')
+    invokeCode = `
+auto result = __method(${argumentsCode});
+return JNIRetainedValue<${valueReturnType}>::retain(result);
 `.trim()
-    jniCallBody = `
-static const auto __method = javaClassStatic()->getMethod<${jniSignature}>("invoke_jni");
-auto __result = __method(${jniParamsForward.join(', ')});
-return ${cppResult};
-    `.trim()
   }
-
-  const fbjniReturnType = returnType.fromCppReturnType ?? returnType.getCode('c++', { context: 'return' })
-  const cppReturnType = publicType.returnType.getCode('c++', {
-    context: 'return',
-  })
-  const kotlinCallbackType = publicType.getCode('kotlin', { context: 'value' })
-
-  const imports = [
-    ...callbackType.getCppConverterDependencies().imports,
-    ...inlineType.getRequiredImports('c++'),
-    ...returnType.getRequiredImports('c++'),
-    ...callbackType.parameters.flatMap((p) => p.getRequiredImports('c++')),
-  ]
-  const declarationIncludes = imports.map((i) => getImportCode(i, 'declaration')).filter(isNotDuplicate)
+  const imports = [...returnType.getRequiredImports('c++'), ...callbackType.parameters.flatMap((p) => p.getRequiredImports('c++'))]
+  const declarationIncludes = getImportsCode(imports, 'declaration')
   const implementationIncludes = getImportsCode(
-    [
-      {
-        language: 'c++',
-        declaration: callbackType.config.getCxxHeader(`${jniName}.hpp`, 'private'),
-      },
-      ...imports,
-    ],
+    [{ language: 'c++', declaration: callbackType.config.getCxxHeader(`${jniName}.hpp`, 'private') }, ...imports],
     'implementation'
   )
-
   const fbjniCode = `
 ${createFileMetadataString(`${jniName}.hpp`)}
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
-
-${declarationIncludes.join('\n')}
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
+${declarationIncludes}
 
 namespace ${cxxNamespace} {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback \`${kotlinCallbackType}\`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct ${jniName} : public jni::JavaClass<${jniName}> {
-  public:
-    static constexpr auto kJavaDescriptor = "L${jniInterfaceDescriptor};";
+  class ${jniName}_cxx;
 
-  public:
-    /**
-     * Invokes the callback this \`${jniName}\` instance holds through JNI.
-     */
-    ${cppReturnType} invoke(${jniParams.join(', ')}) const;
+  struct ${jniName} : jni::JavaClass<${jniName}> {
+    static constexpr auto kJavaDescriptor = "L${jniInterfaceDescriptor};";
+    using CxxPart = ${jniName}_cxx;
+    using NativeSignature = JNICallbackState<${valueSignature}>::Signature;
+
+    ${retainedReturnType} invoke(${retainedParameters.join(', ')}) const;
   };
 
-  /**
-   * An implementation of ${name} that is backed by a C++ implementation (using \`Callback<...>\`)
-   */
   class ${jniName}_cxx final : public jni::HybridClass<${jniName}_cxx, ${jniName}> {
   public:
-    static jni::local_ref<${jniName}::javaobject> fromCpp(const ${typename}& callback);
-    static jni::local_ref<${jniName}::javaobject> fromCpp(${inlineParameterType} callback);
-
-  public:
-    /**
-     * Invokes the C++ \`Callback<...>\` this \`${jniName}_cxx\` instance holds.
-     */
-    ${fbjniReturnType} invoke_cxx(${cppParams.join(', ')});
-
-  public:
-    [[nodiscard]]
-    inline const ${typename}& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<${jniName}::NativeSignature>;
     static constexpr auto kJavaDescriptor = "L${jniClassDescriptor};";
+
+    static jni::local_ref<${jniName}> create(CallbackType callback, bool isInline);
+    ${jniReturnType} invoke_cxx(${nativeParams.join(', ')});
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit ${jniName}_cxx(const ${typename}& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    ${typename} _callback;
-    bool _isInline;
+    explicit ${jniName}_cxx(CallbackType callback, bool isInline);
+    JNICallbackState<${valueSignature}> _state;
   };
 
 } // namespace ${cxxNamespace}
-  `.trim()
+`.trim()
 
   const fbjniImplementationCode = `
 ${createFileMetadataString(`${jniName}.cpp`)}
@@ -320,30 +236,27 @@ ${implementationIncludes}
 
 namespace ${cxxNamespace} {
 
-  ${cppReturnType} ${jniName}::invoke(${jniParams.join(', ')}) const {
-    ${indent(jniCallBody, '    ')}
+  ${retainedReturnType} ${jniName}::invoke(${retainedParameters.join(', ')}) const {
+    static const auto __method = javaClassStatic()->getMethod<${jniSignature}>("invoke_jni");
+    ${indent(invokeCode, '    ')}
   }
 
-  jni::local_ref<${jniName}::javaobject> ${jniName}_cxx::fromCpp(const ${typename}& callback) {
-    return newObjectCxxArgs(callback, false);
+  jni::local_ref<${jniName}> ${jniName}_cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
-  jni::local_ref<${jniName}::javaobject> ${jniName}_cxx::fromCpp(${inlineParameterType} callback) {
-    return newObjectCxxArgs(callback.escape(), true);
-  }
-
-  ${fbjniReturnType} ${jniName}_cxx::invoke_cxx(${cppParams.join(', ')}) {
-    ${indent(cppCallBody, '    ')}
+  ${jniReturnType} ${jniName}_cxx::invoke_cxx(${nativeParams.join(', ')}) {
+    return _state.invoke(${paramsForward.join(', ')});
   }
 
   void ${jniName}_cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", ${jniName}_cxx::invoke_cxx)});
   }
 
-  ${jniName}_cxx::${jniName}_cxx(const ${typename}& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  ${jniName}_cxx::${jniName}_cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace ${cxxNamespace}
-  `.trim()
+`.trim()
 
   const files: SourceFile[] = []
   files.push({

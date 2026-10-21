@@ -7,65 +7,39 @@
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
-
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback `(value: Long) -> Long`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct JCallback_int64_t_int64_t : public jni::JavaClass<JCallback_int64_t_int64_t> {
-  public:
-    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_int64_t_int64_t;";
+  class JCallback_int64_t_int64_t_cxx;
 
-  public:
-    /**
-     * Invokes the callback this `JCallback_int64_t_int64_t` instance holds through JNI.
-     */
-    int64_t invoke(int64_t value) const;
+  struct JCallback_int64_t_int64_t : jni::JavaClass<JCallback_int64_t_int64_t> {
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_int64_t_int64_t;";
+    using CxxPart = JCallback_int64_t_int64_t_cxx;
+    using NativeSignature = JNICallbackState<jlong(jlong)>::Signature;
+
+    JNIRetainedValue<jlong>::Type invoke(JNIRetainedValue<jlong>::Type value) const;
   };
 
-  /**
-   * An implementation of Callback_int64_t_int64_t that is backed by a C++ implementation (using `Callback<...>`)
-   */
   class JCallback_int64_t_int64_t_cxx final : public jni::HybridClass<JCallback_int64_t_int64_t_cxx, JCallback_int64_t_int64_t> {
   public:
-    static jni::local_ref<JCallback_int64_t_int64_t::javaobject> fromCpp(const Callback<int64_t(int64_t /* value */)>& callback);
-    static jni::local_ref<JCallback_int64_t_int64_t::javaobject> fromCpp(const InlineCallback<int64_t(int64_t /* value */)>& callback);
-
-  public:
-    /**
-     * Invokes the C++ `Callback<...>` this `JCallback_int64_t_int64_t_cxx` instance holds.
-     */
-    jlong invoke_cxx(jlong value);
-
-  public:
-    [[nodiscard]]
-    inline const Callback<int64_t(int64_t /* value */)>& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<JCallback_int64_t_int64_t::NativeSignature>;
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_int64_t_int64_t_cxx;";
+
+    static jni::local_ref<JCallback_int64_t_int64_t> create(CallbackType callback, bool isInline);
+    jlong invoke_cxx(jlong value);
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit JCallback_int64_t_int64_t_cxx(const Callback<int64_t(int64_t /* value */)>& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    Callback<int64_t(int64_t /* value */)> _callback;
-    bool _isInline;
+    explicit JCallback_int64_t_int64_t_cxx(CallbackType callback, bool isInline);
+    JNICallbackState<jlong(jlong)> _state;
   };
 
 } // namespace margelo::nitro::test

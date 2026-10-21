@@ -7,69 +7,42 @@
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
-
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
 #include <NitroTest/Powertrain.hpp>
 #include <vector>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
-#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback `(array: Array<Powertrain>) -> Unit`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct JCallback_void_std__vector_Powertrain_ : public jni::JavaClass<JCallback_void_std__vector_Powertrain_> {
-  public:
-    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_void_std__vector_Powertrain_;";
+  class JCallback_void_std__vector_Powertrain__cxx;
 
-  public:
-    /**
-     * Invokes the callback this `JCallback_void_std__vector_Powertrain_` instance holds through JNI.
-     */
-    void invoke(const std::vector<Powertrain>& array) const;
+  struct JCallback_void_std__vector_Powertrain_ : jni::JavaClass<JCallback_void_std__vector_Powertrain_> {
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_void_std__vector_Powertrain_;";
+    using CxxPart = JCallback_void_std__vector_Powertrain__cxx;
+    using NativeSignature = JNICallbackState<void(jni::local_ref<jni::JArrayClass<margelo::nitro::test::JPowertrain>>)>::Signature;
+
+    JNIRetainedValue<void>::Type invoke(JNIRetainedValue<jni::local_ref<jni::JArrayClass<margelo::nitro::test::JPowertrain>>>::Type array) const;
   };
 
-  /**
-   * An implementation of Callback_void_std__vector_Powertrain_ that is backed by a C++ implementation (using `Callback<...>`)
-   */
   class JCallback_void_std__vector_Powertrain__cxx final : public jni::HybridClass<JCallback_void_std__vector_Powertrain__cxx, JCallback_void_std__vector_Powertrain_> {
   public:
-    static jni::local_ref<JCallback_void_std__vector_Powertrain_::javaobject> fromCpp(const Callback<void(const std::vector<Powertrain>& /* array */)>& callback);
-    static jni::local_ref<JCallback_void_std__vector_Powertrain_::javaobject> fromCpp(const InlineCallback<void(const std::vector<Powertrain>& /* array */)>& callback);
-
-  public:
-    /**
-     * Invokes the C++ `Callback<...>` this `JCallback_void_std__vector_Powertrain__cxx` instance holds.
-     */
-    void invoke_cxx(jni::alias_ref<jni::JArrayClass<JPowertrain>> array);
-
-  public:
-    [[nodiscard]]
-    inline const Callback<void(const std::vector<Powertrain>& /* array */)>& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<JCallback_void_std__vector_Powertrain_::NativeSignature>;
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_void_std__vector_Powertrain__cxx;";
+
+    static jni::local_ref<JCallback_void_std__vector_Powertrain_> create(CallbackType callback, bool isInline);
+    void invoke_cxx(jni::alias_ref<jni::JArrayClass<JPowertrain>> array);
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit JCallback_void_std__vector_Powertrain__cxx(const Callback<void(const std::vector<Powertrain>& /* array */)>& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    Callback<void(const std::vector<Powertrain>& /* array */)> _callback;
-    bool _isInline;
+    explicit JCallback_void_std__vector_Powertrain__cxx(CallbackType callback, bool isInline);
+    JNICallbackState<void(jni::local_ref<jni::JArrayClass<margelo::nitro::test::JPowertrain>>)> _state;
   };
 
 } // namespace margelo::nitro::test

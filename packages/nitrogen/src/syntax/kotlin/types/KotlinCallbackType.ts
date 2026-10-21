@@ -1,12 +1,22 @@
-import { combineKotlinCppConverters, type KotlinCppConverter } from '../KotlinConverter.js'
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
-import { CallbackType, type GetCallbackCodeOptions } from '../../types/CallbackType.js'
+import type { Type } from '../../types/Type.js'
+import { KotlinCxxCallbackType } from './KotlinCxxCallbackType.js'
+import { getTypeAs } from '../../types/getTypeAs.js'
+import type { KotlinCppConverter } from '../KotlinConverter.js'
+import { getKotlinConverter } from '../KotlinConverter.js'
+import { CallbackType } from '../../types/CallbackType.js'
 import { createKotlinCallback } from '../KotlinCallback.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
 import { KotlinNamedType } from './KotlinNamedType.js'
-import { getJniReferenceCode, type JNINativeRegistration, type KotlinConversion, type KotlinType } from './KotlinType.js'
+import {
+  getJniReferenceCode,
+  type GetKotlinCodeOptions,
+  type JNINativeRegistration,
+  type KotlinConversion,
+  type KotlinType,
+} from './KotlinType.js'
 
 /**
  * JNI represents a callback as a Kotlin `fun interface`.
@@ -15,7 +25,7 @@ import { getJniReferenceCode, type JNINativeRegistration, type KotlinConversion,
 export class KotlinCallbackType extends CallbackType implements KotlinType {
   override readonly returnType: KotlinType
   override readonly parameters: KotlinNamedType[]
-  readonly jniValueKind = 'pointer'
+  readonly jniValueKind = 'wrapper'
   readonly needsKotlinConversion = true
 
   constructor(
@@ -40,46 +50,40 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     return `J${this.specializationName}`
   }
 
-  convert(value: string, { from, in: language }: KotlinConversion): string {
+  convert(value: string, { from, in: language, context = 'value' }: KotlinConversion): string {
     switch (language) {
       case 'kotlin':
         if (from === 'kotlin') {
           return `${value}.let { if (it is ${this.specializationName}) it else ${this.specializationName}_java(it) }`
         }
         return value
-      case 'c++':
+      case 'c++': {
+        const converter = getKotlinConverter({ cppType: this.type, context: context, kotlinType: this })
         switch (from) {
           case 'c++':
-            return `${this.jniName}_cxx::fromCpp(${value})`
+            return `${converter}::toJNI(${value})`
           case 'kotlin':
-            return this.getJniToCppCode(value)
+            return `${converter}::fromJNI(${value})`
         }
+      }
     }
   }
 
-  private getJniToCppCode(value: string): string {
-    const returnType = this.type.returnType.getCode('c++', {
-      context: 'return',
-    })
-    const paramTypes = this.type.parameters.map((p) => p.getCode('c++', { context: 'parameter' }))
-    const jniType = `${this.jniName}_cxx`
-    const cppCallbackType = this.type.getCode('c++', { context: 'return' })
-    return `
-[&]() -> ${cppCallbackType} {
-  if (${value}->isInstanceOf(${jniType}::javaClassStatic())) [[likely]] {
-    auto downcast = jni::static_ref_cast<${jniType}::javaobject>(${value});
-    return downcast->cthis()->getCallback();
-  } else {
-    auto __callbackRef = jni::make_global(${value});
-    return ${cppCallbackType}::make(JNICallable<${this.jniName}, ${returnType}(${paramTypes.join(', ')})>(std::move(__callbackRef)));
+  getJSIType(): Type | undefined {
+    if (this.isInline) return undefined
+    return this
   }
-}()
-`.trim()
+
+  getCppConverter(cppType: Type): KotlinCppConverter {
+    return new KotlinCxxCallbackType(getTypeAs(cppType, CallbackType), this).getConverter()
   }
-  override getCode(language: Language, options: GetCallbackCodeOptions): string {
+
+  override getCode(language: Language, options: GetKotlinCodeOptions): string {
     switch (language) {
-      case 'c++':
-        return getJniReferenceCode(`${this.jniName}::javaobject`, options)
+      case 'c++': {
+        const jniClass = this.config.getCxxNamespace('c++', this.jniName)
+        return getJniReferenceCode(jniClass, options)
+      }
       case 'kotlin':
         return this.specializationName
       default:
@@ -101,22 +105,25 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     ]
   }
 
-  getCppConverterDependencies(): KotlinCppConverter {
-    const parameters = this.parameters.map((parameter, index) => {
-      const original = this.type.parameters[index]
-      if (original == null) throw new Error('Mismatched callback parameter count')
-      return parameter.type.getCppConverter?.(original)
-    })
-    return combineKotlinCppConverters([this.returnType.getCppConverter?.(this.type.returnType), ...parameters])
-  }
-
   override getExtraFiles(): SourceFile[] {
     if (this.config.isExternalConfig) return []
-    return [...this.getCppConverterDependencies().files, ...super.getExtraFiles(), ...createKotlinCallback(this)]
+    return [
+      ...this.returnType.getExtraFiles(),
+      ...this.parameters.flatMap((parameter) => parameter.getExtraFiles()),
+      ...createKotlinCallback(this),
+    ]
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
-    const imports = this.type.getRequiredImports(language)
+    const imports: SourceImport[] = []
+    switch (language) {
+      case 'kotlin':
+      case 'swift':
+        imports.push(...this.type.getRequiredImports(language))
+        break
+      case 'c++':
+        break
+    }
     switch (language) {
       case 'c++':
         imports.push(
@@ -127,7 +134,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
           {
             language: language,
             declaration: {
-              header: 'NitroModules/JNICallable.hpp',
+              header: 'NitroModules/JNIConverter+Callback.hpp',
               space: 'system',
             },
           }

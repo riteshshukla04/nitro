@@ -6,46 +6,32 @@
 ///
 
 #include <NitroTest/private/JJsStyleStruct.hpp>
-
-#include <NitroTest/private/JsStyleStructKotlin.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
 #include <NitroTest/private/JCallback_void_double.hpp>
-#include <NitroModules/JNICallable.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/JSIHelpers.hpp>
 
-namespace margelo::nitro::test {
+namespace margelo::nitro {
 
-  JsStyleStructKotlin JJsStyleStruct::toCpp() const {
-    static const auto clazz = javaClassStatic();
-    static const auto fieldValue = clazz->getField<jdouble>("value");
-    jdouble value = this->getFieldValue(fieldValue);
-    static const auto fieldOnChanged = clazz->getField<JCallback_void_double::javaobject>("onChanged");
-    jni::local_ref<JCallback_void_double::javaobject> onChanged = this->getFieldValue(fieldOnChanged);
-    return JsStyleStructKotlin(
-      JNIConverter<double, jdouble>::fromJNI(value),
-      [&]() -> Callback<void(double /* num */)> {
-        if (onChanged->isInstanceOf(JCallback_void_double_cxx::javaClassStatic())) [[likely]] {
-          auto downcast = jni::static_ref_cast<JCallback_void_double_cxx::javaobject>(onChanged);
-          return downcast->cthis()->getCallback();
-        } else {
-          auto __callbackRef = jni::make_global(onChanged);
-          return Callback<void(double /* num */)>::make(JNICallable<JCallback_void_double, void(double)>(std::move(__callbackRef)));
-        }
-      }()
-    );
+  jni::local_ref<margelo::nitro::test::JJsStyleStruct> JSIConverter<jni::local_ref<margelo::nitro::test::JJsStyleStruct>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto object = value.asObject(runtime);
+    return margelo::nitro::test::JJsStyleStruct::create(JSIConverter<jdouble>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "value"))), JSIConverter<jni::local_ref<margelo::nitro::test::JCallback_void_double>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "onChanged"))));
   }
 
-  jni::local_ref<JJsStyleStruct::javaobject> JJsStyleStruct::fromCpp(const JsStyleStructKotlin& value) {
-    using JSignature = JJsStyleStruct(jdouble, jni::alias_ref<JCallback_void_double::javaobject>);
-    static const auto clazz = javaClassStatic();
-    static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
-    return create(
-      clazz,
-      JNIConverter<double, jdouble>::toJNI(value.value),
-      JCallback_void_double_cxx::fromCpp(value.onChanged)
-    );
+  jsi::Value JSIConverter<jni::local_ref<margelo::nitro::test::JJsStyleStruct>>::toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JJsStyleStruct> value) {
+    jsi::Object object(runtime);
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "value"), JSIConverter<jdouble>::toJSI(runtime, value->getValue()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "onChanged"), JSIConverter<jni::local_ref<margelo::nitro::test::JCallback_void_double>>::toJSI(runtime, value->getOnChanged()));
+    return object;
   }
 
-} // namespace margelo::nitro::test
+  bool JSIConverter<jni::local_ref<margelo::nitro::test::JJsStyleStruct>>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (!value.isObject()) return false;
+    auto object = value.getObject(runtime);
+    if (!isPlainObject(runtime, object)) return false;
+    return JSIConverter<jdouble>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "value"))) && JSIConverter<jni::local_ref<margelo::nitro::test::JCallback_void_double>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "onChanged")));
+  }
+
+} // namespace margelo::nitro

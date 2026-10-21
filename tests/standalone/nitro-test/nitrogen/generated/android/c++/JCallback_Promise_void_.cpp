@@ -9,35 +9,27 @@
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/JNIConverter+Promise.hpp>
 #include <NitroModules/JSIConverter+JTypedPromise.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test {
 
-  Promise<void> JCallback_Promise_void_::invoke() const {
+  JNIRetainedValue<jni::local_ref<JTypedPromise<void>>>::Type JCallback_Promise_void_::invoke() const {
     static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JTypedPromise<void>>()>("invoke_jni");
-    auto __result = __method(self());
-    return JNIConverter<Promise<void>, jni::local_ref<JTypedPromise<void>>>::fromJNI(__result);
+    auto result = __method(self());
+    return JNIRetainedValue<jni::local_ref<JTypedPromise<void>>>::retain(result);
   }
 
-  jni::local_ref<JCallback_Promise_void_::javaobject> JCallback_Promise_void__cxx::fromCpp(const Callback<Promise<void>()>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_Promise_void_::javaobject> JCallback_Promise_void__cxx::fromCpp(const InlineCallback<Promise<void>()>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_Promise_void_> JCallback_Promise_void__cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   jni::local_ref<JTypedPromise<void>> JCallback_Promise_void__cxx::invoke_cxx() {
-    Promise<void> __result = _callback.callSync();
-    return JNIConverter<Promise<void>, jni::local_ref<JTypedPromise<void>>>::toJNI(__result);
+    return _state.invoke();
   }
 
   void JCallback_Promise_void__cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_Promise_void__cxx::invoke_cxx)});
   }
 
-  JCallback_Promise_void__cxx::JCallback_Promise_void__cxx(const Callback<Promise<void>()>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_Promise_void__cxx::JCallback_Promise_void__cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

@@ -6,37 +6,26 @@
 ///
 
 #include <NitroTest/private/JCallback_void.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test {
 
-  void JCallback_void::invoke() const {
+  JNIRetainedValue<void>::Type JCallback_void::invoke() const {
     static const auto __method = javaClassStatic()->getMethod<void()>("invoke_jni");
     __method(self());
   }
 
-  jni::local_ref<JCallback_void::javaobject> JCallback_void_cxx::fromCpp(const Callback<void()>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_void::javaobject> JCallback_void_cxx::fromCpp(const InlineCallback<void()>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_void> JCallback_void_cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   void JCallback_void_cxx::invoke_cxx() {
-    if (_isInline) {
-      _callback.callSync();
-    } else {
-      _callback.callAndForget();
-    }
+    return _state.invoke();
   }
 
   void JCallback_void_cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_void_cxx::invoke_cxx)});
   }
 
-  JCallback_void_cxx::JCallback_void_cxx(const Callback<void()>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_void_cxx::JCallback_void_cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

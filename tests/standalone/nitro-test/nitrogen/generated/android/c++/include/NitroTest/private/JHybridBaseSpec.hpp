@@ -22,8 +22,8 @@
 #include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpecJavaPart.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
+#include <NitroTest/private/JCallback_SizeKotlin_SizeKotlin.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
 #include <NitroTest/private/JHybridBaseSpec.hpp>
 #include <memory>
 // Forward declaration of `JHybridBaseSpec` to properly resolve imports.
@@ -73,7 +73,7 @@ namespace margelo::nitro::test {
     // Methods
     jni::local_ref<JSize> bounceSize(const jni::local_ref<JSize>& size);
     jni::local_ref<JSizeUnit> bounceSizeUnit(const jni::local_ref<JSizeUnit>& unit);
-    jni::local_ref<JTypedPromise<jni::local_ref<JSize>>> mapSize(const jni::local_ref<JSize>& size, const Callback<SizeKotlin(const SizeKotlin& /* size */)>& callback);
+    jni::local_ref<JTypedPromise<jni::local_ref<JSize>>> mapSize(const jni::local_ref<JSize>& size, const jni::local_ref<margelo::nitro::test::JCallback_SizeKotlin_SizeKotlin>& callback);
 
   public:
     // Constructor and static members

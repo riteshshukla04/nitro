@@ -17,17 +17,17 @@ import com.margelo.nitro.core.AnyJSON
  */
 @Suppress("ClassName")
 @DoNotStrip
-sealed class CoreTypesVariant {
+sealed class CoreTypesVariant private constructor(@DoNotStrip private val index: Int) {
   @DoNotStrip
-  data class First(@DoNotStrip val value: ArrayBuffer): CoreTypesVariant()
+  data class First(@DoNotStrip val value: ArrayBuffer): CoreTypesVariant(0)
   @DoNotStrip
-  data class Second(@DoNotStrip val value: Callback_void_double): CoreTypesVariant()
+  data class Second(@DoNotStrip val value: Callback_void_double): CoreTypesVariant(1)
   @DoNotStrip
-  data class Third(@DoNotStrip val value: WrappedJsStruct): CoreTypesVariant()
+  data class Third(@DoNotStrip val value: WrappedJsStruct): CoreTypesVariant(2)
   @DoNotStrip
-  data class Fourth(@DoNotStrip val value: Promise<Double>): CoreTypesVariant()
+  data class Fourth(@DoNotStrip val value: Promise<Double>): CoreTypesVariant(3)
   @DoNotStrip
-  data class Fifth(@DoNotStrip val value: AnyJSON): CoreTypesVariant()
+  data class Fifth(@DoNotStrip val value: AnyJSON): CoreTypesVariant(4)
 
   inline fun <reified T> asType(): T? {
     return when (this) {

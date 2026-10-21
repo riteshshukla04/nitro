@@ -6,40 +6,29 @@
 ///
 
 #include <NitroTest/private/JCallback_void_std__exception_ptr.hpp>
-#include <NitroModules/JNIConverter+Error.hpp>
 #include <exception>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
+#include <NitroModules/JNIConverter+Error.hpp>
 #include <NitroModules/JSIConverter+JThrowable.hpp>
 
 namespace margelo::nitro::test {
 
-  void JCallback_void_std__exception_ptr::invoke(const std::exception_ptr& error) const {
-    static const auto __method = javaClassStatic()->getMethod<void(jni::alias_ref<jni::JThrowable> /* error */)>("invoke_jni");
-    __method(self(), JNIConverter<std::exception_ptr, jni::local_ref<jni::JThrowable>>::toJNI(error));
+  JNIRetainedValue<void>::Type JCallback_void_std__exception_ptr::invoke(JNIRetainedValue<jni::local_ref<jni::JThrowable>>::Type error) const {
+    static const auto __method = javaClassStatic()->getMethod<void(jni::alias_ref<jni::JThrowable>)>("invoke_jni");
+    __method(self(), JNIRetainedValue<jni::local_ref<jni::JThrowable>>::borrow(error));
   }
 
-  jni::local_ref<JCallback_void_std__exception_ptr::javaobject> JCallback_void_std__exception_ptr_cxx::fromCpp(const Callback<void(const std::exception_ptr& /* error */)>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_void_std__exception_ptr::javaobject> JCallback_void_std__exception_ptr_cxx::fromCpp(const InlineCallback<void(const std::exception_ptr& /* error */)>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_void_std__exception_ptr> JCallback_void_std__exception_ptr_cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   void JCallback_void_std__exception_ptr_cxx::invoke_cxx(jni::alias_ref<jni::JThrowable> error) {
-    if (_isInline) {
-      _callback.callSync(JNIConverter<std::exception_ptr, jni::local_ref<jni::JThrowable>>::fromJNI(error));
-    } else {
-      _callback.callAndForget(JNIConverter<std::exception_ptr, jni::local_ref<jni::JThrowable>>::fromJNI(error));
-    }
+    return _state.invoke(error);
   }
 
   void JCallback_void_std__exception_ptr_cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_void_std__exception_ptr_cxx::invoke_cxx)});
   }
 
-  JCallback_void_std__exception_ptr_cxx::JCallback_void_std__exception_ptr_cxx(const Callback<void(const std::exception_ptr& /* error */)>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_void_std__exception_ptr_cxx::JCallback_void_std__exception_ptr_cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

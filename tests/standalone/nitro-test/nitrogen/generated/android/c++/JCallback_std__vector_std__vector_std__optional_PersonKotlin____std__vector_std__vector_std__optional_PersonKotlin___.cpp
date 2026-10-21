@@ -14,36 +14,27 @@
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
-#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test {
 
-  std::vector<std::vector<std::optional<PersonKotlin>>> JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___::invoke(const std::vector<std::vector<std::optional<PersonKotlin>>>& value) const {
-    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> /* value */)>("invoke_jni");
-    auto __result = __method(self(), JNIConverter<std::vector<std::vector<std::optional<PersonKotlin>>>, jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>>::toJNI(value));
-    return JNIConverter<std::vector<std::vector<std::optional<PersonKotlin>>>, jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>>::fromJNI(__result);
+  JNIRetainedValue<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<margelo::nitro::test::JPerson>>>>>::Type JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___::invoke(JNIRetainedValue<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<margelo::nitro::test::JPerson>>>>>::Type value) const {
+    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>)>("invoke_jni");
+    auto result = __method(self(), JNIRetainedValue<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<margelo::nitro::test::JPerson>>>>>::borrow(value));
+    return JNIRetainedValue<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<margelo::nitro::test::JPerson>>>>>::retain(result);
   }
 
-  jni::local_ref<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___::javaobject> JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::fromCpp(const Callback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___::javaobject> JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::fromCpp(const InlineCallback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___> JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::invoke_cxx(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> value) {
-    std::vector<std::vector<std::optional<PersonKotlin>>> __result = _callback.callSync(JNIConverter<std::vector<std::vector<std::optional<PersonKotlin>>>, jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>>::fromJNI(value));
-    return JNIConverter<std::vector<std::vector<std::optional<PersonKotlin>>>, jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>>>::toJNI(__result);
+    return _state.invoke(value);
   }
 
   void JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::invoke_cxx)});
   }
 
-  JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx(const Callback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

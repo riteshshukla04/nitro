@@ -8,33 +8,51 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/OptionalCallbackKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <NitroModules/Callback.hpp>
+#include <functional>
+#include <variant>
+#include <optional>
+#include <NitroTest/private/JVariant_______Unit_Double.hpp>
+#include <NitroTest/private/JCallback_void.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "OptionalCallback" and the Kotlin data class "OptionalCallback".
-   */
+  /** JNI access to the Kotlin data class OptionalCallback. */
   struct JOptionalCallback final : public jni::JavaClass<JOptionalCallback> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/OptionalCallback;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct OptionalCallback by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    OptionalCallbackKotlin toCpp() const;
+    static jni::local_ref<JOptionalCallback> create(jni::alias_ref<JOptional<JVariant_______Unit_Double>> callback) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JOptionalCallback(jni::alias_ref<JOptional<JVariant_______Unit_Double>>)>("fromCpp");
+      return create(clazz, callback);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JOptionalCallback::javaobject> fromCpp(const OptionalCallbackKotlin& value);
+    jni::local_ref<JOptional<JVariant_______Unit_Double>> getCallback() const {
+      static const auto field = javaClassStatic()->getField<JOptional<JVariant_______Unit_Double>>("callback");
+      return getFieldValue(field);
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JOptionalCallback>> {
+    static jni::local_ref<margelo::nitro::test::JOptionalCallback> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JOptionalCallback> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

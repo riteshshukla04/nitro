@@ -8,33 +8,49 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/private/JsStyleStructKotlin.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroTest/private/JCallback_void_double.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ struct "JsStyleStruct" and the Kotlin data class "JsStyleStruct".
-   */
+  /** JNI access to the Kotlin data class JsStyleStruct. */
   struct JJsStyleStruct final : public jni::JavaClass<JJsStyleStruct> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/JsStyleStruct;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based struct to the C++ struct JsStyleStruct by copying all values to C++.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    JsStyleStructKotlin toCpp() const;
+    static jni::local_ref<JJsStyleStruct> create(jdouble value, jni::alias_ref<margelo::nitro::test::JCallback_void_double> onChanged) {
+      static const auto clazz = javaClassStatic();
+      static const auto create = clazz->getStaticMethod<JJsStyleStruct(jdouble, jni::alias_ref<margelo::nitro::test::JCallback_void_double>)>("fromCpp");
+      return create(clazz, value, onChanged);
+    }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based struct by copying all values from the given C++ struct to Java.
-     */
-    [[maybe_unused]]
-    static jni::local_ref<JJsStyleStruct::javaobject> fromCpp(const JsStyleStructKotlin& value);
+    jdouble getValue() const {
+      static const auto field = javaClassStatic()->getField<jdouble>("value");
+      return getFieldValue(field);
+    }
+
+    jni::local_ref<margelo::nitro::test::JCallback_void_double> getOnChanged() const {
+      static const auto method = javaClassStatic()->getMethod<margelo::nitro::test::JCallback_void_double()>("getOnChanged_cxx");
+      return method(this->self());
+    }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JJsStyleStruct>> {
+    static jni::local_ref<margelo::nitro::test::JJsStyleStruct> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JJsStyleStruct> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

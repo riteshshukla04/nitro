@@ -7,65 +7,39 @@
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
-
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback `(value: Double) -> Unit`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct JCallback_void_double : public jni::JavaClass<JCallback_void_double> {
-  public:
-    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_void_double;";
+  class JCallback_void_double_cxx;
 
-  public:
-    /**
-     * Invokes the callback this `JCallback_void_double` instance holds through JNI.
-     */
-    void invoke(double value) const;
+  struct JCallback_void_double : jni::JavaClass<JCallback_void_double> {
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_void_double;";
+    using CxxPart = JCallback_void_double_cxx;
+    using NativeSignature = JNICallbackState<void(jdouble)>::Signature;
+
+    JNIRetainedValue<void>::Type invoke(JNIRetainedValue<jdouble>::Type value) const;
   };
 
-  /**
-   * An implementation of Callback_void_double that is backed by a C++ implementation (using `Callback<...>`)
-   */
   class JCallback_void_double_cxx final : public jni::HybridClass<JCallback_void_double_cxx, JCallback_void_double> {
   public:
-    static jni::local_ref<JCallback_void_double::javaobject> fromCpp(const Callback<void(double /* value */)>& callback);
-    static jni::local_ref<JCallback_void_double::javaobject> fromCpp(const InlineCallback<void(double /* value */)>& callback);
-
-  public:
-    /**
-     * Invokes the C++ `Callback<...>` this `JCallback_void_double_cxx` instance holds.
-     */
-    void invoke_cxx(jdouble value);
-
-  public:
-    [[nodiscard]]
-    inline const Callback<void(double /* value */)>& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<JCallback_void_double::NativeSignature>;
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_void_double_cxx;";
+
+    static jni::local_ref<JCallback_void_double> create(CallbackType callback, bool isInline);
+    void invoke_cxx(jdouble value);
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit JCallback_void_double_cxx(const Callback<void(double /* value */)>& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    Callback<void(double /* value */)> _callback;
-    bool _isInline;
+    explicit JCallback_void_double_cxx(CallbackType callback, bool isInline);
+    JNICallbackState<void(jdouble)> _state;
   };
 
 } // namespace margelo::nitro::test

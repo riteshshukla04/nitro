@@ -25,7 +25,7 @@ data class WrappedJsStruct(
   @Keep
   val items: Array<JsStyleStruct>
 ) {
-  /* primary constructor */
+
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

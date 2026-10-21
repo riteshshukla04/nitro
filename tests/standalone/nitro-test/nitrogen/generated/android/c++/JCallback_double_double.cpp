@@ -7,36 +7,28 @@
 
 #include <NitroTest/private/JCallback_double_double.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
-  double JCallback_double_double::invoke(double value) const {
-    static const auto __method = javaClassStatic()->getMethod<jdouble(jdouble /* value */)>("invoke_jni");
-    auto __result = __method(self(), JNIConverter<double, jdouble>::toJNI(value));
-    return JNIConverter<double, jdouble>::fromJNI(__result);
+  JNIRetainedValue<jdouble>::Type JCallback_double_double::invoke(JNIRetainedValue<jdouble>::Type value) const {
+    static const auto __method = javaClassStatic()->getMethod<jdouble(jdouble)>("invoke_jni");
+    auto result = __method(self(), JNIRetainedValue<jdouble>::borrow(value));
+    return JNIRetainedValue<jdouble>::retain(result);
   }
 
-  jni::local_ref<JCallback_double_double::javaobject> JCallback_double_double_cxx::fromCpp(const Callback<double(double /* value */)>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_double_double::javaobject> JCallback_double_double_cxx::fromCpp(const InlineCallback<double(double /* value */)>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_double_double> JCallback_double_double_cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   jdouble JCallback_double_double_cxx::invoke_cxx(jdouble value) {
-    double __result = _callback.callSync(JNIConverter<double, jdouble>::fromJNI(value));
-    return JNIConverter<double, jdouble>::toJNI(__result);
+    return _state.invoke(value);
   }
 
   void JCallback_double_double_cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_double_double_cxx::invoke_cxx)});
   }
 
-  JCallback_double_double_cxx::JCallback_double_double_cxx(const Callback<double(double /* value */)>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_double_double_cxx::JCallback_double_double_cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

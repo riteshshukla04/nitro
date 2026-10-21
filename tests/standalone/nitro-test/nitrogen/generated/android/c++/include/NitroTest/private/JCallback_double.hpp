@@ -7,65 +7,39 @@
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
-
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback `() -> Double`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct JCallback_double : public jni::JavaClass<JCallback_double> {
-  public:
-    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_double;";
+  class JCallback_double_cxx;
 
-  public:
-    /**
-     * Invokes the callback this `JCallback_double` instance holds through JNI.
-     */
-    double invoke() const;
+  struct JCallback_double : jni::JavaClass<JCallback_double> {
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_double;";
+    using CxxPart = JCallback_double_cxx;
+    using NativeSignature = JNICallbackState<jdouble()>::Signature;
+
+    JNIRetainedValue<jdouble>::Type invoke() const;
   };
 
-  /**
-   * An implementation of Callback_double that is backed by a C++ implementation (using `Callback<...>`)
-   */
   class JCallback_double_cxx final : public jni::HybridClass<JCallback_double_cxx, JCallback_double> {
   public:
-    static jni::local_ref<JCallback_double::javaobject> fromCpp(const Callback<double()>& callback);
-    static jni::local_ref<JCallback_double::javaobject> fromCpp(const InlineCallback<double()>& callback);
-
-  public:
-    /**
-     * Invokes the C++ `Callback<...>` this `JCallback_double_cxx` instance holds.
-     */
-    jdouble invoke_cxx();
-
-  public:
-    [[nodiscard]]
-    inline const Callback<double()>& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<JCallback_double::NativeSignature>;
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_double_cxx;";
+
+    static jni::local_ref<JCallback_double> create(CallbackType callback, bool isInline);
+    jdouble invoke_cxx();
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit JCallback_double_cxx(const Callback<double()>& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    Callback<double()> _callback;
-    bool _isInline;
+    explicit JCallback_double_cxx(CallbackType callback, bool isInline);
+    JNICallbackState<jdouble()> _state;
   };
 
 } // namespace margelo::nitro::test

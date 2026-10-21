@@ -7,69 +7,43 @@
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
-
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/JNIConverter+Promise.hpp>
 #include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback `() -> Promise<ArrayBuffer>`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct JCallback_Promise_ArrayBuffer_ : public jni::JavaClass<JCallback_Promise_ArrayBuffer_> {
-  public:
-    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_Promise_ArrayBuffer_;";
+  class JCallback_Promise_ArrayBuffer__cxx;
 
-  public:
-    /**
-     * Invokes the callback this `JCallback_Promise_ArrayBuffer_` instance holds through JNI.
-     */
-    Promise<ArrayBuffer> invoke() const;
+  struct JCallback_Promise_ArrayBuffer_ : jni::JavaClass<JCallback_Promise_ArrayBuffer_> {
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_Promise_ArrayBuffer_;";
+    using CxxPart = JCallback_Promise_ArrayBuffer__cxx;
+    using NativeSignature = JNICallbackState<jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>()>::Signature;
+
+    JNIRetainedValue<jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>>::Type invoke() const;
   };
 
-  /**
-   * An implementation of Callback_Promise_ArrayBuffer_ that is backed by a C++ implementation (using `Callback<...>`)
-   */
   class JCallback_Promise_ArrayBuffer__cxx final : public jni::HybridClass<JCallback_Promise_ArrayBuffer__cxx, JCallback_Promise_ArrayBuffer_> {
   public:
-    static jni::local_ref<JCallback_Promise_ArrayBuffer_::javaobject> fromCpp(const Callback<Promise<ArrayBuffer>()>& callback);
-    static jni::local_ref<JCallback_Promise_ArrayBuffer_::javaobject> fromCpp(const InlineCallback<Promise<ArrayBuffer>()>& callback);
-
-  public:
-    /**
-     * Invokes the C++ `Callback<...>` this `JCallback_Promise_ArrayBuffer__cxx` instance holds.
-     */
-    jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>> invoke_cxx();
-
-  public:
-    [[nodiscard]]
-    inline const Callback<Promise<ArrayBuffer>()>& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<JCallback_Promise_ArrayBuffer_::NativeSignature>;
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_Promise_ArrayBuffer__cxx;";
+
+    static jni::local_ref<JCallback_Promise_ArrayBuffer_> create(CallbackType callback, bool isInline);
+    jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>> invoke_cxx();
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit JCallback_Promise_ArrayBuffer__cxx(const Callback<Promise<ArrayBuffer>()>& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    Callback<Promise<ArrayBuffer>()> _callback;
-    bool _isInline;
+    explicit JCallback_Promise_ArrayBuffer__cxx(CallbackType callback, bool isInline);
+    JNICallbackState<jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>()> _state;
   };
 
 } // namespace margelo::nitro::test

@@ -7,66 +7,39 @@
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
-
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
-#include <string>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 #include <NitroModules/JSIConverter+JString.hpp>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback `() -> String`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct JCallback_std__string : public jni::JavaClass<JCallback_std__string> {
-  public:
-    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_std__string;";
+  class JCallback_std__string_cxx;
 
-  public:
-    /**
-     * Invokes the callback this `JCallback_std__string` instance holds through JNI.
-     */
-    std::string invoke() const;
+  struct JCallback_std__string : jni::JavaClass<JCallback_std__string> {
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_std__string;";
+    using CxxPart = JCallback_std__string_cxx;
+    using NativeSignature = JNICallbackState<jni::local_ref<jni::JString>()>::Signature;
+
+    JNIRetainedValue<jni::local_ref<jni::JString>>::Type invoke() const;
   };
 
-  /**
-   * An implementation of Callback_std__string that is backed by a C++ implementation (using `Callback<...>`)
-   */
   class JCallback_std__string_cxx final : public jni::HybridClass<JCallback_std__string_cxx, JCallback_std__string> {
   public:
-    static jni::local_ref<JCallback_std__string::javaobject> fromCpp(const Callback<std::string()>& callback);
-    static jni::local_ref<JCallback_std__string::javaobject> fromCpp(const InlineCallback<std::string()>& callback);
-
-  public:
-    /**
-     * Invokes the C++ `Callback<...>` this `JCallback_std__string_cxx` instance holds.
-     */
-    jni::local_ref<jni::JString> invoke_cxx();
-
-  public:
-    [[nodiscard]]
-    inline const Callback<std::string()>& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<JCallback_std__string::NativeSignature>;
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_std__string_cxx;";
+
+    static jni::local_ref<JCallback_std__string> create(CallbackType callback, bool isInline);
+    jni::local_ref<jni::JString> invoke_cxx();
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit JCallback_std__string_cxx(const Callback<std::string()>& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    Callback<std::string()> _callback;
-    bool _isInline;
+    explicit JCallback_std__string_cxx(CallbackType callback, bool isInline);
+    JNICallbackState<jni::local_ref<jni::JString>()> _state;
   };
 
 } // namespace margelo::nitro::test

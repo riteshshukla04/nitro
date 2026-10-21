@@ -7,63 +7,38 @@
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
 
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test::external {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback `() -> Unit`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct JCallback_void : public jni::JavaClass<JCallback_void> {
-  public:
-    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/Callback_void;";
+  class JCallback_void_cxx;
 
-  public:
-    /**
-     * Invokes the callback this `JCallback_void` instance holds through JNI.
-     */
-    void invoke() const;
+  struct JCallback_void : jni::JavaClass<JCallback_void> {
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/Callback_void;";
+    using CxxPart = JCallback_void_cxx;
+    using NativeSignature = JNICallbackState<void()>::Signature;
+
+    JNIRetainedValue<void>::Type invoke() const;
   };
 
-  /**
-   * An implementation of Callback_void that is backed by a C++ implementation (using `Callback<...>`)
-   */
   class JCallback_void_cxx final : public jni::HybridClass<JCallback_void_cxx, JCallback_void> {
   public:
-    static jni::local_ref<JCallback_void::javaobject> fromCpp(const Callback<void()>& callback);
-    static jni::local_ref<JCallback_void::javaobject> fromCpp(const InlineCallback<void()>& callback);
-
-  public:
-    /**
-     * Invokes the C++ `Callback<...>` this `JCallback_void_cxx` instance holds.
-     */
-    void invoke_cxx();
-
-  public:
-    [[nodiscard]]
-    inline const Callback<void()>& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<JCallback_void::NativeSignature>;
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/Callback_void_cxx;";
+
+    static jni::local_ref<JCallback_void> create(CallbackType callback, bool isInline);
+    void invoke_cxx();
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit JCallback_void_cxx(const Callback<void()>& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    Callback<void()> _callback;
-    bool _isInline;
+    explicit JCallback_void_cxx(CallbackType callback, bool isInline);
+    JNICallbackState<void()> _state;
   };
 
 } // namespace margelo::nitro::test::external

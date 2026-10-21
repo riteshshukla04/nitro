@@ -7,36 +7,28 @@
 
 #include <NitroTest/private/JCallback_int64_t_int64_t.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
 namespace margelo::nitro::test {
 
-  int64_t JCallback_int64_t_int64_t::invoke(int64_t value) const {
-    static const auto __method = javaClassStatic()->getMethod<jlong(jlong /* value */)>("invoke_jni");
-    auto __result = __method(self(), JNIConverter<int64_t, jlong>::toJNI(value));
-    return JNIConverter<int64_t, jlong>::fromJNI(__result);
+  JNIRetainedValue<jlong>::Type JCallback_int64_t_int64_t::invoke(JNIRetainedValue<jlong>::Type value) const {
+    static const auto __method = javaClassStatic()->getMethod<jlong(jlong)>("invoke_jni");
+    auto result = __method(self(), JNIRetainedValue<jlong>::borrow(value));
+    return JNIRetainedValue<jlong>::retain(result);
   }
 
-  jni::local_ref<JCallback_int64_t_int64_t::javaobject> JCallback_int64_t_int64_t_cxx::fromCpp(const Callback<int64_t(int64_t /* value */)>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_int64_t_int64_t::javaobject> JCallback_int64_t_int64_t_cxx::fromCpp(const InlineCallback<int64_t(int64_t /* value */)>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_int64_t_int64_t> JCallback_int64_t_int64_t_cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   jlong JCallback_int64_t_int64_t_cxx::invoke_cxx(jlong value) {
-    int64_t __result = _callback.callSync(JNIConverter<int64_t, jlong>::fromJNI(value));
-    return JNIConverter<int64_t, jlong>::toJNI(__result);
+    return _state.invoke(value);
   }
 
   void JCallback_int64_t_int64_t_cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_int64_t_int64_t_cxx::invoke_cxx)});
   }
 
-  JCallback_int64_t_int64_t_cxx::JCallback_int64_t_int64_t_cxx(const Callback<int64_t(int64_t /* value */)>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_int64_t_int64_t_cxx::JCallback_int64_t_int64_t_cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

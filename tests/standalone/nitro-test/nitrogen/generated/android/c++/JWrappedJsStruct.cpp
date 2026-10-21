@@ -6,54 +6,33 @@
 ///
 
 #include <NitroTest/private/JWrappedJsStruct.hpp>
-
-#include <NitroTest/private/WrappedJsStructKotlin.hpp>
 #include <NitroTest/private/JJsStyleStruct.hpp>
 #include <NitroTest/private/JsStyleStructKotlin.hpp>
-#include <NitroModules/JNIConverter+Primitives.hpp>
 #include <vector>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <NitroModules/PropNameIDCache.hpp>
+#include <NitroModules/JSIHelpers.hpp>
 
-namespace margelo::nitro::test {
+namespace margelo::nitro {
 
-  WrappedJsStructKotlin JWrappedJsStruct::toCpp() const {
-    static const auto clazz = javaClassStatic();
-    static const auto fieldValue = clazz->getField<JJsStyleStruct>("value");
-    jni::local_ref<JJsStyleStruct> value = this->getFieldValue(fieldValue);
-    static const auto fieldItems = clazz->getField<jni::JArrayClass<JJsStyleStruct>>("items");
-    jni::local_ref<jni::JArrayClass<JJsStyleStruct>> items = this->getFieldValue(fieldItems);
-    return WrappedJsStructKotlin(
-      value->toCpp(),
-      [&](auto&& __input) {
-        size_t __size = __input->size();
-        std::vector<JsStyleStructKotlin> __vector;
-        __vector.reserve(__size);
-        for (size_t __i = 0; __i < __size; __i++) {
-          auto __element = __input->getElement(__i);
-          __vector.push_back(__element->toCpp());
-        }
-        return __vector;
-      }(items)
-    );
+  jni::local_ref<margelo::nitro::test::JWrappedJsStruct> JSIConverter<jni::local_ref<margelo::nitro::test::JWrappedJsStruct>>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
+    auto object = value.asObject(runtime);
+    return margelo::nitro::test::JWrappedJsStruct::create(JSIConverter<jni::local_ref<margelo::nitro::test::JJsStyleStruct>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "value"))), JSIConverter<jni::local_ref<jni::JArrayClass<margelo::nitro::test::JJsStyleStruct>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "items"))));
   }
 
-  jni::local_ref<JWrappedJsStruct::javaobject> JWrappedJsStruct::fromCpp(const WrappedJsStructKotlin& value) {
-    using JSignature = JWrappedJsStruct(jni::alias_ref<JJsStyleStruct>, jni::alias_ref<jni::JArrayClass<JJsStyleStruct>>);
-    static const auto clazz = javaClassStatic();
-    static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
-    return create(
-      clazz,
-      JJsStyleStruct::fromCpp(value.value),
-      [&](auto&& __input) {
-        size_t __size = __input.size();
-        jni::local_ref<jni::JArrayClass<JJsStyleStruct>> __array = jni::JArrayClass<JJsStyleStruct>::newArray(__size);
-        for (size_t __i = 0; __i < __size; __i++) {
-          const auto& __element = __input[__i];
-          auto __elementJni = JJsStyleStruct::fromCpp(__element);
-          __array->setElement(__i, *__elementJni);
-        }
-        return __array;
-      }(value.items)
-    );
+  jsi::Value JSIConverter<jni::local_ref<margelo::nitro::test::JWrappedJsStruct>>::toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JWrappedJsStruct> value) {
+    jsi::Object object(runtime);
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "value"), JSIConverter<jni::local_ref<margelo::nitro::test::JJsStyleStruct>>::toJSI(runtime, value->getValue()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "items"), JSIConverter<jni::local_ref<jni::JArrayClass<margelo::nitro::test::JJsStyleStruct>>>::toJSI(runtime, value->getItems()));
+    return object;
   }
 
-} // namespace margelo::nitro::test
+  bool JSIConverter<jni::local_ref<margelo::nitro::test::JWrappedJsStruct>>::canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
+    if (!value.isObject()) return false;
+    auto object = value.getObject(runtime);
+    if (!isPlainObject(runtime, object)) return false;
+    return JSIConverter<jni::local_ref<margelo::nitro::test::JJsStyleStruct>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "value"))) && JSIConverter<jni::local_ref<jni::JArrayClass<margelo::nitro::test::JJsStyleStruct>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "items")));
+  }
+
+} // namespace margelo::nitro

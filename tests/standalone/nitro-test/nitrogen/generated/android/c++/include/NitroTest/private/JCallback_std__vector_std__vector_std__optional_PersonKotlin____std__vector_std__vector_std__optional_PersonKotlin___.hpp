@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <fbjni/fbjni.h>
-#include <functional>
-
+#include <NitroModules/JNICallback.hpp>
+#include <NitroModules/JSIConverter+JNICallback.hpp>
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <optional>
 #include <vector>
@@ -18,61 +17,35 @@
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
-#include <NitroTest/private/PersonKotlin+Kotlin+NitroTest.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * Represents the Java/Kotlin callback `(value: Array<Array<Person?>>) -> Array<Array<Person?>>`.
-   * This can be passed around between C++ and Java/Kotlin.
-   */
-  struct JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___ : public jni::JavaClass<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___> {
-  public:
-    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___;";
+  class JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx;
 
-  public:
-    /**
-     * Invokes the callback this `JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___` instance holds through JNI.
-     */
-    std::vector<std::vector<std::optional<PersonKotlin>>> invoke(const std::vector<std::vector<std::optional<PersonKotlin>>>& value) const;
+  struct JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___ : jni::JavaClass<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___> {
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___;";
+    using CxxPart = JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx;
+    using NativeSignature = JNICallbackState<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<margelo::nitro::test::JPerson>>>>(jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<margelo::nitro::test::JPerson>>>>)>::Signature;
+
+    JNIRetainedValue<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<margelo::nitro::test::JPerson>>>>>::Type invoke(JNIRetainedValue<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<margelo::nitro::test::JPerson>>>>>::Type value) const;
   };
 
-  /**
-   * An implementation of Callback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___ that is backed by a C++ implementation (using `Callback<...>`)
-   */
   class JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx final : public jni::HybridClass<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx, JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___> {
   public:
-    static jni::local_ref<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___::javaobject> fromCpp(const Callback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)>& callback);
-    static jni::local_ref<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___::javaobject> fromCpp(const InlineCallback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)>& callback);
-
-  public:
-    /**
-     * Invokes the C++ `Callback<...>` this `JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx` instance holds.
-     */
-    jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> invoke_cxx(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> value);
-
-  public:
-    [[nodiscard]]
-    inline const Callback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)>& getCallback() const {
-      return _callback;
-    }
-
-  public:
+    using CallbackType = Callback<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___::NativeSignature>;
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Callback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx;";
+
+    static jni::local_ref<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___> create(CallbackType callback, bool isInline);
+    jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> invoke_cxx(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JOptional<JPerson>>>> value);
+    const CallbackType& getCallback() const { return _state.getCallback(); }
     static void registerNatives();
 
   private:
-    explicit JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx(const Callback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)>& callback, bool isInline);
-
-  private:
     friend HybridBase;
-    Callback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)> _callback;
-    bool _isInline;
+    explicit JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx(CallbackType callback, bool isInline);
+    JNICallbackState<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<margelo::nitro::test::JPerson>>>>(jni::local_ref<jni::JArrayClass<jni::JArrayClass<JOptional<margelo::nitro::test::JPerson>>>>)> _state;
   };
 
 } // namespace margelo::nitro::test

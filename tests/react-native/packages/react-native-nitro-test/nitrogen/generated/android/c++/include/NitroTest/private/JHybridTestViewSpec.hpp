@@ -14,8 +14,8 @@
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JColorScheme.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
+#include <NitroTest/private/JCallback_void.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
 #include <optional>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
@@ -68,8 +68,8 @@ namespace margelo::nitro::test {
     void setInt64Value(jlong int64Value);
     jni::local_ref<JColorScheme> getColorScheme();
     void setColorScheme(const jni::local_ref<JColorScheme>& colorScheme);
-    Callback<void()> getSomeCallback();
-    void setSomeCallback(const Callback<void()>& someCallback);
+    jni::local_ref<margelo::nitro::test::JCallback_void> getSomeCallback();
+    void setSomeCallback(const jni::local_ref<margelo::nitro::test::JCallback_void>& someCallback);
     jni::local_ref<JOptional<jni::JDouble>> getNativeDefaultValue();
     void setNativeDefaultValue(const jni::local_ref<JOptional<jni::JDouble>>& nativeDefaultValue);
 

@@ -32,11 +32,9 @@
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
-#include <memory>
 #include <NitroTest/private/JCallback_double.hpp>
-#include <NitroModules/JNICallable.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
+#include <memory>
 
 namespace margelo::nitro::test {
 
@@ -174,9 +172,9 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), buffer);
     return __result;
   }
-  jdouble JHybridBenchmarkObjectSwiftKotlinSpec::callbackSync(const Callback<double()>& callback) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble(jni::alias_ref<JCallback_double::javaobject> /* callback */)>("callbackSync_cxx");
-    auto __result = __method(_javaPart, CxxPart::getClass(), JCallback_double_cxx::fromCpp(callback));
+  jdouble JHybridBenchmarkObjectSwiftKotlinSpec::callbackSync(const jni::local_ref<margelo::nitro::test::JCallback_double>& callback) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble(jni::alias_ref<margelo::nitro::test::JCallback_double> /* callback */)>("callbackSync_cxx");
+    auto __result = __method(_javaPart, CxxPart::getClass(), callback);
     return __result;
   }
   jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> JHybridBenchmarkObjectSwiftKotlinSpec::promiseReturnsInstantly() {

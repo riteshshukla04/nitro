@@ -11,37 +11,26 @@
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
-#include <NitroModules/Callback.hpp>
-#include <NitroModules/InlineCallback.hpp>
-#include <functional>
 
 namespace margelo::nitro::test {
 
-  void JCallback_void_std__optional_double_::invoke(const std::optional<double>& maybe) const {
-    static const auto __method = javaClassStatic()->getMethod<void(jni::alias_ref<JOptional<jni::JDouble>> /* maybe */)>("invoke_jni");
-    __method(self(), JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(maybe));
+  JNIRetainedValue<void>::Type JCallback_void_std__optional_double_::invoke(JNIRetainedValue<jni::local_ref<JOptional<jni::JDouble>>>::Type maybe) const {
+    static const auto __method = javaClassStatic()->getMethod<void(jni::alias_ref<JOptional<jni::JDouble>>)>("invoke_jni");
+    __method(self(), JNIRetainedValue<jni::local_ref<JOptional<jni::JDouble>>>::borrow(maybe));
   }
 
-  jni::local_ref<JCallback_void_std__optional_double_::javaobject> JCallback_void_std__optional_double__cxx::fromCpp(const Callback<void(const std::optional<double>& /* maybe */)>& callback) {
-    return newObjectCxxArgs(callback, false);
-  }
-
-  jni::local_ref<JCallback_void_std__optional_double_::javaobject> JCallback_void_std__optional_double__cxx::fromCpp(const InlineCallback<void(const std::optional<double>& /* maybe */)>& callback) {
-    return newObjectCxxArgs(callback.escape(), true);
+  jni::local_ref<JCallback_void_std__optional_double_> JCallback_void_std__optional_double__cxx::create(CallbackType callback, bool isInline) {
+    return newObjectCxxArgs(std::move(callback), isInline);
   }
 
   void JCallback_void_std__optional_double__cxx::invoke_cxx(jni::alias_ref<JOptional<jni::JDouble>> maybe) {
-    if (_isInline) {
-      _callback.callSync(JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(maybe));
-    } else {
-      _callback.callAndForget(JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(maybe));
-    }
+    return _state.invoke(maybe);
   }
 
   void JCallback_void_std__optional_double__cxx::registerNatives() {
     registerHybrid({makeNativeMethod("invoke_cxx", JCallback_void_std__optional_double__cxx::invoke_cxx)});
   }
 
-  JCallback_void_std__optional_double__cxx::JCallback_void_std__optional_double__cxx(const Callback<void(const std::optional<double>& /* maybe */)>& callback, bool isInline): _callback(callback), _isInline(isInline) { }
+  JCallback_void_std__optional_double__cxx::JCallback_void_std__optional_double__cxx(CallbackType callback, bool isInline) : _state(std::move(callback), isInline) {}
 
 } // namespace margelo::nitro::test

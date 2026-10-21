@@ -2,7 +2,7 @@ import type { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { KotlinCppConverter } from '../KotlinConverter.js'
 import type { SourceImport } from '../../SourceFile.js'
-import type { GetCodeOptions, Type } from '../../types/Type.js'
+import type { GetCodeOptions, Type, TypeContext } from '../../types/Type.js'
 
 /** A generated JNI class whose native methods must be registered by its module. */
 export interface JNINativeRegistration {
@@ -29,6 +29,8 @@ export type KotlinConversion = ({ from: 'c++'; to: 'kotlin' } | { from: 'kotlin'
    * public Kotlin value and the Kotlin type JNI uses.
    */
   in: 'c++' | 'kotlin'
+  /** Native callbacks borrow only when passed as a method parameter. */
+  context?: TypeContext
 }
 
 /**

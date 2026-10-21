@@ -8,24 +8,20 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
-#include <NitroTest/private/WrappedJsStructKotlin.hpp>
-#include <NitroModules/Promise.hpp>
-#include <NitroModules/AnyJSON.hpp>
-#include <variant>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 #include <NitroTest/private/JCallback_void_double.hpp>
-#include <NitroModules/JNICallable.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JWrappedJsStruct.hpp>
+#include <NitroModules/Promise.hpp>
 #include <NitroModules/JNIConverter+Promise.hpp>
 #include <NitroModules/JSIConverter+JTypedPromise.hpp>
+#include <NitroModules/AnyJSON.hpp>
 #include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+AnyJSON.hpp>
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
@@ -34,58 +30,73 @@ namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "CoreTypesVariant".
-   */
+  namespace JCoreTypesVariant_impl {
+    class First;
+    class Second;
+    class Third;
+    class Fourth;
+    class Fifth;
+  }
+
+  /** The JNI representation of Kotlin's sealed CoreTypesVariant class. */
   class JCoreTypesVariant : public jni::JavaClass<JCoreTypesVariant> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/CoreTypesVariant;";
+    using Cases = std::tuple<JCoreTypesVariant_impl::First, JCoreTypesVariant_impl::Second, JCoreTypesVariant_impl::Third, JCoreTypesVariant_impl::Fourth, JCoreTypesVariant_impl::Fifth>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<ArrayBuffer, margelo::nitro::Callback<void(double /* value */)>, margelo::nitro::test::WrappedJsStructKotlin, Promise<double>, AnyJSON>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JCoreTypesVariant> create_0(jni::alias_ref<JArrayBuffer::JavaPart> value);
-    static jni::local_ref<JCoreTypesVariant> create_1(jni::alias_ref<JCallback_void_double::javaobject> value);
-    static jni::local_ref<JCoreTypesVariant> create_2(jni::alias_ref<JWrappedJsStruct> value);
-    static jni::local_ref<JCoreTypesVariant> create_3(jni::alias_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> value);
-    static jni::local_ref<JCoreTypesVariant> create_4(jni::alias_ref<JAnyJSON> value);
-
-    static jni::local_ref<JCoreTypesVariant> fromCpp(const std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStructKotlin, Promise<double>, AnyJSON>& variant);
-
-    [[nodiscard]] std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStructKotlin, Promise<double>, AnyJSON> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JCoreTypesVariant_impl {
     class First final : public jni::JavaClass<First, JCoreTypesVariant> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/CoreTypesVariant$First;";
+      using Value = jni::local_ref<JArrayBuffer::JavaPart>;
 
-      [[nodiscard]] jni::local_ref<JArrayBuffer::JavaPart> getValue() const;
+      static jni::local_ref<JCoreTypesVariant> create(jni::alias_ref<JArrayBuffer::JavaPart> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JCoreTypesVariant> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/CoreTypesVariant$Second;";
+      using Value = jni::local_ref<margelo::nitro::test::JCallback_void_double>;
 
-      [[nodiscard]] jni::local_ref<JCallback_void_double::javaobject> getValue() const;
+      static jni::local_ref<JCoreTypesVariant> create(jni::alias_ref<margelo::nitro::test::JCallback_void_double> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Third final : public jni::JavaClass<Third, JCoreTypesVariant> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/CoreTypesVariant$Third;";
+      using Value = jni::local_ref<JWrappedJsStruct>;
 
-      [[nodiscard]] jni::local_ref<JWrappedJsStruct> getValue() const;
+      static jni::local_ref<JCoreTypesVariant> create(jni::alias_ref<JWrappedJsStruct> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Fourth final : public jni::JavaClass<Fourth, JCoreTypesVariant> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/CoreTypesVariant$Fourth;";
+      using Value = jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>>;
 
-      [[nodiscard]] jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> getValue() const;
+      static jni::local_ref<JCoreTypesVariant> create(jni::alias_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Fifth final : public jni::JavaClass<Fifth, JCoreTypesVariant> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/CoreTypesVariant$Fifth;";
+      using Value = jni::local_ref<JAnyJSON>;
 
-      [[nodiscard]] jni::local_ref<JAnyJSON> getValue() const;
+      static jni::local_ref<JCoreTypesVariant> create(jni::alias_ref<JAnyJSON> value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JCoreTypesVariant_impl
+  }
+
 } // namespace margelo::nitro::test

@@ -8,13 +8,10 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <variant>
-
-#include <NitroModules/Callback.hpp>
-#include <functional>
-#include <variant>
+#include <tuple>
+#include <NitroModules/JSIConverter+JNIVariant.hpp>
 #include <NitroTest/private/JCallback_void.hpp>
-#include <NitroModules/JNICallable.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
@@ -22,34 +19,43 @@ namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ std::variant and the Java class "Variant_______Unit_Double".
-   */
+  namespace JVariant_______Unit_Double_impl {
+    class First;
+    class Second;
+  }
+
+  /** The JNI representation of Kotlin's sealed Variant_______Unit_Double class. */
   class JVariant_______Unit_Double : public jni::JavaClass<JVariant_______Unit_Double> {
   public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_______Unit_Double;";
+    using Cases = std::tuple<JVariant_______Unit_Double_impl::First, JVariant_______Unit_Double_impl::Second>;
+#ifdef NITRO_DEBUG
+    static constexpr auto diagnosticName = "variant<margelo::nitro::Callback<void()>, double>";
+#else
+    static constexpr auto diagnosticName = "variant<...>";
+#endif
 
-    static jni::local_ref<JVariant_______Unit_Double> create_0(jni::alias_ref<JCallback_void::javaobject> value);
-    static jni::local_ref<JVariant_______Unit_Double> create_1(jdouble value);
-
-    static jni::local_ref<JVariant_______Unit_Double> fromCpp(const std::variant<Callback<void()>, double>& variant);
-
-    [[nodiscard]] std::variant<Callback<void()>, double> toCpp() const;
+    [[nodiscard]] size_t getIndex() const;
   };
 
   namespace JVariant_______Unit_Double_impl {
     class First final : public jni::JavaClass<First, JVariant_______Unit_Double> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_______Unit_Double$First;";
+      using Value = jni::local_ref<margelo::nitro::test::JCallback_void>;
 
-      [[nodiscard]] jni::local_ref<JCallback_void::javaobject> getValue() const;
+      static jni::local_ref<JVariant_______Unit_Double> create(jni::alias_ref<margelo::nitro::test::JCallback_void> value);
+      [[nodiscard]] Value getValue() const;
     };
 
     class Second final : public jni::JavaClass<Second, JVariant_______Unit_Double> {
     public:
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_______Unit_Double$Second;";
+      using Value = jdouble;
 
-      [[nodiscard]] jdouble getValue() const;
+      static jni::local_ref<JVariant_______Unit_Double> create(jdouble value);
+      [[nodiscard]] Value getValue() const;
     };
-  } // namespace JVariant_______Unit_Double_impl
+  }
+
 } // namespace margelo::nitro::test
