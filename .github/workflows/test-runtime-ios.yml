@@ -62,6 +62,7 @@ jobs:
           ninja --version
           xcodebuild -version
           xcrun swift --version
+          echo "CPUs: $(sysctl -n hw.ncpu), memory: $(($(sysctl -n hw.memsize) / 1073741824)) GiB"
       - name: Read Hermes build cache inputs
         id: hermes
         run: |
@@ -81,16 +82,21 @@ jobs:
         run: bun install --frozen-lockfile --ignore-scripts
       - name: Prepare runtime test fixtures
         run: bun test:prepare
+      # The runner's Swift package is the repository root. Xcode enumerates
+      # every file under a local package before it builds, and the 300k files
+      # of node_modules cost minutes. Nothing after test:prepare needs them.
+      - name: Move node_modules out of the Swift package
+        run: mv node_modules "$RUNNER_TEMP/node_modules"
       - name: Test Swift HybridObjects in Hermes
         env:
           HERMES_CACHE_HIT: ${{ steps.hermes-cache.outputs.cache-hit }}
           SANITIZER: ${{ matrix.sanitizer.value }}
         run: |
+          options=(--os 27 --sanitizer "$SANITIZER" --jobs "$(sysctl -n hw.ncpu)" --derived-data "$RUNNER_TEMP/DerivedData")
           if [ "$HERMES_CACHE_HIT" = 'true' ]; then
-            bun tests/standalone/test-runner/ios/run.mjs --os 27 --sanitizer "$SANITIZER" --skip-hermes-build
-          else
-            bun tests/standalone/test-runner/ios/run.mjs --os 27 --sanitizer "$SANITIZER"
+            options+=(--skip-hermes-build)
           fi
+          bun tests/standalone/test-runner/ios/run.mjs "${options[@]}"
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7
