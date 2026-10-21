@@ -23,6 +23,8 @@
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
+#include <NitroModules/JNIConverter+Map.hpp>
+#include <NitroModules/JSIConverter+JMap.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
@@ -151,23 +153,10 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), JCar::fromCpp(car));
     return __result->toCpp();
   }
-  std::unordered_map<std::string, double> JHybridBenchmarkObjectSwiftKotlinSpec::bounceSimpleMap(const std::unordered_map<std::string, double>& map) {
+  jni::local_ref<jni::JMap<jni::JString, jni::JDouble>> JHybridBenchmarkObjectSwiftKotlinSpec::bounceSimpleMap(const jni::local_ref<jni::JMap<jni::JString, jni::JDouble>>& map) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JMap<jni::JString, jni::JDouble>>(jni::alias_ref<jni::JMap<jni::JString, jni::JDouble>> /* map */)>("bounceSimpleMap");
-    auto __result = __method(_javaPart, CxxPart::getClass(), [&](const auto& __input) -> jni::local_ref<jni::JMap<jni::JString, jni::JDouble>> {
-      auto __map = jni::JHashMap<jni::JString, jni::JDouble>::create(__input.size());
-      for (const auto& __entry : __input) {
-        __map->put(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.first), JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(__entry.second));
-      }
-      return __map;
-    }(map));
-    return [&](const auto& __input) {
-      std::unordered_map<std::string, double> __map;
-      __map.reserve(__input->size());
-      for (const auto& __entry : *__input) {
-        __map.emplace(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.first), JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__entry.second));
-      }
-      return __map;
-    }(__result);
+    auto __result = __method(_javaPart, CxxPart::getClass(), map);
+    return __result;
   }
   jni::local_ref<jni::JString> JHybridBenchmarkObjectSwiftKotlinSpec::tryOptionalParams(jdouble num, jboolean boo, const jni::local_ref<JOptional<jni::JString>>& str) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(jdouble /* num */, jboolean /* boo */, jni::alias_ref<JOptional<jni::JString>> /* str */)>("tryOptionalParams");

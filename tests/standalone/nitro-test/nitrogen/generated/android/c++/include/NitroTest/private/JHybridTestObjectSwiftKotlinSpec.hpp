@@ -66,6 +66,8 @@ namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; 
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
+#include <NitroModules/JNIConverter+Map.hpp>
+#include <NitroModules/JSIConverter+JMap.hpp>
 #include <NitroModules/JNIConverter+Error.hpp>
 #include <NitroModules/JSIConverter+JThrowable.hpp>
 #include <NitroTest/private/JHybridTestObjectSwiftKotlinSpec.hpp>
@@ -189,11 +191,11 @@ namespace margelo::nitro::test {
     jni::local_ref<JAnyJSON> mergeMaps(const jni::local_ref<JAnyJSON>& a, const jni::local_ref<JAnyJSON>& b);
     jni::local_ref<JAnyJSON> copyAnyMap(const jni::local_ref<JAnyJSON>& map);
     std::unordered_map<std::string, std::variant<bool, double>> bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map);
-    std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map);
-    std::unordered_map<std::string, std::optional<std::string>> bounceOptionalMap(const std::unordered_map<std::string, std::optional<std::string>>& map);
+    jni::local_ref<jni::JMap<jni::JString, jni::JDouble>> bounceSimpleMap(const jni::local_ref<jni::JMap<jni::JString, jni::JDouble>>& map);
+    jni::local_ref<jni::JMap<jni::JString, JOptional<jni::JString>>> bounceOptionalMap(const jni::local_ref<jni::JMap<jni::JString, JOptional<jni::JString>>>& map);
     std::unordered_map<std::string, std::variant<nitro::NullType, std::string>> bounceNullMap(const std::unordered_map<std::string, std::variant<nitro::NullType, std::string>>& map);
     std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>> bounceOptionalNullMap(const std::unordered_map<std::string, std::optional<std::variant<nitro::NullType, std::string>>>& map);
-    std::unordered_map<std::string, std::string> extractMap(const MapWrapperKotlin& mapWrapper);
+    jni::local_ref<jni::JMap<jni::JString, jni::JString>> extractMap(const MapWrapperKotlin& mapWrapper);
     jdouble funcThatThrows();
     Promise<void> funcThatThrowsBeforePromise();
     void throwError(const jni::local_ref<jni::JThrowable>& error);

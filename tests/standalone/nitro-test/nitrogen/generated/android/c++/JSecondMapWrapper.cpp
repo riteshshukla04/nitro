@@ -12,6 +12,8 @@
 #include <unordered_map>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Map.hpp>
+#include <NitroModules/JSIConverter+JMap.hpp>
 
 namespace margelo::nitro::test {
 
@@ -20,14 +22,7 @@ namespace margelo::nitro::test {
     static const auto fieldSecond = clazz->getField<jni::JMap<jni::JString, jni::JString>>("second");
     jni::local_ref<jni::JMap<jni::JString, jni::JString>> second = this->getFieldValue(fieldSecond);
     return SecondMapWrapperKotlin(
-      [&](const auto& __input) {
-        std::unordered_map<std::string, std::string> __map;
-        __map.reserve(__input->size());
-        for (const auto& __entry : *__input) {
-          __map.emplace(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.first), JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.second));
-        }
-        return __map;
-      }(second)
+      JNIConverter<std::unordered_map<std::string, std::string>, jni::local_ref<jni::JMap<jni::JString, jni::JString>>>::fromJNI(second)
     );
   }
 
@@ -37,13 +32,7 @@ namespace margelo::nitro::test {
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      [&](const auto& __input) -> jni::local_ref<jni::JMap<jni::JString, jni::JString>> {
-        auto __map = jni::JHashMap<jni::JString, jni::JString>::create(__input.size());
-        for (const auto& __entry : __input) {
-          __map->put(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.first), JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.second));
-        }
-        return __map;
-      }(value.second)
+      JNIConverter<std::unordered_map<std::string, std::string>, jni::local_ref<jni::JMap<jni::JString, jni::JString>>>::toJNI(value.second)
     );
   }
 

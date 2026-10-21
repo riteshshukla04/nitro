@@ -56,6 +56,8 @@
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
+#include <NitroModules/JNIConverter+Map.hpp>
+#include <NitroModules/JSIConverter+JMap.hpp>
 #include <NitroModules/JNIConverter+Error.hpp>
 #include <NitroModules/JSIConverter+JThrowable.hpp>
 #include <NitroModules/JUInt64.hpp>
@@ -1081,41 +1083,15 @@ namespace margelo::nitro::test {
       return __map;
     }(__result);
   }
-  std::unordered_map<std::string, double> JHybridTestObjectSwiftKotlinSpec::bounceSimpleMap(const std::unordered_map<std::string, double>& map) {
+  jni::local_ref<jni::JMap<jni::JString, jni::JDouble>> JHybridTestObjectSwiftKotlinSpec::bounceSimpleMap(const jni::local_ref<jni::JMap<jni::JString, jni::JDouble>>& map) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JMap<jni::JString, jni::JDouble>>(jni::alias_ref<jni::JMap<jni::JString, jni::JDouble>> /* map */)>("bounceSimpleMap");
-    auto __result = __method(_javaPart, CxxPart::getClass(), [&](const auto& __input) -> jni::local_ref<jni::JMap<jni::JString, jni::JDouble>> {
-      auto __map = jni::JHashMap<jni::JString, jni::JDouble>::create(__input.size());
-      for (const auto& __entry : __input) {
-        __map->put(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.first), JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(__entry.second));
-      }
-      return __map;
-    }(map));
-    return [&](const auto& __input) {
-      std::unordered_map<std::string, double> __map;
-      __map.reserve(__input->size());
-      for (const auto& __entry : *__input) {
-        __map.emplace(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.first), JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__entry.second));
-      }
-      return __map;
-    }(__result);
+    auto __result = __method(_javaPart, CxxPart::getClass(), map);
+    return __result;
   }
-  std::unordered_map<std::string, std::optional<std::string>> JHybridTestObjectSwiftKotlinSpec::bounceOptionalMap(const std::unordered_map<std::string, std::optional<std::string>>& map) {
+  jni::local_ref<jni::JMap<jni::JString, JOptional<jni::JString>>> JHybridTestObjectSwiftKotlinSpec::bounceOptionalMap(const jni::local_ref<jni::JMap<jni::JString, JOptional<jni::JString>>>& map) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JMap<jni::JString, JOptional<jni::JString>>>(jni::alias_ref<jni::JMap<jni::JString, JOptional<jni::JString>>> /* map */)>("bounceOptionalMap");
-    auto __result = __method(_javaPart, CxxPart::getClass(), [&](const auto& __input) -> jni::local_ref<jni::JMap<jni::JString, JOptional<jni::JString>>> {
-      auto __map = jni::JHashMap<jni::JString, JOptional<jni::JString>>::create(__input.size());
-      for (const auto& __entry : __input) {
-        __map->put(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__entry.first), JNIConverter<std::optional<std::string>, jni::local_ref<JOptional<jni::JString>>>::toJNI(__entry.second));
-      }
-      return __map;
-    }(map));
-    return [&](const auto& __input) {
-      std::unordered_map<std::string, std::optional<std::string>> __map;
-      __map.reserve(__input->size());
-      for (const auto& __entry : *__input) {
-        __map.emplace(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.first), JNIConverter<std::optional<std::string>, jni::local_ref<JOptional<jni::JString>>>::fromJNI(__entry.second));
-      }
-      return __map;
-    }(__result);
+    auto __result = __method(_javaPart, CxxPart::getClass(), map);
+    return __result;
   }
   std::unordered_map<std::string, std::variant<nitro::NullType, std::string>> JHybridTestObjectSwiftKotlinSpec::bounceNullMap(const std::unordered_map<std::string, std::variant<nitro::NullType, std::string>>& map) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JMap<jni::JString, JVariant_NullType_String>>(jni::alias_ref<jni::JMap<jni::JString, JVariant_NullType_String>> /* map */)>("bounceNullMap");
@@ -1153,17 +1129,10 @@ namespace margelo::nitro::test {
       return __map;
     }(__result);
   }
-  std::unordered_map<std::string, std::string> JHybridTestObjectSwiftKotlinSpec::extractMap(const MapWrapperKotlin& mapWrapper) {
+  jni::local_ref<jni::JMap<jni::JString, jni::JString>> JHybridTestObjectSwiftKotlinSpec::extractMap(const MapWrapperKotlin& mapWrapper) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JMap<jni::JString, jni::JString>>(jni::alias_ref<JMapWrapper> /* mapWrapper */)>("extractMap");
     auto __result = __method(_javaPart, CxxPart::getClass(), JMapWrapper::fromCpp(mapWrapper));
-    return [&](const auto& __input) {
-      std::unordered_map<std::string, std::string> __map;
-      __map.reserve(__input->size());
-      for (const auto& __entry : *__input) {
-        __map.emplace(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.first), JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__entry.second));
-      }
-      return __map;
-    }(__result);
+    return __result;
   }
   jdouble JHybridTestObjectSwiftKotlinSpec::funcThatThrows() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble()>("funcThatThrows");

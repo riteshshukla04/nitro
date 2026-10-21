@@ -1,9 +1,12 @@
 import type { Language } from '../../../getPlatformSpecs.js'
-import type { GetCodeOptions } from '../../types/Type.js'
+import type { GetCodeOptions, Type } from '../../types/Type.js'
 import { indent } from '../../../utils.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { RecordType } from '../../types/RecordType.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
+import type { KotlinCppConverter } from '../KotlinConverter.js'
+import { KotlinCxxRecordType } from './KotlinCxxRecordType.js'
+import { getTypeAs } from '../../types/getTypeAs.js'
 import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 /** JNI represents a record as a `java.util.Map` of boxed keys and values. */
@@ -18,6 +21,20 @@ export class KotlinRecordType extends RecordType implements KotlinType {
     super(keyType, valueType)
     this.keyType = keyType
     this.valueType = valueType
+  }
+
+  private get canConvertDirectly(): boolean {
+    return this.keyType.kind === 'string' && this.keyType.getJSIType?.() != null && this.valueType.getJSIType?.() != null
+  }
+
+  getJSIType(): this | undefined {
+    if (!this.canConvertDirectly) return undefined
+    return this
+  }
+
+  getCppConverter(cppType: Type): KotlinCppConverter | undefined {
+    if (!this.canConvertDirectly) return undefined
+    return new KotlinCxxRecordType(getTypeAs(cppType, RecordType), this).getConverter()
   }
 
   get needsKotlinConversion(): boolean {
@@ -39,6 +56,17 @@ export class KotlinRecordType extends RecordType implements KotlinType {
         return `${value}.map { (__key, __value) -> ${key} to ${item} }.toMap()`
       }
       case 'c++':
+        if (this.canConvertDirectly) {
+          const cppType = this.type.getCode('c++', { context: 'value' })
+          const jniType = this.getCode('c++', { context: 'value' })
+          const converter = `JNIConverter<${cppType}, ${jniType}>`
+          switch (conversion.from) {
+            case 'c++':
+              return `${converter}::toJNI(${value})`
+            case 'kotlin':
+              return `${converter}::fromJNI(${value})`
+          }
+        }
         switch (conversion.from) {
           case 'c++':
             return this.getCppToJniCode(value)
@@ -104,10 +132,24 @@ export class KotlinRecordType extends RecordType implements KotlinType {
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
-    return [
+    const imports = [
       ...this.type.getRequiredImports(language),
       ...this.keyType.getRequiredImports(language),
       ...this.valueType.getRequiredImports(language),
     ]
+    switch (language) {
+      case 'c++':
+        if (this.canConvertDirectly) {
+          imports.push(
+            { language: language, declaration: { header: 'NitroModules/JNIConverter+Map.hpp', space: 'system' } },
+            { language: language, declaration: { header: 'NitroModules/JSIConverter+JMap.hpp', space: 'system' } }
+          )
+        }
+        break
+      case 'kotlin':
+      case 'swift':
+        break
+    }
+    return imports
   }
 }
