@@ -135,6 +135,13 @@ jsi::String CommonGlobals::JSON::stringify(jsi::Runtime& runtime, const jsi::Val
   return stringifyFunc.call(runtime, value).asString(runtime);
 }
 
+jsi::Value CommonGlobals::JSON::parse(jsi::Runtime& runtime, const jsi::String& value) {
+  const jsi::Function& parseFunc = getGlobalFunction(runtime, "JSON.parse", [](jsi::Runtime& runtime) {
+    return runtime.global().getPropertyAsObject(runtime, "JSON").getPropertyAsFunction(runtime, "parse");
+  });
+  return parseFunc.call(runtime, value);
+}
+
 // pragma MARK: CommonGlobals
 
 void CommonGlobals::defineGlobal(jsi::Runtime& runtime, KnownGlobalPropertyName name, jsi::Value&& value) {

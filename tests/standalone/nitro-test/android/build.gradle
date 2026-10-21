@@ -59,6 +59,7 @@ apply from: '../nitrogen/generated/android/NitroTest+autolinking.gradle'
 dependencies {
   api project(':nitro-core')
   api project(':nitro-test-external')
+  implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1'
 }
 
 tasks.configureEach {

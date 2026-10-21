@@ -124,6 +124,7 @@ public:
     ~JSON() = delete;
 
     static jsi::String stringify(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value parse(jsi::Runtime& runtime, const jsi::String& value);
   };
 
 private:

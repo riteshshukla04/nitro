@@ -28,6 +28,8 @@
 #include <NitroModules/JPromise.hpp>
 #include <NitroModules/JNISharedPtr.hpp>
 #include <NitroModules/JAnyJSON.hpp>
+#include <NitroModules/JNIConverter+AnyJSON.hpp>
+#include <NitroModules/JSIConverter+JAnyJSON.hpp>
 
 namespace margelo::nitro::test {
 

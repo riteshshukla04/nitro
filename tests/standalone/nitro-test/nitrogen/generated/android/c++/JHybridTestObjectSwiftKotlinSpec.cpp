@@ -42,6 +42,9 @@
 #include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JAnyJSON.hpp>
+#include <NitroModules/JNIConverter+AnyJSON.hpp>
+#include <NitroModules/JSIConverter+JAnyJSON.hpp>
 #include <NitroModules/JNull.hpp>
 #include <NitroTest/private/JVariant_NullType_String.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
@@ -56,7 +59,6 @@
 #include <NitroModules/JPromise.hpp>
 #include <NitroModules/JNISharedPtr.hpp>
 #include <NitroTest/private/JCallback_void.hpp>
-#include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JArrayBuffer.hpp>
 #include <NitroTest/private/JVariant_Boolean_Double.hpp>
 #include <NitroModules/JUnit.hpp>
@@ -954,7 +956,7 @@ namespace margelo::nitro::test {
       jni::local_ref<jni::JArrayClass<JAnyJSON>> __array = jni::JArrayClass<JAnyJSON>::newArray(__size);
       for (size_t __i = 0; __i < __size; __i++) {
         const auto& __element = __input[__i];
-        auto __elementJni = JAnyJSON::create(__element);
+        auto __elementJni = JNIConverter<AnyJSON, jni::local_ref<JAnyJSON>>::toJNI(__element);
         __array->setElement(__i, *__elementJni);
       }
       return __array;
@@ -965,7 +967,7 @@ namespace margelo::nitro::test {
       __vector.reserve(__size);
       for (size_t __i = 0; __i < __size; __i++) {
         auto __element = __input->getElement(__i);
-        __vector.push_back(__element->toCpp());
+        __vector.push_back(JNIConverter<AnyJSON, jni::local_ref<JAnyJSON>>::fromJNI(__element));
       }
       return __vector;
     }(__result);
@@ -1133,19 +1135,19 @@ namespace margelo::nitro::test {
       return __vector;
     }(__result);
   }
-  AnyJSON JHybridTestObjectSwiftKotlinSpec::createMap() {
+  jni::local_ref<JAnyJSON> JHybridTestObjectSwiftKotlinSpec::createMap() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JAnyJSON>()>("createMap");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return __result->toCpp();
+    return __result;
   }
-  AnyJSON JHybridTestObjectSwiftKotlinSpec::mapRoundtrip(const AnyJSON& map) {
+  jni::local_ref<JAnyJSON> JHybridTestObjectSwiftKotlinSpec::mapRoundtrip(const jni::local_ref<JAnyJSON>& map) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JAnyJSON>(jni::alias_ref<JAnyJSON> /* map */)>("mapRoundtrip");
-    auto __result = __method(_javaPart, CxxPart::getClass(), JAnyJSON::create(map));
-    return __result->toCpp();
+    auto __result = __method(_javaPart, CxxPart::getClass(), map);
+    return __result;
   }
-  std::vector<std::string> JHybridTestObjectSwiftKotlinSpec::getMapKeys(const AnyJSON& map) {
+  std::vector<std::string> JHybridTestObjectSwiftKotlinSpec::getMapKeys(const jni::local_ref<JAnyJSON>& map) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JArrayClass<jni::JString>>(jni::alias_ref<JAnyJSON> /* map */)>("getMapKeys");
-    auto __result = __method(_javaPart, CxxPart::getClass(), JAnyJSON::create(map));
+    auto __result = __method(_javaPart, CxxPart::getClass(), map);
     return [&](auto&& __input) {
       size_t __size = __input->size();
       std::vector<std::string> __vector;
@@ -1157,15 +1159,15 @@ namespace margelo::nitro::test {
       return __vector;
     }(__result);
   }
-  AnyJSON JHybridTestObjectSwiftKotlinSpec::mergeMaps(const AnyJSON& a, const AnyJSON& b) {
+  jni::local_ref<JAnyJSON> JHybridTestObjectSwiftKotlinSpec::mergeMaps(const jni::local_ref<JAnyJSON>& a, const jni::local_ref<JAnyJSON>& b) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JAnyJSON>(jni::alias_ref<JAnyJSON> /* a */, jni::alias_ref<JAnyJSON> /* b */)>("mergeMaps");
-    auto __result = __method(_javaPart, CxxPart::getClass(), JAnyJSON::create(a), JAnyJSON::create(b));
-    return __result->toCpp();
+    auto __result = __method(_javaPart, CxxPart::getClass(), a, b);
+    return __result;
   }
-  AnyJSON JHybridTestObjectSwiftKotlinSpec::copyAnyMap(const AnyJSON& map) {
+  jni::local_ref<JAnyJSON> JHybridTestObjectSwiftKotlinSpec::copyAnyMap(const jni::local_ref<JAnyJSON>& map) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JAnyJSON>(jni::alias_ref<JAnyJSON> /* map */)>("copyAnyMap");
-    auto __result = __method(_javaPart, CxxPart::getClass(), JAnyJSON::create(map));
-    return __result->toCpp();
+    auto __result = __method(_javaPart, CxxPart::getClass(), map);
+    return __result;
   }
   std::unordered_map<std::string, std::variant<bool, double>> JHybridTestObjectSwiftKotlinSpec::bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JMap<jni::JString, JVariant_Boolean_Double>>(jni::alias_ref<jni::JMap<jni::JString, JVariant_Boolean_Double>> /* map */)>("bounceMap");

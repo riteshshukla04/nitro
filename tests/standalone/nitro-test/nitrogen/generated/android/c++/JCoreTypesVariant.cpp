@@ -24,6 +24,8 @@
 #include <NitroModules/JPromise.hpp>
 #include <NitroModules/JNISharedPtr.hpp>
 #include <NitroModules/JAnyJSON.hpp>
+#include <NitroModules/JNIConverter+AnyJSON.hpp>
+#include <NitroModules/JSIConverter+JAnyJSON.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JCoreTypesVariant> JCoreTypesVariant::create_0(jni::alias_ref<JArrayBuffer::javaobject> value) {
@@ -78,7 +80,7 @@ namespace margelo::nitro::test {
         });
         return __localPromise;
       }());
-      case 4: return create_4(JAnyJSON::create(std::get<4>(variant)));
+      case 4: return create_4(JNIConverter<AnyJSON, jni::local_ref<JAnyJSON>>::toJNI(std::get<4>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
   }
@@ -157,7 +159,7 @@ namespace margelo::nitro::test {
     } else if (isInstanceOf(JCoreTypesVariant_impl::Fifth::javaClassStatic())) {
       // It's a `AnyJSON`
       auto jniValue = static_cast<const JCoreTypesVariant_impl::Fifth*>(this)->getValue();
-      return jniValue->toCpp();
+      return JNIConverter<AnyJSON, jni::local_ref<JAnyJSON>>::fromJNI(jniValue);
     }
     throw std::invalid_argument("Variant is unknown Kotlin instance!");
   }

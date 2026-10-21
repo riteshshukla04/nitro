@@ -1,3 +1,6 @@
+import { KotlinCxxAnyJSONType } from './KotlinCxxAnyJSONType.js'
+import type { KotlinCppConverter } from '../KotlinConverter.js'
+import type { Type } from '../../types/Type.js'
 import type { Language } from '../../../getPlatformSpecs.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { AnyJSONType } from '../../types/AnyJSONType.js'
@@ -8,6 +11,14 @@ import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './K
 export class KotlinAnyJSONType extends AnyJSONType implements KotlinType {
   readonly jniValueKind = 'wrapper'
   readonly needsKotlinConversion = false
+
+  getCppConverter(cppType: Type): KotlinCppConverter {
+    return new KotlinCxxAnyJSONType(cppType, this).getConverter()
+  }
+
+  getJSIType(): this {
+    return this
+  }
 
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
@@ -26,9 +37,9 @@ export class KotlinAnyJSONType extends AnyJSONType implements KotlinType {
       case 'c++':
         switch (conversion.from) {
           case 'c++':
-            return `JAnyJSON::create(${value})`
+            return `JNIConverter<AnyJSON, jni::local_ref<JAnyJSON>>::toJNI(${value})`
           case 'kotlin':
-            return `${value}->toCpp()`
+            return `JNIConverter<AnyJSON, jni::local_ref<JAnyJSON>>::fromJNI(${value})`
         }
     }
   }
@@ -37,10 +48,14 @@ export class KotlinAnyJSONType extends AnyJSONType implements KotlinType {
     const imports = super.getRequiredImports(language)
     switch (language) {
       case 'c++':
-        imports.push({
-          language: language,
-          declaration: { header: 'NitroModules/JAnyJSON.hpp', space: 'system' },
-        })
+        imports.push(
+          {
+            language: language,
+            declaration: { header: 'NitroModules/JAnyJSON.hpp', space: 'system' },
+          },
+          { language: language, declaration: { header: 'NitroModules/JNIConverter+AnyJSON.hpp', space: 'system' } },
+          { language: language, declaration: { header: 'NitroModules/JSIConverter+JAnyJSON.hpp', space: 'system' } }
+        )
         break
     }
     return imports

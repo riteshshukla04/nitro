@@ -14,8 +14,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import java.math.BigDecimal
 
 @Keep
@@ -28,6 +36,7 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
 
     @Volatile override var sharedNumber: Double = 0.0
     private val promiseScope = CoroutineScope(Dispatchers.Default)
+    private val jsonObjectSerializer = MapSerializer(String.serializer(), JsonElement.serializer())
   }
 
   override var numberValue: Double = 0.0
@@ -198,43 +207,39 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
   }
 
   override fun createMap(): AnyJSON {
-    val values = listOf(numberValue, boolValue, stringValue, int64Value)
+    val values = listOf(JsonPrimitive(numberValue), JsonPrimitive(boolValue), JsonPrimitive(stringValue), JsonPrimitive(int64Value))
     val objectValue =
-      JSONObject()
-        .put("number", numberValue)
-        .put("bool", boolValue)
-        .put("string", stringValue)
-        .put("int64", int64Value)
-        .put("null", JSONObject.NULL)
-        .put("array", JSONArray(values + listOf(JSONArray(values))))
+      buildJsonObject {
+        put("number", JsonPrimitive(numberValue))
+        put("bool", JsonPrimitive(boolValue))
+        put("string", JsonPrimitive(stringValue))
+        put("int64", JsonPrimitive(int64Value))
+        put("null", JsonNull)
+        put("array", JsonArray(values + listOf(JsonArray(values))))
+      }
     val map =
-      JSONObject()
-        .put("number", numberValue)
-        .put("bool", boolValue)
-        .put("string", stringValue)
-        .put("int64", int64Value)
-        .put("null", JSONObject.NULL)
-        .put("array", JSONArray(values))
-        .put("object", objectValue)
-    return AnyJSON(map.toString())
+      buildJsonObject {
+        put("number", JsonPrimitive(numberValue))
+        put("bool", JsonPrimitive(boolValue))
+        put("string", JsonPrimitive(stringValue))
+        put("int64", JsonPrimitive(int64Value))
+        put("null", JsonNull)
+        put("array", JsonArray(values))
+        put("object", objectValue)
+      }
+    return encodeJSON(jsonObjectSerializer, map)
   }
 
   override fun getMapKeys(map: AnyJSON): Array<String> {
-    return JSONObject(map.stringRepresentation)
-      .keys()
-      .asSequence()
-      .toList()
-      .toTypedArray()
+    return decodeJSON(jsonObjectSerializer, map).keys.toTypedArray()
   }
 
   override fun mergeMaps(
     a: AnyJSON,
     b: AnyJSON,
   ): AnyJSON {
-    val result = JSONObject(a.stringRepresentation)
-    val additions = JSONObject(b.stringRepresentation)
-    additions.keys().forEach { key -> result.put(key, additions.get(key)) }
-    return AnyJSON(result.toString())
+    val result = decodeJSON(jsonObjectSerializer, a) + decodeJSON(jsonObjectSerializer, b)
+    return encodeJSON(jsonObjectSerializer, result)
   }
 
   override fun copyAnyMap(map: AnyJSON): AnyJSON {
@@ -242,7 +247,8 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
   }
 
   override fun mapRoundtrip(map: AnyJSON): AnyJSON {
-    return map
+    val value = decodeJSON(JsonElement.serializer(), map)
+    return encodeJSON(JsonElement.serializer(), value)
   }
 
   override fun funcThatThrows(): Double {
@@ -774,6 +780,20 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
     } catch (error: Throwable) {
       Promise.rejected(error)
     }
+  }
+
+  private fun <T> encodeJSON(
+    serializer: SerializationStrategy<T>,
+    value: T,
+  ): AnyJSON {
+    return AnyJSON(Json.encodeToString(serializer, value))
+  }
+
+  private fun <T> decodeJSON(
+    serializer: DeserializationStrategy<T>,
+    value: AnyJSON,
+  ): T {
+    return Json.decodeFromString(serializer, value.stringRepresentation)
   }
 
   private fun stringify(value: Double): String {

@@ -52,6 +52,9 @@ namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; 
 #include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JAnyJSON.hpp>
+#include <NitroModules/JNIConverter+AnyJSON.hpp>
+#include <NitroModules/JSIConverter+JAnyJSON.hpp>
 #include <NitroTest/private/JHybridTestObjectSwiftKotlinSpec.hpp>
 
 namespace margelo::nitro::test {
@@ -167,11 +170,11 @@ namespace margelo::nitro::test {
     std::vector<std::optional<std::string>> bounceOptionals(const std::vector<std::optional<std::string>>& strings, const std::vector<std::optional<ArrayBuffer>>& arrayBuffers);
     std::vector<std::variant<nitro::NullType, std::string>> bounceNulls(const std::vector<std::variant<nitro::NullType, std::string>>& strings);
     std::vector<std::optional<std::variant<nitro::NullType, std::string>>> bounceOptionalNulls(const std::vector<std::optional<std::variant<nitro::NullType, std::string>>>& strings);
-    AnyJSON createMap();
-    AnyJSON mapRoundtrip(const AnyJSON& map);
-    std::vector<std::string> getMapKeys(const AnyJSON& map);
-    AnyJSON mergeMaps(const AnyJSON& a, const AnyJSON& b);
-    AnyJSON copyAnyMap(const AnyJSON& map);
+    jni::local_ref<JAnyJSON> createMap();
+    jni::local_ref<JAnyJSON> mapRoundtrip(const jni::local_ref<JAnyJSON>& map);
+    std::vector<std::string> getMapKeys(const jni::local_ref<JAnyJSON>& map);
+    jni::local_ref<JAnyJSON> mergeMaps(const jni::local_ref<JAnyJSON>& a, const jni::local_ref<JAnyJSON>& b);
+    jni::local_ref<JAnyJSON> copyAnyMap(const jni::local_ref<JAnyJSON>& map);
     std::unordered_map<std::string, std::variant<bool, double>> bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map);
     std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map);
     std::unordered_map<std::string, std::optional<std::string>> bounceOptionalMap(const std::unordered_map<std::string, std::optional<std::string>>& map);

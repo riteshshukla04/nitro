@@ -5,18 +5,22 @@
 
 namespace margelo::nitro {
 
+namespace jni = facebook::jni;
+
 /** Bridges encoded JSON without parsing or re-encoding it. */
-struct JAnyJSON final : facebook::jni::JavaClass<JAnyJSON> {
+struct JAnyJSON final : jni::JavaClass<JAnyJSON> {
   static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/core/AnyJSON;";
 
-  static facebook::jni::local_ref<JAnyJSON> create(const AnyJSON& value) {
-    return newInstance(facebook::jni::make_jstring(value.stringRepresentation));
+  static jni::local_ref<JAnyJSON> create(jni::alias_ref<jni::JString> value) {
+    return newInstance(value);
   }
+  static jni::local_ref<JAnyJSON> create(const AnyJSON& value);
 
-  AnyJSON toCpp() const {
-    static const auto getter = javaClassStatic()->getMethod<facebook::jni::JString()>("getStringRepresentation");
-    return AnyJSON{getter(self())->toStdString()};
+  jni::local_ref<jni::JString> getStringRepresentation() const {
+    static const auto getter = javaClassStatic()->getMethod<jni::JString()>("getStringRepresentation");
+    return getter(self());
   }
+  AnyJSON toCpp() const;
 };
 
 } // namespace margelo::nitro
