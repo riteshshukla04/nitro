@@ -13,6 +13,14 @@ export class KotlinHybridObjectType extends HybridObjectType implements KotlinTy
     super(type.hybridObjectName, type.platforms, type.baseTypes, type.sourceConfig)
   }
 
+  /** An exact implementation can skip JVM virtual dispatch for its direct members. */
+  get canUseNonvirtualJniCalls(): boolean {
+    const android = this.platforms.android
+    return (
+      android?.language === 'kotlin' && android.implementation != null && !android.allowInheritance && !android.allowMultipleImplementations
+    )
+  }
+
   /** The C++ class holding the Kotlin instance, e.g. `JHybridImageSpec`. */
   get jniName(): string {
     const name = getHybridObjectName(this.hybridObjectName)

@@ -54,6 +54,10 @@ namespace margelo::nitro::test {
     return makeCxxInstance(jThis);
   }
 
+  jni::alias_ref<jni::JClass> JHybridChildSpec::CxxPart::getClass() {
+    return JHybridChildSpec::JavaPart::javaClassStatic();
+  }
+
   std::shared_ptr<JHybridObject> JHybridChildSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
     auto castJavaPart = jni::dynamic_ref_cast<JHybridChildSpec::JavaPart>(javaPart);
     if (castJavaPart == nullptr) [[unlikely]] {
@@ -70,14 +74,14 @@ namespace margelo::nitro::test {
 
   // Properties
   double JHybridChildSpec::getChildValue() {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<double()>("getChildValue");
+    static const auto __method = CxxPart::getClass()->getMethod<double()>("getChildValue");
     auto __result = __method(_javaPart);
     return __result;
   }
 
   // Methods
   std::variant<std::string, CarKotlin> JHybridChildSpec::bounceVariant(const std::variant<std::string, CarKotlin>& variant) {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JNamedVariant>(jni::alias_ref<JNamedVariant> /* variant */)>("bounceVariant");
+    static const auto __method = CxxPart::getClass()->getMethod<jni::local_ref<JNamedVariant>(jni::alias_ref<JNamedVariant> /* variant */)>("bounceVariant");
     auto __result = __method(_javaPart, JNamedVariant::fromCpp(variant));
     return __result->toCpp();
   }

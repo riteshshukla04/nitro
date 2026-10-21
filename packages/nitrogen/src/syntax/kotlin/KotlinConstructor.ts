@@ -6,7 +6,7 @@ import { HybridObjectType } from '../types/HybridObjectType.js'
 import { KotlinNativeHybridObjectType } from './types/KotlinNativeHybridObjectType.js'
 import {
   createCppJniCallBody,
-  createKotlinForwarderBody,
+  createKotlinBridgeBody,
   getKotlinImplementation,
   prepareKotlinMethod,
   type KotlinMethodBridge,
@@ -60,7 +60,7 @@ export class KotlinConstructor extends Constructor {
       jniMethodLookup: `${this.jniClass}->getStaticMethod`,
       jniReceiver: this.jniClass,
     })
-    const kotlinBody = createKotlinForwarderBody({
+    const kotlinBody = createKotlinBridgeBody({
       callable: this.callable,
       getKotlinInvocation: (args) => `${this.implementationClassName}(${args.join(', ')})`,
     })

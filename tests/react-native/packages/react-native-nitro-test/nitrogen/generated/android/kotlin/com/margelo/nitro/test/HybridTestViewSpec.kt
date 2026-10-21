@@ -11,6 +11,7 @@ import androidx.annotation.Keep
 import com.facebook.jni.HybridData
 import com.facebook.proguard.annotations.DoNotStrip
 import dalvik.annotation.optimization.FastNative
+import com.margelo.nitro.test.HybridTestView
 import com.margelo.nitro.core.HybridObject
 import com.margelo.nitro.views.HybridView
 
@@ -104,6 +105,13 @@ abstract class HybridTestViewSpec: HybridView() {
     // C++ JHybridTestViewSpec::CxxPart::initHybrid(...)
     @FastNative
     external override fun initHybrid(): HybridData
+
+    companion object {
+      @DoNotStrip
+      @Keep
+      @JvmField
+      val implementationClass_cxx: Class<out HybridTestViewSpec> = HybridTestView::class.java
+    }
   }
   override fun createCxxPart(): CxxPart {
     return CxxPart(this)

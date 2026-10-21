@@ -42,6 +42,12 @@ namespace margelo::nitro::test {
     return makeCxxInstance(jThis);
   }
 
+  jni::alias_ref<jni::JClass> JHybridRecyclableTestViewSpec::CxxPart::getClass() {
+    static const auto __field = CxxPart::javaClassStatic()->getStaticField<jni::JClass>("implementationClass_cxx");
+    static const auto __class = jni::make_global(CxxPart::javaClassStatic()->getStaticFieldValue(__field));
+    return __class;
+  }
+
   std::shared_ptr<JHybridObject> JHybridRecyclableTestViewSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
     auto castJavaPart = jni::dynamic_ref_cast<JHybridRecyclableTestViewSpec::JavaPart>(javaPart);
     if (castJavaPart == nullptr) [[unlikely]] {
@@ -58,43 +64,43 @@ namespace margelo::nitro::test {
 
   // Properties
   bool JHybridRecyclableTestViewSpec::getIsBlue() {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<jboolean()>("isBlue");
-    auto __result = __method(_javaPart);
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean()>("isBlue");
+    auto __result = __method(_javaPart, CxxPart::getClass());
     return static_cast<bool>(__result);
   }
   void JHybridRecyclableTestViewSpec::setIsBlue(bool isBlue) {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<void(jboolean /* isBlue */)>("setBlue");
-    __method(_javaPart, isBlue);
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jboolean /* isBlue */)>("setBlue");
+    __method(_javaPart, CxxPart::getClass(), isBlue);
   }
   std::optional<double> JHybridRecyclableTestViewSpec::getNativeDefaultValue() {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<jni::JDouble>()>("getNativeDefaultValue");
-    auto __result = __method(_javaPart);
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JDouble>()>("getNativeDefaultValue");
+    auto __result = __method(_javaPart, CxxPart::getClass());
     return __result != nullptr ? std::make_optional(__result->value()) : std::nullopt;
   }
   void JHybridRecyclableTestViewSpec::setNativeDefaultValue(const std::optional<double>& nativeDefaultValue) {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<void(jni::alias_ref<jni::JDouble> /* nativeDefaultValue */)>("setNativeDefaultValue");
-    __method(_javaPart, nativeDefaultValue.has_value() ? jni::JDouble::valueOf(nativeDefaultValue.value()) : nullptr);
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<jni::JDouble> /* nativeDefaultValue */)>("setNativeDefaultValue");
+    __method(_javaPart, CxxPart::getClass(), nativeDefaultValue.has_value() ? jni::JDouble::valueOf(nativeDefaultValue.value()) : nullptr);
   }
 
   // Methods
   double JHybridRecyclableTestViewSpec::getInvalidLifecycleOrderCount() {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<double()>("getInvalidLifecycleOrderCount");
-    auto __result = __method(_javaPart);
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double()>("getInvalidLifecycleOrderCount");
+    auto __result = __method(_javaPart, CxxPart::getClass());
     return __result;
   }
   double JHybridRecyclableTestViewSpec::getOnDropViewCount() {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<double()>("getOnDropViewCount");
-    auto __result = __method(_javaPart);
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double()>("getOnDropViewCount");
+    auto __result = __method(_javaPart, CxxPart::getClass());
     return __result;
   }
   double JHybridRecyclableTestViewSpec::getPrepareForRecycleCount() {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<double()>("getPrepareForRecycleCount");
-    auto __result = __method(_javaPart);
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double()>("getPrepareForRecycleCount");
+    auto __result = __method(_javaPart, CxxPart::getClass());
     return __result;
   }
   double JHybridRecyclableTestViewSpec::getNativeDefaultValueSetterCallCount() {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<double()>("getNativeDefaultValueSetterCallCount");
-    auto __result = __method(_javaPart);
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double()>("getNativeDefaultValueSetterCallCount");
+    auto __result = __method(_javaPart, CxxPart::getClass());
     return __result;
   }
 

@@ -72,6 +72,10 @@ namespace margelo::nitro::test {
     return makeCxxInstance(jThis);
   }
 
+  jni::alias_ref<jni::JClass> JHybridBaseSpec::CxxPart::getClass() {
+    return JHybridBaseSpec::JavaPart::javaClassStatic();
+  }
+
   std::shared_ptr<JHybridObject> JHybridBaseSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
     auto castJavaPart = jni::dynamic_ref_cast<JHybridBaseSpec::JavaPart>(javaPart);
     if (castJavaPart == nullptr) [[unlikely]] {
@@ -88,25 +92,25 @@ namespace margelo::nitro::test {
 
   // Properties
   double JHybridBaseSpec::getBaseValue() {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<double()>("getBaseValue");
+    static const auto __method = CxxPart::getClass()->getMethod<double()>("getBaseValue");
     auto __result = __method(_javaPart);
     return __result;
   }
 
   // Methods
   SizeKotlin JHybridBaseSpec::bounceSize(const SizeKotlin& size) {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JSize>(jni::alias_ref<JSize> /* size */)>("bounceSize");
+    static const auto __method = CxxPart::getClass()->getMethod<jni::local_ref<JSize>(jni::alias_ref<JSize> /* size */)>("bounceSize");
     auto __result = __method(_javaPart, JSize::fromCpp(size));
     return __result->toCpp();
   }
   SizeUnit JHybridBaseSpec::bounceSizeUnit(SizeUnit unit) {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JSizeUnit>(jni::alias_ref<JSizeUnit> /* unit */)>("bounceSizeUnit");
+    static const auto __method = CxxPart::getClass()->getMethod<jni::local_ref<JSizeUnit>(jni::alias_ref<JSizeUnit> /* unit */)>("bounceSizeUnit");
     auto __result = __method(_javaPart, JSizeUnit::fromCpp(unit));
     return __result->toCpp();
   }
   Promise<SizeKotlin> JHybridBaseSpec::mapSize(const SizeKotlin& size, const Callback<SizeKotlin(const SizeKotlin& /* size */)>& callback) {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<JSize> /* size */, jni::alias_ref<JCallback_SizeKotlin_SizeKotlin::javaobject> /* callback */)>("mapSize_cxx");
-    auto __result = __method(_javaPart, JSize::fromCpp(size), JCallback_SizeKotlin_SizeKotlin_cxx::fromCpp(callback));
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<JSize> /* size */, jni::alias_ref<JCallback_SizeKotlin_SizeKotlin::javaobject> /* callback */)>("mapSize_cxx");
+    auto __result = __method(_javaPart, CxxPart::getClass(), JSize::fromCpp(size), JCallback_SizeKotlin_SizeKotlin_cxx::fromCpp(callback));
     return [&]() {
       auto __promise = Promise<SizeKotlin>::pending();
       __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {

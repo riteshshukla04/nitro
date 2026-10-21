@@ -52,13 +52,13 @@ export function prepareKotlinMethod(nativeMethod: Method): KotlinMethodInfo {
   }
 }
 
-interface KotlinForwarderBodyOptions {
+interface KotlinBridgeBodyOptions {
   callable: KotlinMethodInfo
   getKotlinInvocation: (args: string[]) => string
 }
 
-/** Kotlin forwarders convert JNI values to the public API and back. */
-export function createKotlinForwarderBody({ callable, getKotlinInvocation }: KotlinForwarderBodyOptions): string {
+/** Kotlin bridges convert JNI values to the public API and back. */
+export function createKotlinBridgeBody({ callable, getKotlinInvocation }: KotlinBridgeBodyOptions): string {
   const kotlinArguments = callable.parameters.map((parameter) =>
     parameter.type.convert(parameter.native.type.escapedName, {
       from: 'c++',
@@ -87,10 +87,12 @@ interface CppJniCallBodyOptions {
   callable: KotlinMethodInfo
   /** The JVM method C++ calls, e.g. `addNumbers_cxx`. */
   jvmName: string
-  /** Looks up the fbjni method, e.g. `_javaPart->javaClassStatic()->getMethod`. */
+  /** Looks up the fbjni method, e.g. `CxxPart::getClass()->getMethod`. */
   jniMethodLookup: string
   /** The Java instance, or the class for static methods. */
   jniReceiver: string
+  /** The lookup class passed to fbjni's nonvirtual invocation. */
+  jniDeclaringClass?: string
 }
 
 /**
@@ -98,7 +100,13 @@ interface CppJniCallBodyOptions {
  * The caller must already be attached to the JVM.
  * Generated locals use the reserved `__` prefix, so they cannot shadow parameters.
  */
-export function createCppJniCallBody({ callable, jvmName, jniMethodLookup, jniReceiver }: CppJniCallBodyOptions): string {
+export function createCppJniCallBody({
+  callable,
+  jvmName,
+  jniMethodLookup,
+  jniReceiver,
+  jniDeclaringClass,
+}: CppJniCallBodyOptions): string {
   const jniReturnType = callable.returnType.getCode('c++', {
     context: 'return',
   })
@@ -107,16 +115,19 @@ export function createCppJniCallBody({ callable, jvmName, jniMethodLookup, jniRe
     return `${type} /* ${parameter.native.name} */`
   })
   const jniSignature = `${jniReturnType}(${jniParameterTypes.join(', ')})`
-  const jniArguments = [
-    jniReceiver,
+  const jniArguments = [jniReceiver]
+  if (jniDeclaringClass != null) {
+    jniArguments.push(jniDeclaringClass)
+  }
+  jniArguments.push(
     ...callable.parameters.map((parameter) =>
       parameter.type.convert(parameter.native.type.escapedName, {
         from: 'c++',
         to: 'kotlin',
         in: 'c++',
       })
-    ),
-  ]
+    )
+  )
   if (callable.nativeMethod.returnType.kind === 'void') {
     return `
 static const auto __method = ${jniMethodLookup}<${jniSignature}>("${jvmName}");

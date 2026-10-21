@@ -35,6 +35,7 @@ namespace margelo::nitro::test::external {
       static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/HybridSomeExternalObjectSpec$CxxPart;";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
       static void registerNatives();
+      static jni::alias_ref<jni::JClass> getClass();
       using HybridBase::HybridBase;
     protected:
       std::shared_ptr<JHybridObject> createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) override;

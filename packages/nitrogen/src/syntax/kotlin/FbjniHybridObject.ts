@@ -8,15 +8,36 @@ import { getKotlinPropertyAccessors, KotlinInstanceMethod } from './KotlinInstan
 import { wrapKotlinType } from './wrapKotlinType.js'
 import { getImportsCode } from '../getImportCode.js'
 import { createKotlinHybridClassBindings } from './KotlinHybridClassBindings.js'
+import type { KotlinHybridObjectType } from './types/KotlinHybridObjectType.js'
 
-export function createFbjniHybridObject(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {
+interface FbjniHybridObjectOptions {
+  spec: HybridObjectSpec<'kotlin'>
+  hybridObject: KotlinHybridObjectType
+}
+
+export function createFbjniHybridObject({ spec, hybridObject }: FbjniHybridObjectOptions): SourceFile[] {
   const name = getHybridObjectName(spec.name)
   const properties = spec.properties
   const nativeMethods = spec.methods
+  const nonvirtual = hybridObject.canUseNonvirtualJniCalls
   const propertyAccessors = properties.flatMap(getKotlinPropertyAccessors)
-  const propertyDefinitions = propertyAccessors.flatMap((accessor) => accessor.createBridge().cppMethods)
-  const methodDefinitions = nativeMethods.flatMap((method) => new KotlinInstanceMethod({ method: method }).createBridge().cppMethods)
+  const propertyDefinitions = propertyAccessors.flatMap((accessor) => accessor.createBridge({ nonvirtual: nonvirtual }).cppMethods)
+  const methodDefinitions = nativeMethods.flatMap(
+    (method) => new KotlinInstanceMethod({ method: method }).createBridge({ nonvirtual: nonvirtual }).cppMethods
+  )
   const bindings = createKotlinHybridClassBindings(spec)
+  let getClassBody: string
+  if (nonvirtual) {
+    getClassBody = `
+static const auto __field = CxxPart::javaClassStatic()->getStaticField<jni::JClass>("implementationClass_cxx");
+static const auto __class = jni::make_global(CxxPart::javaClassStatic()->getStaticFieldValue(__field));
+return __class;
+`.trim()
+  } else {
+    getClassBody = `
+return ${name.JHybridTSpec}::JavaPart::javaClassStatic();
+`.trim()
+  }
   const registrations: string[] = []
   for (const property of properties) {
     const accessors = [`&${name.JHybridTSpec}::${property.getGetterName('other')}`]
@@ -96,6 +117,7 @@ namespace ${cxxNamespace} {
       static constexpr auto kJavaDescriptor = "L${cxxPartJniClassDescriptor};";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
       static void registerNatives();
+      static jni::alias_ref<jni::JClass> getClass();
       using HybridBase::HybridBase;
     protected:
       std::shared_ptr<JHybridObject> createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) override;
@@ -201,6 +223,10 @@ namespace ${cxxNamespace} {
 
   jni::local_ref<${name.JHybridTSpec}::CxxPart::jhybriddata> ${name.JHybridTSpec}::CxxPart::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
+  }
+
+  jni::alias_ref<jni::JClass> ${name.JHybridTSpec}::CxxPart::getClass() {
+    ${indent(getClassBody, '    ')}
   }
 
   std::shared_ptr<JHybridObject> ${name.JHybridTSpec}::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {

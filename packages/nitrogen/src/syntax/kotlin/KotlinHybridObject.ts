@@ -19,6 +19,7 @@ import type { KotlinStaticProperty } from './KotlinStaticProperty.js'
 import { wrapKotlinType } from './wrapKotlinType.js'
 import { getImportCode } from '../getImportCode.js'
 import { getKotlinNativeType } from './getKotlinNativeType.js'
+import { KotlinHybridObjectType } from './types/KotlinHybridObjectType.js'
 
 export function createKotlinHybridObject(publicSpec: HybridObjectSpec<'kotlin'>): SourceFile[] {
   const nativeProperties = publicSpec.properties.map((property) => {
@@ -29,6 +30,7 @@ export function createKotlinHybridObject(publicSpec: HybridObjectSpec<'kotlin'>)
     ...publicSpec,
     properties: nativeProperties,
   }
+  const hybridObject = new KotlinHybridObjectType(new HybridObjectType(spec))
   const name = getHybridObjectName(spec.name)
   const properties = spec.properties.map(getKotlinPropertyCode).join('\n\n')
   const methods = spec.methods.map(getKotlinMethodCode).join('\n\n')
@@ -40,6 +42,7 @@ export function createKotlinHybridObject(publicSpec: HybridObjectSpec<'kotlin'>)
     })
     .join('\n\n')
   const bridgeCompanion = getKotlinCompanion(spec)
+  const cxxPartMembers = getKotlinCxxPartMembers({ spec: spec, hybridObject: hybridObject })
 
   const extraImports: SourceImport[] = [
     ...spec.properties.flatMap((p) => p.getRequiredImports('kotlin')),
@@ -48,6 +51,7 @@ export function createKotlinHybridObject(publicSpec: HybridObjectSpec<'kotlin'>)
     ...spec.staticMethods.flatMap((m) => m.getRequiredImports('kotlin')),
     ...(spec.constructor?.getRequiredImports('kotlin') ?? []),
     ...bridgeCompanion.imports,
+    ...cxxPartMembers.imports,
     ...spec.baseTypes.flatMap((b) => new HybridObjectType(b).getRequiredImports('kotlin')),
     {
       name: 'com.margelo.nitro.core.HybridObject',
@@ -124,9 +128,7 @@ abstract class ${name.HybridTSpec}: ${supertypes} {
   @DoNotStrip
   @Keep
   protected open class CxxPart(javaPart: ${name.HybridTSpec}): ${cxxPartBase}(javaPart) {
-    // C++ ${name.JHybridTSpec}::CxxPart::initHybrid(...)
-    @FastNative
-    external override fun initHybrid(): HybridData
+    ${indent(cxxPartMembers.code, '    ')}
   }
   override fun createCxxPart(): CxxPart {
     return CxxPart(this)
@@ -147,7 +149,7 @@ abstract class ${name.HybridTSpec}: ${supertypes} {
   `.trim()
 
   // 2. Create C++ (fbjni) bindings
-  const cppFiles = createFbjniHybridObject(spec)
+  const cppFiles = createFbjniHybridObject({ spec: spec, hybridObject: hybridObject })
 
   // 3. Create enums or structs in Kotlin
   const nativeTypes = getAllTypes(spec)
@@ -181,8 +183,39 @@ interface KotlinCompanionGroup {
   callables: (KotlinConstructor | KotlinStaticMethod | KotlinStaticProperty)[]
 }
 
+interface KotlinCxxPartMembersOptions {
+  spec: HybridObjectSpec<'kotlin'>
+  hybridObject: KotlinHybridObjectType
+}
+
+function getKotlinCxxPartMembers({ spec, hybridObject }: KotlinCxxPartMembersOptions): KotlinCompanion {
+  const name = getHybridObjectName(spec.name)
+  const initHybridCode = `
+// C++ ${name.JHybridTSpec}::CxxPart::initHybrid(...)
+@FastNative
+external override fun initHybrid(): HybridData
+`.trim()
+  const sections = [initHybridCode]
+  const imports: SourceImport[] = []
+  if (hybridObject.canUseNonvirtualJniCalls) {
+    const implementation = getKotlinImplementation(spec)
+    imports.push(implementation.kotlinImport)
+    // A class literal keeps the implementation reachable after R8 renaming.
+    const implementationClassCode = `
+companion object {
+  @DoNotStrip
+  @Keep
+  @JvmField
+  val implementationClass_cxx: Class<out ${name.HybridTSpec}> = ${implementation.className}::class.java
+}
+`.trim()
+    sections.push(implementationClassCode)
+  }
+  return { code: sections.join('\n\n'), imports: imports }
+}
+
 /**
- * The companion object holds the forwarders JNI calls to construct the class or call its static methods.
+ * The companion object holds the bridges JNI calls to construct the class or call its static methods.
  * They let Kotlin check the implementation at compile time, keep it from being stripped by R8,
  * and expose actual JVM static methods through `@JvmStatic`.
  * TODO: Remove the Kotlin-side conversions (`convert(..., { in: 'kotlin' })`, for `UInt64`
@@ -211,7 +244,7 @@ protected const val TAG = "${name.HybridTSpec}"
   // Only static members require a companion; instance-only specs may have no configured implementation.
   if (spec.staticMethods.length > 0 || spec.staticProperties.length > 0) {
     const implementation = getKotlinImplementation(spec)
-    // Check the configured companion's contract; forwarders still call it directly.
+    // Check the configured companion's contract; bridges still call it directly.
     const companionRequirement = `
 private val implementationCompanion: Companion
   get() = ${implementation.className}
@@ -219,18 +252,18 @@ private val implementationCompanion: Companion
     sections.push(companionRequirement)
   }
   for (const group of groups) {
-    const forwarders = group.callables
+    const bridges = group.callables
       .flatMap((callable) => callable.createBridge().kotlinMethods)
       .map(({ method, body }) => method.getDefinition('kotlin', { body: body }))
     const groupCode = `
 // ${group.comment}
-${forwarders.join('\n\n')}
+${bridges.join('\n\n')}
 `.trim()
     sections.push(groupCode)
   }
   const imports: SourceImport[] = []
   if (groups.length > 0) {
-    // The forwarders call the implementation by its class name.
+    // The bridges call the implementation by its class name.
     imports.push(getKotlinImplementation(spec).kotlinImport)
   }
   return { code: sections.join('\n\n'), imports: imports }
@@ -238,29 +271,29 @@ ${forwarders.join('\n\n')}
 
 function getKotlinMethodCode(method: InstanceMethod): string {
   const kotlinMethod = new KotlinInstanceMethod({ method: method })
-  // Without a forwarder, JNI calls the abstract member directly.
+  // Without a bridge, JNI calls the abstract member directly.
   const declaration = new InstanceMethod(method.name, method.returnType, method.parameters, {
-    doNotStrip: !kotlinMethod.needsKotlinForwarder,
+    doNotStrip: !kotlinMethod.needsKotlinBridge,
     pureVirtual: true,
   })
-  const forwarders = kotlinMethod
+  const bridges = kotlinMethod
     .createBridge()
-    .kotlinMethods.map(({ method: forwarder, body }) => forwarder.getDefinition('kotlin', { body: body }))
-  return [declaration.getDeclaration('kotlin'), ...forwarders].join('\n\n')
+    .kotlinMethods.map(({ method: bridge, body }) => bridge.getDefinition('kotlin', { body: body }))
+  return [declaration.getDeclaration('kotlin'), ...bridges].join('\n\n')
 }
 
 function getKotlinPropertyCode(property: Property): string {
   const accessors = getKotlinPropertyAccessors(property)
-  // Without forwarders, JNI calls the abstract accessors directly.
-  const isCalledFromJni = accessors.every((accessor) => !accessor.needsKotlinForwarder)
+  // Without bridges, JNI calls the abstract accessors directly.
+  const isCalledFromJni = accessors.every((accessor) => !accessor.needsKotlinBridge)
   const declaration = property.getCode('kotlin', {
     doNotStrip: isCalledFromJni,
     virtual: true,
   })
-  const forwarders = accessors
+  const bridges = accessors
     .flatMap((accessor) => accessor.createBridge().kotlinMethods)
     .map(({ method, body }) => method.getDefinition('kotlin', { body: body }))
-  return [declaration, ...forwarders].join('\n\n')
+  return [declaration, ...bridges].join('\n\n')
 }
 
 function getImplementedInterfaceImport(implementedInterface: KotlinImplementedInterface): SourceImport<'kotlin'> {

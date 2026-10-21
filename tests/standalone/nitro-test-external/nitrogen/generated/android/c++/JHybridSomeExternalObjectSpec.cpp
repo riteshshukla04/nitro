@@ -46,6 +46,10 @@ namespace margelo::nitro::test::external {
     return makeCxxInstance(jThis);
   }
 
+  jni::alias_ref<jni::JClass> JHybridSomeExternalObjectSpec::CxxPart::getClass() {
+    return JHybridSomeExternalObjectSpec::JavaPart::javaClassStatic();
+  }
+
   std::shared_ptr<JHybridObject> JHybridSomeExternalObjectSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
     auto castJavaPart = jni::dynamic_ref_cast<JHybridSomeExternalObjectSpec::JavaPart>(javaPart);
     if (castJavaPart == nullptr) [[unlikely]] {
@@ -65,13 +69,13 @@ namespace margelo::nitro::test::external {
 
   // Methods
   std::string JHybridSomeExternalObjectSpec::getValue() {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<jni::JString>()>("getValue");
+    static const auto __method = CxxPart::getClass()->getMethod<jni::local_ref<jni::JString>()>("getValue");
     auto __result = __method(_javaPart);
     return __result->toStdString();
   }
   OptionalPrimitivesHolderKotlin JHybridSomeExternalObjectSpec::createOptionalPrimitivesHolder(const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64) {
-    static const auto __method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JOptionalPrimitivesHolder>(jni::alias_ref<jni::JDouble> /* optionalNumber */, jni::alias_ref<jni::JBoolean> /* optionalBoolean */, jni::alias_ref<jni::JLong> /* optionalUInt64 */, jni::alias_ref<jni::JLong> /* optionalInt64 */)>("createOptionalPrimitivesHolder_cxx");
-    auto __result = __method(_javaPart, optionalNumber.has_value() ? jni::JDouble::valueOf(optionalNumber.value()) : nullptr, optionalBoolean.has_value() ? jni::JBoolean::valueOf(optionalBoolean.value()) : nullptr, optionalUInt64.has_value() ? jni::JLong::valueOf(optionalUInt64.value()) : nullptr, optionalInt64.has_value() ? jni::JLong::valueOf(optionalInt64.value()) : nullptr);
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOptionalPrimitivesHolder>(jni::alias_ref<jni::JDouble> /* optionalNumber */, jni::alias_ref<jni::JBoolean> /* optionalBoolean */, jni::alias_ref<jni::JLong> /* optionalUInt64 */, jni::alias_ref<jni::JLong> /* optionalInt64 */)>("createOptionalPrimitivesHolder_cxx");
+    auto __result = __method(_javaPart, CxxPart::getClass(), optionalNumber.has_value() ? jni::JDouble::valueOf(optionalNumber.value()) : nullptr, optionalBoolean.has_value() ? jni::JBoolean::valueOf(optionalBoolean.value()) : nullptr, optionalUInt64.has_value() ? jni::JLong::valueOf(optionalUInt64.value()) : nullptr, optionalInt64.has_value() ? jni::JLong::valueOf(optionalInt64.value()) : nullptr);
     return __result->toCpp();
   }
 

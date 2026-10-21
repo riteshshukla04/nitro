@@ -3,7 +3,7 @@ import { StaticMethod } from '../StaticMethod.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
 import {
   createCppJniCallBody,
-  createKotlinForwarderBody,
+  createKotlinBridgeBody,
   getKotlinImplementation,
   prepareKotlinMethod,
   type KotlinMethodBridge,
@@ -17,7 +17,7 @@ interface KotlinStaticMethodOptions {
 }
 
 /**
- * The companion forwarder C++ calls through JNI.
+ * The companion bridge C++ calls through JNI.
  * It calls the static method on the Kotlin implementation's companion object.
  */
 export class KotlinStaticMethod extends StaticMethod {
@@ -52,7 +52,7 @@ export class KotlinStaticMethod extends StaticMethod {
       jniMethodLookup: `${this.jniClass}->getStaticMethod`,
       jniReceiver: this.jniClass,
     })
-    const kotlinBody = createKotlinForwarderBody({
+    const kotlinBody = createKotlinBridgeBody({
       callable: this.callable,
       getKotlinInvocation: (args) => `${this.implementationClassName}.${nativeMethod.name}(${args.join(', ')})`,
     })

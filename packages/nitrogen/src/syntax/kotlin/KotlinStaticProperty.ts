@@ -6,7 +6,7 @@ import { StaticProperty } from '../StaticProperty.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
 import {
   createCppJniCallBody,
-  createKotlinForwarderBody,
+  createKotlinBridgeBody,
   getKotlinImplementation,
   prepareKotlinMethod,
   type KotlinMethodBridge,
@@ -95,7 +95,7 @@ export class KotlinStaticProperty extends StaticProperty {
       jniMethodLookup: `${this.jniClass}->getStaticMethod`,
       jniReceiver: this.jniClass,
     })
-    const kotlinBody = createKotlinForwarderBody({
+    const kotlinBody = createKotlinBridgeBody({
       callable: callable,
       getKotlinInvocation: getKotlinInvocation,
     })

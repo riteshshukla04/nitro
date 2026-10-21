@@ -46,6 +46,13 @@ abstract class HybridGrandchildSpec: HybridChildSpec() {
     // C++ JHybridGrandchildSpec::CxxPart::initHybrid(...)
     @FastNative
     external override fun initHybrid(): HybridData
+
+    companion object {
+      @DoNotStrip
+      @Keep
+      @JvmField
+      val implementationClass_cxx: Class<out HybridGrandchildSpec> = HybridGrandchild::class.java
+    }
   }
   override fun createCxxPart(): CxxPart {
     return CxxPart(this)

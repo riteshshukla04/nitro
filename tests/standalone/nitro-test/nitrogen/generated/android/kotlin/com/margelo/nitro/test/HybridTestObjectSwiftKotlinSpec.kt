@@ -799,6 +799,13 @@ abstract class HybridTestObjectSwiftKotlinSpec: HybridObject() {
     // C++ JHybridTestObjectSwiftKotlinSpec::CxxPart::initHybrid(...)
     @FastNative
     external override fun initHybrid(): HybridData
+
+    companion object {
+      @DoNotStrip
+      @Keep
+      @JvmField
+      val implementationClass_cxx: Class<out HybridTestObjectSwiftKotlinSpec> = HybridTestObjectKotlin::class.java
+    }
   }
   override fun createCxxPart(): CxxPart {
     return CxxPart(this)
