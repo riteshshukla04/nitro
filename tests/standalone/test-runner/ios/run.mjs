@@ -229,7 +229,9 @@ const xcodebuild = (args) =>
     child.once('error', reject)
     child.once('close', (code) => resolve(code ?? 1))
   })
-let status = await xcodebuild(['build-for-testing', ...buildSettings])
+const bootedBeforeBuild = await simulatorBooted
+console.log(`Simulator booted before the build after ${elapsed()}`)
+let status = bootedBeforeBuild === 0 ? await xcodebuild(['build-for-testing', ...buildSettings]) : bootedBeforeBuild
 console.log(`Built for testing after ${elapsed()}`)
 if (values.ccache) run('ccache', ['--show-stats'])
 if (status === 0) {
