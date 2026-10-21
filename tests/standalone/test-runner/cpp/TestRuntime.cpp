@@ -372,6 +372,9 @@ namespace {
       pthread_attr_t attributes;
       pthread_attr_init(&attributes);
       pthread_attr_setstacksize(&attributes, 8 * 1024 * 1024);
+#ifdef __APPLE__
+      pthread_attr_set_qos_class_np(&attributes, QOS_CLASS_USER_INTERACTIVE, 0);
+#endif
       const int error = pthread_create(
           &thread, &attributes,
           [](void* context) -> void* {
