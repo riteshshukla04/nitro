@@ -80,6 +80,7 @@ function run(command, args, capture = false) {
 }
 
 let destination = values.destination
+let bootDevice
 if (!destination) {
   const { devices } = JSON.parse(run('xcrun', ['simctl', 'list', 'devices', 'available', '--json'], true))
   const deviceName = values.device ?? defaults.device
@@ -101,8 +102,7 @@ if (!destination) {
   // Xcode can start tests while a fresh simulator is still migrating data.
   // Finish booting before starting the test watchdogs. Booting during the
   // build was no faster on 3-core CI machines: both compete for the CPU.
-  run('xcrun', ['simctl', 'bootstatus', device.udid, '-b'])
-  console.log(`Simulator booted after ${elapsed()}`)
+  bootDevice = device.udid
 }
 if (values['skip-hermes-build']) {
   const framework = path.join(root, 'tests/standalone/.build/hermes/NitroTestHermes.xcframework')
@@ -141,7 +141,7 @@ const buildSettings = [
   '-scheme',
   'NitroRuntimeTests',
   '-destination',
-  destination,
+  'generic/platform=iOS Simulator',
   '-derivedDataPath',
   derivedData,
   '-enableAddressSanitizer',
@@ -213,6 +213,10 @@ const xcodebuild = (args) =>
 let status = await xcodebuild(['build-for-testing', ...buildSettings])
 console.log(`Built for testing after ${elapsed()}`)
 if (status === 0) {
+  if (bootDevice) {
+    run('xcrun', ['simctl', 'bootstatus', bootDevice, '-b'])
+    console.log(`Simulator booted after ${elapsed()}`)
+  }
   status = await xcodebuild(argumentsForTests())
   console.log(`Tests finished after ${elapsed()}`)
 }
