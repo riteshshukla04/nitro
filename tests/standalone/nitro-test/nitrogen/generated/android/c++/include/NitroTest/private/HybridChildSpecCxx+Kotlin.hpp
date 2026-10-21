@@ -18,8 +18,8 @@ namespace margelo::nitro {
 
   template <>
   struct JNIConverter<margelo::nitro::test::HybridChildSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridChildSpec>> final {
-    static std::shared_ptr<margelo::nitro::test::JHybridChildSpec> toKotlin(const margelo::nitro::test::HybridChildSpecCxx& value);
-    static margelo::nitro::test::HybridChildSpecCxx fromKotlin(const std::shared_ptr<margelo::nitro::test::JHybridChildSpec>& value);
+    static std::shared_ptr<margelo::nitro::test::JHybridChildSpec> toJNI(const margelo::nitro::test::HybridChildSpecCxx& value);
+    static margelo::nitro::test::HybridChildSpecCxx fromJNI(const std::shared_ptr<margelo::nitro::test::JHybridChildSpec>& value);
   };
 
 } // namespace margelo::nitro

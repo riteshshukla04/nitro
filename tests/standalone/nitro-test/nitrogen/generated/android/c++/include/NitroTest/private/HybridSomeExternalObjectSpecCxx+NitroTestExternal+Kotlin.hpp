@@ -18,8 +18,8 @@ namespace margelo::nitro {
 
   template <>
   struct JNIConverter<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>> final {
-    static std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec> toKotlin(const margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& value);
-    static margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx fromKotlin(const std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>& value);
+    static std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec> toJNI(const margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx& value);
+    static margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx fromJNI(const std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>& value);
   };
 
 } // namespace margelo::nitro

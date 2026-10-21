@@ -13,7 +13,7 @@
 
 namespace margelo::nitro {
 
-  std::shared_ptr<margelo::nitro::test::JHybridChildSpec> JNIConverter<margelo::nitro::test::HybridChildSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridChildSpec>>::toKotlin(const margelo::nitro::test::HybridChildSpecCxx& value) {
+  std::shared_ptr<margelo::nitro::test::JHybridChildSpec> JNIConverter<margelo::nitro::test::HybridChildSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridChildSpec>>::toJNI(const margelo::nitro::test::HybridChildSpecCxx& value) {
     auto result = std::dynamic_pointer_cast<std::shared_ptr<margelo::nitro::test::JHybridChildSpec>::element_type>(value.getNativeObject());
     if (result == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot convert Child to its Kotlin implementation.");
@@ -21,7 +21,7 @@ namespace margelo::nitro {
     return result;
   }
 
-  margelo::nitro::test::HybridChildSpecCxx JNIConverter<margelo::nitro::test::HybridChildSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridChildSpec>>::fromKotlin(const std::shared_ptr<margelo::nitro::test::JHybridChildSpec>& value) {
+  margelo::nitro::test::HybridChildSpecCxx JNIConverter<margelo::nitro::test::HybridChildSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridChildSpec>>::fromJNI(const std::shared_ptr<margelo::nitro::test::JHybridChildSpec>& value) {
     return margelo::nitro::test::HybridChildSpecCxx::fromNative(value);
   }
 

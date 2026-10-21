@@ -11,21 +11,21 @@
 
 namespace margelo::nitro {
 
-  margelo::nitro::test::external::OptionalPrimitivesHolderKotlin JNIConverter<margelo::nitro::test::OptionalPrimitivesHolder, margelo::nitro::test::external::OptionalPrimitivesHolderKotlin>::toKotlin(const margelo::nitro::test::OptionalPrimitivesHolder& value) {
+  margelo::nitro::test::external::OptionalPrimitivesHolderKotlin JNIConverter<margelo::nitro::test::OptionalPrimitivesHolder, margelo::nitro::test::external::OptionalPrimitivesHolderKotlin>::toJNI(const margelo::nitro::test::OptionalPrimitivesHolder& value) {
     return margelo::nitro::test::external::OptionalPrimitivesHolderKotlin(
-      JNIConverter<std::optional<double>, std::optional<double>>::toKotlin(value.optionalNumber),
-      JNIConverter<std::optional<bool>, std::optional<bool>>::toKotlin(value.optionalBoolean),
-      JNIConverter<std::optional<uint64_t>, std::optional<uint64_t>>::toKotlin(value.optionalUInt64),
-      JNIConverter<std::optional<int64_t>, std::optional<int64_t>>::toKotlin(value.optionalInt64)
+      JNIConverter<std::optional<double>, std::optional<double>>::toJNI(value.optionalNumber),
+      JNIConverter<std::optional<bool>, std::optional<bool>>::toJNI(value.optionalBoolean),
+      JNIConverter<std::optional<uint64_t>, std::optional<uint64_t>>::toJNI(value.optionalUInt64),
+      JNIConverter<std::optional<int64_t>, std::optional<int64_t>>::toJNI(value.optionalInt64)
     );
   }
 
-  margelo::nitro::test::OptionalPrimitivesHolder JNIConverter<margelo::nitro::test::OptionalPrimitivesHolder, margelo::nitro::test::external::OptionalPrimitivesHolderKotlin>::fromKotlin(const margelo::nitro::test::external::OptionalPrimitivesHolderKotlin& value) {
+  margelo::nitro::test::OptionalPrimitivesHolder JNIConverter<margelo::nitro::test::OptionalPrimitivesHolder, margelo::nitro::test::external::OptionalPrimitivesHolderKotlin>::fromJNI(const margelo::nitro::test::external::OptionalPrimitivesHolderKotlin& value) {
     return margelo::nitro::test::OptionalPrimitivesHolder(
-      JNIConverter<std::optional<double>, std::optional<double>>::fromKotlin(value.optionalNumber),
-      JNIConverter<std::optional<bool>, std::optional<bool>>::fromKotlin(value.optionalBoolean),
-      JNIConverter<std::optional<uint64_t>, std::optional<uint64_t>>::fromKotlin(value.optionalUInt64),
-      JNIConverter<std::optional<int64_t>, std::optional<int64_t>>::fromKotlin(value.optionalInt64)
+      JNIConverter<std::optional<double>, std::optional<double>>::fromJNI(value.optionalNumber),
+      JNIConverter<std::optional<bool>, std::optional<bool>>::fromJNI(value.optionalBoolean),
+      JNIConverter<std::optional<uint64_t>, std::optional<uint64_t>>::fromJNI(value.optionalUInt64),
+      JNIConverter<std::optional<int64_t>, std::optional<int64_t>>::fromJNI(value.optionalInt64)
     );
   }
 

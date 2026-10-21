@@ -37,7 +37,7 @@ namespace margelo::nitro::test {
       throw std::invalid_argument("Cannot call Child.getChildValue on an empty or incompatible C++ adapter.");
     }
     auto __result = __implementation->getChildValue();
-    return JNIConverter<double, double>::fromKotlin(__result);
+    return JNIConverter<double, double>::fromJNI(__result);
   }
 
   std::variant<std::string, margelo::nitro::test::Car> HybridChildSpecCxx::bounceVariant(const std::variant<std::string, Car>& variant) const {
@@ -45,8 +45,8 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Child.bounceVariant on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->bounceVariant(JNIConverter<std::variant<std::string, margelo::nitro::test::Car>, std::variant<std::string, margelo::nitro::test::CarKotlin>>::toKotlin(variant));
-    return JNIConverter<std::variant<std::string, margelo::nitro::test::Car>, std::variant<std::string, margelo::nitro::test::CarKotlin>>::fromKotlin(__result);
+    auto __result = __implementation->bounceVariant(JNIConverter<std::variant<std::string, margelo::nitro::test::Car>, std::variant<std::string, margelo::nitro::test::CarKotlin>>::toJNI(variant));
+    return JNIConverter<std::variant<std::string, margelo::nitro::test::Car>, std::variant<std::string, margelo::nitro::test::CarKotlin>>::fromJNI(__result);
   }
 
 } // namespace margelo::nitro::test

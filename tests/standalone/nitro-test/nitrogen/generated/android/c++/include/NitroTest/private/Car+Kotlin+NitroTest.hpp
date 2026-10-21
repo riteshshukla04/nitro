@@ -17,8 +17,8 @@ namespace margelo::nitro {
 
   template <>
   struct JNIConverter<margelo::nitro::test::Car, margelo::nitro::test::CarKotlin> final {
-    static margelo::nitro::test::CarKotlin toKotlin(const margelo::nitro::test::Car& value);
-    static margelo::nitro::test::Car fromKotlin(const margelo::nitro::test::CarKotlin& value);
+    static margelo::nitro::test::CarKotlin toJNI(const margelo::nitro::test::Car& value);
+    static margelo::nitro::test::Car fromJNI(const margelo::nitro::test::CarKotlin& value);
   };
 
 } // namespace margelo::nitro

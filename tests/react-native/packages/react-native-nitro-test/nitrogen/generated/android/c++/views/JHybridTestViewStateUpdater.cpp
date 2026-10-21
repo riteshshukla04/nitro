@@ -71,32 +71,32 @@ void JHybridTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /*
     if (oldProps == nullptr
           ? newProps->isBlue.isProvided()
           : !newProps->isBlue.hasSameValue(oldProps->isBlue)) {
-      hybridView->setIsBlue(JNIConverter<bool, bool>::toKotlin(newProps->isBlue.get()));
+      hybridView->setIsBlue(JNIConverter<bool, bool>::toJNI(newProps->isBlue.get()));
     }
     if (oldProps == nullptr
           ? newProps->hasBeenCalled.isProvided()
           : !newProps->hasBeenCalled.hasSameValue(oldProps->hasBeenCalled)) {
-      hybridView->setHasBeenCalled(JNIConverter<bool, bool>::toKotlin(newProps->hasBeenCalled.get()));
+      hybridView->setHasBeenCalled(JNIConverter<bool, bool>::toJNI(newProps->hasBeenCalled.get()));
     }
     if (oldProps == nullptr
           ? newProps->int64Value.isProvided()
           : !newProps->int64Value.hasSameValue(oldProps->int64Value)) {
-      hybridView->setInt64Value(JNIConverter<int64_t, int64_t>::toKotlin(newProps->int64Value.get()));
+      hybridView->setInt64Value(JNIConverter<int64_t, int64_t>::toJNI(newProps->int64Value.get()));
     }
     if (oldProps == nullptr
           ? newProps->colorScheme.isProvided()
           : !newProps->colorScheme.hasSameValue(oldProps->colorScheme)) {
-      hybridView->setColorScheme(JNIConverter<margelo::nitro::test::ColorScheme, margelo::nitro::test::ColorScheme>::toKotlin(newProps->colorScheme.get()));
+      hybridView->setColorScheme(JNIConverter<margelo::nitro::test::ColorScheme, margelo::nitro::test::ColorScheme>::toJNI(newProps->colorScheme.get()));
     }
     if (oldProps == nullptr
           ? newProps->someCallback.isProvided()
           : !newProps->someCallback.hasSameValue(oldProps->someCallback)) {
-      hybridView->setSomeCallback(JNIConverter<margelo::nitro::Callback<void()>, margelo::nitro::Callback<void()>>::toKotlin(newProps->someCallback.get()));
+      hybridView->setSomeCallback(JNIConverter<margelo::nitro::Callback<void()>, margelo::nitro::Callback<void()>>::toJNI(newProps->someCallback.get()));
     }
     if (oldProps == nullptr
           ? newProps->nativeDefaultValue.isProvided()
           : !newProps->nativeDefaultValue.hasSameValue(oldProps->nativeDefaultValue)) {
-      hybridView->setNativeDefaultValue(JNIConverter<std::optional<double>, std::optional<double>>::toKotlin(newProps->nativeDefaultValue.get()));
+      hybridView->setNativeDefaultValue(JNIConverter<std::optional<double>, std::optional<double>>::toJNI(newProps->nativeDefaultValue.get()));
     }
 
     if (oldProps == nullptr

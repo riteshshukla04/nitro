@@ -17,8 +17,8 @@ namespace margelo::nitro {
 
   template <>
   struct JNIConverter<margelo::nitro::test::OptionalPrimitivesHolder, margelo::nitro::test::external::OptionalPrimitivesHolderKotlin> final {
-    static margelo::nitro::test::external::OptionalPrimitivesHolderKotlin toKotlin(const margelo::nitro::test::OptionalPrimitivesHolder& value);
-    static margelo::nitro::test::OptionalPrimitivesHolder fromKotlin(const margelo::nitro::test::external::OptionalPrimitivesHolderKotlin& value);
+    static margelo::nitro::test::external::OptionalPrimitivesHolderKotlin toJNI(const margelo::nitro::test::OptionalPrimitivesHolder& value);
+    static margelo::nitro::test::OptionalPrimitivesHolder fromJNI(const margelo::nitro::test::external::OptionalPrimitivesHolderKotlin& value);
   };
 
 } // namespace margelo::nitro

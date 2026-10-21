@@ -107,11 +107,11 @@ return static_cast<${cppCode}>(value);
     } else {
       const cppToKotlinFields = cppType.properties.map((property) => {
         const converter = getKotlinNativeConverter({ cppType: property, config: config })
-        return `${converter}::toKotlin(value.${property.escapedName})`
+        return `${converter}::toJNI(value.${property.escapedName})`
       })
       const kotlinToCppFields = cppType.properties.map((property) => {
         const converter = getKotlinNativeConverter({ cppType: property, config: config })
-        return `${converter}::fromKotlin(value.${property.escapedName})`
+        return `${converter}::fromJNI(value.${property.escapedName})`
       })
       const referencedFieldTypes = cppType.properties.flatMap(getReferencedTypes)
       const fieldTypes = referencedFieldTypes.filter((item) => isSpecialized(item, config))
@@ -154,8 +154,8 @@ namespace margelo::nitro {
 
   template <>
   struct ${converterCode} final {
-    static ${nativeCode} toKotlin(const ${cppCode}& value);
-    static ${cppCode} fromKotlin(const ${nativeCode}& value);
+    static ${nativeCode} toJNI(const ${cppCode}& value);
+    static ${cppCode} fromJNI(const ${nativeCode}& value);
   };
 
 } // namespace margelo::nitro
@@ -167,11 +167,11 @@ ${implementationIncludes}
 
 namespace margelo::nitro {
 
-  ${nativeCode} ${converterCode}::toKotlin(const ${cppCode}& value) {
+  ${nativeCode} ${converterCode}::toJNI(const ${cppCode}& value) {
     ${indent(cppToKotlinBody, '    ')}
   }
 
-  ${cppCode} ${converterCode}::fromKotlin(const ${nativeCode}& value) {
+  ${cppCode} ${converterCode}::fromJNI(const ${nativeCode}& value) {
     ${indent(kotlinToCppBody, '    ')}
   }
 

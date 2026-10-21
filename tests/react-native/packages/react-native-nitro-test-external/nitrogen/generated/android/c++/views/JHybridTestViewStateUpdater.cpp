@@ -69,12 +69,12 @@ void JHybridTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /*
     if (oldProps == nullptr
           ? newProps->isBlue.isProvided()
           : !newProps->isBlue.hasSameValue(oldProps->isBlue)) {
-      hybridView->setIsBlue(JNIConverter<bool, bool>::toKotlin(newProps->isBlue.get()));
+      hybridView->setIsBlue(JNIConverter<bool, bool>::toJNI(newProps->isBlue.get()));
     }
     if (oldProps == nullptr
           ? newProps->someCallback.isProvided()
           : !newProps->someCallback.hasSameValue(oldProps->someCallback)) {
-      hybridView->setSomeCallback(JNIConverter<margelo::nitro::Callback<void()>, margelo::nitro::Callback<void()>>::toKotlin(newProps->someCallback.get()));
+      hybridView->setSomeCallback(JNIConverter<margelo::nitro::Callback<void()>, margelo::nitro::Callback<void()>>::toJNI(newProps->someCallback.get()));
     }
 
     if (oldProps == nullptr

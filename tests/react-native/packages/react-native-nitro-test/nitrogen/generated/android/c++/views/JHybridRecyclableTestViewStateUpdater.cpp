@@ -68,12 +68,12 @@ void JHybridRecyclableTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::
     if (oldProps == nullptr
           ? newProps->isBlue.isProvided()
           : !newProps->isBlue.hasSameValue(oldProps->isBlue)) {
-      hybridView->setIsBlue(JNIConverter<bool, bool>::toKotlin(newProps->isBlue.get()));
+      hybridView->setIsBlue(JNIConverter<bool, bool>::toJNI(newProps->isBlue.get()));
     }
     if (oldProps == nullptr
           ? newProps->nativeDefaultValue.isProvided()
           : !newProps->nativeDefaultValue.hasSameValue(oldProps->nativeDefaultValue)) {
-      hybridView->setNativeDefaultValue(JNIConverter<std::optional<double>, std::optional<double>>::toKotlin(newProps->nativeDefaultValue.get()));
+      hybridView->setNativeDefaultValue(JNIConverter<std::optional<double>, std::optional<double>>::toJNI(newProps->nativeDefaultValue.get()));
     }
 
     if (oldProps == nullptr

@@ -226,7 +226,7 @@ public:
 if (oldProps == nullptr
       ? newProps->${name}.isProvided()
       : !newProps->${name}.hasSameValue(oldProps->${name})) {
-  hybridView->${setter}(${converter}::toKotlin(newProps->${name}.get()));
+  hybridView->${setter}(${converter}::toJNI(newProps->${name}.get()));
 }
     `.trim()
   })

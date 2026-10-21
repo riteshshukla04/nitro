@@ -36,7 +36,7 @@ namespace margelo::nitro::test::adapters::NitroTestExternal {
       throw std::invalid_argument("Cannot call SomeExternalObject.getValue on an empty or incompatible C++ adapter.");
     }
     auto __result = __implementation->getValue();
-    return JNIConverter<std::string, std::string>::fromKotlin(__result);
+    return JNIConverter<std::string, std::string>::fromJNI(__result);
   }
 
   margelo::nitro::test::OptionalPrimitivesHolder HybridSomeExternalObjectSpecCxx::createOptionalPrimitivesHolder(const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64) const {
@@ -44,8 +44,8 @@ namespace margelo::nitro::test::adapters::NitroTestExternal {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call SomeExternalObject.createOptionalPrimitivesHolder on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->createOptionalPrimitivesHolder(JNIConverter<std::optional<double>, std::optional<double>>::toKotlin(optionalNumber), JNIConverter<std::optional<bool>, std::optional<bool>>::toKotlin(optionalBoolean), JNIConverter<std::optional<uint64_t>, std::optional<uint64_t>>::toKotlin(optionalUInt64), JNIConverter<std::optional<int64_t>, std::optional<int64_t>>::toKotlin(optionalInt64));
-    return JNIConverter<margelo::nitro::test::OptionalPrimitivesHolder, margelo::nitro::test::external::OptionalPrimitivesHolderKotlin>::fromKotlin(__result);
+    auto __result = __implementation->createOptionalPrimitivesHolder(JNIConverter<std::optional<double>, std::optional<double>>::toJNI(optionalNumber), JNIConverter<std::optional<bool>, std::optional<bool>>::toJNI(optionalBoolean), JNIConverter<std::optional<uint64_t>, std::optional<uint64_t>>::toJNI(optionalUInt64), JNIConverter<std::optional<int64_t>, std::optional<int64_t>>::toJNI(optionalInt64));
+    return JNIConverter<margelo::nitro::test::OptionalPrimitivesHolder, margelo::nitro::test::external::OptionalPrimitivesHolderKotlin>::fromJNI(__result);
   }
 
 } // namespace margelo::nitro::test::adapters::NitroTestExternal

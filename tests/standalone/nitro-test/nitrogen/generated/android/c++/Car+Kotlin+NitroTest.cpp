@@ -12,35 +12,35 @@
 
 namespace margelo::nitro {
 
-  margelo::nitro::test::CarKotlin JNIConverter<margelo::nitro::test::Car, margelo::nitro::test::CarKotlin>::toKotlin(const margelo::nitro::test::Car& value) {
+  margelo::nitro::test::CarKotlin JNIConverter<margelo::nitro::test::Car, margelo::nitro::test::CarKotlin>::toJNI(const margelo::nitro::test::Car& value) {
     return margelo::nitro::test::CarKotlin(
-      JNIConverter<double, double>::toKotlin(value.year),
-      JNIConverter<std::string, std::string>::toKotlin(value.make),
-      JNIConverter<std::string, std::string>::toKotlin(value.model),
-      JNIConverter<double, double>::toKotlin(value.power),
-      JNIConverter<margelo::nitro::test::Powertrain, margelo::nitro::test::Powertrain>::toKotlin(value.powertrain),
-      JNIConverter<std::optional<margelo::nitro::test::Person>, std::optional<margelo::nitro::test::PersonKotlin>>::toKotlin(value.driver),
-      JNIConverter<std::vector<margelo::nitro::test::Person>, std::vector<margelo::nitro::test::PersonKotlin>>::toKotlin(value.passengers),
-      JNIConverter<std::optional<bool>, std::optional<bool>>::toKotlin(value.isFast),
-      JNIConverter<std::optional<std::string>, std::optional<std::string>>::toKotlin(value.favouriteTrack),
-      JNIConverter<std::vector<double>, std::vector<double>>::toKotlin(value.performanceScores),
-      JNIConverter<std::optional<std::variant<double, std::string>>, std::optional<std::variant<double, std::string>>>::toKotlin(value.someVariant)
+      JNIConverter<double, double>::toJNI(value.year),
+      JNIConverter<std::string, std::string>::toJNI(value.make),
+      JNIConverter<std::string, std::string>::toJNI(value.model),
+      JNIConverter<double, double>::toJNI(value.power),
+      JNIConverter<margelo::nitro::test::Powertrain, margelo::nitro::test::Powertrain>::toJNI(value.powertrain),
+      JNIConverter<std::optional<margelo::nitro::test::Person>, std::optional<margelo::nitro::test::PersonKotlin>>::toJNI(value.driver),
+      JNIConverter<std::vector<margelo::nitro::test::Person>, std::vector<margelo::nitro::test::PersonKotlin>>::toJNI(value.passengers),
+      JNIConverter<std::optional<bool>, std::optional<bool>>::toJNI(value.isFast),
+      JNIConverter<std::optional<std::string>, std::optional<std::string>>::toJNI(value.favouriteTrack),
+      JNIConverter<std::vector<double>, std::vector<double>>::toJNI(value.performanceScores),
+      JNIConverter<std::optional<std::variant<double, std::string>>, std::optional<std::variant<double, std::string>>>::toJNI(value.someVariant)
     );
   }
 
-  margelo::nitro::test::Car JNIConverter<margelo::nitro::test::Car, margelo::nitro::test::CarKotlin>::fromKotlin(const margelo::nitro::test::CarKotlin& value) {
+  margelo::nitro::test::Car JNIConverter<margelo::nitro::test::Car, margelo::nitro::test::CarKotlin>::fromJNI(const margelo::nitro::test::CarKotlin& value) {
     return margelo::nitro::test::Car(
-      JNIConverter<double, double>::fromKotlin(value.year),
-      JNIConverter<std::string, std::string>::fromKotlin(value.make),
-      JNIConverter<std::string, std::string>::fromKotlin(value.model),
-      JNIConverter<double, double>::fromKotlin(value.power),
-      JNIConverter<margelo::nitro::test::Powertrain, margelo::nitro::test::Powertrain>::fromKotlin(value.powertrain),
-      JNIConverter<std::optional<margelo::nitro::test::Person>, std::optional<margelo::nitro::test::PersonKotlin>>::fromKotlin(value.driver),
-      JNIConverter<std::vector<margelo::nitro::test::Person>, std::vector<margelo::nitro::test::PersonKotlin>>::fromKotlin(value.passengers),
-      JNIConverter<std::optional<bool>, std::optional<bool>>::fromKotlin(value.isFast),
-      JNIConverter<std::optional<std::string>, std::optional<std::string>>::fromKotlin(value.favouriteTrack),
-      JNIConverter<std::vector<double>, std::vector<double>>::fromKotlin(value.performanceScores),
-      JNIConverter<std::optional<std::variant<double, std::string>>, std::optional<std::variant<double, std::string>>>::fromKotlin(value.someVariant)
+      JNIConverter<double, double>::fromJNI(value.year),
+      JNIConverter<std::string, std::string>::fromJNI(value.make),
+      JNIConverter<std::string, std::string>::fromJNI(value.model),
+      JNIConverter<double, double>::fromJNI(value.power),
+      JNIConverter<margelo::nitro::test::Powertrain, margelo::nitro::test::Powertrain>::fromJNI(value.powertrain),
+      JNIConverter<std::optional<margelo::nitro::test::Person>, std::optional<margelo::nitro::test::PersonKotlin>>::fromJNI(value.driver),
+      JNIConverter<std::vector<margelo::nitro::test::Person>, std::vector<margelo::nitro::test::PersonKotlin>>::fromJNI(value.passengers),
+      JNIConverter<std::optional<bool>, std::optional<bool>>::fromJNI(value.isFast),
+      JNIConverter<std::optional<std::string>, std::optional<std::string>>::fromJNI(value.favouriteTrack),
+      JNIConverter<std::vector<double>, std::vector<double>>::fromJNI(value.performanceScores),
+      JNIConverter<std::optional<std::variant<double, std::string>>, std::optional<std::variant<double, std::string>>>::fromJNI(value.someVariant)
     );
   }
 

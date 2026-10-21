@@ -11,19 +11,19 @@
 
 namespace margelo::nitro {
 
-  margelo::nitro::test::SizeKotlin JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::toKotlin(const margelo::nitro::test::Size& value) {
+  margelo::nitro::test::SizeKotlin JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::toJNI(const margelo::nitro::test::Size& value) {
     return margelo::nitro::test::SizeKotlin(
-      JNIConverter<double, double>::toKotlin(value.width),
-      JNIConverter<double, double>::toKotlin(value.height),
-      JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::toKotlin(value.unit)
+      JNIConverter<double, double>::toJNI(value.width),
+      JNIConverter<double, double>::toJNI(value.height),
+      JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::toJNI(value.unit)
     );
   }
 
-  margelo::nitro::test::Size JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::fromKotlin(const margelo::nitro::test::SizeKotlin& value) {
+  margelo::nitro::test::Size JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::fromJNI(const margelo::nitro::test::SizeKotlin& value) {
     return margelo::nitro::test::Size(
-      JNIConverter<double, double>::fromKotlin(value.width),
-      JNIConverter<double, double>::fromKotlin(value.height),
-      JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::fromKotlin(value.unit)
+      JNIConverter<double, double>::fromJNI(value.width),
+      JNIConverter<double, double>::fromJNI(value.height),
+      JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::fromJNI(value.unit)
     );
   }
 

@@ -13,7 +13,7 @@
 
 namespace margelo::nitro {
 
-  std::shared_ptr<margelo::nitro::test::JHybridBaseSpec> JNIConverter<margelo::nitro::test::HybridBaseSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>>::toKotlin(const margelo::nitro::test::HybridBaseSpecCxx& value) {
+  std::shared_ptr<margelo::nitro::test::JHybridBaseSpec> JNIConverter<margelo::nitro::test::HybridBaseSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>>::toJNI(const margelo::nitro::test::HybridBaseSpecCxx& value) {
     auto result = std::dynamic_pointer_cast<std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>::element_type>(value.getNativeObject());
     if (result == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot convert Base to its Kotlin implementation.");
@@ -21,7 +21,7 @@ namespace margelo::nitro {
     return result;
   }
 
-  margelo::nitro::test::HybridBaseSpecCxx JNIConverter<margelo::nitro::test::HybridBaseSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>>::fromKotlin(const std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>& value) {
+  margelo::nitro::test::HybridBaseSpecCxx JNIConverter<margelo::nitro::test::HybridBaseSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>>::fromJNI(const std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>& value) {
     return margelo::nitro::test::HybridBaseSpecCxx::fromNative(value);
   }
 

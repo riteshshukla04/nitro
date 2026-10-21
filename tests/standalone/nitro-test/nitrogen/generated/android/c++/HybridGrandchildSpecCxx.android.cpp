@@ -31,7 +31,7 @@ namespace margelo::nitro::test {
       throw std::invalid_argument("Cannot call Grandchild.getGrandchildValue on an empty or incompatible C++ adapter.");
     }
     auto __result = __implementation->getGrandchildValue();
-    return JNIConverter<double, double>::fromKotlin(__result);
+    return JNIConverter<double, double>::fromJNI(__result);
   }
 
 } // namespace margelo::nitro::test

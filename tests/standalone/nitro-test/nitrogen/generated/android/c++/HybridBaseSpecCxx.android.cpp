@@ -41,7 +41,7 @@ namespace margelo::nitro::test {
       throw std::invalid_argument("Cannot call Base.getBaseValue on an empty or incompatible C++ adapter.");
     }
     auto __result = __implementation->getBaseValue();
-    return JNIConverter<double, double>::fromKotlin(__result);
+    return JNIConverter<double, double>::fromJNI(__result);
   }
 
   margelo::nitro::test::Size HybridBaseSpecCxx::bounceSize(const Size& size) const {
@@ -49,8 +49,8 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Base.bounceSize on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->bounceSize(JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::toKotlin(size));
-    return JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::fromKotlin(__result);
+    auto __result = __implementation->bounceSize(JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::toJNI(size));
+    return JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::fromJNI(__result);
   }
 
   margelo::nitro::test::SizeUnit HybridBaseSpecCxx::bounceSizeUnit(SizeUnit unit) const {
@@ -58,8 +58,8 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Base.bounceSizeUnit on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->bounceSizeUnit(JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::toKotlin(unit));
-    return JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::fromKotlin(__result);
+    auto __result = __implementation->bounceSizeUnit(JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::toJNI(unit));
+    return JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::fromJNI(__result);
   }
 
   Promise<margelo::nitro::test::Size> HybridBaseSpecCxx::mapSize(const Size& size, const Callback<Size(const Size& /* size */)>& callback) const {
@@ -67,18 +67,18 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Base.mapSize on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->mapSize(JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::toKotlin(size), JNIConverter<margelo::nitro::Callback<margelo::nitro::test::Size(const margelo::nitro::test::Size& /* size */)>, margelo::nitro::Callback<margelo::nitro::test::SizeKotlin(const margelo::nitro::test::SizeKotlin& /* size */)>>::toKotlin(callback));
-    return JNIConverter<Promise<margelo::nitro::test::Size>, Promise<margelo::nitro::test::SizeKotlin>>::fromKotlin(__result);
+    auto __result = __implementation->mapSize(JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin>::toJNI(size), JNIConverter<margelo::nitro::Callback<margelo::nitro::test::Size(const margelo::nitro::test::Size& /* size */)>, margelo::nitro::Callback<margelo::nitro::test::SizeKotlin(const margelo::nitro::test::SizeKotlin& /* size */)>>::toJNI(callback));
+    return JNIConverter<Promise<margelo::nitro::test::Size>, Promise<margelo::nitro::test::SizeKotlin>>::fromJNI(__result);
   }
 
   margelo::nitro::test::HybridBaseSpecCxx HybridBaseSpecCxx::createAlternativeBase() {
     auto __result = margelo::nitro::test::JHybridBaseSpec::createAlternativeBase();
-    return JNIConverter<margelo::nitro::test::HybridBaseSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>>::fromKotlin(__result);
+    return JNIConverter<margelo::nitro::test::HybridBaseSpecCxx, std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>>::fromJNI(__result);
   }
 
   margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx HybridBaseSpecCxx::createInternalExternalObject() {
     auto __result = margelo::nitro::test::JHybridBaseSpec::createInternalExternalObject();
-    return JNIConverter<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>>::fromKotlin(__result);
+    return JNIConverter<margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx, std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>>::fromJNI(__result);
   }
 
 } // namespace margelo::nitro::test

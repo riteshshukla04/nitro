@@ -17,8 +17,8 @@ namespace margelo::nitro {
 
   template <>
   struct JNIConverter<margelo::nitro::test::Size, margelo::nitro::test::SizeKotlin> final {
-    static margelo::nitro::test::SizeKotlin toKotlin(const margelo::nitro::test::Size& value);
-    static margelo::nitro::test::Size fromKotlin(const margelo::nitro::test::SizeKotlin& value);
+    static margelo::nitro::test::SizeKotlin toJNI(const margelo::nitro::test::Size& value);
+    static margelo::nitro::test::Size fromJNI(const margelo::nitro::test::SizeKotlin& value);
   };
 
 } // namespace margelo::nitro

@@ -11,17 +11,17 @@
 
 namespace margelo::nitro {
 
-  margelo::nitro::test::PersonKotlin JNIConverter<margelo::nitro::test::Person, margelo::nitro::test::PersonKotlin>::toKotlin(const margelo::nitro::test::Person& value) {
+  margelo::nitro::test::PersonKotlin JNIConverter<margelo::nitro::test::Person, margelo::nitro::test::PersonKotlin>::toJNI(const margelo::nitro::test::Person& value) {
     return margelo::nitro::test::PersonKotlin(
-      JNIConverter<std::string, std::string>::toKotlin(value.name),
-      JNIConverter<double, double>::toKotlin(value.age)
+      JNIConverter<std::string, std::string>::toJNI(value.name),
+      JNIConverter<double, double>::toJNI(value.age)
     );
   }
 
-  margelo::nitro::test::Person JNIConverter<margelo::nitro::test::Person, margelo::nitro::test::PersonKotlin>::fromKotlin(const margelo::nitro::test::PersonKotlin& value) {
+  margelo::nitro::test::Person JNIConverter<margelo::nitro::test::Person, margelo::nitro::test::PersonKotlin>::fromJNI(const margelo::nitro::test::PersonKotlin& value) {
     return margelo::nitro::test::Person(
-      JNIConverter<std::string, std::string>::fromKotlin(value.name),
-      JNIConverter<double, double>::fromKotlin(value.age)
+      JNIConverter<std::string, std::string>::fromJNI(value.name),
+      JNIConverter<double, double>::fromJNI(value.age)
     );
   }
 
