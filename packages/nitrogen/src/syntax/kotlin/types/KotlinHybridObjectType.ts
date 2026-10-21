@@ -3,7 +3,7 @@ import type { GetCodeOptions } from '../../types/Type.js'
 import { getHybridObjectName } from '../../getHybridObjectName.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { HybridObjectType } from '../../types/HybridObjectType.js'
-import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
+import { getJniReferenceCode, type JNINativeRegistration, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinHybridObjectType extends HybridObjectType implements KotlinType {
   readonly jniValueKind = 'wrapper'
@@ -69,6 +69,21 @@ export class KotlinHybridObjectType extends HybridObjectType implements KotlinTy
           }
         }
     }
+  }
+
+  getJniNativeRegistrations(): readonly JNINativeRegistration[] {
+    if (this.sourceConfig.isExternalConfig) return []
+    const name = getHybridObjectName(this.hybridObjectName)
+    return [
+      {
+        namespace: this.sourceConfig.getCxxNamespace('c++').split('::'),
+        className: `${name.JHybridTSpec}::CxxPart`,
+        import: {
+          language: 'c++',
+          declaration: this.sourceConfig.getCxxHeader(`${name.JHybridTSpec}.hpp`, 'private'),
+        },
+      },
+    ]
   }
 
   override getRequiredImports(language: Language): SourceImport[] {

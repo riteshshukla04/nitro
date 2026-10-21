@@ -3,21 +3,26 @@ import { getImportCode, getImportsCode } from '../../syntax/getImportCode.js'
 import { createFileMetadataString, isNotDuplicate } from '../../syntax/helpers.js'
 import type { HybridObjectSpec } from '../../syntax/HybridObjectSpec.js'
 import type { SourceFile } from '../../syntax/SourceFile.js'
+import type { JNINativeRegistration } from '../../syntax/kotlin/types/KotlinType.js'
 import { indent } from '../../utils.js'
 import { createHybridClassRegistration } from '../createHybridClassRegistration.js'
 
-export function createHybridObjectInitializer({ specs, files }: { specs: HybridObjectSpec[]; files: SourceFile[] }): SourceFile[] {
+interface HybridObjectInitializerOptions {
+  specs: readonly HybridObjectSpec[]
+  jniNativeRegistrations: readonly JNINativeRegistration[]
+}
+
+export function createHybridObjectInitializer({ specs, jniNativeRegistrations }: HybridObjectInitializerOptions): SourceFile[] {
   const config = NitroConfig.current
   const namespace = config.getCxxNamespace('c++')
   const library = config.getAndroidCxxLibName()
   const name = `${library}OnLoad`
   const registrations = specs.map(createHybridClassRegistration)
-  const natives = files.flatMap((file) => file.jniNativeRegistrations ?? [])
   const includes = getImportsCode(
-    [...natives.map((native) => native.import), ...registrations.flatMap((registration) => registration.imports)],
+    [...jniNativeRegistrations.map((native) => native.import), ...registrations.flatMap((registration) => registration.imports)],
     'implementation'
   )
-  const nativeRegistrations = natives
+  const nativeRegistrations = jniNativeRegistrations
     .map((native) => `${native.namespace.join('::')}::${native.className}::registerNatives();`)
     .filter(isNotDuplicate)
   const classRegistrations = registrations.map((registration) => registration.registration)

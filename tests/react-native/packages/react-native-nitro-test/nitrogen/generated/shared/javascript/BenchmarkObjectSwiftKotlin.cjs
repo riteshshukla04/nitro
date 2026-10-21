@@ -7,7 +7,6 @@
 
 const { NitroModules } = require('react-native-nitro-modules')
 
-// Copies of this getter, e.g. from Babel's interop helpers, share the cached class.
 let hybridClass
 
 module.exports = {

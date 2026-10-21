@@ -8,14 +8,14 @@
 #include <NitroTestExternal/private/NitroTestExternalOnLoad.hpp>
 #include <NitroModules/HybridClassRegistry.hpp>
 #include <NitroTestExternal/private/JHybridTestViewSpec.hpp>
-#include <NitroTestExternal/private/JCallback_void.hpp>
 #include <NitroTestExternal/private/views/JHybridTestViewStateUpdater.hpp>
+#include <NitroTestExternal/private/JCallback_void.hpp>
 
 namespace margelo::nitro::test::external {
   void registerAllNatives() {
     margelo::nitro::test::external::JHybridTestViewSpec::CxxPart::registerNatives();
-    margelo::nitro::test::external::JCallback_void_cxx::registerNatives();
     margelo::nitro::test::external::views::JHybridTestViewStateUpdater::registerNatives();
+    margelo::nitro::test::external::JCallback_void_cxx::registerNatives();
 
     HybridClassRegistry::registerHybridClass("test.external.TestView", JHybridTestViewSpec::Class::get());
   }

@@ -10,21 +10,21 @@ import { EnumType } from '../types/EnumType.js'
 import { StructType } from '../types/StructType.js'
 import type { Type, TypeContext } from '../types/Type.js'
 import { getKotlinNativeType } from './getKotlinNativeType.js'
-import { KotlinNativeStructType } from './types/KotlinNativeStructType.js'
+import { KotlinCxxStructType } from './types/KotlinCxxStructType.js'
 
 interface KotlinNativeConverterOptions {
   cppType: Type
   context?: TypeContext
-  nativeConfig?: NitroConfig
+  config?: NitroConfig
 }
 
 /** Explicit public/private type pair for a native boundary conversion. */
 export function getKotlinNativeConverter({
   cppType,
   context = 'value',
-  nativeConfig = NitroConfig.current,
+  config = NitroConfig.current,
 }: KotlinNativeConverterOptions): string {
-  const nativeType = getKotlinNativeType(cppType, nativeConfig)
+  const nativeType = getKotlinNativeType(cppType, config)
   const cppCode = cppType.getCode('c++', { context: context, fullyQualified: true })
   const nativeCode = nativeType.getCode('c++', { context: context, fullyQualified: true })
   return `JNIConverter<${cppCode}, ${nativeCode}>`
@@ -40,41 +40,41 @@ const runtimeImport: SourceImport = {
   declaration: { header: 'NitroModules/JNIConverter.hpp', space: 'system' },
 }
 
-function getConverterFileName(type: ForeignHybridObjectType | StructType | EnumType, nativeConfig: NitroConfig): string {
+function getConverterFileName(type: ForeignHybridObjectType | StructType | EnumType, config: NitroConfig): string {
   if (type instanceof ForeignHybridObjectType) {
     return `${getCppHybridObjectAdapterNames(type).fileName}+Kotlin`
   }
-  if (type instanceof EnumType) return `${type.enumName}+Kotlin+${nativeConfig.getAndroidCxxLibName()}`
-  return `${type.cppName}+Kotlin+${nativeConfig.getAndroidCxxLibName()}`
+  if (type instanceof EnumType) return `${type.enumName}+Kotlin+${config.getAndroidCxxLibName()}`
+  return `${type.cppName}+Kotlin+${config.getAndroidCxxLibName()}`
 }
 
-function isSpecialized(type: Type, nativeConfig: NitroConfig): type is ForeignHybridObjectType | StructType | EnumType {
+function isSpecialized(type: Type, config: NitroConfig): type is ForeignHybridObjectType | StructType | EnumType {
   return (
     type instanceof ForeignHybridObjectType ||
-    (type instanceof StructType && !(type instanceof KotlinNativeStructType)) ||
-    (type instanceof EnumType && nativeConfig.isExternalConfig)
+    (type instanceof StructType && !(type instanceof KotlinCxxStructType)) ||
+    (type instanceof EnumType && config.isExternalConfig)
   )
 }
 
 /** Native-only conversion files. This does not emit JNI bindings or JSI conversions. */
-export function createKotlinNativeConverters(type: Type, nativeConfig: NitroConfig = NitroConfig.current): KotlinNativeConverterFiles {
+export function createKotlinNativeConverters(type: Type, config: NitroConfig = NitroConfig.current): KotlinNativeConverterFiles {
   const referencedTypes = getReferencedTypes(type)
-  const specializations = referencedTypes.filter((item) => isSpecialized(item, nativeConfig))
-  const projectedType = getKotlinNativeType(type, nativeConfig)
+  const specializations = referencedTypes.filter((item) => isSpecialized(item, config))
+  const projectedType = getKotlinNativeType(type, config)
   const nativeTypeImports = projectedType.getRequiredImports('c++')
   const imports: SourceImport[] = [runtimeImport, ...nativeTypeImports]
   const files: SourceFile[] = projectedType.getExtraFiles()
   const emitted = new Set<string>()
   for (const cppType of specializations) {
-    const fileName = getConverterFileName(cppType, nativeConfig)
+    const fileName = getConverterFileName(cppType, config)
     if (emitted.has(fileName)) continue
     emitted.add(fileName)
     const ownHeader = NitroConfig.current.getCxxHeader(`${fileName}.hpp`, 'private')
     imports.push({ language: 'c++', declaration: ownHeader })
-    const nativeType = getKotlinNativeType(cppType, nativeConfig)
+    const nativeType = getKotlinNativeType(cppType, config)
     const cppCode = cppType.getCode('c++', { context: 'value', fullyQualified: true })
     const nativeCode = nativeType.getCode('c++', { context: 'value', fullyQualified: true })
-    const converterCode = getKotlinNativeConverter({ cppType: cppType, nativeConfig: nativeConfig })
+    const converterCode = getKotlinNativeConverter({ cppType: cppType, config: config })
     const declarationImports = [runtimeImport, ...cppType.getRequiredImports('c++'), ...nativeType.getRequiredImports('c++')]
     const implementationImports: SourceImport[] = [
       { language: 'c++', declaration: ownHeader },
@@ -106,17 +106,17 @@ return static_cast<${cppCode}>(value);
 `.trim()
     } else {
       const cppToKotlinFields = cppType.properties.map((property) => {
-        const converter = getKotlinNativeConverter({ cppType: property, nativeConfig: nativeConfig })
+        const converter = getKotlinNativeConverter({ cppType: property, config: config })
         return `${converter}::toKotlin(value.${property.escapedName})`
       })
       const kotlinToCppFields = cppType.properties.map((property) => {
-        const converter = getKotlinNativeConverter({ cppType: property, nativeConfig: nativeConfig })
+        const converter = getKotlinNativeConverter({ cppType: property, config: config })
         return `${converter}::fromKotlin(value.${property.escapedName})`
       })
       const referencedFieldTypes = cppType.properties.flatMap(getReferencedTypes)
-      const fieldTypes = referencedFieldTypes.filter((item) => isSpecialized(item, nativeConfig))
+      const fieldTypes = referencedFieldTypes.filter((item) => isSpecialized(item, config))
       for (const fieldType of fieldTypes) {
-        const fieldFileName = getConverterFileName(fieldType, nativeConfig)
+        const fieldFileName = getConverterFileName(fieldType, config)
         implementationImports.push({
           language: 'c++',
           declaration: NitroConfig.current.getCxxHeader(`${fieldFileName}.hpp`, 'private'),

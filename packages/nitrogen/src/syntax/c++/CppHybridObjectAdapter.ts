@@ -178,7 +178,7 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec, platform: P
           return `${converter}::toSwift(${parameter.type.escapedName})`
         }
         case 'kotlin': {
-          const converter = getKotlinNativeConverter({ cppType: parameter.type, context: 'parameter-type', nativeConfig: spec.config })
+          const converter = getKotlinNativeConverter({ cppType: parameter.type, context: 'parameter-type', config: spec.config })
           return `${converter}::toKotlin(${parameter.type.escapedName})`
         }
         case 'c++':
@@ -208,7 +208,7 @@ return ${converter}::fromSwift(__result);
 `.trim()
       }
       case 'kotlin': {
-        const converter = getKotlinNativeConverter({ cppType: method.returnType, nativeConfig: spec.config })
+        const converter = getKotlinNativeConverter({ cppType: method.returnType, config: spec.config })
         return `
 auto __result = ${call};
 return ${converter}::fromKotlin(__result);

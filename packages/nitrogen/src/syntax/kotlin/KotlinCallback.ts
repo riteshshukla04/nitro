@@ -1,4 +1,3 @@
-import { NitroConfig } from '../../config/NitroConfig.js'
 import { indent } from '../../utils.js'
 import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
@@ -10,7 +9,7 @@ export function createKotlinCallback(callbackType: KotlinCallbackType): SourceFi
   const publicType = callbackType.type
   const name = callbackType.specializationName
   const jniName = callbackType.jniName
-  const packageName = NitroConfig.current.getAndroidPackage('java/kotlin')
+  const packageName = callbackType.config.getAndroidPackage('java/kotlin')
   const kotlinReturnType = publicType.returnType.getCode('kotlin', {
     context: 'return',
   })
@@ -147,10 +146,10 @@ class ${name}_java(private val callback: ${lambdaSignature}): ${name} {
 }
   `.trim()
 
-  const jniInterfaceDescriptor = NitroConfig.current.getAndroidPackage('c++/jni', name)
-  const jniClassDescriptor = NitroConfig.current.getAndroidPackage('c++/jni', `${name}_cxx`)
+  const jniInterfaceDescriptor = callbackType.config.getAndroidPackage('c++/jni', name)
+  const jniClassDescriptor = callbackType.config.getAndroidPackage('c++/jni', `${name}_cxx`)
   const returnType = callbackType.returnType
-  const cxxNamespace = NitroConfig.current.getCxxNamespace('c++')
+  const cxxNamespace = callbackType.config.getCxxNamespace('c++')
   const typename = publicType.getCode('c++', { context: 'value' })
   // Inline and owning variants of a signature share this file, so it always
   // accepts an `InlineCallback` and escapes it into the callback it holds.
@@ -241,7 +240,7 @@ return ${cppResult};
     [
       {
         language: 'c++',
-        declaration: NitroConfig.current.getCxxHeader(`${jniName}.hpp`, 'private'),
+        declaration: callbackType.config.getCxxHeader(`${jniName}.hpp`, 'private'),
       },
       ...imports,
     ],
@@ -350,7 +349,7 @@ namespace ${cxxNamespace} {
     content: kotlinCode,
     language: 'kotlin',
     name: `${name}.kt`,
-    subdirectory: NitroConfig.current.getAndroidPackageDirectory(),
+    subdirectory: callbackType.config.getAndroidPackageDirectory(),
     platform: 'android',
   })
   files.push({
@@ -362,16 +361,6 @@ namespace ${cxxNamespace} {
   })
   files.push({
     content: fbjniImplementationCode,
-    jniNativeRegistrations: [
-      {
-        namespace: cxxNamespace.split('::'),
-        className: `${jniName}_cxx`,
-        import: {
-          language: 'c++',
-          declaration: NitroConfig.current.getCxxHeader(`${jniName}.hpp`, 'private'),
-        },
-      },
-    ],
     language: 'c++',
     name: `${jniName}.cpp`,
     subdirectory: [],

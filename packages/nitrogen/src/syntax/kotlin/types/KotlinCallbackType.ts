@@ -5,7 +5,7 @@ import { CallbackType, type GetCallbackCodeOptions } from '../../types/CallbackT
 import { createKotlinCallback } from '../KotlinCallback.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
 import { KotlinNamedType } from './KotlinNamedType.js'
-import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
+import { getJniReferenceCode, type JNINativeRegistration, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 /**
  * JNI represents a callback as a Kotlin `fun interface`.
@@ -17,7 +17,10 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
   readonly jniValueKind = 'pointer'
   readonly needsKotlinConversion = true
 
-  constructor(readonly type: CallbackType) {
+  constructor(
+    readonly type: CallbackType,
+    readonly config: NitroConfig = NitroConfig.current
+  ) {
     const returnType = wrapKotlinType(type.returnType)
     const parameters = type.parameters.map((p) => new KotlinNamedType(p.name, wrapKotlinType(p)))
     super(returnType, parameters, type.isInline)
@@ -83,6 +86,19 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     }
   }
 
+  getJniNativeRegistrations(): readonly JNINativeRegistration[] {
+    return [
+      {
+        namespace: this.config.getCxxNamespace('c++').split('::'),
+        className: `${this.jniName}_cxx`,
+        import: {
+          language: 'c++',
+          declaration: this.config.getCxxHeader(`${this.jniName}.hpp`, 'private'),
+        },
+      },
+    ]
+  }
+
   override getExtraFiles(): SourceFile[] {
     return [...super.getExtraFiles(), ...createKotlinCallback(this)]
   }
@@ -94,7 +110,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
         imports.push(
           {
             language: language,
-            declaration: NitroConfig.current.getCxxHeader(`${this.jniName}.hpp`, 'private'),
+            declaration: this.config.getCxxHeader(`${this.jniName}.hpp`, 'private'),
           },
           {
             language: language,

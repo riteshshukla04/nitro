@@ -5,7 +5,7 @@ import type { SourceImport } from '../../SourceFile.js'
 import { HybridObjectType, type GetHybridObjectCodeOptions } from '../../types/HybridObjectType.js'
 
 /** Private C++ representation used by Kotlin's JSI/JNI fallback bridge. */
-export class KotlinNativeHybridObjectType extends HybridObjectType {
+export class KotlinCxxHybridObjectType extends HybridObjectType {
   constructor(type: HybridObjectType) {
     super(type.hybridObjectName, type.platforms, type.baseTypes, type.sourceConfig)
   }
@@ -38,15 +38,21 @@ export class KotlinNativeHybridObjectType extends HybridObjectType {
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
-    if (language !== 'c++') return super.getRequiredImports(language)
-    const { JHybridTSpec } = getHybridObjectName(this.hybridObjectName)
-    return [
-      { language: 'c++', declaration: { header: 'memory', space: 'system' } },
-      {
-        language: 'c++',
-        declaration: { forwardDeclaration: getForwardDeclaration('class', JHybridTSpec, this.sourceConfig.getCxxNamespace('c++')) },
-        implementation: this.getCppHeader(),
-      },
-    ]
+    switch (language) {
+      case 'c++': {
+        const { JHybridTSpec } = getHybridObjectName(this.hybridObjectName)
+        return [
+          { language: 'c++', declaration: { header: 'memory', space: 'system' } },
+          {
+            language: 'c++',
+            declaration: { forwardDeclaration: getForwardDeclaration('class', JHybridTSpec, this.sourceConfig.getCxxNamespace('c++')) },
+            implementation: this.getCppHeader(),
+          },
+        ]
+      }
+      case 'kotlin':
+      case 'swift':
+        return super.getRequiredImports(language)
+    }
   }
 }

@@ -262,16 +262,6 @@ namespace ${cxxNamespace} {
   })
   files.push({
     content: cppImplCode,
-    jniNativeRegistrations: [
-      {
-        namespace: cxxNamespace.split('::'),
-        className: `${name.JHybridTSpec}::CxxPart`,
-        import: {
-          language: 'c++',
-          declaration: spec.config.getCxxHeader(`${name.JHybridTSpec}.hpp`, 'private'),
-        },
-      },
-    ],
     language: 'c++',
     name: `${name.JHybridTSpec}.cpp`,
     subdirectory: [],

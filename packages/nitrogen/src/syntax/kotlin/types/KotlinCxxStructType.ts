@@ -6,25 +6,25 @@ import { StructType } from '../../types/StructType.js'
 import type { GetCodeOptions, NamedType } from '../../types/Type.js'
 
 /** Keeps Kotlin fallback fields independent of the public C++ struct projection. */
-export class KotlinNativeStructType extends StructType {
-  readonly nativeConfig: NitroConfig
+export class KotlinCxxStructType extends StructType {
+  readonly config: NitroConfig
 
   constructor(
     structName: string,
     properties: NamedType[],
     sourceConfig: NitroConfig = NitroConfig.current,
-    nativeConfig: NitroConfig = NitroConfig.current
+    config: NitroConfig = NitroConfig.current
   ) {
     super(structName, properties, sourceConfig, { cppName: `${structName}Kotlin`, platform: 'android', headerVisibility: 'private' })
-    this.nativeConfig = nativeConfig
+    this.config = config
   }
 
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++': {
         let name: string
-        if (options.fullyQualified || this.nativeConfig.isExternalConfig) {
-          name = this.nativeConfig.getCxxNamespace('c++', this.cppName)
+        if (options.fullyQualified || this.config.isExternalConfig) {
+          name = this.config.getCxxNamespace('c++', this.cppName)
         } else {
           name = this.cppName
         }
@@ -42,8 +42,8 @@ export class KotlinNativeStructType extends StructType {
           {
             language: 'c++',
             declaration: {
-              ...this.nativeConfig.getCxxHeader(`${this.cppName}.hpp`, 'private'),
-              forwardDeclaration: getForwardDeclaration('struct', this.cppName, this.nativeConfig.getCxxNamespace('c++')),
+              ...this.config.getCxxHeader(`${this.cppName}.hpp`, 'private'),
+              forwardDeclaration: getForwardDeclaration('struct', this.cppName, this.config.getCxxNamespace('c++')),
             },
           },
         ]
@@ -53,7 +53,7 @@ export class KotlinNativeStructType extends StructType {
   }
 
   override getExtraFiles(): SourceFile[] {
-    if (this.nativeConfig.isExternalConfig) return []
+    if (this.config.isExternalConfig) return []
     return super.getExtraFiles()
   }
 }

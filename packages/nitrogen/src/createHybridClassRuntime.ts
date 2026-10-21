@@ -123,11 +123,10 @@ function createHybridClassRuntime({ classNames, views = [], outputDirectory }: W
       initializer: `NitroModules.getHybridClass('${registryName}')`,
     })
     const exportsCode = [classExportCode]
+    // Getters copied by interop helpers share these module-level caches.
     const cacheDeclarationsCode = ['let hybridClass']
     let declarationsCode: string
-    let cacheComment: string
     if (view != null) {
-      cacheComment = "// Copies of these getters, e.g. from Babel's interop helpers, share the caches."
       const componentInitializerCode = createComponentInitializer(view)
       const componentExportCode = createLazyExport({
         name: `${name}Component`,
@@ -142,7 +141,6 @@ function createHybridClassRuntime({ classNames, views = [], outputDirectory }: W
         runtimeDirectory: runtimeDirectory,
       })
     } else {
-      cacheComment = "// Copies of this getter, e.g. from Babel's interop helpers, share the cached class."
       declarationsCode = `
 // The spec's \`export declare class ${name}\` types this runtime export.
 export {}
@@ -153,7 +151,6 @@ ${createFileMetadataString(jsFileName)}
 
 const { NitroModules } = require('${NitroConfig.current.getRuntimePackageName()}')
 
-${cacheComment}
 ${cacheDeclarationsCode.join('\n')}
 
 module.exports = {

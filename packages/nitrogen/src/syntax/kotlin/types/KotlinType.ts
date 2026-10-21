@@ -1,4 +1,12 @@
+import type { SourceImport } from '../../SourceFile.js'
 import type { Type, TypeContext } from '../../types/Type.js'
+
+/** A generated JNI class whose native methods must be registered by its module. */
+export interface JNINativeRegistration {
+  readonly namespace: readonly string[]
+  readonly className: string
+  readonly import: SourceImport<'c++'>
+}
 
 export interface KotlinTypeOptions {
   /**
@@ -49,6 +57,8 @@ export interface KotlinType extends Type {
   readonly fromCppReturnType?: string
   /** Whether the public Kotlin API needs conversion to this representation. */
   readonly needsKotlinConversion: boolean
+  /** Native methods required by this type, owned by the module that declares them. */
+  getJniNativeRegistrations?(): readonly JNINativeRegistration[]
   /** Converts `value` across JNI, see `KotlinConversion`. */
   convert(value: string, conversion: KotlinConversion): string
 }
@@ -82,11 +92,16 @@ export function getJniPrimitiveCode(jniType: string, context: TypeContext, { box
 
 /** Boxes or unboxes a JNI primitive in C++ where JNI requires an object. */
 export function convertJniPrimitive(value: string, { from, in: language }: KotlinConversion, { boxedType, boxed }: JniPrimitive): string {
-  if (language !== 'c++' || !boxed) return value
-  switch (from) {
-    case 'c++':
-      return `${boxedType}::valueOf(${value})`
+  switch (language) {
     case 'kotlin':
-      return `${value}->value()`
+      return value
+    case 'c++':
+      if (!boxed) return value
+      switch (from) {
+        case 'c++':
+          return `${boxedType}::valueOf(${value})`
+        case 'kotlin':
+          return `${value}->value()`
+      }
   }
 }

@@ -1,3 +1,4 @@
+import { KotlinHybridViewType } from './KotlinHybridViewType.js'
 import type { SourceFile } from '../../syntax/SourceFile.js'
 import type { HybridObjectSpec } from '../../syntax/HybridObjectSpec.js'
 import {
@@ -20,7 +21,7 @@ export function createKotlinHybridViewManager(spec: HybridObjectSpec<'kotlin'>):
   const cxxNamespace = spec.config.getCxxNamespace('c++', 'views')
   const { JHybridTSpec, HybridTSpec } = getHybridObjectName(spec.name)
   const { manager, stateClassName, component, propsClassName, descriptorClassName } = getViewComponentNames(spec)
-  const stateUpdaterName = `${stateClassName}Updater`
+  const { stateUpdaterName } = new KotlinHybridViewType(spec)
   const implementation = getKotlinImplementation(spec)
   const viewImplementation = implementation.className
   const implementationImport = getImportCode(implementation.kotlinImport)
@@ -220,7 +221,7 @@ public:
   const propsUpdaterCalls = viewProperties.map(({ property, config }) => {
     const name = escapeCppName(property.name)
     const setter = property.getSetterName('other')
-    const converter = getKotlinNativeConverter({ cppType: property.type, nativeConfig: config })
+    const converter = getKotlinNativeConverter({ cppType: property.type, config: config })
     return `
 if (oldProps == nullptr
       ? newProps->${name}.isProvided()
@@ -339,16 +340,6 @@ void J${stateUpdaterName}::updateViewProps(jni::alias_ref<jni::JClass> /* class 
       name: `J${stateUpdaterName}.cpp`,
       platform: 'android',
       subdirectory: ['views'],
-      jniNativeRegistrations: [
-        {
-          namespace: cxxNamespace.split('::'),
-          className: `J${stateUpdaterName}`,
-          import: {
-            language: 'c++',
-            declaration: updaterHeader,
-          },
-        },
-      ],
     },
   ]
 }
