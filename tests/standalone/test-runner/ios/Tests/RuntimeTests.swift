@@ -221,8 +221,8 @@ struct RunnerContractTests {
     }
   }
 
-  // A deadlock still times out. The budget only absorbs a busy cooperative
-  // thread, which every Swift Promise in the behavior groups also uses.
+  // A deadlock still times out. The budget only absorbs a busy machine while
+  // the behavior groups start.
   @Test func swiftTasksCanCompleteDuringNativeRun() async throws {
     let source = """
       globalThis.runNitroTest = async () => {
