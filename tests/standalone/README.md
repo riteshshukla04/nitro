@@ -93,9 +93,9 @@ The bundler discovers exported values using TypeScript's module information, wit
 unexported or in separate helper files. Each test gets a file-qualified name, such as `promises.fibonacci` for a function in
 `promises.test.ts`. New files and cases require no Swift/Kotlin edits.
 
-Swift Testing and JUnit run the names as parameterized cases, preserving individual results and continuing after a case fails. Missing,
-invalid, or empty case lists fail discovery. The native error/timeout contract tests remain handwritten. Jest and Vitest are not needed to
-run the JS cases.
+JUnit runs the names as parameterized cases. Swift Testing runs one parameterized case per test file and records an issue for each failed
+case. Both keep running after a case fails. Missing, invalid, or empty case lists fail discovery. The native error/timeout contract tests
+remain handwritten. Jest and Vitest are not needed to run the JS cases.
 
 Larger suites can export a `cases` object whose keys are literal test names. `casesForTestObjects` binds each case to a fresh C++ or
 Swift/Kotlin fixture; `namedCases` prefixes cases that do not use that pair of fixtures:
@@ -135,11 +135,15 @@ but cannot prove these ownership and scheduling details.
 
 ## Execution and failures
 
-Each native case creates a fresh Hermes runtime, installs Nitro, loads the bundle, and calls `runNitroTest(name)`. The runner eagerly
-compiles the bundle once and caches its bytecode by source contents. Each runtime evaluates that bytecode with fresh globals and native
-objects. Compilation happens before the JS deadlines; Hermes' watchdog cannot interrupt the native compiler.
+On iOS, each test file runs in one Hermes runtime. The runner installs Nitro, loads the bundle, and calls `runNitroTest(name)` for each case
+of the file in order. Destroying the runtime afterwards also checks that Nitro releases everything the file created. After a passing case,
+the runner runs the native callbacks and microtasks that case already queued, so their errors fail that case and not the next one. A failed
+case may leave work behind, so the cases after it get a fresh runtime. Cases of a file share module-level state; a case that needs its own
+runtime belongs in its own file. On Android, each case still creates its own runtime. The runner eagerly compiles the bundle once and caches
+its bytecode by source contents. Each runtime evaluates that bytecode with fresh globals and native objects. Compilation happens before the
+JS deadlines; Hermes' watchdog cannot interrupt the native compiler.
 
-The native thread owns the runtime and pumps its dispatcher. On iOS, an operation queue runs at most two native tests at once while Swift
+The native thread owns the runtime and pumps its dispatcher. On iOS, an operation queue runs at most two test files at once while Swift
 awaits continuations. This leaves Swift's cooperative executor free to run `Promise.async` tasks that the JavaScript case awaits. The iOS
 runner restricts the cooperative pool to one worker so the concurrent native Promise test checks this behavior. Native work runs on
 background threads; its callbacks are queued back to the runtime's owning thread. When the microtask queue is empty, the dispatcher sleeps

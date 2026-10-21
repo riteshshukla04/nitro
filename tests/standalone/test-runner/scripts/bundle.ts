@@ -39,6 +39,8 @@ for (const [index, file] of files.entries()) {
   const exports = checker.getExportsOfModule(module).sort((a, b) => a.name.localeCompare(b.name))
   let count = 0
   const prefix = file.replace(/\.test\.ts$/, '')
+  // The iOS runner groups cases by file through the text before the first dot.
+  if (prefix.includes('.')) throw new Error(`${file}: test file names must not contain dots`)
   for (const symbol of exports) {
     const value = symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol
     if (!(value.flags & ts.SymbolFlags.Value)) continue

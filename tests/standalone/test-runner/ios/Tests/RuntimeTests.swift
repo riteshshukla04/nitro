@@ -12,12 +12,14 @@ private var testResources: Bundle {
   #endif
 }
 
-private let runtimeQueue: OperationQueue = {
+private func makeRuntimeQueue() -> OperationQueue {
   let queue = OperationQueue()
   queue.name = "com.margelo.nitro.tests.runtime"
   queue.maxConcurrentOperationCount = 2
   return queue
-}()
+}
+
+private let runtimeQueue = makeRuntimeQueue()
 
 private func runNitroTest(_ source: String, _ name: String, _ timeoutMs: UInt32) async -> String? {
   // The native runner blocks until JS settles. Swift Promise.async fixtures need
@@ -29,15 +31,23 @@ private func runNitroTest(_ source: String, _ name: String, _ timeoutMs: UInt32)
   }
 }
 
+/// Runs the cases of one test file in order, in one Hermes runtime, and returns
+/// the failure of every case that failed, keyed by its name.
+private func runNitroTests(_ source: String, _ names: [String], _ timeoutMs: UInt32) async -> [String: String] {
+  await withCheckedContinuation { continuation in
+    runtimeQueue.addOperation {
+      continuation.resume(returning: NitroRunTests(source, names, timeoutMs))
+    }
+  }
+}
+
 private struct JavaScriptFailure: Error, CustomStringConvertible {
   let description: String
 }
 
 @Suite
 struct RuntimeTests {
-  private static func testNames(
-    skipped: Bool = false, sharedStaticState: Bool? = nil
-  ) throws -> [String] {
+  private static func testNames(skipped: Bool = false) throws -> [String] {
     let resources = testResources
     guard let url = resources.url(forResource: "runtime-tests", withExtension: "json") else {
       throw JavaScriptFailure(
@@ -76,16 +86,19 @@ struct RuntimeTests {
         description: "Invalid test exclusion metadata in runtime-test-skips.json.")
     }
     return names.filter { name in
-      if let sharedStaticState,
-        name.hasPrefix("static-properties.") != sharedStaticState
-      {
-        return false
-      }
       var reason = skips[name]?["ios"]
       #if !DEBUG
         reason = reason ?? skips[name]?["release"]
       #endif
       return (reason != nil) == skipped
+    }
+  }
+
+  /// The enabled cases of each test file, in bundle order. Every case name
+  /// starts with its file name, e.g. `arrays.` for `arrays.test.ts`.
+  private static let testFiles = Result {
+    Dictionary(grouping: try testNames()) { name in
+      String(name.prefix { $0 != "." })
     }
   }
 
@@ -95,22 +108,18 @@ struct RuntimeTests {
     return try String(contentsOf: url, encoding: .utf8)
   }
 
-  private func run(_ name: String) async throws {
-    if let failure = await runNitroTest(try Self.bundleSource.get(), name, 10_000) {
-      throw JavaScriptFailure(description: failure)
+  // Each test file runs in one Hermes runtime, so destroying it also checks
+  // that Nitro releases everything the file created. A case that needs its own
+  // runtime belongs in its own file.
+  @Test(arguments: try RuntimeTests.testFiles.get().keys.sorted())
+  func javaScript(_ file: String) async throws {
+    let cases = try #require(try Self.testFiles.get()[file])
+    let failures = await runNitroTests(try Self.bundleSource.get(), cases, 10_000)
+    for name in cases {
+      if let failure = failures[name] {
+        Issue.record(JavaScriptFailure(description: failure))
+      }
     }
-  }
-
-  @Test(arguments: try RuntimeTests.testNames(sharedStaticState: false))
-  func javaScript(_ name: String) async throws {
-    try await run(name)
-  }
-
-  // These cases write process-wide native storage. Fresh JS runtimes do not
-  // isolate their write/assert/restore sequences from each other.
-  @Test(.serialized, arguments: try RuntimeTests.testNames(sharedStaticState: true))
-  func staticProperties(_ name: String) async throws {
-    try await run(name)
   }
 
   // Swift Testing conditions apply to a test function, so keep platform/build
@@ -120,7 +129,7 @@ struct RuntimeTests {
     .disabled("See runtime-test-skips.json for the platform/build exclusion reasons"),
     arguments: try RuntimeTests.testNames(skipped: true))
   func excludedJavaScript(_ name: String) async throws {
-    try await run(name)
+    Issue.record("Excluded case \(name) must not run")
   }
 
   // These handwritten cases test the runner, not HybridObject behavior. They
@@ -165,6 +174,48 @@ struct RuntimeTests {
     }
   }
 
+  // Module state lives as long as the runtime, so it shows which cases shared one.
+  private static let runtimeCounter = """
+    globalThis.evaluations = (globalThis.evaluations ?? 0) + 1;
+    globalThis.casesRun = 0;
+    globalThis.runNitroTest = async (name) => {
+      if (globalThis.evaluations !== 1) throw new Error('bundle evaluated twice in one runtime');
+      globalThis.casesRun++;
+      const expected = Number(name.split(':')[1]);
+      if (globalThis.casesRun !== expected) {
+        throw new Error(`${name} ran as case ${globalThis.casesRun} of its runtime`);
+      }
+      if (name.startsWith('fail')) throw new Error('intentional failure');
+    };
+    """
+
+  @Test func casesOfAFileShareOneRuntime() async throws {
+    let failures = await runNitroTests(Self.runtimeCounter, ["a:1", "b:2", "c:3"], 1000)
+    #expect(failures.isEmpty, "\(failures)")
+  }
+
+  @Test func failedCasesGiveTheRestOfTheirFileAFreshRuntime() async throws {
+    let failures = await runNitroTests(Self.runtimeCounter, ["a:1", "fail:2", "b:1", "c:2"], 1000)
+    #expect(Set(failures.keys) == ["fail:2"], "\(failures)")
+    #expect(failures["fail:2"]?.contains("intentional failure") == true)
+  }
+
+  @Test func timedOutCasesDoNotStallTheirFile() async throws {
+    let source = "globalThis.runNitroTest = async (name) => { if (name === 'hang') while (true) {} };"
+    let failures = await runNitroTests(source, ["hang", "after"], 1000)
+    #expect(Set(failures.keys) == ["hang"], "\(failures)")
+    #expect(failures["hang"]?.localizedCaseInsensitiveContains("timed out") == true)
+  }
+
+  @Test func filesThatCannotLoadFailEveryCase() async throws {
+    let failures = await runNitroTests("throw new Error('evaluation failure')", ["a", "b"], 1000)
+    for name in ["a", "b"] {
+      let failure = try #require(failures[name])
+      #expect(failure.contains("evaluation failure"))
+      #expect(failure.contains("loading JS test bundle"))
+    }
+  }
+
   @Test func parallelRuntimesOverlapAndStayIsolated() async {
     let source = """
       globalThis.executionCount = (globalThis.executionCount ?? 0) + 1;
@@ -178,9 +229,12 @@ struct RuntimeTests {
       };
       """
     let runs = ConcurrentRuns()
+    // A queue like the shared one, so test files running on that queue cannot
+    // keep the rendezvous pair apart.
+    let queue = makeRuntimeQueue()
     await withCheckedContinuation { continuation in
       let operations = (0..<3).map { index in
-        let operation = BlockOperation {
+        BlockOperation {
           let failure = NitroRunTest(source, "parallel-runtime-\(index)", 10_000) {
             runs.started(index)
           }
@@ -188,11 +242,8 @@ struct RuntimeTests {
             continuation.resume()
           }
         }
-        // Keep the rendezvous pair together ahead of the behavior-test backlog.
-        operation.queuePriority = .veryHigh
-        return operation
       }
-      runtimeQueue.addOperations(operations, waitUntilFinished: false)
+      queue.addOperations(operations, waitUntilFinished: false)
     }
     let result = runs.result
     #expect(result.overlapped, "Two initialized Hermes runtimes must meet before either test runs")

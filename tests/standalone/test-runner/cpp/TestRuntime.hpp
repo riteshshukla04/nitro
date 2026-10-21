@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <functional>
 #include <string>
+#include <vector>
 
 namespace margelo::nitro::testing {
 
@@ -14,5 +15,11 @@ namespace margelo::nitro::testing {
 // onTestStarted lets runner contract tests synchronize two initialized runtimes.
 std::string runTest(const std::string& bundle, const std::string& name, uint32_t timeoutMs = 10000,
                     const std::function<void()>& onTestStarted = {});
+
+// Runs the cases of one test file in order, in one Hermes runtime owned by the
+// calling thread, and returns one runTest()-style result per case. After a case
+// passes, work it already queued runs before the next case starts. A failed case
+// may leave work behind, so the cases after it get a fresh runtime.
+std::vector<std::string> runTests(const std::string& bundle, const std::vector<std::string>& names, uint32_t timeoutMs = 10000);
 
 } // namespace margelo::nitro::testing
