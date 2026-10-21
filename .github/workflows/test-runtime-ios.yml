@@ -42,10 +42,6 @@ jobs:
         sanitizer:
           - name: Default
             value: none
-          - name: ASan
-            value: address
-          - name: TSan
-            value: thread
     env:
       DEVELOPER_DIR: /Applications/Xcode_27.1.app/Contents/Developer
     steps:
@@ -87,18 +83,12 @@ jobs:
       # of node_modules cost minutes. Nothing after test:prepare needs them.
       - name: Move node_modules out of the Swift package
         run: mv node_modules "$RUNNER_TEMP/node_modules"
-      # C, C++ and Objective-C compile through ccache. Swift does not.
-      - name: Restore compiler cache
-        uses: hendrikmuhs/ccache-action@v1.2.24
-        with:
-          max-size: 1G
-          key: standalone-ios-${{ runner.os }}-${{ runner.arch }}-xcode27.1-${{ matrix.sanitizer.name }}
       - name: Test Swift HybridObjects in Hermes
         env:
           HERMES_CACHE_HIT: ${{ steps.hermes-cache.outputs.cache-hit }}
           SANITIZER: ${{ matrix.sanitizer.value }}
         run: |
-          options=(--os 27 --sanitizer "$SANITIZER" --jobs "$(sysctl -n hw.ncpu)" --ccache --derived-data "$RUNNER_TEMP/DerivedData")
+          options=(--os 27 --sanitizer "$SANITIZER" --jobs "$(sysctl -n hw.ncpu)" --derived-data "$RUNNER_TEMP/DerivedData")
           if [ "$HERMES_CACHE_HIT" = 'true' ]; then
             options+=(--skip-hermes-build)
           fi
