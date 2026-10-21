@@ -7,31 +7,31 @@
 
 #pragma once
 
-#include <NitroModules/NitroDefines.hpp>
 #include <fbjni/fbjni.h>
 
 namespace margelo::nitro {
 
-using namespace facebook;
+namespace jni = facebook::jni;
 
 /**
  * Represents a `Unit` from Kotlin.
  * This is similar to `void` for Java, but is actually an `Object`.
  */
-class JUnit final {
+class JUnit final : public jni::JavaClass<JUnit> {
+public:
+  static constexpr auto kJavaDescriptor = "Lkotlin/Unit;";
+
 public:
   /**
    * Gets the shared instance to `Unit`. This is always a static global.
    */
-  static jni::alias_ref<jni::JObject> instance() {
-    static jni::global_ref<jni::JObject> sharedInstance = nullptr;
-    if (sharedInstance == nullptr) {
-      jni::alias_ref<jni::JClass> clazz = jni::findClassStatic("java/lang/Object");
-      jni::JConstructor<jobject()> constructor = clazz->getConstructor<jobject()>();
-      jni::local_ref<jobject> instance = clazz->newObject(constructor);
-      sharedInstance = jni::make_global(instance);
-    }
-    return sharedInstance;
+  static jni::alias_ref<JUnit> instance() {
+    static const auto value = [] {
+      const auto clazz = javaClassStatic();
+      const auto field = clazz->getStaticField<JUnit>("INSTANCE");
+      return jni::make_global(clazz->getStaticFieldValue(field));
+    }();
+    return value;
   }
 };
 
