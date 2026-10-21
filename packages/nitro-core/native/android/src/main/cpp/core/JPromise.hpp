@@ -11,7 +11,6 @@
 #include <NitroModules/Promise.hpp>
 #include <exception>
 #include <fbjni/fbjni.h>
-#include <functional>
 #include <utility>
 
 namespace margelo::nitro {
@@ -42,8 +41,6 @@ class JPromise final : public jni::HybridClass<JPromise> {
 public:
   static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/core/Promise;";
   using ResultType = jni::global_ref<jni::JObject>;
-  using OnResolvedFunc = std::function<void(jni::alias_ref<jni::JObject>)>;
-  using OnRejectedFunc = std::function<void(jni::alias_ref<jni::JThrowable>)>;
 
 private:
   /**
@@ -73,15 +70,6 @@ public:
   }
 
 public:
-  void addOnResolvedListener(OnResolvedFunc onResolved) {
-    _promise.addOnResolvedListener([onResolved = std::move(onResolved)](const ResultType& result) { onResolved(result); });
-  }
-  void addOnRejectedListener(OnRejectedFunc onRejected) {
-    _promise.addOnRejectedListener([onRejected = std::move(onRejected)](const std::exception_ptr& error) {
-      onRejected(JNIConverter<std::exception_ptr, jni::local_ref<jni::JThrowable>>::toJNI(error));
-    });
-  }
-
   /** Borrow the shared state while this JNI owner is alive. Wiring listeners requires an attached thread. */
   const Promise<ResultType>& getPromise() const {
     return _promise;
