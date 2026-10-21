@@ -89,12 +89,13 @@
 #include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
 #include <NitroTest/private/JCallback_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_.hpp>
 #include <memory>
+#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace margelo::nitro::test {
 
   JHybridTestObjectSwiftKotlinSpec::~JHybridTestObjectSwiftKotlinSpec() {
     // Hermes GC can destroy JS objects on a non-JNI thread.
-    jni::ThreadScope::WithClassLoader([&] { _javaPart.reset(); });
+    resetGlobalRef(_javaPart);
   }
 
   std::shared_ptr<JHybridTestObjectSwiftKotlinSpec> JHybridTestObjectSwiftKotlinSpec::constructor() {

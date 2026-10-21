@@ -18,12 +18,13 @@
 #include <NitroTest/private/JCallback_Size_Size.hpp>
 #include <NitroModules/JNIConverter+Callback.hpp>
 #include <memory>
+#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace margelo::nitro::test {
 
   JHybridBaseSpec::~JHybridBaseSpec() {
     // Hermes GC can destroy JS objects on a non-JNI thread.
-    jni::ThreadScope::WithClassLoader([&] { _javaPart.reset(); });
+    resetGlobalRef(_javaPart);
   }
 
   std::shared_ptr<JHybridBaseSpec> JHybridBaseSpec::constructor() {

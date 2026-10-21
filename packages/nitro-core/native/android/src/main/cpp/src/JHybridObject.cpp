@@ -6,6 +6,7 @@
 //
 
 #include "JHybridObject.hpp"
+#include "JNIGlobalRef.hpp"
 #include <fbjni/fbjni.h>
 
 namespace margelo::nitro {
@@ -54,7 +55,7 @@ JHybridObject::JHybridObject(const jni::local_ref<JHybridObject::JavaPart>& java
 
 JHybridObject::~JHybridObject() {
   // Hermes GC can destroy JS objects on a non-JNI Thread.
-  jni::ThreadScope::WithClassLoader([&] { _javaPart.reset(); });
+  resetGlobalRef(_javaPart);
 }
 
 size_t JHybridObject::getExternalMemorySize() noexcept {

@@ -231,12 +231,13 @@ namespace ${cxxNamespace} {
 ${createFileMetadataString(`${name.JHybridTSpec}.cpp`)}
 
 ${cppImplementationIncludes}
+#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace ${cxxNamespace} {
 
   ${name.JHybridTSpec}::~${name.JHybridTSpec}() {
     // Hermes GC can destroy JS objects on a non-JNI thread.
-    jni::ThreadScope::WithClassLoader([&] { _javaPart.reset(); });
+    resetGlobalRef(_javaPart);
   }
 
   ${indent(bindings.definitions.join('\n\n'), '  ')}

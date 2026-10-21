@@ -12,12 +12,13 @@
 #include <NitroModules/JNIConverter+Callback.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace margelo::nitro::test::external {
 
   JHybridTestViewSpec::~JHybridTestViewSpec() {
     // Hermes GC can destroy JS objects on a non-JNI thread.
-    jni::ThreadScope::WithClassLoader([&] { _javaPart.reset(); });
+    resetGlobalRef(_javaPart);
   }
 
 

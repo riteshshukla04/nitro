@@ -10,12 +10,13 @@
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <memory>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace margelo::nitro::test {
 
   JHybridPlatformObjectSpec::~JHybridPlatformObjectSpec() {
     // Hermes GC can destroy JS objects on a non-JNI thread.
-    jni::ThreadScope::WithClassLoader([&] { _javaPart.reset(); });
+    resetGlobalRef(_javaPart);
   }
 
   std::shared_ptr<JHybridPlatformObjectSpec> JHybridPlatformObjectSpec::constructor() {

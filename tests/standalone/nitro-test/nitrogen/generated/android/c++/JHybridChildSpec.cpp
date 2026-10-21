@@ -14,12 +14,13 @@
 #include <NitroTest/private/JCar.hpp>
 #include <memory>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
+#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace margelo::nitro::test {
 
   JHybridChildSpec::~JHybridChildSpec() {
     // Hermes GC can destroy JS objects on a non-JNI thread.
-    jni::ThreadScope::WithClassLoader([&] { _javaPart.reset(); });
+    resetGlobalRef(_javaPart);
   }
 
   std::shared_ptr<JHybridChildSpec> JHybridChildSpec::constructor() {

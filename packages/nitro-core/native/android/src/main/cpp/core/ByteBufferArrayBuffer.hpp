@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "JNIGlobalRef.hpp"
 #include <NitroModules/ArrayBuffer.hpp>
 #include <fbjni/ByteBuffer.h>
 #include <fbjni/fbjni.h>
@@ -28,7 +29,7 @@ public:
 
   ~ByteBufferArrayBuffer() {
     // Hermes GC can destroy JS objects on a non-JNI Thread.
-    jni::ThreadScope::WithClassLoader([&] { _byteBuffer.reset(); });
+    resetGlobalRef(_byteBuffer);
   }
 
 public:

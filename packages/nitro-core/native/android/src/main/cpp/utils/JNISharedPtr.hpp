@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "JNIGlobalRef.hpp"
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/NitroTypeInfo.hpp>
 #include <fbjni/fbjni.h>
@@ -22,7 +23,7 @@ struct GlobalRefDeleter {
 
   void operator()(T* /* cthis */) {
     // It's RAII - once `GlobalRefDeleter` goes out of scope, `jni::global_ref` will too.
-    jni::ThreadScope::WithClassLoader([&] { _ref.reset(); });
+    resetGlobalRef(_ref);
   }
 
 private:
