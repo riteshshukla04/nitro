@@ -15,6 +15,10 @@ export class KotlinNamedType extends NamedWrappingType<KotlinType> implements Ko
   get jniValueKind(): JniValueKind {
     return this.type.jniValueKind
   }
+  get isKotlinFieldCompatible(): boolean {
+    return this.type.isKotlinFieldCompatible ?? !this.type.needsKotlinConversion
+  }
+
   get needsKotlinConversion(): boolean {
     return this.type.needsKotlinConversion
   }

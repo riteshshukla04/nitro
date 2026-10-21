@@ -73,6 +73,8 @@ namespace NitroTest { class Record_swift__String___NitroTest__Variant_NullType_S
 namespace NitroTest { class Record_swift__String_swift__Optional___NitroTest__Variant_NullType_String_cxx_; }
 // Forward declaration of `Record_swift__String_swift__String` to properly resolve imports.
 namespace NitroTest { class Record_swift__String_swift__String; }
+// Forward declaration of `UnsignedScalar` to properly resolve imports.
+namespace NitroTest { class UnsignedScalar; }
 // Forward declaration of `JsStyleStruct` to properly resolve imports.
 namespace NitroTest { class JsStyleStruct; }
 // Forward declaration of `WrappedJsStruct` to properly resolve imports.

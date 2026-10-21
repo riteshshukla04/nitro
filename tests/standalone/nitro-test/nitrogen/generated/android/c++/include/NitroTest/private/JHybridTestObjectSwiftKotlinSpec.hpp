@@ -50,6 +50,7 @@
 #include <NitroModules/JNIConverter+Map.hpp>
 #include <NitroModules/JSIConverter+JMap.hpp>
 #include <NitroTest/private/JCar.hpp>
+#include <NitroTest/private/JUnsignedScalar.hpp>
 #include <NitroTest/private/JWrappedJsStruct.hpp>
 #include <NitroTest/private/JOptionalWrapper.hpp>
 #include <NitroTest/private/JOptionalCallback.hpp>
@@ -259,6 +260,7 @@ namespace margelo::nitro::test {
     jni::local_ref<JOptional<JPerson>> getDriver(const jni::local_ref<JCar>& car);
     jni::local_ref<JCar> bounceCar(const jni::local_ref<JCar>& car);
     void jsStyleObjectAsParameters(const jni::local_ref<JJsStyleStruct>& params);
+    jni::local_ref<JUnsignedScalar> roundtripUnsignedScalar(const jni::local_ref<JUnsignedScalar>& value);
     jni::local_ref<JWrappedJsStruct> bounceWrappedJsStyleStruct(const jni::local_ref<JWrappedJsStruct>& value);
     jni::local_ref<JOptionalWrapper> bounceOptionalWrapper(const jni::local_ref<JOptionalWrapper>& wrapper);
     jni::local_ref<JOptionalCallback> bounceOptionalCallback(const jni::local_ref<JOptionalCallback>& value);

@@ -34,7 +34,7 @@ val ${p.escapedName}: ${type}
   const extraImports = getImportsCode(kotlinPropertyImports)
 
   const jniGetters = structType.properties
-    .filter((property) => property.needsKotlinConversion)
+    .filter((property) => !property.isKotlinFieldCompatible)
     .map((property) => {
       const name = capitalizeName(property.escapedName)
       const type = property.getCode('kotlin', { context: 'return' })
@@ -120,7 +120,7 @@ data class ${structType.structName}(
     const name = capitalizeName(property.escapedName)
     const methodResult = convertJniValue(property, 'method(this->self())', 'from-jni')
     const fieldResult = convertJniValue(property, 'getFieldValue(field)', 'from-jni')
-    if (property.needsKotlinConversion) {
+    if (!property.isKotlinFieldCompatible) {
       return `
 ${returnType} get${name}() const {
   static const auto method = javaClassStatic()->getMethod<${signatureType}()>("get${name}_cxx");

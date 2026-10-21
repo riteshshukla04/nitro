@@ -31,6 +31,7 @@
 #include <exception>
 #include <NitroModules/InlineCallback.hpp>
 #include <NitroTest/JsStyleStruct.hpp>
+#include <NitroTest/UnsignedScalar.hpp>
 #include <NitroTest/WrappedJsStruct.hpp>
 #include <NitroTest/OptionalWrapper.hpp>
 #include <NitroTest/OptionalCallback.hpp>
@@ -187,6 +188,7 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("getDriver", &HybridTestObjectCppSpec::getDriver);
       clazz.registerHybridMethod("bounceCar", &HybridTestObjectCppSpec::bounceCar);
       clazz.registerHybridMethod("jsStyleObjectAsParameters", &HybridTestObjectCppSpec::jsStyleObjectAsParameters);
+      clazz.registerHybridMethod("roundtripUnsignedScalar", &HybridTestObjectCppSpec::roundtripUnsignedScalar);
       clazz.registerHybridMethod("bounceWrappedJsStyleStruct", &HybridTestObjectCppSpec::bounceWrappedJsStyleStruct);
       clazz.registerHybridMethod("bounceOptionalWrapper", &HybridTestObjectCppSpec::bounceOptionalWrapper);
       clazz.registerHybridMethod("bounceOptionalCallback", &HybridTestObjectCppSpec::bounceOptionalCallback);

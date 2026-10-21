@@ -179,6 +179,7 @@ namespace margelo::nitro::test {
     swift::Optional<::NitroTest::Person> getDriver(const ::NitroTest::Car& car);
     ::NitroTest::Car bounceCar(const ::NitroTest::Car& car);
     void jsStyleObjectAsParameters(const ::NitroTest::JsStyleStruct& params);
+    ::NitroTest::UnsignedScalar roundtripUnsignedScalar(const ::NitroTest::UnsignedScalar& value);
     ::NitroTest::WrappedJsStruct bounceWrappedJsStyleStruct(const ::NitroTest::WrappedJsStruct& value);
     ::NitroTest::OptionalWrapper bounceOptionalWrapper(const ::NitroTest::OptionalWrapper& wrapper);
     ::NitroTest::OptionalCallback bounceOptionalCallback(const ::NitroTest::OptionalCallback& value);

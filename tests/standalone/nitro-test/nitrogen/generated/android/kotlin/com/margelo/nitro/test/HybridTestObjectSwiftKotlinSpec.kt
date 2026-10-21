@@ -597,6 +597,10 @@ abstract class HybridTestObjectSwiftKotlinSpec: HybridObject() {
 
   @DoNotStrip
   @Keep
+  abstract fun roundtripUnsignedScalar(value: UnsignedScalar): UnsignedScalar
+
+  @DoNotStrip
+  @Keep
   abstract fun bounceWrappedJsStyleStruct(value: WrappedJsStruct): WrappedJsStruct
 
   @DoNotStrip

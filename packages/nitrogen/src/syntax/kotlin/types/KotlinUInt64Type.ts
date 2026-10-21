@@ -20,6 +20,10 @@ export class KotlinUInt64Type extends UInt64Type implements KotlinType {
   readonly needsKotlinConversion = true
   readonly boxed: boolean
 
+  get isKotlinFieldCompatible(): boolean {
+    return !this.boxed
+  }
+
   constructor({ boxed }: KotlinTypeOptions = {}) {
     super()
     this.boxed = boxed === true

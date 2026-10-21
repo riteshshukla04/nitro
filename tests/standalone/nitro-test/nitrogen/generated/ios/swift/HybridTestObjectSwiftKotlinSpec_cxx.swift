@@ -1071,6 +1071,16 @@ public final class HybridTestObjectSwiftKotlinSpec_cxx {
     }
   }
 
+  public final func roundtripUnsignedScalar(value: UnsignedScalar, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
+    do {
+      let value = try __implementation.roundtripUnsignedScalar(value: value)
+      __outResult.assumingMemoryBound(to: UnsignedScalar.self).initialize(to: value)
+      return bridge.Result_void.withValue()
+    } catch {
+      return bridge.Result_void.withError(error.toCpp())
+    }
+  }
+
   public final func bounceWrappedJsStyleStruct(value: WrappedJsStruct, __outResult: UnsafeMutableRawPointer) -> bridge.Result_void {
     do {
       let value = try __implementation.bounceWrappedJsStyleStruct(value: value)

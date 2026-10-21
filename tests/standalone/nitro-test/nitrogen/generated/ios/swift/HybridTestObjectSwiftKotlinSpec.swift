@@ -118,6 +118,7 @@ public protocol HybridTestObjectSwiftKotlinSpec_protocol: HybridObject {
   func getDriver(car: Car) throws -> Person?
   func bounceCar(car: Car) throws -> Car
   func jsStyleObjectAsParameters(params: JsStyleStruct) throws -> Void
+  func roundtripUnsignedScalar(value: UnsignedScalar) throws -> UnsignedScalar
   func bounceWrappedJsStyleStruct(value: WrappedJsStruct) throws -> WrappedJsStruct
   func bounceOptionalWrapper(wrapper: OptionalWrapper) throws -> OptionalWrapper
   func bounceOptionalCallback(value: OptionalCallback) throws -> OptionalCallback

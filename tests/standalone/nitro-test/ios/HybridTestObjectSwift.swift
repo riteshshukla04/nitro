@@ -604,6 +604,10 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     params.onChanged(params.value)
   }
 
+  func roundtripUnsignedScalar(value: UnsignedScalar) throws -> UnsignedScalar {
+    return value
+  }
+
   func bounceWrappedJsStyleStruct(value: WrappedJsStruct) throws -> WrappedJsStruct {
     return value
   }

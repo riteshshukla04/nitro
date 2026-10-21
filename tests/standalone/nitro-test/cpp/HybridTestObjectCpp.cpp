@@ -780,6 +780,10 @@ void HybridTestObjectCpp::jsStyleObjectAsParameters(const JsStyleStruct& params)
   params.onChanged(params.value);
 }
 
+UnsignedScalar HybridTestObjectCpp::roundtripUnsignedScalar(const UnsignedScalar& value) {
+  return value;
+}
+
 WrappedJsStruct HybridTestObjectCpp::bounceWrappedJsStyleStruct(const WrappedJsStruct& value) {
   return value;
 }

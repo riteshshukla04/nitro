@@ -240,6 +240,7 @@ public:
   std::optional<Person> getDriver(const Car& car) override;
   Car bounceCar(const Car& car) override;
   void jsStyleObjectAsParameters(const JsStyleStruct& params) override;
+  UnsignedScalar roundtripUnsignedScalar(const UnsignedScalar& value) override;
   WrappedJsStruct bounceWrappedJsStyleStruct(const WrappedJsStruct& value) override;
   OptionalWrapper bounceOptionalWrapper(const OptionalWrapper& wrapper) override;
   OptionalCallback bounceOptionalCallback(const OptionalCallback& value) override;

@@ -70,6 +70,7 @@ target_sources(NitroTest PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JSizeUnit.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JStringOrExternal.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JTruckPowertrain.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JUnsignedScalar.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JVariant_Boolean_Double.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JVariant_Boolean_DoubleArray_Array_String__Double_String.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JVariant_Double_String.cpp"
@@ -104,6 +105,7 @@ target_sources(NitroTest PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/Person.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/SecondMapWrapper.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/Size.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/UnsignedScalar.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/WrappedJsStruct.cpp"
 )
 

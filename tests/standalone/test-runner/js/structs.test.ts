@@ -5,6 +5,8 @@ import { type Car, type OptionalWrapper } from 'nitro-test'
 
 import { sumUpAllPassengers, TEST_CAR, TEST_CAR_2, TEST_OPTIONAL_ENUM_WRAPPER, TEST_PERSON, TEST_WRAPPED_STRUCT } from './utils/fixtures'
 
+const UNSIGNED_BOUNDARIES = [0n, 1n, 9223372036854775807n, 9223372036854775808n, 18446744073709551615n]
+
 const CAR_WITHOUT_DRIVER: Car = {
   make: 'Lamborghini',
   year: 2018,
@@ -37,6 +39,13 @@ function withoutKey<T extends object>(value: T, key: keyof T): Partial<T> {
   return copy
 }
 export const cases = {
+  ...casesForTestObjects('Unsigned struct roundtrips', {
+    'roundtripUnsignedScalar preserves all 64 bits': (testObject) => {
+      for (const unsigned of UNSIGNED_BOUNDARIES) {
+        expect(testObject.roundtripUnsignedScalar({ value: unsigned })).to.deep.equal({ value: unsigned })
+      }
+    },
+  }),
   ...casesForTestObjects('Struct roundtrips', {
     'bouncePartialStruct(...) keeps an empty struct': (testObject) => {
       expect(testObject.bouncePartialStruct({ name: undefined, age: undefined })).to.deep.equal({ name: undefined, age: undefined })
