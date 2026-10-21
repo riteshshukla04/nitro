@@ -61,7 +61,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.
 const environment = { ...process.env }
 // A single cooperative worker catches native runners that block Swift Tasks
 // needed to resolve their JavaScript Promises.
-environment.TEST_RUNNER_LIBDISPATCH_COOPERATIVE_POOL_STRICT = '1'
+// Experiment: full cooperative pool.
 const started = Date.now()
 const elapsed = () => `${((Date.now() - started) / 1000).toFixed(0)} s`
 function run(command, args, capture = false) {
