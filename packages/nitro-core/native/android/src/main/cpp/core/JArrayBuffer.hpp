@@ -125,7 +125,8 @@ public:
 #if __ANDROID_API__ >= 26
     AHardwareBuffer* buffer = getHardwareBuffer();
     jobject boxed = AHardwareBuffer_toHardwareBuffer(jni::Environment::current(), buffer);
-    return jni::make_local(boxed);
+    jni::throwPendingJniExceptionAsCppException();
+    return jni::adopt_local(boxed);
 #else
     throw std::runtime_error("ArrayBuffer(HardwareBuffer) requires NDK API 26 or above! (minSdk >= 26)");
 #endif

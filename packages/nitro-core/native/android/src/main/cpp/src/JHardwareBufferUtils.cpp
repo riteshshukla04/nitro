@@ -9,6 +9,7 @@
 #include <NitroModules/NitroDefines.hpp>
 #include <android/hardware_buffer_jni.h>
 #include <android/ndk-version.h>
+#include <memory>
 
 namespace margelo::nitro {
 
@@ -84,13 +85,18 @@ JHardwareBufferUtils::copyHardwareBufferBoxedNew(jni::alias_ref<jni::JClass>,
   AHardwareBuffer_Desc description;
   AHardwareBuffer_describe(sourceHardwareBuffer, &description);
   // 3. Create a new buffer from the same description
-  AHardwareBuffer* destinationHardwareBuffer;
-  AHardwareBuffer_allocate(&description, &destinationHardwareBuffer);
+  AHardwareBuffer* destinationHardwareBuffer = nullptr;
+  const int status = AHardwareBuffer_allocate(&description, &destinationHardwareBuffer);
+  if (status != 0) {
+    throw std::runtime_error("Failed to allocate destination HardwareBuffer! Error: " + std::to_string(status));
+  }
+  const std::unique_ptr<AHardwareBuffer, decltype(&AHardwareBuffer_release)> owner(destinationHardwareBuffer, AHardwareBuffer_release);
   // 4. Copy the data over
   copyHardwareBuffer(sourceHardwareBuffer, destinationHardwareBuffer);
   // 5. Box it into jobject again
   jobject boxed = AHardwareBuffer_toHardwareBuffer(jni::Environment::current(), destinationHardwareBuffer);
-  return jni::make_local(boxed);
+  jni::throwPendingJniExceptionAsCppException();
+  return jni::adopt_local(boxed);
 #else
   throw std::runtime_error("ArrayBuffer(HardwareBuffer) requires NDK API 26 or above! (minSdk >= 26)");
 #endif
@@ -118,13 +124,11 @@ void JHardwareBufferUtils::copyHardwareBuffer([[maybe_unused]] AHardwareBuffer* 
   size_t sourceSize = getHardwareBufferSize(sourceHardwareBuffer);
 
   // 2. Get info about the destination buffer
-#ifdef NITRO_DEBUG
   size_t destinationSize = getHardwareBufferSize(destinationHardwareBuffer);
   if (sourceSize != destinationSize) {
     throw std::runtime_error("Source HardwareBuffer (" + std::to_string(sourceSize) + " bytes) and destination HardwareBuffer (" +
                              std::to_string(destinationSize) + " bytes) are not the same size!");
   }
-#endif
 
   // 3. Copy data over
   void* sourceData;
