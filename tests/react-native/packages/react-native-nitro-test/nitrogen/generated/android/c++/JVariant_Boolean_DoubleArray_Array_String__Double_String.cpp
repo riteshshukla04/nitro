@@ -15,6 +15,7 @@
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JVariant_Boolean_DoubleArray_Array_String__Double_String> JVariant_Boolean_DoubleArray_Array_String__Double_String::create_0(jboolean value) {
@@ -46,16 +47,7 @@ namespace margelo::nitro::test {
     switch (variant.index()) {
       case 0: return create_0(JNIConverter<bool, jboolean>::toJNI(std::get<0>(variant)));
       case 1: return create_1(JNIConverter<std::vector<double>, jni::local_ref<jni::JArrayDouble>>::toJNI(std::get<1>(variant)));
-      case 2: return create_2([&](auto&& __input) {
-        size_t __size = __input.size();
-        jni::local_ref<jni::JArrayClass<jni::JString>> __array = jni::JArrayClass<jni::JString>::newArray(__size);
-        for (size_t __i = 0; __i < __size; __i++) {
-          const auto& __element = __input[__i];
-          auto __elementJni = JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(__element);
-          __array->setElement(__i, *__elementJni);
-        }
-        return __array;
-      }(std::get<2>(variant)));
+      case 2: return create_2(JNIConverter<std::vector<std::string>, jni::local_ref<jni::JArrayClass<jni::JString>>>::toJNI(std::get<2>(variant)));
       case 3: return create_3(JNIConverter<double, jdouble>::toJNI(std::get<3>(variant)));
       case 4: return create_4(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<4>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
@@ -102,16 +94,7 @@ namespace margelo::nitro::test {
     } else if (isInstanceOf(JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Third::javaClassStatic())) {
       // It's a `std::vector<std::string>`
       auto jniValue = static_cast<const JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Third*>(this)->getValue();
-      return [&](auto&& __input) {
-        size_t __size = __input->size();
-        std::vector<std::string> __vector;
-        __vector.reserve(__size);
-        for (size_t __i = 0; __i < __size; __i++) {
-          auto __element = __input->getElement(__i);
-          __vector.push_back(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(__element));
-        }
-        return __vector;
-      }(jniValue);
+      return JNIConverter<std::vector<std::string>, jni::local_ref<jni::JArrayClass<jni::JString>>>::fromJNI(jniValue);
     } else if (isInstanceOf(JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth::javaClassStatic())) {
       // It's a `double`
       auto jniValue = static_cast<const JVariant_Boolean_DoubleArray_Array_String__Double_String_impl::Fourth*>(this)->getValue();

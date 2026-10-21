@@ -27,7 +27,7 @@ export class KotlinArrayType extends ArrayType implements KotlinType {
       case 'uint64':
         return true
       default:
-        return false
+        return this.itemType.getJSIType?.() != null
     }
   }
 

@@ -19,6 +19,7 @@
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
 
 namespace margelo::nitro::test {
 

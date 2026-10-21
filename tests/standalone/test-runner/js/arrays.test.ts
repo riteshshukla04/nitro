@@ -299,8 +299,6 @@ export const cases = {
       expect(testObject.bounceStrings(['', 'a', ''])).to.deep.equal(['', 'a', ''])
     },
 
-    // TODO: Fix in Nitro - bounceStrings(...) truncates strings at the first NUL on Kotlin (JHybridTestObjectSwiftKotlinSpec uses jni::make_jstring(std::string), which reads c_str()), so ['a\0b', '\0'] comes back as ['a', '']; C++ and Swift keep them
-
     'bounceStrings(...) keeps NUL characters': (testObject) => {
       expect(testObject.bounceStrings(['a\0b', '\0'])).to.deep.equal(['a\0b', '\0'])
     },
@@ -456,9 +454,4 @@ export const cases = {
   }),
 }
 
-export const skips = {
-  'Array values / TestObjectSwiftKotlin / bounceStrings(...) keeps NUL characters': {
-    android:
-      "Fix in Nitro - bounceStrings(...) truncates strings at the first NUL on Kotlin (JHybridTestObjectSwiftKotlinSpec uses jni::make_jstring(std::string), which reads c_str()), so ['a\\0b', '\\0'] comes back as ['a', '']; C++ and Swift keep them",
-  },
-} as const
+export const skips = {} as const

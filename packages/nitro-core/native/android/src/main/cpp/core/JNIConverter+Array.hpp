@@ -50,4 +50,29 @@ struct JNIConverter<std::vector<CppElement>, jni::local_ref<JavaArray>> {
   }
 };
 
+template <typename CppElement, typename JavaElement>
+struct JNIConverter<std::vector<CppElement>, jni::local_ref<jni::JArrayClass<JavaElement>>> {
+  using JavaArray = jni::JArrayClass<JavaElement>;
+
+  static jni::local_ref<JavaArray> toJNI(const std::vector<CppElement>& value) {
+    const jsize size = static_cast<jsize>(value.size());
+    auto array = JavaArray::newArray(size);
+    for (jsize i = 0; i < size; ++i) {
+      auto element = JNIConverter<CppElement, jni::local_ref<JavaElement>>::toJNI(value[i]);
+      array->setElement(i, *element);
+    }
+    return array;
+  }
+  static std::vector<CppElement> fromJNI(jni::alias_ref<JavaArray> value) {
+    const jsize size = static_cast<jsize>(value->size());
+    std::vector<CppElement> result;
+    result.reserve(size);
+    for (jsize i = 0; i < size; ++i) {
+      auto element = value->getElement(i);
+      result.push_back(JNIConverter<CppElement, jni::local_ref<JavaElement>>::fromJNI(element));
+    }
+    return result;
+  }
+};
+
 } // namespace margelo::nitro

@@ -59,14 +59,15 @@ namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; 
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+AnyJSON.hpp>
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
-#include <NitroModules/JNIConverter+Error.hpp>
-#include <NitroModules/JSIConverter+JThrowable.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
+#include <NitroModules/JNIConverter+Error.hpp>
+#include <NitroModules/JSIConverter+JThrowable.hpp>
 #include <NitroTest/private/JHybridTestObjectSwiftKotlinSpec.hpp>
 
 namespace margelo::nitro::test {
@@ -128,8 +129,8 @@ namespace margelo::nitro::test {
     void setStringOrUndefined(const jni::local_ref<JOptional<jni::JString>>& stringOrUndefined);
     std::variant<nitro::NullType, std::string> getStringOrNull();
     void setStringOrNull(const std::variant<nitro::NullType, std::string>& stringOrNull);
-    std::optional<std::vector<std::string>> getOptionalArray();
-    void setOptionalArray(const std::optional<std::vector<std::string>>& optionalArray);
+    jni::local_ref<JOptional<jni::JArrayClass<jni::JString>>> getOptionalArray();
+    void setOptionalArray(const jni::local_ref<JOptional<jni::JArrayClass<jni::JString>>>& optionalArray);
     std::optional<Powertrain> getOptionalEnum();
     void setOptionalEnum(const std::optional<Powertrain>& optionalEnum);
     std::optional<OldEnum> getOptionalOldEnum();
@@ -161,7 +162,7 @@ namespace margelo::nitro::test {
     jni::local_ref<jni::JString> addStrings(const jni::local_ref<jni::JString>& a, const jni::local_ref<jni::JString>& b);
     void multipleArguments(jdouble num, const jni::local_ref<jni::JString>& str, jboolean boo);
     jni::local_ref<JNull> bounceNull(const jni::local_ref<JNull>& value);
-    std::vector<std::string> bounceStrings(const std::vector<std::string>& array);
+    jni::local_ref<jni::JArrayClass<jni::JString>> bounceStrings(const jni::local_ref<jni::JArrayClass<jni::JString>>& array);
     jni::local_ref<jni::JArrayDouble> bounceNumbers(const jni::local_ref<jni::JArrayDouble>& array);
     std::vector<PersonKotlin> bounceStructs(const std::vector<PersonKotlin>& array);
     std::vector<std::vector<PersonKotlin>> bounceNestedArray(const std::vector<std::vector<PersonKotlin>>& array);
@@ -176,15 +177,15 @@ namespace margelo::nitro::test {
     std::vector<std::vector<std::optional<PersonKotlin>>> callNestedStructCallback(const std::vector<std::vector<std::optional<PersonKotlin>>>& value, const Callback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)>& callback);
     std::vector<std::shared_ptr<JHybridChildSpec>> bounceHybridObjects(const std::vector<std::shared_ptr<JHybridChildSpec>>& array);
     std::vector<Callback<void()>> bounceFunctions(const std::vector<Callback<void()>>& functions);
-    std::vector<AnyJSON> bounceMaps(const std::vector<AnyJSON>& maps);
+    jni::local_ref<jni::JArrayClass<JAnyJSON>> bounceMaps(const jni::local_ref<jni::JArrayClass<JAnyJSON>>& maps);
     std::vector<Promise<double>> bouncePromises(const std::vector<Promise<double>>& promises);
-    std::vector<ArrayBuffer> bounceArrayBuffers(const std::vector<ArrayBuffer>& arrayBuffers);
-    std::vector<std::optional<std::string>> bounceOptionals(const std::vector<std::optional<std::string>>& strings, const std::vector<std::optional<ArrayBuffer>>& arrayBuffers);
+    jni::local_ref<jni::JArrayClass<JArrayBuffer::JavaPart>> bounceArrayBuffers(const jni::local_ref<jni::JArrayClass<JArrayBuffer::JavaPart>>& arrayBuffers);
+    jni::local_ref<jni::JArrayClass<JOptional<jni::JString>>> bounceOptionals(const jni::local_ref<jni::JArrayClass<JOptional<jni::JString>>>& strings, const jni::local_ref<jni::JArrayClass<JOptional<JArrayBuffer::JavaPart>>>& arrayBuffers);
     std::vector<std::variant<nitro::NullType, std::string>> bounceNulls(const std::vector<std::variant<nitro::NullType, std::string>>& strings);
     std::vector<std::optional<std::variant<nitro::NullType, std::string>>> bounceOptionalNulls(const std::vector<std::optional<std::variant<nitro::NullType, std::string>>>& strings);
     jni::local_ref<JAnyJSON> createMap();
     jni::local_ref<JAnyJSON> mapRoundtrip(const jni::local_ref<JAnyJSON>& map);
-    std::vector<std::string> getMapKeys(const jni::local_ref<JAnyJSON>& map);
+    jni::local_ref<jni::JArrayClass<jni::JString>> getMapKeys(const jni::local_ref<JAnyJSON>& map);
     jni::local_ref<JAnyJSON> mergeMaps(const jni::local_ref<JAnyJSON>& a, const jni::local_ref<JAnyJSON>& b);
     jni::local_ref<JAnyJSON> copyAnyMap(const jni::local_ref<JAnyJSON>& map);
     std::unordered_map<std::string, std::variant<bool, double>> bounceMap(const std::unordered_map<std::string, std::variant<bool, double>>& map);

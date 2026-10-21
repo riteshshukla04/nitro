@@ -36,6 +36,7 @@
 #include <NitroModules/JPromise.hpp>
 #include <NitroModules/JNISharedPtr.hpp>
 #include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
 #include <NitroTest/private/JCallback_double.hpp>
 #include <NitroModules/JNICallable.hpp>
 
