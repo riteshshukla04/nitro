@@ -13,6 +13,8 @@ import com.facebook.proguard.annotations.DoNotStrip
 import dalvik.annotation.optimization.FastNative
 import com.margelo.nitro.core.NullType
 import com.margelo.nitro.core.Promise
+import com.margelo.nitro.utils.mapToArray
+import com.margelo.nitro.utils.mapToLongArray
 import com.margelo.nitro.core.AnyJSON
 import com.margelo.nitro.core.ArrayBuffer
 import com.margelo.nitro.test.external.HybridSomeExternalObjectSpec
@@ -286,8 +288,8 @@ abstract class HybridTestObjectSwiftKotlinSpec: HybridObject() {
   @DoNotStrip
   @Keep
   private fun bounceFunctions_cxx(functions: Array<Callback_void>): Array<Callback_void> {
-    val __result = bounceFunctions(functions.map { __item -> __item }.toTypedArray<() -> Unit>())
-    return __result.map { __item -> __item.let { if (it is Callback_void) it else Callback_void_java(it) } }.toTypedArray<Callback_void>()
+    val __result = bounceFunctions(functions.mapToArray<Callback_void, () -> Unit> { __item -> __item })
+    return __result.mapToArray<() -> Unit, Callback_void> { __item -> __item.let { if (it is Callback_void) it else Callback_void_java(it) } }
   }
 
   @DoNotStrip

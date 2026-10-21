@@ -35,7 +35,10 @@ export function createKotlinHybridObject(spec: HybridObjectSpec<'kotlin'>): Sour
   const bridgeCompanion = getKotlinCompanion(spec)
   const cxxPartMembers = getKotlinCxxPartMembers({ spec: spec, hybridObject: hybridObject })
 
+  const jniTypes = getAllTypes(spec).map((type) => wrapKotlinType(type, { config: spec.config }))
+  const jniImports = jniTypes.flatMap((type) => type.getRequiredImports('kotlin'))
   const extraImports: SourceImport[] = [
+    ...jniImports,
     ...spec.properties.flatMap((p) => p.getRequiredImports('kotlin')),
     ...spec.staticProperties.flatMap((p) => p.getRequiredImports('kotlin')),
     ...spec.methods.flatMap((m) => m.getRequiredImports('kotlin')),

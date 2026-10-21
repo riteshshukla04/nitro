@@ -94,7 +94,8 @@ private fun fromCpp_${i}(value: ${bridgeType}): ${kotlinName} = ${innerName}(val
 `.trim()
   })
 
-  const kotlinImports = publicVariant.variants.flatMap((type) => type.getRequiredImports('kotlin'))
+  const kotlinTypes = [...publicVariant.variants, ...variant.variants]
+  const kotlinImports = kotlinTypes.flatMap((type) => type.getRequiredImports('kotlin'))
   const extraImports = getImportsCode(kotlinImports)
 
   const code = `

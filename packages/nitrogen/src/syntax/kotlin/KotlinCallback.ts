@@ -55,10 +55,12 @@ return ${kotlinResult}
 `.trim()
   }
 
-  const extraImports = publicType
-    .getRequiredImports('kotlin')
-    .map((i) => getImportCode(i))
-    .filter(isNotDuplicate)
+  const callbackImports = [
+    ...publicType.getRequiredImports('kotlin'),
+    ...callbackType.returnType.getRequiredImports('kotlin'),
+    ...callbackType.parameters.flatMap((parameter) => parameter.getRequiredImports('kotlin')),
+  ]
+  const extraImports = callbackImports.map((i) => getImportCode(i)).filter(isNotDuplicate)
 
   const kotlinCode = `
 ${createFileMetadataString(`${name}.kt`)}

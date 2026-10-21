@@ -37,8 +37,17 @@ export class KotlinArrayType extends ArrayType implements KotlinType {
         const resultCode = resultType.getCode('kotlin', {
           context: 'type-argument',
         })
-        const toArray = this.itemType.kind === 'uint64' && conversion.from === 'kotlin' ? 'toLongArray()' : `toTypedArray<${resultCode}>()`
-        return `${value}.map { __item -> ${item} }.${toArray}`
+        let conversionFunction: string
+        if (this.itemType.kind === 'uint64') {
+          conversionFunction = conversion.from === 'kotlin' ? 'mapToLongArray' : `mapToArray<${resultCode}>`
+        } else {
+          const sourceType = conversion.from === 'c++' ? this.itemType : this.type.itemType
+          const sourceCode = sourceType.getCode('kotlin', { context: 'type-argument' })
+          conversionFunction = `mapToArray<${sourceCode}, ${resultCode}>`
+        }
+        return `
+${value}.${conversionFunction} { __item -> ${item} }
+`.trim()
       }
       case 'c++': {
         const cppType = this.type.getCode('c++', { context: 'value' })
@@ -121,6 +130,14 @@ export class KotlinArrayType extends ArrayType implements KotlinType {
         break
       }
       case 'kotlin':
+        if (this.needsKotlinConversion) {
+          imports.push(
+            { language: language, name: 'com.margelo.nitro.utils.mapToArray' },
+            { language: language, name: 'com.margelo.nitro.utils.mapToLongArray' }
+          )
+        }
+        imports.push(...this.type.getRequiredImports(language))
+        break
       case 'swift':
         imports.push(...this.type.getRequiredImports(language))
         break
