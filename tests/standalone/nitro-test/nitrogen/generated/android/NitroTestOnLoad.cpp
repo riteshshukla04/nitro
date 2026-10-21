@@ -16,6 +16,7 @@
 #include <NitroTest/private/JCallback_void_double.hpp>
 #include <NitroTest/private/JCallback_std__vector_Powertrain__std__vector_Powertrain_.hpp>
 #include <NitroTest/private/JCallback_void.hpp>
+#include <NitroTest/private/JCallback_uint64_t_uint64_t.hpp>
 #include <NitroTest/private/JCallback_double.hpp>
 #include <NitroTest/private/JCallback_int64_t_int64_t.hpp>
 #include <NitroTest/private/JCallback_void_std__vector_Powertrain_.hpp>
@@ -46,6 +47,7 @@ namespace margelo::nitro::test {
     margelo::nitro::test::JCallback_void_double_cxx::registerNatives();
     margelo::nitro::test::JCallback_std__vector_Powertrain__std__vector_Powertrain__cxx::registerNatives();
     margelo::nitro::test::JCallback_void_cxx::registerNatives();
+    margelo::nitro::test::JCallback_uint64_t_uint64_t_cxx::registerNatives();
     margelo::nitro::test::JCallback_double_cxx::registerNatives();
     margelo::nitro::test::JCallback_int64_t_int64_t_cxx::registerNatives();
     margelo::nitro::test::JCallback_void_std__vector_Powertrain__cxx::registerNatives();

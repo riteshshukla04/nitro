@@ -5,24 +5,31 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-internal import NitroModules
+public import NitroModules
+public import NitroTestAppleCxx
 internal import CxxStdlib
 
 @_expose(Cxx)
-public struct UnsignedValues: Equatable, Hashable, Sendable {
+public struct UnsignedValues: Sendable {
   public let unsignedValue: UInt64
   public let optionalUnsigned: UInt64?
+  public let values: [UInt64]
+  public let nested: [[UInt64]]
   public let record: Dictionary<String, UInt64?>
+  public let callbacks: [any Callback<(/* value */ UInt64), UInt64>]
 
-  public init(unsignedValue: UInt64, optionalUnsigned: UInt64?, record: Dictionary<String, UInt64?>) {
+  public init(unsignedValue: UInt64, optionalUnsigned: UInt64?, values: [UInt64], nested: [[UInt64]], record: Dictionary<String, UInt64?>, callbacks: [any Callback<(/* value */ UInt64), UInt64>]) {
     self.unsignedValue = unsignedValue
     self.optionalUnsigned = optionalUnsigned
+    self.values = values
+    self.nested = nested
     self.record = record
+    self.callbacks = callbacks
   }
 
   @_spi(NitroCxx)
-  public static func init_cxx(_ unsignedValue: UInt64, _ optionalUnsigned: UInt64?, _ record: Record_swift__String_swift__Optional_uint64_t_) -> Self {
-    return Self(unsignedValue: unsignedValue, optionalUnsigned: optionalUnsigned, record: record.dictionary)
+  public static func init_cxx(_ unsignedValue: UInt64, _ optionalUnsigned: UInt64?, _ values: [UInt64], _ nested: [[UInt64]], _ record: Record_swift__String_swift__Optional_uint64_t_, _ callbacks: [margelo.nitro.test.swift_bridge.Callback_uint64_t_uint64_t]) -> Self {
+    return Self(unsignedValue: unsignedValue, optionalUnsigned: optionalUnsigned, values: values, nested: nested, record: record.dictionary, callbacks: callbacks.map { $0 })
   }
 
   @_spi(NitroCxx)
@@ -36,7 +43,22 @@ public struct UnsignedValues: Equatable, Hashable, Sendable {
   }
 
   @_spi(NitroCxx)
+  public borrowing func getValues_cxx() -> [UInt64] {
+    return self.values
+  }
+
+  @_spi(NitroCxx)
+  public borrowing func getNested_cxx() -> [[UInt64]] {
+    return self.nested
+  }
+
+  @_spi(NitroCxx)
   public borrowing func getRecord_cxx() -> Record_swift__String_swift__Optional_uint64_t_ {
     return Record_swift__String_swift__Optional_uint64_t_(self.record)
+  }
+
+  @_spi(NitroCxx)
+  public borrowing func getCallbacks_cxx() -> [margelo.nitro.test.swift_bridge.Callback_uint64_t_uint64_t] {
+    return self.callbacks.map { $0.toCpp() }
   }
 }

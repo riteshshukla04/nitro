@@ -13,7 +13,7 @@ struct JUInt64 : jni::JavaClass<JUInt64, jni::JLong> {
 
 /** Java long[] storage interpreted as Kotlin ULongArray's unsigned bits. */
 struct JArrayUInt64 : jni::JavaClass<JArrayUInt64, jni::JArrayLong> {
-  static constexpr auto kJavaDescriptor = "[J";
+  static constexpr const char* kJavaDescriptor = nullptr;
 
   static jni::local_ref<JArrayUInt64> newArray(size_t size) {
     auto array = jni::JArrayLong::newArray(size);

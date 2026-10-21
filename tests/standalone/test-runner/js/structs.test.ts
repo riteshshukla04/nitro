@@ -46,18 +46,24 @@ export const cases = {
       }
     },
 
-    'roundtripUnsignedValues preserves values in records': (testObject) => {
+    'roundtripUnsignedValues preserves values in containers and callbacks': (testObject) => {
       for (const unsigned of UNSIGNED_BOUNDARIES) {
         for (const optionalUnsigned of [undefined, ...UNSIGNED_BOUNDARIES]) {
           const input: UnsignedValues = {
             unsignedValue: unsigned,
             optionalUnsigned: optionalUnsigned,
+            values: UNSIGNED_BOUNDARIES,
+            nested: [[], UNSIGNED_BOUNDARIES, [unsigned]],
             record: { missing: undefined, value: unsigned, maximum: UNSIGNED_BOUNDARIES.at(-1) },
+            callbacks: [(value) => value],
           }
           const result = testObject.roundtripUnsignedValues(input)
           expect(result.unsignedValue).to.equal(unsigned)
           expect(result.optionalUnsigned).to.equal(optionalUnsigned)
+          expect(result.values).to.deep.equal(UNSIGNED_BOUNDARIES)
+          expect(result.nested).to.deep.equal(input.nested)
           expect(result.record).to.deep.equal(input.record)
+          expect(result.callbacks[0]?.(unsigned)).to.equal(unsigned)
         }
       }
     },

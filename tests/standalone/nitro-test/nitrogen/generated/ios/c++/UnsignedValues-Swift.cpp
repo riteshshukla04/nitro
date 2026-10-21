@@ -13,14 +13,17 @@ namespace margelo::nitro {
 
   ::NitroTest::UnsignedValues JSIConverter<::NitroTest::UnsignedValues>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
     auto object = value.asObject(runtime);
-    return ::NitroTest::UnsignedValues::init_cxx(JSIConverter<uint64_t>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "unsignedValue"))), JSIConverter<swift::Optional<uint64_t>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalUnsigned"))), JSIConverter<::NitroTest::Record_swift__String_swift__Optional_uint64_t_>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "record"))));
+    return ::NitroTest::UnsignedValues::init_cxx(JSIConverter<uint64_t>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "unsignedValue"))), JSIConverter<swift::Optional<uint64_t>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalUnsigned"))), JSIConverter<swift::Array<uint64_t>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "values"))), JSIConverter<swift::Array<swift::Array<uint64_t>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "nested"))), JSIConverter<::NitroTest::Record_swift__String_swift__Optional_uint64_t_>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "record"))), JSIConverter<swift::Array<Callback<uint64_t(uint64_t)>>>::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "callbacks"))));
   }
 
   jsi::Value JSIConverter<::NitroTest::UnsignedValues>::toJSI(jsi::Runtime& runtime, const ::NitroTest::UnsignedValues& value) {
     jsi::Object object(runtime);
     object.setProperty(runtime, PropNameIDCache::get(runtime, "unsignedValue"), JSIConverter<uint64_t>::toJSI(runtime, value.getUnsignedValue_cxx()));
     object.setProperty(runtime, PropNameIDCache::get(runtime, "optionalUnsigned"), JSIConverter<swift::Optional<uint64_t>>::toJSI(runtime, value.getOptionalUnsigned_cxx()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "values"), JSIConverter<swift::Array<uint64_t>>::toJSI(runtime, value.getValues_cxx()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "nested"), JSIConverter<swift::Array<swift::Array<uint64_t>>>::toJSI(runtime, value.getNested_cxx()));
     object.setProperty(runtime, PropNameIDCache::get(runtime, "record"), JSIConverter<::NitroTest::Record_swift__String_swift__Optional_uint64_t_>::toJSI(runtime, value.getRecord_cxx()));
+    object.setProperty(runtime, PropNameIDCache::get(runtime, "callbacks"), JSIConverter<swift::Array<Callback<uint64_t(uint64_t)>>>::toJSI(runtime, value.getCallbacks_cxx()));
     return object;
   }
 
@@ -28,7 +31,7 @@ namespace margelo::nitro {
     if (!value.isObject()) return false;
     auto object = value.getObject(runtime);
     if (!isPlainObject(runtime, object)) return false;
-    return JSIConverter<uint64_t>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "unsignedValue"))) && JSIConverter<swift::Optional<uint64_t>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalUnsigned"))) && JSIConverter<::NitroTest::Record_swift__String_swift__Optional_uint64_t_>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "record")));
+    return JSIConverter<uint64_t>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "unsignedValue"))) && JSIConverter<swift::Optional<uint64_t>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "optionalUnsigned"))) && JSIConverter<swift::Array<uint64_t>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "values"))) && JSIConverter<swift::Array<swift::Array<uint64_t>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "nested"))) && JSIConverter<::NitroTest::Record_swift__String_swift__Optional_uint64_t_>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "record"))) && JSIConverter<swift::Array<Callback<uint64_t(uint64_t)>>>::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "callbacks")));
   }
 
 } // namespace margelo::nitro

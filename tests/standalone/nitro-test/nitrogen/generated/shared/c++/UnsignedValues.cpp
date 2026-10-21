@@ -9,8 +9,11 @@
 #include <NitroModules/JSIHelpers.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <optional>
+#include <vector>
 #include <string>
 #include <unordered_map>
+#include <NitroModules/Callback.hpp>
+#include <functional>
 
 namespace margelo::nitro {
 
@@ -19,7 +22,10 @@ namespace margelo::nitro {
     return margelo::nitro::test::UnsignedValues(
       JSIConverter<uint64_t>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "unsignedValue"))),
       JSIConverter<std::optional<uint64_t>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "optionalUnsigned"))),
-      JSIConverter<std::unordered_map<std::string, std::optional<uint64_t>>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "record")))
+      JSIConverter<std::vector<uint64_t>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "values"))),
+      JSIConverter<std::vector<std::vector<uint64_t>>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "nested"))),
+      JSIConverter<std::unordered_map<std::string, std::optional<uint64_t>>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "record"))),
+      JSIConverter<std::vector<margelo::nitro::Callback<uint64_t(uint64_t)>>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "callbacks")))
     );
   }
 
@@ -27,7 +33,10 @@ namespace margelo::nitro {
     jsi::Object obj(runtime);
     obj.setProperty(runtime, PropNameIDCache::get(runtime, "unsignedValue"), JSIConverter<uint64_t>::toJSI(runtime, arg.unsignedValue));
     obj.setProperty(runtime, PropNameIDCache::get(runtime, "optionalUnsigned"), JSIConverter<std::optional<uint64_t>>::toJSI(runtime, arg.optionalUnsigned));
+    obj.setProperty(runtime, PropNameIDCache::get(runtime, "values"), JSIConverter<std::vector<uint64_t>>::toJSI(runtime, arg.values));
+    obj.setProperty(runtime, PropNameIDCache::get(runtime, "nested"), JSIConverter<std::vector<std::vector<uint64_t>>>::toJSI(runtime, arg.nested));
     obj.setProperty(runtime, PropNameIDCache::get(runtime, "record"), JSIConverter<std::unordered_map<std::string, std::optional<uint64_t>>>::toJSI(runtime, arg.record));
+    obj.setProperty(runtime, PropNameIDCache::get(runtime, "callbacks"), JSIConverter<std::vector<margelo::nitro::Callback<uint64_t(uint64_t)>>>::toJSI(runtime, arg.callbacks));
     return obj;
   }
 
@@ -41,7 +50,10 @@ namespace margelo::nitro {
     }
     if (!JSIConverter<uint64_t>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "unsignedValue")))) return false;
     if (!JSIConverter<std::optional<uint64_t>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "optionalUnsigned")))) return false;
+    if (!JSIConverter<std::vector<uint64_t>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "values")))) return false;
+    if (!JSIConverter<std::vector<std::vector<uint64_t>>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "nested")))) return false;
     if (!JSIConverter<std::unordered_map<std::string, std::optional<uint64_t>>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "record")))) return false;
+    if (!JSIConverter<std::vector<margelo::nitro::Callback<uint64_t(uint64_t)>>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "callbacks")))) return false;
     return true;
   }
 

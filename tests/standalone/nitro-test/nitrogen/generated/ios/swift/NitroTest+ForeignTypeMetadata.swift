@@ -20,6 +20,13 @@ public func __nitro_NitroTest_metadata_ArrayBuffer(_ request: UInt) -> (UnsafeRa
   return (unsafeBitCast(ArrayBuffer.self as Any.Type, to: UnsafeRawPointer.self), 0)
 }
 
+/// Exported copy of `$sSo7margeloO5nitroO0065CallbackCUnsignedLongLongCUnsignedLongLong_EwBFqaFFaaIdtBpCCaCdtaVMa`, the type metadata accessor of `margelo.nitro.Callback<((CUnsignedLongLong) -> CUnsignedLongLong)>`.
+@_silgen_name("nitro_NitroTest_metadata_Callback_uint64_t_uint64_t")
+public func __nitro_NitroTest_metadata_Callback_uint64_t_uint64_t(_ request: UInt) -> (UnsafeRawPointer, UInt) {
+  // Imported C++ records' metadata is always complete (MetadataState::Complete).
+  return (unsafeBitCast(margelo.nitro.test.swift_bridge.Callback_uint64_t_uint64_t.self as Any.Type, to: UnsafeRawPointer.self), 0)
+}
+
 /// Exported copy of `$sSo7margeloO5nitroO0031CallbackVoid_dCJJcaCjargEexqtbgVMa`, the type metadata accessor of `margelo.nitro.Callback<(() -> Void)>`.
 @_silgen_name("nitro_NitroTest_metadata_Callback_void")
 public func __nitro_NitroTest_metadata_Callback_void(_ request: UInt) -> (UnsafeRawPointer, UInt) {

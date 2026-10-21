@@ -14,10 +14,15 @@
 #include <NitroModules/JUInt64.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Map.hpp>
 #include <NitroModules/JSIConverter+JMap.hpp>
+#include <NitroTest/private/JCallback_uint64_t_uint64_t.hpp>
+#include <NitroModules/JNIConverter+Callback.hpp>
 
 namespace margelo::nitro::test {
 
@@ -27,10 +32,10 @@ namespace margelo::nitro::test {
   struct JUnsignedValues final : public jni::JavaClass<JUnsignedValues> {
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/UnsignedValues;";
 
-    static jni::local_ref<JUnsignedValues> create(uint64_t unsignedValue, jni::alias_ref<JOptional<JUInt64>> optionalUnsigned, jni::alias_ref<jni::JMap<jni::JString, JOptional<JUInt64>>> record) {
+    static jni::local_ref<JUnsignedValues> create(uint64_t unsignedValue, jni::alias_ref<JOptional<JUInt64>> optionalUnsigned, jni::alias_ref<JArrayUInt64> values, jni::alias_ref<jni::JArrayClass<JArrayUInt64>> nested, jni::alias_ref<jni::JMap<jni::JString, JOptional<JUInt64>>> record, jni::alias_ref<jni::JArrayClass<margelo::nitro::test::JCallback_uint64_t_uint64_t>> callbacks) {
       static const auto clazz = javaClassStatic();
-      static const auto create = clazz->getStaticMethod<JUnsignedValues(jlong, jni::alias_ref<JOptional<JUInt64>>, jni::alias_ref<jni::JMap<jni::JString, JOptional<JUInt64>>>)>("fromCpp");
-      return create(clazz, JNIConverter<uint64_t, jlong>::toJNI(unsignedValue), optionalUnsigned, record);
+      static const auto create = clazz->getStaticMethod<JUnsignedValues(jlong, jni::alias_ref<JOptional<JUInt64>>, jni::alias_ref<JArrayUInt64>, jni::alias_ref<jni::JArrayClass<JArrayUInt64>>, jni::alias_ref<jni::JMap<jni::JString, JOptional<JUInt64>>>, jni::alias_ref<jni::JArrayClass<margelo::nitro::test::JCallback_uint64_t_uint64_t>>)>("fromCpp");
+      return create(clazz, JNIConverter<uint64_t, jlong>::toJNI(unsignedValue), optionalUnsigned, values, nested, record, callbacks);
     }
 
     uint64_t getUnsignedValue() const {
@@ -43,8 +48,23 @@ namespace margelo::nitro::test {
       return method(this->self());
     }
 
+    jni::local_ref<JArrayUInt64> getValues() const {
+      static const auto method = javaClassStatic()->getMethod<JArrayUInt64()>("getValues_cxx");
+      return method(this->self());
+    }
+
+    jni::local_ref<jni::JArrayClass<JArrayUInt64>> getNested() const {
+      static const auto method = javaClassStatic()->getMethod<jni::JArrayClass<JArrayUInt64>()>("getNested_cxx");
+      return method(this->self());
+    }
+
     jni::local_ref<jni::JMap<jni::JString, JOptional<JUInt64>>> getRecord() const {
       static const auto method = javaClassStatic()->getMethod<jni::JMap<jni::JString, JOptional<JUInt64>>()>("getRecord_cxx");
+      return method(this->self());
+    }
+
+    jni::local_ref<jni::JArrayClass<margelo::nitro::test::JCallback_uint64_t_uint64_t>> getCallbacks() const {
+      static const auto method = javaClassStatic()->getMethod<jni::JArrayClass<margelo::nitro::test::JCallback_uint64_t_uint64_t>()>("getCallbacks_cxx");
       return method(this->self());
     }
   };

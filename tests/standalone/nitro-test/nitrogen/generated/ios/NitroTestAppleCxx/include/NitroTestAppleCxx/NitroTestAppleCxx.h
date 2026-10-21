@@ -238,6 +238,11 @@ namespace margelo::nitro::test::swift_bridge {
   void resolve_Promise___NitroTest__Car(const Promise___NitroTest__Car& promise, const void* NON_NULL value);
   void listen_Promise___NitroTest__Car(const Promise___NitroTest__Car& promise, std::function<void(const void* NON_NULL)> listener);
   using Promise_ArrayBuffer = Promise<ArrayBuffer>;
+  using Promise_uint64_t = Promise<uint64_t>;
+  using Result_uint64_t = Result<uint64_t, margelo::nitro::test::swift_bridge::ResultTag>;
+  using Callback_uint64_t_uint64_t = Callback<uint64_t(uint64_t)>;
+  Result<uint64_t, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_uint64_t_uint64_t(const Callback_uint64_t_uint64_t& callback, uint64_t param0) noexcept;
+  Callback_uint64_t_uint64_t create_Callback_uint64_t_uint64_t(std::function<Result<uint64_t, margelo::nitro::test::swift_bridge::ResultTag>(uint64_t param0)> closure);
   using Result_double = Result<double, margelo::nitro::test::swift_bridge::ResultTag>;
   using Callback_double = Callback<double()>;
   Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double(const Callback_double& callback) noexcept;

@@ -10,7 +10,8 @@ package com.margelo.nitro.test
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
 import java.util.Objects
-
+import com.margelo.nitro.utils.mapToArray
+import com.margelo.nitro.utils.mapToLongArray
 
 /**
  * Represents the JavaScript object/struct "UnsignedValues".
@@ -26,7 +27,16 @@ data class UnsignedValues(
   val optionalUnsigned: ULong?,
   @DoNotStrip
   @Keep
-  val record: Map<String, ULong?>
+  val values: Array<ULong>,
+  @DoNotStrip
+  @Keep
+  val nested: Array<Array<ULong>>,
+  @DoNotStrip
+  @Keep
+  val record: Map<String, ULong?>,
+  @DoNotStrip
+  @Keep
+  val callbacks: Array<(value: ULong) -> ULong>
 ) {
   @DoNotStrip
   @Keep
@@ -38,8 +48,29 @@ data class UnsignedValues(
   @DoNotStrip
   @Keep
   @Suppress("unused", "FunctionName")
+  private fun getValues_cxx(): LongArray {
+    return values.mapToLongArray { __item -> __item.toLong() }
+  }
+
+  @DoNotStrip
+  @Keep
+  @Suppress("unused", "FunctionName")
+  private fun getNested_cxx(): Array<LongArray> {
+    return nested.mapToArray<Array<ULong>, LongArray> { __item -> __item.mapToLongArray { __item -> __item.toLong() } }
+  }
+
+  @DoNotStrip
+  @Keep
+  @Suppress("unused", "FunctionName")
   private fun getRecord_cxx(): Map<String, Long?> {
     return record.mapValues { (_, __value) -> __value?.let { it.toLong() } }
+  }
+
+  @DoNotStrip
+  @Keep
+  @Suppress("unused", "FunctionName")
+  private fun getCallbacks_cxx(): Array<Callback_uint64_t_uint64_t> {
+    return callbacks.mapToArray<(value: ULong) -> ULong, Callback_uint64_t_uint64_t> { __item -> __item.let { if (it is Callback_uint64_t_uint64_t) it else Callback_uint64_t_uint64_t_java(it) } }
   }
 
   override fun equals(other: Any?): Boolean {
@@ -47,14 +78,20 @@ data class UnsignedValues(
     if (other !is UnsignedValues) return false
     return Objects.deepEquals(this.unsignedValue, other.unsignedValue)
       && Objects.deepEquals(this.optionalUnsigned, other.optionalUnsigned)
+      && Objects.deepEquals(this.values, other.values)
+      && Objects.deepEquals(this.nested, other.nested)
       && Objects.deepEquals(this.record, other.record)
+      && Objects.deepEquals(this.callbacks, other.callbacks)
   }
 
   override fun hashCode(): Int {
     return arrayOf<Any?>(
       unsignedValue,
       optionalUnsigned,
-      record
+      values,
+      nested,
+      record,
+      callbacks
     ).contentDeepHashCode()
   }
 
@@ -66,8 +103,8 @@ data class UnsignedValues(
     @Keep
     @Suppress("unused")
     @JvmStatic
-    private fun fromCpp(unsignedValue: Long, optionalUnsigned: Long?, record: Map<String, Long?>): UnsignedValues {
-      return UnsignedValues(unsignedValue.toULong(), optionalUnsigned?.let { it.toULong() }, record.mapValues { (_, __value) -> __value?.let { it.toULong() } })
+    private fun fromCpp(unsignedValue: Long, optionalUnsigned: Long?, values: LongArray, nested: Array<LongArray>, record: Map<String, Long?>, callbacks: Array<Callback_uint64_t_uint64_t>): UnsignedValues {
+      return UnsignedValues(unsignedValue.toULong(), optionalUnsigned?.let { it.toULong() }, values.mapToArray<ULong> { __item -> __item.toULong() }, nested.mapToArray<LongArray, Array<ULong>> { __item -> __item.mapToArray<ULong> { __item -> __item.toULong() } }, record.mapValues { (_, __value) -> __value?.let { it.toULong() } }, callbacks.mapToArray<Callback_uint64_t_uint64_t, (value: ULong) -> ULong> { __item -> __item })
     }
   }
 }

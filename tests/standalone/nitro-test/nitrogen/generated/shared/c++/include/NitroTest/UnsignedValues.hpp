@@ -10,8 +10,11 @@
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <optional>
+#include <vector>
 #include <string>
 #include <unordered_map>
+#include <NitroModules/Callback.hpp>
+#include <functional>
 #include <utility>
 
 namespace margelo::nitro::test {
@@ -23,14 +26,17 @@ namespace margelo::nitro::test {
   public:
     uint64_t unsignedValue     SWIFT_PRIVATE;
     std::optional<uint64_t> optionalUnsigned     SWIFT_PRIVATE;
+    std::vector<uint64_t> values     SWIFT_PRIVATE;
+    std::vector<std::vector<uint64_t>> nested     SWIFT_PRIVATE;
     std::unordered_map<std::string, std::optional<uint64_t>> record     SWIFT_PRIVATE;
+    std::vector<Callback<uint64_t(uint64_t /* value */)>> callbacks     SWIFT_PRIVATE;
 
   public:
     UnsignedValues() = default;
-    explicit UnsignedValues(uint64_t unsignedValue, std::optional<uint64_t> optionalUnsigned, std::unordered_map<std::string, std::optional<uint64_t>> record): unsignedValue(unsignedValue), optionalUnsigned(std::move(optionalUnsigned)), record(std::move(record)) {}
+    explicit UnsignedValues(uint64_t unsignedValue, std::optional<uint64_t> optionalUnsigned, std::vector<uint64_t> values, std::vector<std::vector<uint64_t>> nested, std::unordered_map<std::string, std::optional<uint64_t>> record, std::vector<Callback<uint64_t(uint64_t /* value */)>> callbacks): unsignedValue(unsignedValue), optionalUnsigned(std::move(optionalUnsigned)), values(std::move(values)), nested(std::move(nested)), record(std::move(record)), callbacks(std::move(callbacks)) {}
 
   public:
-    friend bool operator==(const UnsignedValues& lhs, const UnsignedValues& rhs) = default;
+    // UnsignedValues is not equatable because these properties are not equatable: callbacks
   };
 
 } // namespace margelo::nitro::test

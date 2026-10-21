@@ -69,7 +69,10 @@ export interface UnsignedScalar {
 export interface UnsignedValues {
   unsignedValue: UInt64
   optionalUnsigned?: UInt64
+  values: UInt64[]
+  nested: UInt64[][]
   record: Record<string, UInt64 | undefined>
+  callbacks: ((value: UInt64) => UInt64)[]
 }
 
 interface JsStyleStruct {

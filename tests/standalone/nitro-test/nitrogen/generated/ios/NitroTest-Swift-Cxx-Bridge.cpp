@@ -270,6 +270,24 @@ namespace margelo::nitro::test::swift_bridge {
     });
   }
 
+  Result<uint64_t, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_uint64_t_uint64_t(const Callback_uint64_t_uint64_t& callback, uint64_t param0) noexcept {
+    try {
+      return Result<uint64_t, margelo::nitro::test::swift_bridge::ResultTag>::withValue(callback.callSync(param0));
+    } catch (...) {
+      return Result<uint64_t, margelo::nitro::test::swift_bridge::ResultTag>::withError(std::current_exception());
+    }
+  }
+
+  Callback_uint64_t_uint64_t create_Callback_uint64_t_uint64_t(std::function<Result<uint64_t, margelo::nitro::test::swift_bridge::ResultTag>(uint64_t param0)> closure) {
+    return Callback_uint64_t_uint64_t::make([closure = std::move(closure)](uint64_t param0) -> uint64_t {
+      auto __result = closure(param0);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      return std::move(__result.value());
+    });
+  }
+
   Result<double, margelo::nitro::test::swift_bridge::ResultTag> callSync_Callback_double(const Callback_double& callback) noexcept {
     try {
       return Result<double, margelo::nitro::test::swift_bridge::ResultTag>::withValue(callback.callSync());
