@@ -17,8 +17,8 @@ struct JAnyJSON final : jni::JavaClass<JAnyJSON> {
   static jni::local_ref<JAnyJSON> create(const AnyJSON& value);
 
   jni::local_ref<jni::JString> getStringRepresentation() const {
-    static const auto getter = javaClassStatic()->getMethod<jni::JString()>("getStringRepresentation");
-    return getter(self());
+    static const auto field = javaClassStatic()->getField<jni::JString>("stringRepresentation");
+    return getFieldValue(field);
   }
   AnyJSON toCpp() const;
 };

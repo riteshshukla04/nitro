@@ -13,7 +13,7 @@ import com.facebook.proguard.annotations.DoNotStrip
 @Keep
 @DoNotStrip
 data class AnyJSON(
-  @get:Keep
-  @get:DoNotStrip
+  @field:Keep
+  @field:DoNotStrip
   val stringRepresentation: String,
 )
