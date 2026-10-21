@@ -11,7 +11,7 @@ export class KotlinNullType extends NullType implements KotlinType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniReferenceCode('JNull', options.context)
+        return getJniReferenceCode('JNull', options)
       default:
         return super.getCode(language, options)
     }

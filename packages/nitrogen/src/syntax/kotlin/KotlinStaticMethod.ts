@@ -45,7 +45,8 @@ export class KotlinStaticMethod extends StaticMethod {
 
   createBridge(): KotlinMethodBridge {
     const nativeMethod = this.nativeMethod
-    const cppMethod = new StaticMethod(nativeMethod.name, nativeMethod.returnType, nativeMethod.parameters, { generated: true })
+    const cppParameters = this.callable.parameters.map((parameter) => parameter.cpp)
+    const cppMethod = new StaticMethod(nativeMethod.name, this.callable.cppReturnType, cppParameters, { generated: true })
     const cppBody = createCppJniCallBody({
       callable: this.callable,
       jvmName: this.name,

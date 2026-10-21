@@ -94,7 +94,7 @@ export class KotlinRecordType extends RecordType implements KotlinType {
     switch (language) {
       case 'c++': {
         const mapType = `jni::JMap<${this.jniKeyType}, ${this.jniValueType}>`
-        return getJniReferenceCode(mapType, options.context)
+        return getJniReferenceCode(mapType, options)
       }
       case 'kotlin':
         return super.getCode(language, options)

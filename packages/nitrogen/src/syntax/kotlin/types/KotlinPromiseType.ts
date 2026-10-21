@@ -143,7 +143,7 @@ ${value}->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>&
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniReferenceCode('JPromise::javaobject', options.context)
+        return getJniReferenceCode('JPromise::javaobject', options)
       case 'kotlin':
         return super.getCode(language, options)
       default:

@@ -1,4 +1,5 @@
-import { KotlinHybridViewType } from './KotlinHybridViewType.js'
+import { getKotlinJSIType } from '../../syntax/kotlin/getKotlinJSIType.js'
+import { getKotlinNativeType } from '../../syntax/kotlin/getKotlinNativeType.js'
 import type { SourceFile } from '../../syntax/SourceFile.js'
 import type { HybridObjectSpec } from '../../syntax/HybridObjectSpec.js'
 import {
@@ -12,7 +13,8 @@ import { getHybridObjectName } from '../../syntax/getHybridObjectName.js'
 import { indent } from '../../utils.js'
 import { getImportsCode, getImportCode } from '../../syntax/getImportCode.js'
 import { getKotlinImplementation } from '../../syntax/kotlin/KotlinMethodHelpers.js'
-import { createKotlinNativeConverters, getKotlinNativeConverter } from '../../syntax/kotlin/KotlinNativeConverter.js'
+import { createKotlinConverters, getKotlinConverter } from '../../syntax/kotlin/KotlinConverter.js'
+import { KotlinHybridViewType } from './KotlinHybridViewType.js'
 
 export function createKotlinHybridViewManager(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {
   const cppFiles = createViewComponentShadowNodeFiles(spec)
@@ -27,7 +29,7 @@ export function createKotlinHybridViewManager(spec: HybridObjectSpec<'kotlin'>):
   const implementationImport = getImportCode(implementation.kotlinImport)
   const viewProperties = getHybridViewProperties(spec)
   const propertyFiles = viewProperties.flatMap(({ property }) => property.type.getExtraFiles())
-  const propertyConverters = viewProperties.map(({ property, config }) => createKotlinNativeConverters(property.type, config))
+  const propertyConverters = viewProperties.map(({ property, config }) => createKotlinConverters(property.type, config))
   const converterFiles = propertyConverters.flatMap((converter) => converter.files)
   const converterImports = propertyConverters.flatMap((converter) => converter.imports)
   const componentName = getHybridViewComponentName(spec)
@@ -221,7 +223,10 @@ public:
   const propsUpdaterCalls = viewProperties.map(({ property, config }) => {
     const name = escapeCppName(property.name)
     const setter = property.getSetterName('other')
-    const converter = getKotlinNativeConverter({ cppType: property.type, config: config })
+    const converter = getKotlinConverter({
+      cppType: property.type,
+      kotlinType: getKotlinJSIType(getKotlinNativeType(property.type, config)),
+    })
     return `
 if (oldProps == nullptr
       ? newProps->${name}.isProvided()

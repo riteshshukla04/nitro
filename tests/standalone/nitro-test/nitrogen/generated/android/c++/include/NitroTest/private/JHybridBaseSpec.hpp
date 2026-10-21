@@ -20,6 +20,8 @@ namespace margelo::nitro::test { class JHybridBaseSpec; }
 namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; }
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroTest/private/JHybridBaseSpec.hpp>
+#include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 
 namespace margelo::nitro::test {
 

@@ -13,6 +13,7 @@
 #include <string>
 #include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
 #include <optional>
+#include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 
 namespace margelo::nitro::test::external {
 

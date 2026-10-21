@@ -78,7 +78,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
   override getCode(language: Language, options: GetCallbackCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniReferenceCode(`${this.jniName}::javaobject`, options.context)
+        return getJniReferenceCode(`${this.jniName}::javaobject`, options)
       case 'kotlin':
         return this.specializationName
       default:

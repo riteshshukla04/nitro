@@ -11,6 +11,7 @@
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
 #include <string>
+#include <NitroTest/private/JHybridPlatformObjectSpec.hpp>
 
 namespace margelo::nitro::test {
 

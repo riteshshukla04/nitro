@@ -1,5 +1,6 @@
+import type { KotlinCppConverter } from '../KotlinConverter.js'
 import type { SourceImport } from '../../SourceFile.js'
-import type { Type, TypeContext } from '../../types/Type.js'
+import type { GetCodeOptions, Type } from '../../types/Type.js'
 
 /** A generated JNI class whose native methods must be registered by its module. */
 export interface JNINativeRegistration {
@@ -48,6 +49,13 @@ export type JniValueKind = 'primitive' | 'wrapper' | 'pointer'
  * `getExtraFiles()` returns only the Kotlin and fbjni files;
  * the original type provides its C++ declarations.
  */
+export interface GetKotlinCodeOptions extends GetCodeOptions {
+  /** JNI signatures use their JVM ABI; JSI values preserve JavaScript semantics. */
+  representation?: 'jni' | 'jsi'
+  /** Whether a parameter borrows a JNI input or owns a freshly decoded JS value. */
+  ownership?: 'owned' | 'borrowed'
+}
+
 export interface KotlinType extends Type {
   readonly jniValueKind: JniValueKind
   /**
@@ -57,6 +65,10 @@ export interface KotlinType extends Type {
   readonly fromCppReturnType?: string
   /** Whether the public Kotlin API needs conversion to this representation. */
   readonly needsKotlinConversion: boolean
+  /** The owned JNI representation consumed by direct JSI conversions, when supported. */
+  getJSIType?(): Type | undefined
+  /** Native conversion requirements requested only by a C++ consumer. */
+  getCppConverter?(cppType: Type): KotlinCppConverter
   /** Native methods required by this type, owned by the module that declares them. */
   getJniNativeRegistrations?(): readonly JNINativeRegistration[]
   /** Converts `value` across JNI, see `KotlinConversion`. */
@@ -64,9 +76,10 @@ export interface KotlinType extends Type {
 }
 
 /** Renders an fbjni object reference for the context it is used in. */
-export function getJniReferenceCode(jniType: string, context: TypeContext): string {
+export function getJniReferenceCode(jniType: string, { context, ownership }: GetKotlinCodeOptions): string {
   switch (context) {
     case 'parameter':
+      if (ownership === 'owned') return `const jni::local_ref<${jniType}>&`
       return `jni::alias_ref<${jniType}>`
     case 'return':
     case 'value':
@@ -85,8 +98,8 @@ interface JniPrimitive {
 }
 
 /** Renders a JNI primitive, or the object that boxes it. */
-export function getJniPrimitiveCode(jniType: string, context: TypeContext, { boxedType, boxed }: JniPrimitive): string {
-  if (boxed) return getJniReferenceCode(boxedType, context)
+export function getJniPrimitiveCode(jniType: string, options: GetKotlinCodeOptions, { boxedType, boxed }: JniPrimitive): string {
+  if (boxed) return getJniReferenceCode(boxedType, options)
   return jniType
 }
 

@@ -23,6 +23,7 @@ namespace margelo::nitro::test { class JHybridBenchmarkObjectSwiftKotlinSpec; }
 #include <optional>
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroTest/private/JHybridBenchmarkObjectSwiftKotlinSpec.hpp>
 
 namespace margelo::nitro::test {
 

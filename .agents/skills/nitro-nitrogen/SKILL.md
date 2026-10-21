@@ -25,6 +25,10 @@ description: Apply Nitro v1's review conventions when editing Nitrogen generator
   do not infer modules from include paths.
 - Put type-specific policy on `Type`/`SwiftType` as overridable properties or methods, e.g. contextual `getCode()` and
   `requiresExplicitSwiftTarget`, rather than repeating `type.kind` checks in shared emitters.
+- Keep Kotlin JNI ABI and JSI value representations in the type's printer. Callback and container consumers must not know how unsigned
+  values are represented or boxed. Select primitive arrays directly in the array type's language branch.
+- Reject unsupported Kotlin types when wrapping them; do not create placeholder types whose methods only throw later.
+- Keep one class per file. Avoid generated forwarding specializations when a constrained runtime specialization can handle their metadata.
 - Keep foreign projection requirements immutable on each type or generation plan. Scope caches to the TypeScript project and include the
   owning native namespace in type identities. Avoid mutable global generation state and reset functions.
 - Validate supported language references when rendering the type. Keep nested containers subject to the same rules; use a concrete failing

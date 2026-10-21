@@ -89,6 +89,8 @@ export class KotlinStaticProperty extends StaticProperty {
     { nativeMethod, kotlinMethod, callable }: KotlinStaticAccessor,
     getKotlinInvocation: (args: string[]) => string
   ): KotlinMethodBridge {
+    const cppParameters = callable.parameters.map((parameter) => parameter.cpp)
+    const cppMethod = new StaticMethod(nativeMethod.name, callable.cppReturnType, cppParameters, { generated: true })
     const cppBody = createCppJniCallBody({
       callable: callable,
       jvmName: kotlinMethod.name,
@@ -101,7 +103,7 @@ export class KotlinStaticProperty extends StaticProperty {
     })
     return {
       kotlinMethods: [{ method: kotlinMethod, body: kotlinBody }],
-      cppMethods: [{ method: nativeMethod, body: cppBody }],
+      cppMethods: [{ method: cppMethod, body: cppBody }],
     }
   }
 }

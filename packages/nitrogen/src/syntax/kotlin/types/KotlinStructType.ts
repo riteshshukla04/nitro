@@ -40,7 +40,7 @@ export class KotlinStructType extends StructType implements KotlinType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniReferenceCode(this.jniName, options.context)
+        return getJniReferenceCode(this.jniName, options)
       default:
         return super.getCode(language, options)
     }

@@ -75,7 +75,9 @@ return ${name.JHybridTSpec}::JavaPart::javaClassStatic();
     cxxPartBaseClass = 'JHybridObject::CxxPart'
   }
   const allTypes = getAllTypes(spec)
-  const nativeImports = allTypes.flatMap((type) => type.getRequiredImports('c++'))
+  const cppMethods = [...propertyDefinitions, ...methodDefinitions]
+  const signatureImports = cppMethods.flatMap(({ method }) => method.getRequiredImports('c++'))
+  const nativeImports = [...allTypes.flatMap((type) => type.getRequiredImports('c++')), ...signatureImports, ...bindings.imports]
   const cppImports: SourceImport[] = [
     { language: 'c++', declaration: { header: 'NitroModules/JHybridObject.hpp', space: 'system' } },
     { language: 'c++', declaration: { header: 'NitroModules/HybridClass.hpp', space: 'system' } },

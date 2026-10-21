@@ -10,6 +10,7 @@
 #include <NitroModules/JHybridObject.hpp>
 #include <NitroModules/HybridClass.hpp>
 #include <fbjni/fbjni.h>
+#include <NitroTest/private/JHybridGrandchildSpec.hpp>
 #include <NitroTest/private/JHybridChildSpec.hpp>
 
 namespace margelo::nitro::test {

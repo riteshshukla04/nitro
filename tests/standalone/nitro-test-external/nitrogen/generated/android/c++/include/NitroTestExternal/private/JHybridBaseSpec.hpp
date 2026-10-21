@@ -15,6 +15,7 @@
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
+#include <NitroTestExternal/private/JHybridBaseSpec.hpp>
 
 namespace margelo::nitro::test::external {
 

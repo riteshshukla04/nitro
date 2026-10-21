@@ -1,3 +1,5 @@
+import { getKotlinJSIType } from '../kotlin/getKotlinJSIType.js'
+import { getKotlinNativeType } from '../kotlin/getKotlinNativeType.js'
 import { NitroConfig } from '../../config/NitroConfig.js'
 import type { Platform } from '../../getPlatformSpecs.js'
 import { indent } from '../../utils.js'
@@ -14,7 +16,7 @@ import { HybridObjectType } from '../types/HybridObjectType.js'
 import { getCppHybridObjectAdapterNames } from './CppHybridObjectAdapterNames.js'
 import { ForeignHybridObjectType } from './ForeignHybridObjectType.js'
 import { wrapSwiftType } from '../swift/wrapSwiftType.js'
-import { createKotlinNativeConverters, getKotlinNativeConverter } from '../kotlin/KotlinNativeConverter.js'
+import { createKotlinConverters, getKotlinConverter } from '../kotlin/KotlinConverter.js'
 
 /**
  * Expose a callable C++ value handle for a foreign HybridObject.
@@ -144,7 +146,7 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec, platform: P
     }
     case 'kotlin': {
       for (const cppType of [type, ...getAllTypes(spec)]) {
-        const converter = createKotlinNativeConverters(cppType, spec.config)
+        const converter = createKotlinConverters(cppType, spec.config)
         conversionFiles.push(...converter.files)
         implementationImports.push(...converter.imports)
       }
@@ -178,7 +180,11 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec, platform: P
           return `${converter}::toSwift(${parameter.type.escapedName})`
         }
         case 'kotlin': {
-          const converter = getKotlinNativeConverter({ cppType: parameter.type, context: 'parameter-type', config: spec.config })
+          const converter = getKotlinConverter({
+            cppType: parameter.type,
+            context: 'parameter-type',
+            kotlinType: getKotlinJSIType(getKotlinNativeType(parameter.type, spec.config)),
+          })
           return `${converter}::toJNI(${parameter.type.escapedName})`
         }
         case 'c++':
@@ -208,7 +214,10 @@ return ${converter}::fromSwift(__result);
 `.trim()
       }
       case 'kotlin': {
-        const converter = getKotlinNativeConverter({ cppType: method.returnType, config: spec.config })
+        const converter = getKotlinConverter({
+          cppType: method.returnType,
+          kotlinType: getKotlinJSIType(getKotlinNativeType(method.returnType, spec.config)),
+        })
         return `
 auto __result = ${call};
 return ${converter}::fromJNI(__result);

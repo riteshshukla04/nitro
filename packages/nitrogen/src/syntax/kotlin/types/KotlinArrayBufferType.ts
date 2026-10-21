@@ -11,7 +11,7 @@ export class KotlinArrayBufferType extends ArrayBufferType implements KotlinType
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniReferenceCode('JArrayBuffer::javaobject', options.context)
+        return getJniReferenceCode('JArrayBuffer::javaobject', options)
       default:
         return super.getCode(language, options)
     }

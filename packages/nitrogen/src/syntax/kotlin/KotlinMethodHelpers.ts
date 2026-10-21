@@ -3,8 +3,9 @@ import type { Method } from '../Method.js'
 import { Parameter } from '../Parameter.js'
 import type { SourceImport } from '../SourceFile.js'
 import { wrapKotlinType } from './wrapKotlinType.js'
-import type { KotlinType } from './types/KotlinType.js'
+import type { GetKotlinCodeOptions, KotlinType } from './types/KotlinType.js'
 import { indent } from '../../utils.js'
+import type { Type } from '../types/Type.js'
 
 export interface KotlinMethodDefinition {
   method: Method
@@ -20,6 +21,7 @@ export interface KotlinMethodBridge {
 
 interface KotlinMethodParameter {
   native: Parameter
+  cpp: Parameter
   kotlin: Parameter
   type: KotlinType
 }
@@ -28,6 +30,7 @@ interface KotlinMethodParameter {
 export interface KotlinMethodInfo {
   nativeMethod: Method
   returnType: KotlinType
+  cppReturnType: Type
   parameters: KotlinMethodParameter[]
   /** Whether any value needs conversion between the public Kotlin API and JNI. */
   needsKotlinConversion: boolean
@@ -35,10 +38,12 @@ export interface KotlinMethodInfo {
 
 export function prepareKotlinMethod(nativeMethod: Method): KotlinMethodInfo {
   const returnType = wrapKotlinType(nativeMethod.returnType)
+  const cppParameterOptions: GetKotlinCodeOptions = { context: 'parameter', representation: 'jsi', ownership: 'owned' }
   const parameters = nativeMethod.parameters.map((parameter) => {
     const kotlinType = wrapKotlinType(parameter.type)
     return {
       native: parameter,
+      cpp: new Parameter(parameter.name, kotlinType.getJSIType?.() ?? parameter.type, { codeOptions: cppParameterOptions }),
       kotlin: new Parameter(parameter.name, kotlinType),
       type: kotlinType,
     }
@@ -47,6 +52,7 @@ export function prepareKotlinMethod(nativeMethod: Method): KotlinMethodInfo {
   return {
     nativeMethod: nativeMethod,
     returnType: returnType,
+    cppReturnType: returnType.getJSIType?.() ?? nativeMethod.returnType,
     parameters: parameters,
     needsKotlinConversion: needsKotlinConversion,
   }
@@ -120,13 +126,14 @@ export function createCppJniCallBody({
     jniArguments.push(jniDeclaringClass)
   }
   jniArguments.push(
-    ...callable.parameters.map((parameter) =>
-      parameter.type.convert(parameter.native.type.escapedName, {
+    ...callable.parameters.map((parameter) => {
+      if (parameter.type.getJSIType?.() != null) return parameter.native.type.escapedName
+      return parameter.type.convert(parameter.native.type.escapedName, {
         from: 'c++',
         to: 'kotlin',
         in: 'c++',
       })
-    )
+    })
   )
   if (callable.nativeMethod.returnType.kind === 'void') {
     return `
@@ -134,11 +141,16 @@ static const auto __method = ${jniMethodLookup}<${jniSignature}>("${jvmName}");
 __method(${jniArguments.join(', ')});
 `.trim()
   }
-  const cppResult = callable.returnType.convert('__result', {
-    from: 'kotlin',
-    to: 'c++',
-    in: 'c++',
-  })
+  let cppResult: string
+  if (callable.returnType.getJSIType?.() != null) {
+    cppResult = '__result'
+  } else {
+    cppResult = callable.returnType.convert('__result', {
+      from: 'kotlin',
+      to: 'c++',
+      in: 'c++',
+    })
+  }
   return `
 static const auto __method = ${jniMethodLookup}<${jniSignature}>("${jvmName}");
 auto __result = __method(${jniArguments.join(', ')});

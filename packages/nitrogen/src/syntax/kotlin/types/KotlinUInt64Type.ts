@@ -30,7 +30,7 @@ export class KotlinUInt64Type extends UInt64Type implements KotlinType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniPrimitiveCode('jlong', options.context, this.jniPrimitive)
+        return getJniPrimitiveCode('jlong', options, this.jniPrimitive)
       case 'kotlin':
         return 'Long'
       default:

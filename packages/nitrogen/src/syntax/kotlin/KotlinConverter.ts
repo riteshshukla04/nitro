@@ -10,27 +10,24 @@ import { EnumType } from '../types/EnumType.js'
 import { StructType } from '../types/StructType.js'
 import type { Type, TypeContext } from '../types/Type.js'
 import { getKotlinNativeType } from './getKotlinNativeType.js'
+import { wrapKotlinType } from './wrapKotlinType.js'
+import { getKotlinJSIType } from './getKotlinJSIType.js'
 import { KotlinCxxStructType } from './types/KotlinCxxStructType.js'
 
-interface KotlinNativeConverterOptions {
+interface KotlinConverterOptions {
   cppType: Type
   context?: TypeContext
-  config?: NitroConfig
+  kotlinType: Type
 }
 
 /** Explicit public/private type pair for a native boundary conversion. */
-export function getKotlinNativeConverter({
-  cppType,
-  context = 'value',
-  config = NitroConfig.current,
-}: KotlinNativeConverterOptions): string {
-  const nativeType = getKotlinNativeType(cppType, config)
+export function getKotlinConverter({ cppType, context = 'value', kotlinType }: KotlinConverterOptions): string {
   const cppCode = cppType.getCode('c++', { context: context, fullyQualified: true })
-  const nativeCode = nativeType.getCode('c++', { context: context, fullyQualified: true })
+  const nativeCode = kotlinType.getCode('c++', { context: 'value', fullyQualified: true })
   return `JNIConverter<${cppCode}, ${nativeCode}>`
 }
 
-interface KotlinNativeConverterFiles {
+export interface KotlinCppConverter {
   files: SourceFile[]
   imports: SourceImport[]
 }
@@ -57,11 +54,14 @@ function isSpecialized(type: Type, config: NitroConfig): type is ForeignHybridOb
 }
 
 /** Native-only conversion files. This does not emit JNI bindings or JSI conversions. */
-export function createKotlinNativeConverters(type: Type, config: NitroConfig = NitroConfig.current): KotlinNativeConverterFiles {
+export function createKotlinConverters(type: Type, config: NitroConfig = NitroConfig.current): KotlinCppConverter {
+  const representation = wrapKotlinType(getKotlinNativeType(type, config))
+  const directConverter = representation.getCppConverter?.(type)
+  if (directConverter != null) return directConverter
   const referencedTypes = getReferencedTypes(type)
   const specializations = referencedTypes.filter((item) => isSpecialized(item, config))
   const projectedType = getKotlinNativeType(type, config)
-  const nativeTypeImports = projectedType.getRequiredImports('c++')
+  const nativeTypeImports = [...projectedType.getRequiredImports('c++'), ...getKotlinJSIType(projectedType).getRequiredImports('c++')]
   const imports: SourceImport[] = [runtimeImport, ...nativeTypeImports]
   const files: SourceFile[] = projectedType.getExtraFiles()
   const emitted = new Set<string>()
@@ -74,7 +74,7 @@ export function createKotlinNativeConverters(type: Type, config: NitroConfig = N
     const nativeType = getKotlinNativeType(cppType, config)
     const cppCode = cppType.getCode('c++', { context: 'value', fullyQualified: true })
     const nativeCode = nativeType.getCode('c++', { context: 'value', fullyQualified: true })
-    const converterCode = getKotlinNativeConverter({ cppType: cppType, config: config })
+    const converterCode = getKotlinConverter({ cppType: cppType, kotlinType: nativeType })
     const declarationImports = [runtimeImport, ...cppType.getRequiredImports('c++'), ...nativeType.getRequiredImports('c++')]
     const implementationImports: SourceImport[] = [
       { language: 'c++', declaration: ownHeader },
@@ -106,11 +106,11 @@ return static_cast<${cppCode}>(value);
 `.trim()
     } else {
       const cppToKotlinFields = cppType.properties.map((property) => {
-        const converter = getKotlinNativeConverter({ cppType: property, config: config })
+        const converter = getKotlinConverter({ cppType: property, kotlinType: getKotlinNativeType(property, config) })
         return `${converter}::toJNI(value.${property.escapedName})`
       })
       const kotlinToCppFields = cppType.properties.map((property) => {
-        const converter = getKotlinNativeConverter({ cppType: property, config: config })
+        const converter = getKotlinConverter({ cppType: property, kotlinType: getKotlinNativeType(property, config) })
         return `${converter}::fromJNI(value.${property.escapedName})`
       })
       const referencedFieldTypes = cppType.properties.flatMap(getReferencedTypes)
@@ -183,4 +183,13 @@ namespace margelo::nitro {
     )
   }
   return { files: files, imports: imports }
+}
+
+/** Runtime templates compose the native conversion requirements of their elements. */
+export function combineKotlinCppConverters(converters: (KotlinCppConverter | undefined)[]): KotlinCppConverter {
+  const required = converters.filter((converter) => converter != null)
+  return {
+    imports: required.flatMap((converter) => converter.imports),
+    files: required.flatMap((converter) => converter.files),
+  }
 }

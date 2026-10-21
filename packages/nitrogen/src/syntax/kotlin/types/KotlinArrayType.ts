@@ -191,7 +191,7 @@ export class KotlinArrayType extends ArrayType implements KotlinType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniReferenceCode(this.jniArrayType, options.context)
+        return getJniReferenceCode(this.jniArrayType, options)
       case 'kotlin':
         if (this.itemType.kind === 'uint64') return 'LongArray'
         return super.getCode(language, options)

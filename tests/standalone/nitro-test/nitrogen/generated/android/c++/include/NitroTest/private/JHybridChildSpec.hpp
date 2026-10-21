@@ -13,6 +13,7 @@
 #include <string>
 #include <NitroTest/private/CarKotlin.hpp>
 #include <variant>
+#include <NitroTest/private/JHybridChildSpec.hpp>
 #include <NitroTest/private/JHybridBaseSpec.hpp>
 
 namespace margelo::nitro::test {

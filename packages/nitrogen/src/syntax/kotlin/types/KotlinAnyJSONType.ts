@@ -12,7 +12,7 @@ export class KotlinAnyJSONType extends AnyJSONType implements KotlinType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniReferenceCode('JAnyJSON', options.context)
+        return getJniReferenceCode('JAnyJSON', options)
       case 'swift':
       case 'kotlin':
         return super.getCode(language, options)

@@ -3,11 +3,16 @@ import type { CodeNode } from './CodeNode.js'
 import { escapeCppName } from './helpers.js'
 import type { Language } from '../getPlatformSpecs.js'
 import { type SourceFile, type SourceImport } from './SourceFile.js'
-import type { NamedType, Type } from './types/Type.js'
+import type { GetCodeOptions, NamedType, Type } from './types/Type.js'
 import { NamedWrappingType } from './types/NamedWrappingType.js'
 import { createNamedType, type TypeParsingTarget } from './createType.js'
 
-type ParameterArguments = [string, Type, { generated: boolean }?] | [ParameterDeclaration, TypeParsingTarget]
+interface ParameterOptions {
+  generated?: boolean
+  codeOptions?: GetCodeOptions
+}
+
+type ParameterArguments = [string, Type, ParameterOptions?] | [ParameterDeclaration, TypeParsingTarget]
 
 function isDeclarationArguments(args: ParameterArguments): args is [ParameterDeclaration, TypeParsingTarget] {
   return typeof args[0] !== 'string'
@@ -15,10 +20,12 @@ function isDeclarationArguments(args: ParameterArguments): args is [ParameterDec
 
 export class Parameter implements CodeNode {
   readonly type: NamedType
+  private readonly codeOptions: GetCodeOptions
 
-  constructor(name: string, type: Type, options?: { generated: boolean })
+  constructor(name: string, type: Type, options?: ParameterOptions)
   constructor(parameter: ParameterDeclaration, target: TypeParsingTarget)
   constructor(...args: ParameterArguments) {
+    this.codeOptions = args[2]?.codeOptions ?? { context: 'parameter' }
     if (!isDeclarationArguments(args)) {
       // constructor(...) #1
       const [name, type] = args
@@ -48,7 +55,7 @@ export class Parameter implements CodeNode {
     const name = escapeCppName(this.name)
     switch (language) {
       case 'c++':
-        const cppType = this.type.getCode('c++', { context: 'parameter' })
+        const cppType = this.type.getCode('c++', this.codeOptions)
         return `${cppType} ${name}`
       case 'swift':
         return `${name}: ${this.type.getCode('swift', { context: 'parameter' })}`

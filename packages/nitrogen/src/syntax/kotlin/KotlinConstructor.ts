@@ -49,6 +49,8 @@ export class KotlinConstructor extends Constructor {
   createBridge(): KotlinMethodBridge {
     // The C++ bridge calls static factories rather than Kotlin constructors.
     const nativeFactory = this.nativeFactory
+    const cppParameters = this.callable.parameters.map((parameter) => parameter.cpp)
+    const cppFactory = new StaticMethod(nativeFactory.name, this.callable.cppReturnType, cppParameters, { generated: true })
     const kotlinFactory = new StaticMethod(`${nativeFactory.name}_cxx`, this.returnType, this.parameters, {
       access: 'private',
       doNotStrip: true,
@@ -66,7 +68,7 @@ export class KotlinConstructor extends Constructor {
     })
     return {
       kotlinMethods: [{ method: kotlinFactory, body: kotlinBody }],
-      cppMethods: [{ method: nativeFactory, body: cppBody }],
+      cppMethods: [{ method: cppFactory, body: cppBody }],
     }
   }
 

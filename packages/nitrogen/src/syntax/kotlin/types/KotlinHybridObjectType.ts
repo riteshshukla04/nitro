@@ -49,7 +49,7 @@ export class KotlinHybridObjectType extends HybridObjectType implements KotlinTy
 
     switch (language) {
       case 'c++':
-        return getJniReferenceCode(`${this.jniName}::JavaPart`, options.context)
+        return getJniReferenceCode(`${this.jniName}::JavaPart`, options)
       default:
         return super.getCode(language, options)
     }

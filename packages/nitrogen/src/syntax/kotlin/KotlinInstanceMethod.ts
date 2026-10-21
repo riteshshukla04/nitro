@@ -81,7 +81,8 @@ export class KotlinInstanceMethod extends InstanceMethod {
 
   createBridge({ nonvirtual = false }: KotlinInstanceBridgeOptions = {}): KotlinMethodBridge {
     const nativeMethod = this.nativeMethod
-    const cppMethod = new InstanceMethod(nativeMethod.name, nativeMethod.returnType, nativeMethod.parameters, {
+    const cppParameters = this.callable.parameters.map((parameter) => parameter.cpp)
+    const cppMethod = new InstanceMethod(nativeMethod.name, this.callable.cppReturnType, cppParameters, {
       generated: true,
     })
     const isNonvirtual = nonvirtual || this.needsKotlinBridge

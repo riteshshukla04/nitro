@@ -20,3 +20,4 @@ Use the relevant skill:
 - [TypeScript](.agents/skills/nitro-typescript/SKILL.md) for all TypeScript and TSX changes, including Nitrogen and generated TypeScript.
 - [Nitrogen](.agents/skills/nitro-nitrogen/SKILL.md) for generator changes.
 - [Swift/C++](.agents/skills/nitro-swift-cxx/SKILL.md) for converters and bridge changes.
+- [JNI](.agents/skills/nitro-jni/SKILL.md) for Android converters, reference ownership, callbacks, and Promise bridges.
