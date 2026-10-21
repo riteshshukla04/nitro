@@ -339,6 +339,10 @@ namespace {
 
   // Hermes needs more native stack than the 512 KiB default of secondary
   // threads on Apple platforms, so workers get the main thread's 8 MiB.
+  // Workers also get the user-interactive QoS of React Native's JS thread.
+  // Swift Tasks that `Promise.async` starts inherit it as user-initiated
+  // priority, as in apps. At the pthread default, they waited seconds behind
+  // Swift Testing starting and reporting every case on the cooperative pool.
   class WorkerThread {
   public:
     WorkerThread(std::string name, std::function<void()> body) {
@@ -350,6 +354,9 @@ namespace {
       pthread_attr_t attributes;
       pthread_attr_init(&attributes);
       pthread_attr_setstacksize(&attributes, 8 * 1024 * 1024);
+#ifdef __APPLE__
+      pthread_attr_set_qos_class_np(&attributes, QOS_CLASS_USER_INTERACTIVE, 0);
+#endif
       const int error = pthread_create(
           &thread, &attributes,
           [](void* context) -> void* {
