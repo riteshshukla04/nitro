@@ -16,7 +16,6 @@ import { createKotlinConverters, getKotlinConverter } from '../../syntax/kotlin/
 import { KotlinHybridViewType } from './KotlinHybridViewType.js'
 
 export function createKotlinHybridViewManager(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {
-  const cppFiles = createViewComponentShadowNodeFiles(spec)
   const javaSubNamespace = spec.config.getAndroidPackage('java/kotlin', 'views')
   const javaNamespace = spec.config.getAndroidPackage('java/kotlin')
   const cxxNamespace = spec.config.getCxxNamespace('c++', 'views')
@@ -27,6 +26,10 @@ export function createKotlinHybridViewManager(spec: HybridObjectSpec<'kotlin'>):
   const viewImplementation = implementation.className
   const implementationImport = getImportCode(implementation.kotlinImport)
   const viewProperties = getHybridViewProperties(spec)
+  const cppFiles = createViewComponentShadowNodeFiles(spec, {
+    platform: 'android',
+    properties: viewProperties.map(({ property, config }) => ({ property: property, config: config, type: property.type })),
+  })
   const propertyFiles = viewProperties.flatMap(({ property }) => property.type.getExtraFiles())
   const propertyConverters = viewProperties.map(({ property, config }) => createKotlinConverters(property.type, config))
   const converterFiles = propertyConverters.flatMap((converter) => converter.files)

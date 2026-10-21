@@ -1,5 +1,4 @@
-import { getSwiftConverter } from '../../syntax/swift/SwiftConverter.js'
-import type { SourceFile } from '../../syntax/SourceFile.js'
+import type { SourceFile, SourceImport } from '../../syntax/SourceFile.js'
 import type { HybridObjectSpec } from '../../syntax/HybridObjectSpec.js'
 import { createViewComponentShadowNodeFiles, getViewComponentNames, getHybridViewProperties } from '../CppHybridViewComponent.js'
 import { createFileMetadataString, escapeCppName } from '../../syntax/helpers.js'
@@ -10,7 +9,6 @@ import { getImportsCode } from '../../syntax/getImportCode.js'
 import { wrapSwiftType } from '../../syntax/swift/wrapSwiftType.js'
 
 export function createSwiftHybridViewManager(spec: HybridObjectSpec<'swift'>): SourceFile[] {
-  const cppFiles = createViewComponentShadowNodeFiles(spec)
   const namespace = spec.config.getCxxNamespace('c++')
   const swiftNamespace = spec.config.getIosModuleName()
   const { HybridTSpecSwift, HybridTSpecCxx } = getHybridObjectName(spec.name)
@@ -22,13 +20,20 @@ export function createSwiftHybridViewManager(spec: HybridObjectSpec<'swift'>): S
     const swiftType = wrapSwiftType(property.type, config)
     return {
       property: property,
-      swiftType: swiftType,
-      converter: swiftType.getCppConverter?.(property.type),
+      config: config,
+      type: swiftType,
     }
   })
-  const converterImports = viewProperties.flatMap((property) => property.converter?.imports ?? [])
-  const converterFiles = viewProperties.flatMap((property) => property.converter?.files ?? [])
-  const propertyFiles = viewProperties.flatMap(({ property }) => property.type.getExtraFiles())
+  const swiftUmbrellaImport: SourceImport = {
+    language: 'c++',
+    declaration: spec.config.getCxxHeader(getUmbrellaHeaderName(spec.config), 'private'),
+  }
+  const cppFiles = createViewComponentShadowNodeFiles(spec, {
+    platform: 'ios',
+    properties: viewProperties,
+    imports: [swiftUmbrellaImport],
+  })
+  const propertyFiles = viewProperties.flatMap(({ type }) => type.getExtraFiles())
   const imports = getImportsCode([
     {
       language: 'c++',
@@ -38,27 +43,18 @@ export function createSwiftHybridViewManager(spec: HybridObjectSpec<'swift'>): S
       language: 'c++',
       declaration: spec.config.getCxxHeader(`${HybridTSpecSwift}.hpp`, 'private'),
     },
-    {
-      language: 'c++',
-      declaration: spec.config.getCxxHeader(getUmbrellaHeaderName(), 'private'),
-    },
-    {
-      language: 'c++',
-      declaration: { header: 'NitroModules/SwiftConverter.hpp', space: 'system' },
-    },
-    ...converterImports,
+    swiftUmbrellaImport,
   ])
   const objcComponentName = `${swiftNamespace}_${component}`
-  const propAssignments = viewProperties.map(({ property, swiftType }) => {
+  const propAssignments = viewProperties.map(({ property }) => {
     const name = escapeCppName(property.name)
     const setter = property.getSetterName('other')
-    const converter = getSwiftConverter({ cppType: property.type, swiftType: swiftType })
     return `
 // ${property.jsSignature}
 if (oldViewProps == nullptr
       ? newViewProps.${name}.isProvided()
       : !newViewProps.${name}.hasSameValue(oldViewProps->${name})) {
-  _hybridView->${setter}(nitro::${converter}::toSwift(newViewProps.${name}.get()));
+  _hybridView->${setter}(newViewProps.${name}.get());
 }
 `.trim()
   })
@@ -201,7 +197,6 @@ using namespace ${namespace}::views;
   return [
     ...cppFiles,
     ...propertyFiles,
-    ...converterFiles,
     {
       content: mmFile,
       language: 'c++',

@@ -26,13 +26,13 @@ target_sources(NitroTest PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JPowertrain.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JVariant_Boolean_DoubleArray_Array_String__Double_String.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JVariant_Double_String.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/../android/c++/views/HybridRecyclableTestViewComponent.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/../android/c++/views/HybridTestViewComponent.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/views/JHybridRecyclableTestViewStateUpdater.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/views/JHybridTestViewStateUpdater.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/Car.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/HybridBenchmarkObjectCppSpec.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/Person.cpp"
-  "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/views/HybridRecyclableTestViewComponent.cpp"
-  "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/views/HybridTestViewComponent.cpp"
 )
 
 find_package(fbjni REQUIRED CONFIG)

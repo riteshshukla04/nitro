@@ -98,6 +98,7 @@ export class SwiftPromiseType extends PromiseType implements SwiftType {
   }
 
   override getExtraFiles(): SourceFile[] {
+    if (this.config.isExternalConfig) return []
     return [...this.resultingType.getExtraFiles(), ...createSwiftPromiseBridge(this)]
   }
 

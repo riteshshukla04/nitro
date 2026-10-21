@@ -1,7 +1,6 @@
 import type { Autolinking } from './Autolinking.js'
 import type { SourceFile } from '../syntax/SourceFile.js'
 import { createHybridObjectInitializer } from './ios/createHybridObjectInitializer.js'
-import { createSharedCxxModuleMap } from './ios/createSharedCxxModuleMap.js'
 import { createAppleCxxTarget } from './ios/createAppleCxxTarget.js'
 import { createSwiftCxxBridge } from './ios/createSwiftCxxBridge.js'
 import { createSwiftForeignTypeMetadata } from './ios/createSwiftForeignTypeMetadata.js'
@@ -76,7 +75,6 @@ module ${NitroConfig.current.getIosModuleName()}SwiftBridge {
       swiftBridgeModuleMap,
       ...hybridObjectInitializer,
       ...appleCxxTarget,
-      ...createSharedCxxModuleMap(specs),
     ],
   }
 }

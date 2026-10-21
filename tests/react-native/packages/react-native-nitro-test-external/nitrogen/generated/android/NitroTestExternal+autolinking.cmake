@@ -15,8 +15,9 @@ target_sources(NitroTestExternal PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/NitroTestExternalOnLoad.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JCallback_void.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JHybridTestViewSpec.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/../android/c++/views/HybridTestViewComponent.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/views/JHybridTestViewStateUpdater.cpp"
-  "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/views/HybridTestViewComponent.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/NitroTestExternalCxxModule.cpp"
 )
 
 find_package(fbjni REQUIRED CONFIG)

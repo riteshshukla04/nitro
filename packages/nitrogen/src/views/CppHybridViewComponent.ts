@@ -1,4 +1,4 @@
-import type { SourceFile } from '../syntax/SourceFile.js'
+import type { SourceFile, SourceImport } from '../syntax/SourceFile.js'
 import type { HybridObjectSpec } from '../syntax/HybridObjectSpec.js'
 import { createIndentation, indent } from '../utils.js'
 import { createFileMetadataString, escapeCppName } from '../syntax/helpers.js'
@@ -11,6 +11,8 @@ import { AnyHybridObjectType } from '../syntax/types/AnyHybridObjectType.js'
 import { NamedWrappingType } from '../syntax/types/NamedWrappingType.js'
 import { OptionalType } from '../syntax/types/OptionalType.js'
 import type { NitroConfig } from '../config/NitroConfig.js'
+import type { Platform } from '../getPlatformSpecs.js'
+import type { Type } from '../syntax/types/Type.js'
 
 export function getHybridViewComponentName(spec: HybridObjectSpec): string {
   return spec.config.getHybridClassRegistryName(spec.name)
@@ -19,6 +21,16 @@ export function getHybridViewComponentName(spec: HybridObjectSpec): string {
 interface HybridViewProperty {
   readonly property: Property
   readonly config: NitroConfig
+}
+
+export interface HybridViewPropertyStorage extends HybridViewProperty {
+  readonly type: Type
+}
+
+interface HybridViewComponentOptions {
+  readonly platform: Platform
+  readonly properties: readonly HybridViewPropertyStorage[]
+  readonly imports?: SourceImport[]
 }
 
 /** Inherited React props retain the native module that declares their setters. */
@@ -64,7 +76,10 @@ function getHybridRefProperty(): Property {
   return new Property('hybridRef', new OptionalType(type), false)
 }
 
-export function createViewComponentShadowNodeFiles(spec: HybridObjectSpec): SourceFile[] {
+export function createViewComponentShadowNodeFiles(
+  spec: HybridObjectSpec,
+  { platform, properties: viewProperties, imports: additionalImports = [] }: HybridViewComponentOptions
+): SourceFile[] {
   if (!spec.isHybridView) {
     throw new Error(`Cannot create View Component ShadowNode code for ${spec.name} - it's not a HybridView!`)
   }
@@ -74,18 +89,24 @@ export function createViewComponentShadowNodeFiles(spec: HybridObjectSpec): Sour
 
   const namespace = spec.config.getCxxNamespace('c++', 'views')
 
-  const props = [...getHybridViewProperties(spec).map(({ property }) => property), getHybridRefProperty()]
-  const properties = props.map((p) => `nitro::ReactProp<${p.type.getCode('c++', { context: 'property' })}> ${escapeCppName(p.name)};`)
-  const filterCases = props.map((prop) => `case hashString("${prop.name}"): return true;`)
-  const comparisons = props.map((prop) => {
+  const hybridRef = getHybridRefProperty()
+  const props: readonly HybridViewPropertyStorage[] = [
+    ...viewProperties,
+    { property: hybridRef, config: spec.config, type: hybridRef.type },
+  ]
+  const properties = props.map(
+    ({ property, type }) => `nitro::ReactProp<${type.getCode('c++', { context: 'property' })}> ${escapeCppName(property.name)};`
+  )
+  const filterCases = props.map(({ property }) => `case hashString("${property.name}"): return true;`)
+  const comparisons = props.map(({ property: prop }) => {
     const name = escapeCppName(prop.name)
     return `${name}.hasSameValue(other.${name})`
   })
-  const providedChecks = props.map((prop) => {
+  const providedChecks = props.map(({ property: prop }) => {
     const name = escapeCppName(prop.name)
     return `${name}.isProvided()`
   })
-  const imports = props.flatMap((property) => property.getRequiredImports('c++'))
+  const imports = [...additionalImports, ...props.flatMap(({ type }) => type.getRequiredImports('c++'))]
   const includes = getImportsCode(imports, 'implementation')
   const componentHeaderImport = getImportsCode([
     {
@@ -178,9 +199,9 @@ namespace ${namespace} {
 
   const propInitializers = [
     'react::ViewProps(context, sourceProps, rawProps, filterObjectKeys)',
-    ...props.map((prop) => {
+    ...props.map(({ property: prop, type: storageType }) => {
       const name = escapeCppName(prop.name)
-      const type = prop.type.getCode('c++', { context: 'property' })
+      const type = storageType.getCode('c++', { context: 'property' })
       return `${name}(nitro::ReactProp<${type}>::fromRawValue("${spec.name}", "${prop.name}", rawProps, sourceProps.${name}))`
     }),
   ]
@@ -225,7 +246,7 @@ namespace ${namespace} {
       name: `views/${component}.hpp`,
       content: componentHeaderCode,
       language: 'c++',
-      platform: 'shared',
+      platform: platform,
       subdirectory: [],
       headerVisibility: 'private',
     },
@@ -233,7 +254,7 @@ namespace ${namespace} {
       name: `${component}.cpp`,
       content: componentCode,
       language: 'c++',
-      platform: 'shared',
+      platform: platform,
       subdirectory: ['views'],
     },
   ]

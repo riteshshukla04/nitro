@@ -185,7 +185,8 @@ function checkReactNativeConsumer(packed, version) {
     cwd: consumer,
   })
   for (const file of [
-    'shared/c++/views/HybridTestViewComponent.cpp',
+    'ios/c++/views/HybridTestViewComponent.cpp',
+    'android/c++/views/HybridTestViewComponent.cpp',
     'shared/c++/include/NitroTest/HybridBenchmarkObjectCppSpec.hpp',
     'ios/swift/HybridBenchmarkObjectSwiftKotlinSpec.swift',
     'ios/swift/HybridTestViewSpec.swift',

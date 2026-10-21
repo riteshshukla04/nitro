@@ -162,9 +162,9 @@ export function getHybridObjectSpec(
     if (Node.isPropertyDeclaration(member)) {
       const memberType = member.getType()
       const isOptional = memberSymbol.isOptional() || memberType.getUnionTypes().some((unionType) => unionType.isUndefined())
-      // Mutable view properties are also stored by the C++ Fabric component.
+      // Android Fabric props still use public C++ storage.
       let propertyTarget: TypeParsingTarget
-      if (view && !member.isReadonly()) {
+      if (view && language === 'kotlin' && !member.isReadonly()) {
         propertyTarget = { ...target, language: 'c++' }
       } else {
         propertyTarget = target

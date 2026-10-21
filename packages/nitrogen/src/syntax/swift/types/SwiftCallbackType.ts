@@ -147,6 +147,7 @@ export class SwiftCallbackType extends CallbackType implements SwiftType {
   }
 
   override getExtraFiles(): SourceFile[] {
+    if (this.config.isExternalConfig) return []
     const files = [
       ...this.parameters.flatMap((p) => p.getExtraFiles()),
       ...this.asyncResult.getExtraFiles(),
