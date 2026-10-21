@@ -30,14 +30,10 @@
 #include <NitroTest/private/JCallback_double.hpp>
 #include <NitroModules/JNIConverter+Callback.hpp>
 #include <memory>
-#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace margelo::nitro::test {
 
-  JHybridBenchmarkObjectSwiftKotlinSpec::~JHybridBenchmarkObjectSwiftKotlinSpec() {
-    // Hermes GC can destroy JS objects on a non-JNI thread.
-    resetGlobalRef(_javaPart);
-  }
+  JHybridBenchmarkObjectSwiftKotlinSpec::~JHybridBenchmarkObjectSwiftKotlinSpec() = default;
 
   std::shared_ptr<JHybridBenchmarkObjectSwiftKotlinSpec> JHybridBenchmarkObjectSwiftKotlinSpec::constructor() {
     static const auto __method = JHybridBenchmarkObjectSwiftKotlinSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridBenchmarkObjectSwiftKotlinSpecJavaPart>()>("constructor_cxx");
@@ -88,7 +84,7 @@ namespace margelo::nitro::test {
     return __class;
   }
 
-  std::shared_ptr<JHybridObject> JHybridBenchmarkObjectSwiftKotlinSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
+  std::shared_ptr<JHybridObject> JHybridBenchmarkObjectSwiftKotlinSpec::CxxPart::createHybridObject(jni::alias_ref<JHybridObject::JavaPart> javaPart) {
     auto castJavaPart = jni::dynamic_ref_cast<JHybridBenchmarkObjectSwiftKotlinSpec::JavaPart>(javaPart);
     if (castJavaPart == nullptr) [[unlikely]] {
       throw std::runtime_error("Failed to cast JHybridObject::JavaPart to JHybridBenchmarkObjectSwiftKotlinSpec::JavaPart!");

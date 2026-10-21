@@ -14,14 +14,10 @@
 #include <NitroTest/private/JCar.hpp>
 #include <memory>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
-#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace margelo::nitro::test {
 
-  JHybridChildSpec::~JHybridChildSpec() {
-    // Hermes GC can destroy JS objects on a non-JNI thread.
-    resetGlobalRef(_javaPart);
-  }
+  JHybridChildSpec::~JHybridChildSpec() = default;
 
   std::shared_ptr<JHybridChildSpec> JHybridChildSpec::constructor() {
     static const auto __method = JHybridChildSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridChildSpecJavaPart>()>("constructor_cxx");
@@ -55,7 +51,7 @@ namespace margelo::nitro::test {
     return JHybridChildSpec::JavaPart::javaClassStatic();
   }
 
-  std::shared_ptr<JHybridObject> JHybridChildSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
+  std::shared_ptr<JHybridObject> JHybridChildSpec::CxxPart::createHybridObject(jni::alias_ref<JHybridObject::JavaPart> javaPart) {
     auto castJavaPart = jni::dynamic_ref_cast<JHybridChildSpec::JavaPart>(javaPart);
     if (castJavaPart == nullptr) [[unlikely]] {
       throw std::runtime_error("Failed to cast JHybridObject::JavaPart to JHybridChildSpec::JavaPart!");

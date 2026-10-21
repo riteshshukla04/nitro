@@ -82,17 +82,15 @@ abstract class HybridObject {
   @Suppress("unused")
   @DoNotStrip
   @Keep
+  // Native getJHybridObject holds this monitor across initialization and the C++ facade cache.
   private fun getCxxPart(): CxxPart {
-    synchronized(this) {
-      val currentCxxPart = this.cxxPart
-      if (currentCxxPart != null) {
-        return currentCxxPart
-      } else {
-        val newCxxPart = createCxxPart()
-        this.cxxPart = newCxxPart
-        return newCxxPart
-      }
+    val currentCxxPart = this.cxxPart
+    if (currentCxxPart != null) {
+      return currentCxxPart
     }
+    val newCxxPart = createCxxPart()
+    this.cxxPart = newCxxPart
+    return newCxxPart
   }
 
   @Keep

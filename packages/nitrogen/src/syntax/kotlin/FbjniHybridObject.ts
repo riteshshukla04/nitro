@@ -156,18 +156,18 @@ namespace ${cxxNamespace} {
       static jni::alias_ref<jni::JClass> getClass();
       using HybridBase::HybridBase;
     protected:
-      std::shared_ptr<JHybridObject> createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) override;
+      std::shared_ptr<JHybridObject> createHybridObject(jni::alias_ref<JHybridObject::JavaPart> javaPart) override;
     };
 
   public:
-    explicit ${name.JHybridTSpec}(const jni::local_ref<${name.JHybridTSpec}::JavaPart>& javaPart):
+    explicit ${name.JHybridTSpec}(jni::alias_ref<${name.JHybridTSpec}::JavaPart> javaPart):
       ${cppBaseClass}(javaPart),
-      _javaPart(jni::make_global(javaPart)) {}
+      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {}
     // Defined in the owning library so RTTI has one identity across modules.
     ~${name.JHybridTSpec}() override;
 
   public:
-    inline const jni::global_ref<${name.JHybridTSpec}::JavaPart>& getJavaPart() const noexcept {
+    inline jni::alias_ref<${name.JHybridTSpec}::JavaPart> getJavaPart() const noexcept {
       return _javaPart;
     }
 
@@ -189,7 +189,7 @@ namespace ${cxxNamespace} {
     }
 
   private:
-    jni::global_ref<${name.JHybridTSpec}::JavaPart> _javaPart;
+    jni::alias_ref<${name.JHybridTSpec}::JavaPart> _javaPart;
   };
 
 } // namespace ${cxxNamespace}
@@ -231,14 +231,10 @@ namespace ${cxxNamespace} {
 ${createFileMetadataString(`${name.JHybridTSpec}.cpp`)}
 
 ${cppImplementationIncludes}
-#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace ${cxxNamespace} {
 
-  ${name.JHybridTSpec}::~${name.JHybridTSpec}() {
-    // Hermes GC can destroy JS objects on a non-JNI thread.
-    resetGlobalRef(_javaPart);
-  }
+  ${name.JHybridTSpec}::~${name.JHybridTSpec}() = default;
 
   ${indent(bindings.definitions.join('\n\n'), '  ')}
 
@@ -266,7 +262,7 @@ namespace ${cxxNamespace} {
     ${indent(getClassBody, '    ')}
   }
 
-  std::shared_ptr<JHybridObject> ${name.JHybridTSpec}::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
+  std::shared_ptr<JHybridObject> ${name.JHybridTSpec}::CxxPart::createHybridObject(jni::alias_ref<JHybridObject::JavaPart> javaPart) {
     auto castJavaPart = jni::dynamic_ref_cast<${name.JHybridTSpec}::JavaPart>(javaPart);
     if (castJavaPart == nullptr) [[unlikely]] {
       throw std::runtime_error("Failed to cast JHybridObject::JavaPart to ${name.JHybridTSpec}::JavaPart!");

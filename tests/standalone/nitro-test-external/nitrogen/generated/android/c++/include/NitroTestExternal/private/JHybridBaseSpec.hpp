@@ -46,18 +46,18 @@ namespace margelo::nitro::test::external {
       static jni::alias_ref<jni::JClass> getClass();
       using HybridBase::HybridBase;
     protected:
-      std::shared_ptr<JHybridObject> createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) override;
+      std::shared_ptr<JHybridObject> createHybridObject(jni::alias_ref<JHybridObject::JavaPart> javaPart) override;
     };
 
   public:
-    explicit JHybridBaseSpec(const jni::local_ref<JHybridBaseSpec::JavaPart>& javaPart):
+    explicit JHybridBaseSpec(jni::alias_ref<JHybridBaseSpec::JavaPart> javaPart):
       JHybridObject(javaPart),
-      _javaPart(jni::make_global(javaPart)) {}
+      _javaPart(jni::static_ref_cast<JavaPart>(JHybridObject::getJavaPart())) {}
     // Defined in the owning library so RTTI has one identity across modules.
     ~JHybridBaseSpec() override;
 
   public:
-    inline const jni::global_ref<JHybridBaseSpec::JavaPart>& getJavaPart() const noexcept {
+    inline jni::alias_ref<JHybridBaseSpec::JavaPart> getJavaPart() const noexcept {
       return _javaPart;
     }
 
@@ -81,7 +81,7 @@ namespace margelo::nitro::test::external {
     }
 
   private:
-    jni::global_ref<JHybridBaseSpec::JavaPart> _javaPart;
+    jni::alias_ref<JHybridBaseSpec::JavaPart> _javaPart;
   };
 
 } // namespace margelo::nitro::test::external

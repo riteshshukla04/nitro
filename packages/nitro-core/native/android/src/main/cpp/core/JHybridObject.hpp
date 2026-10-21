@@ -32,23 +32,23 @@ public:
     static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> cxxJavaPart);
     static void registerNatives();
     explicit CxxPart(jni::alias_ref<jhybridobject> cxxJavaPart);
-    std::shared_ptr<JHybridObject> getOrCreateHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart);
+    std::shared_ptr<JHybridObject> getOrCreateHybridObject(jni::alias_ref<JHybridObject::JavaPart> javaPart);
 
   protected:
     /**
      * Override this method in your Class' CxxPart to allow type-erased inheritance.
      */
-    virtual std::shared_ptr<JHybridObject> createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart);
+    virtual std::shared_ptr<JHybridObject> createHybridObject(jni::alias_ref<JHybridObject::JavaPart> javaPart);
 
   private:
     std::weak_ptr<JHybridObject> _hybridObject;
   };
 
 public:
-  explicit JHybridObject(const jni::local_ref<JavaPart>& javaPart);
+  explicit JHybridObject(jni::alias_ref<JavaPart> javaPart);
   ~JHybridObject() override;
 
-  const jni::global_ref<JavaPart>& getJavaPart() const noexcept {
+  jni::alias_ref<JavaPart> getJavaPart() const noexcept {
     return _javaPart;
   }
 

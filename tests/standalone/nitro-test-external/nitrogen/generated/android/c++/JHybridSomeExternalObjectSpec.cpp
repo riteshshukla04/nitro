@@ -16,14 +16,10 @@
 #include <NitroModules/JUInt64.hpp>
 #include <memory>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
-#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace margelo::nitro::test::external {
 
-  JHybridSomeExternalObjectSpec::~JHybridSomeExternalObjectSpec() {
-    // Hermes GC can destroy JS objects on a non-JNI thread.
-    resetGlobalRef(_javaPart);
-  }
+  JHybridSomeExternalObjectSpec::~JHybridSomeExternalObjectSpec() = default;
 
   std::shared_ptr<JHybridSomeExternalObjectSpec> JHybridSomeExternalObjectSpec::constructor() {
     static const auto __method = JHybridSomeExternalObjectSpec::JavaPart::javaClassStatic()->getStaticMethod<jni::local_ref<JHybridSomeExternalObjectSpecJavaPart>()>("constructor_cxx");
@@ -57,7 +53,7 @@ namespace margelo::nitro::test::external {
     return JHybridSomeExternalObjectSpec::JavaPart::javaClassStatic();
   }
 
-  std::shared_ptr<JHybridObject> JHybridSomeExternalObjectSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
+  std::shared_ptr<JHybridObject> JHybridSomeExternalObjectSpec::CxxPart::createHybridObject(jni::alias_ref<JHybridObject::JavaPart> javaPart) {
     auto castJavaPart = jni::dynamic_ref_cast<JHybridSomeExternalObjectSpec::JavaPart>(javaPart);
     if (castJavaPart == nullptr) [[unlikely]] {
       throw std::runtime_error("Failed to cast JHybridObject::JavaPart to JHybridSomeExternalObjectSpec::JavaPart!");

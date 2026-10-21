@@ -15,14 +15,10 @@
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
-#include <NitroModules/JNIGlobalRef.hpp>
 
 namespace margelo::nitro::test {
 
-  JHybridTestViewSpec::~JHybridTestViewSpec() {
-    // Hermes GC can destroy JS objects on a non-JNI thread.
-    resetGlobalRef(_javaPart);
-  }
+  JHybridTestViewSpec::~JHybridTestViewSpec() = default;
 
 
 
@@ -62,7 +58,7 @@ namespace margelo::nitro::test {
     return __class;
   }
 
-  std::shared_ptr<JHybridObject> JHybridTestViewSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
+  std::shared_ptr<JHybridObject> JHybridTestViewSpec::CxxPart::createHybridObject(jni::alias_ref<JHybridObject::JavaPart> javaPart) {
     auto castJavaPart = jni::dynamic_ref_cast<JHybridTestViewSpec::JavaPart>(javaPart);
     if (castJavaPart == nullptr) [[unlikely]] {
       throw std::runtime_error("Failed to cast JHybridObject::JavaPart to JHybridTestViewSpec::JavaPart!");
