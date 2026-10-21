@@ -203,6 +203,7 @@ const xcodebuild = (args) =>
       env: environment,
       stdio: ['ignore', 'pipe', 'pipe'],
     })
+    lastChild = child
     for (const [source, target] of [
       [child.stdout, process.stdout],
       [child.stderr, process.stderr],
@@ -218,6 +219,7 @@ const xcodebuild = (args) =>
     child.once('error', reject)
     child.once('close', (code) => resolve(code ?? 1))
   })
+let lastChild
 let status = await xcodebuild(['build-for-testing', ...buildSettings])
 console.log(`Built for testing after ${elapsed()}`)
 if (status === 0 && simulator) {
@@ -227,8 +229,50 @@ if (status === 0 && simulator) {
   console.log(`Simulator booted after ${elapsed()}`)
 }
 if (status === 0) {
-  status = await xcodebuild(argumentsForTests())
+  // DIAGNOSTIC: where xcodebuild test-without-building spends its time.
+  const spawnedAt = new Date()
+  const testRun = xcodebuild(argumentsForTests())
+  const pid = lastChild.pid
+  console.log(`DIAGNOSTIC: xcodebuild ${pid} spawned at ${spawnedAt.toISOString()}`)
+  const probe = spawn(
+    'sh',
+    [
+      '-c',
+      `while :; do echo "== $(date -u +%H:%M:%S)"; ps -A -r -o %cpu=,time=,state=,pid=,comm= | head -8; ` +
+        `echo "-- xcodebuild"; ps -o %cpu=,time=,state=,rss= -p ${pid}; ` +
+        `echo "-- children"; pgrep -lP ${pid}; echo "-- sims"; pgrep -l launchd_sim; sleep 3; done`,
+    ],
+    { stdio: ['ignore', openSync(path.join(results, 'ps.txt'), 'w'), 'ignore'], detached: true }
+  )
+  const samples = spawn(
+    'sh',
+    [
+      '-c',
+      `for at in 20 90; do sleep $((at - \${last:-0})); last=$at; ` +
+        `kill -0 ${pid} 2>/dev/null || break; echo "sample at +$at s: $(date -u +%H:%M:%S)"; ` +
+        `sudo -n sample ${pid} 10 10 -mayDie -file '${results}/xcodebuild-sample-'$at'.txt' >/dev/null 2>&1 || echo "sample failed"; done`,
+    ],
+    { stdio: ['ignore', openSync(path.join(results, 'samples.log'), 'w'), 'ignore'], detached: true }
+  )
+  status = await testRun
+  const finishedAt = new Date()
+  process.kill(-probe.pid)
+  try {
+    process.kill(-samples.pid)
+  } catch {}
   console.log(`Tests finished after ${elapsed()}`)
+  const local = (date) => date.toLocaleString('sv-SE', { hour12: false }).replace('T', ' ')
+  spawnSync(
+    'sh',
+    [
+      '-c',
+      `log show --style compact --start '${local(spawnedAt)}' --end '${local(finishedAt)}' ` +
+        `--predicate 'processID == ${pid}' 2>&1 | head -40000 > '${results}/xcodebuild-oslog.txt'; ` +
+        `xcrun simctl list devices > '${results}/simctl-devices.txt' 2>&1; ` +
+        `xcrun simctl --set testing list devices >> '${results}/simctl-devices.txt' 2>&1`,
+    ],
+    { stdio: 'inherit', timeout: 180_000 }
+  )
 }
 closeSync(log)
 for (const name of readdirSync(results).filter((name) => name.startsWith('sanitizer.'))) {
