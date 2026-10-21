@@ -68,6 +68,16 @@ jobs:
         with:
           bun-version-file: package.json
 
+      - name: Select Xcode
+        run: |
+          if [ "$XCODE_VERSION" = "default" ]; then
+            sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          else
+            sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app/Contents/Developer"
+          fi
+          xcodebuild -version
+          xcrun swift --version
+
       - name: Install npm dependencies (bun)
         run: bun install --frozen-lockfile
 
@@ -91,27 +101,23 @@ jobs:
             echo "CCACHE_INODECACHE=true"
           } >> "$GITHUB_ENV"
 
-      - name: Select Xcode
-        run: |
-          if [ "$XCODE_VERSION" = "default" ]; then
-            sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-          else
-            sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app/Contents/Developer"
-          fi
-          xcodebuild -version
-          xcrun swift --version
-
       - name: Resolve Swift packages
         working-directory: tests/react-native/apps/example
         run: bun spm
 
+      # `**` globs walked node_modules: computing the key took up to two
+      # minutes and once exceeded hashFiles' 120-second limit in the post step.
+      # bun.lock already covers dependencies, so only the repository's own
+      # Swift package files are hashed.
       - name: Restore DerivedData cache
         uses: actions/cache@v6
         with:
           path: tests/react-native/apps/example/ios/build
           key:
-            ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-Default-dd-${{ hashFiles('bun.lock', '**/Package.swift',
-            '**/Package.resolved') }}
+            ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-Default-dd-${{ hashFiles('bun.lock', 'Package.swift',
+            'Package.resolved', 'packages/*/Package.swift', 'tests/react-native/packages/*/Package.swift',
+            'tests/react-native/apps/*/ios/*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved',
+            'tests/standalone/hermes/Package.swift') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-xcode${{ env.XCODE_VERSION }}-Default-dd-
 
@@ -136,6 +142,43 @@ jobs:
       - name: Install Watchman
         run: brew install watchman
 
+      # A fresh simulator spends minutes migrating data on its first boot. Boot
+      # it outside Harness, whose 420-second startup budget should only cover
+      # launching the app. The boot runs on its own: overlapping it with the
+      # app build or with installing Watchman slowed those steps several times
+      # over on 3-core runners.
+      - name: Boot the simulator
+        id: simulator-boot
+        timeout-minutes: 10
+        run: |
+          runtime="com.apple.CoreSimulator.SimRuntime.iOS-${IOS_VERSION//./-}"
+          udid=$(xcrun simctl list devices available --json |
+            jq -r --arg runtime "$runtime" --arg model "$DEVICE_MODEL" \
+              '.devices[$runtime] // [] | map(select(.name == $model)) | first | .udid // empty')
+          if [ -z "$udid" ]; then
+            echo "::error::No available $DEVICE_MODEL simulator with iOS $IOS_VERSION"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "SIMULATOR_UDID=$udid" >> "$GITHUB_ENV"
+          echo "Booting $DEVICE_MODEL (iOS $IOS_VERSION, $udid) at $(date -u +%T)"
+          xcrun simctl bootstatus "$udid" -b
+          echo "Booted at $(date -u +%T)"
+
+      - name: Collect simulator boot diagnostics
+        if: failure() && steps.simulator-boot.outcome == 'failure'
+        run: |
+          xcrun simctl list devices
+          xcrun simctl diagnose --udid="$SIMULATOR_UDID" --no-archive --output="$RUNNER_TEMP/simulator-diagnostics" -b < /dev/null || true
+
+      - name: Upload simulator boot diagnostics
+        if: failure() && steps.simulator-boot.outcome == 'failure'
+        uses: actions/upload-artifact@v7
+        with:
+          name: harness-ios-simulator-diagnostics
+          path: ${{ runner.temp }}/simulator-diagnostics
+          if-no-files-found: ignore
+
       - name: Run Harness E2E tests
         uses: callstackincubator/react-native-harness@v1.5.0
         with:
@@ -143,6 +186,9 @@ jobs:
           projectRoot: tests/react-native/apps/example
           app: ios/build/Build/Products/Debug-iphonesimulator/NitroExample.app
           packageManager: bun
+          # The default only saves Metro and the simulator agent from the
+          # default branch, so pull requests always started both cold.
+          cacheSavePolicy: always
 
       - name: Print native crash reports
         if: failure()
