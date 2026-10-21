@@ -180,6 +180,7 @@ namespace margelo::nitro::test {
     ::NitroTest::Car bounceCar(const ::NitroTest::Car& car);
     void jsStyleObjectAsParameters(const ::NitroTest::JsStyleStruct& params);
     ::NitroTest::UnsignedScalar roundtripUnsignedScalar(const ::NitroTest::UnsignedScalar& value);
+    ::NitroTest::UnsignedValues roundtripUnsignedValues(const ::NitroTest::UnsignedValues& value);
     ::NitroTest::WrappedJsStruct bounceWrappedJsStyleStruct(const ::NitroTest::WrappedJsStruct& value);
     ::NitroTest::OptionalWrapper bounceOptionalWrapper(const ::NitroTest::OptionalWrapper& wrapper);
     ::NitroTest::OptionalCallback bounceOptionalCallback(const ::NitroTest::OptionalCallback& value);

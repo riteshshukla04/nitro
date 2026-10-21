@@ -551,6 +551,8 @@ class HybridTestObjectKotlin : HybridTestObjectSwiftKotlinSpec() {
 
   override fun roundtripUnsignedScalar(value: UnsignedScalar): UnsignedScalar = value
 
+  override fun roundtripUnsignedValues(value: UnsignedValues): UnsignedValues = value
+
   override fun bounceWrappedJsStyleStruct(value: WrappedJsStruct): WrappedJsStruct {
     return value
   }

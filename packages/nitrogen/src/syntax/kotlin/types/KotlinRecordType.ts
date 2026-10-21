@@ -39,9 +39,10 @@ export class KotlinRecordType extends RecordType implements KotlinType {
     switch (conversion.in) {
       case 'kotlin': {
         if (!this.needsKotlinConversion) return value
-        const key = this.keyType.convert('__key', conversion)
         const item = this.valueType.convert('__value', conversion)
-        return `${value}.map { (__key, __value) -> ${key} to ${item} }.toMap()`
+        return `
+${value}.mapValues { (_, __value) -> ${item} }
+`.trim()
       }
       case 'c++': {
         const cppType = this.type.getCode('c++', { context: 'value' })

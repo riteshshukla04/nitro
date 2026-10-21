@@ -608,6 +608,10 @@ class HybridTestObjectSwift: HybridTestObjectSwiftKotlinSpec {
     return value
   }
 
+  func roundtripUnsignedValues(value: UnsignedValues) throws -> UnsignedValues {
+    return value
+  }
+
   func bounceWrappedJsStyleStruct(value: WrappedJsStruct) throws -> WrappedJsStruct {
     return value
   }

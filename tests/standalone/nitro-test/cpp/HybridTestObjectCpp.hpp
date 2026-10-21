@@ -241,6 +241,7 @@ public:
   Car bounceCar(const Car& car) override;
   void jsStyleObjectAsParameters(const JsStyleStruct& params) override;
   UnsignedScalar roundtripUnsignedScalar(const UnsignedScalar& value) override;
+  UnsignedValues roundtripUnsignedValues(const UnsignedValues& value) override;
   WrappedJsStruct bounceWrappedJsStyleStruct(const WrappedJsStruct& value) override;
   OptionalWrapper bounceOptionalWrapper(const OptionalWrapper& wrapper) override;
   OptionalCallback bounceOptionalCallback(const OptionalCallback& value) override;

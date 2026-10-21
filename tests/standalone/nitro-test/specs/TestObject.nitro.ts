@@ -66,6 +66,12 @@ export interface UnsignedScalar {
   value: UInt64
 }
 
+export interface UnsignedValues {
+  unsignedValue: UInt64
+  optionalUnsigned?: UInt64
+  record: Record<string, UInt64 | undefined>
+}
+
 interface JsStyleStruct {
   value: number
   onChanged: (num: number) => void
@@ -291,6 +297,7 @@ export declare class TestObjectCpp extends HybridObject {
   bounceCar(car: Car): Car
   jsStyleObjectAsParameters(params: JsStyleStruct): void
   roundtripUnsignedScalar(value: UnsignedScalar): UnsignedScalar
+  roundtripUnsignedValues(value: UnsignedValues): UnsignedValues
   bounceWrappedJsStyleStruct(value: WrappedJsStruct): WrappedJsStruct
   bounceOptionalWrapper(wrapper: OptionalWrapper): OptionalWrapper
   bounceOptionalCallback(value: OptionalCallback): OptionalCallback
@@ -547,6 +554,7 @@ export declare class TestObjectSwiftKotlin extends HybridObject {
   bounceCar(car: Car): Car
   jsStyleObjectAsParameters(params: JsStyleStruct): void
   roundtripUnsignedScalar(value: UnsignedScalar): UnsignedScalar
+  roundtripUnsignedValues(value: UnsignedValues): UnsignedValues
   bounceWrappedJsStyleStruct(value: WrappedJsStruct): WrappedJsStruct
   bounceOptionalWrapper(wrapper: OptionalWrapper): OptionalWrapper
   bounceOptionalCallback(value: OptionalCallback): OptionalCallback

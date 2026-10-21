@@ -75,6 +75,10 @@ namespace NitroTest { class Record_swift__String_swift__Optional___NitroTest__Va
 namespace NitroTest { class Record_swift__String_swift__String; }
 // Forward declaration of `UnsignedScalar` to properly resolve imports.
 namespace NitroTest { class UnsignedScalar; }
+// Forward declaration of `Record_swift__String_swift__Optional_uint64_t_` to properly resolve imports.
+namespace NitroTest { class Record_swift__String_swift__Optional_uint64_t_; }
+// Forward declaration of `UnsignedValues` to properly resolve imports.
+namespace NitroTest { class UnsignedValues; }
 // Forward declaration of `JsStyleStruct` to properly resolve imports.
 namespace NitroTest { class JsStyleStruct; }
 // Forward declaration of `WrappedJsStruct` to properly resolve imports.

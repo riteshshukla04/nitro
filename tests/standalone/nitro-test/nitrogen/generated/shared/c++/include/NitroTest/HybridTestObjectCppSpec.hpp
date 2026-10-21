@@ -37,6 +37,7 @@ namespace margelo::nitro::test { class HybridTestObjectCppSpec; }
 #include <NitroModules/InlineCallback.hpp>
 #include <NitroTest/JsStyleStruct.hpp>
 #include <NitroTest/UnsignedScalar.hpp>
+#include <NitroTest/UnsignedValues.hpp>
 #include <NitroTest/WrappedJsStruct.hpp>
 #include <NitroTest/OptionalWrapper.hpp>
 #include <NitroTest/OptionalCallback.hpp>
@@ -226,6 +227,7 @@ namespace margelo::nitro::test {
       virtual Car bounceCar(const Car& car) = 0;
       virtual void jsStyleObjectAsParameters(const JsStyleStruct& params) = 0;
       virtual UnsignedScalar roundtripUnsignedScalar(const UnsignedScalar& value) = 0;
+      virtual UnsignedValues roundtripUnsignedValues(const UnsignedValues& value) = 0;
       virtual WrappedJsStruct bounceWrappedJsStyleStruct(const WrappedJsStruct& value) = 0;
       virtual OptionalWrapper bounceOptionalWrapper(const OptionalWrapper& wrapper) = 0;
       virtual OptionalCallback bounceOptionalCallback(const OptionalCallback& value) = 0;

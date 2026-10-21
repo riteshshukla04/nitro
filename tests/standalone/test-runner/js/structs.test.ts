@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { casesForTestObjects, recordCallback, waitFor } from './utils/cases'
 
-import { type Car, type OptionalWrapper } from 'nitro-test'
+import { type Car, type OptionalWrapper, type UnsignedValues } from 'nitro-test'
 
 import { sumUpAllPassengers, TEST_CAR, TEST_CAR_2, TEST_OPTIONAL_ENUM_WRAPPER, TEST_PERSON, TEST_WRAPPED_STRUCT } from './utils/fixtures'
 
@@ -43,6 +43,22 @@ export const cases = {
     'roundtripUnsignedScalar preserves all 64 bits': (testObject) => {
       for (const unsigned of UNSIGNED_BOUNDARIES) {
         expect(testObject.roundtripUnsignedScalar({ value: unsigned })).to.deep.equal({ value: unsigned })
+      }
+    },
+
+    'roundtripUnsignedValues preserves values in records': (testObject) => {
+      for (const unsigned of UNSIGNED_BOUNDARIES) {
+        for (const optionalUnsigned of [undefined, ...UNSIGNED_BOUNDARIES]) {
+          const input: UnsignedValues = {
+            unsignedValue: unsigned,
+            optionalUnsigned: optionalUnsigned,
+            record: { missing: undefined, value: unsigned, maximum: UNSIGNED_BOUNDARIES.at(-1) },
+          }
+          const result = testObject.roundtripUnsignedValues(input)
+          expect(result.unsignedValue).to.equal(unsigned)
+          expect(result.optionalUnsigned).to.equal(optionalUnsigned)
+          expect(result.record).to.deep.equal(input.record)
+        }
       }
     },
   }),

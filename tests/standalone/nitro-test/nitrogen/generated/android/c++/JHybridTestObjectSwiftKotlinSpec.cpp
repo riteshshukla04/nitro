@@ -46,6 +46,7 @@
 #include <NitroModules/JSIConverter+JMap.hpp>
 #include <NitroTest/private/JCar.hpp>
 #include <NitroTest/private/JUnsignedScalar.hpp>
+#include <NitroTest/private/JUnsignedValues.hpp>
 #include <NitroTest/private/JWrappedJsStruct.hpp>
 #include <NitroTest/private/JOptionalWrapper.hpp>
 #include <NitroTest/private/JOptionalCallback.hpp>
@@ -224,6 +225,7 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("bounceCar", &JHybridTestObjectSwiftKotlinSpec::bounceCar);
       clazz.registerHybridMethod("jsStyleObjectAsParameters", &JHybridTestObjectSwiftKotlinSpec::jsStyleObjectAsParameters);
       clazz.registerHybridMethod("roundtripUnsignedScalar", &JHybridTestObjectSwiftKotlinSpec::roundtripUnsignedScalar);
+      clazz.registerHybridMethod("roundtripUnsignedValues", &JHybridTestObjectSwiftKotlinSpec::roundtripUnsignedValues);
       clazz.registerHybridMethod("bounceWrappedJsStyleStruct", &JHybridTestObjectSwiftKotlinSpec::bounceWrappedJsStyleStruct);
       clazz.registerHybridMethod("bounceOptionalWrapper", &JHybridTestObjectSwiftKotlinSpec::bounceOptionalWrapper);
       clazz.registerHybridMethod("bounceOptionalCallback", &JHybridTestObjectSwiftKotlinSpec::bounceOptionalCallback);
@@ -890,6 +892,11 @@ namespace margelo::nitro::test {
   }
   jni::local_ref<JUnsignedScalar> JHybridTestObjectSwiftKotlinSpec::roundtripUnsignedScalar(const jni::local_ref<JUnsignedScalar>& value) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JUnsignedScalar>(jni::alias_ref<JUnsignedScalar> /* value */)>("roundtripUnsignedScalar");
+    auto __result = __method(_javaPart, CxxPart::getClass(), value);
+    return __result;
+  }
+  jni::local_ref<JUnsignedValues> JHybridTestObjectSwiftKotlinSpec::roundtripUnsignedValues(const jni::local_ref<JUnsignedValues>& value) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JUnsignedValues>(jni::alias_ref<JUnsignedValues> /* value */)>("roundtripUnsignedValues");
     auto __result = __method(_javaPart, CxxPart::getClass(), value);
     return __result;
   }

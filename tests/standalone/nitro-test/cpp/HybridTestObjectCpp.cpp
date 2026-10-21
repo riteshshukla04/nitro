@@ -784,6 +784,10 @@ UnsignedScalar HybridTestObjectCpp::roundtripUnsignedScalar(const UnsignedScalar
   return value;
 }
 
+UnsignedValues HybridTestObjectCpp::roundtripUnsignedValues(const UnsignedValues& value) {
+  return value;
+}
+
 WrappedJsStruct HybridTestObjectCpp::bounceWrappedJsStyleStruct(const WrappedJsStruct& value) {
   return value;
 }

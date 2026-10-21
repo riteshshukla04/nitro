@@ -892,6 +892,16 @@ namespace margelo::nitro::test {
     return std::move(__result.value());
   }
 
+  ::NitroTest::UnsignedValues HybridTestObjectSwiftKotlinSpecSwift::roundtripUnsignedValues(const ::NitroTest::UnsignedValues& value) {
+    auto __result = withSwiftResult<::NitroTest::UnsignedValues>([&](void* __outResult) {
+      return _swiftPart.roundtripUnsignedValues(value, __outResult);
+    });
+    if (__result.hasError()) [[unlikely]] {
+      std::rethrow_exception(__result.error());
+    }
+    return std::move(__result.value());
+  }
+
   ::NitroTest::WrappedJsStruct HybridTestObjectSwiftKotlinSpecSwift::bounceWrappedJsStyleStruct(const ::NitroTest::WrappedJsStruct& value) {
     auto __result = withSwiftResult<::NitroTest::WrappedJsStruct>([&](void* __outResult) {
       return _swiftPart.bounceWrappedJsStyleStruct(value, __outResult);
@@ -1398,6 +1408,7 @@ namespace margelo::nitro::test {
       clazz.registerHybridMethod("bounceCar", &HybridTestObjectSwiftKotlinSpecSwift::bounceCar);
       clazz.registerHybridMethod("jsStyleObjectAsParameters", &HybridTestObjectSwiftKotlinSpecSwift::jsStyleObjectAsParameters);
       clazz.registerHybridMethod("roundtripUnsignedScalar", &HybridTestObjectSwiftKotlinSpecSwift::roundtripUnsignedScalar);
+      clazz.registerHybridMethod("roundtripUnsignedValues", &HybridTestObjectSwiftKotlinSpecSwift::roundtripUnsignedValues);
       clazz.registerHybridMethod("bounceWrappedJsStyleStruct", &HybridTestObjectSwiftKotlinSpecSwift::bounceWrappedJsStyleStruct);
       clazz.registerHybridMethod("bounceOptionalWrapper", &HybridTestObjectSwiftKotlinSpecSwift::bounceOptionalWrapper);
       clazz.registerHybridMethod("bounceOptionalCallback", &HybridTestObjectSwiftKotlinSpecSwift::bounceOptionalCallback);

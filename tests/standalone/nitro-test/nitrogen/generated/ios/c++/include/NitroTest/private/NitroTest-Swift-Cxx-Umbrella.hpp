@@ -74,6 +74,8 @@
 #include <NitroTest/private/Record_swift__String_swift__Optional___NitroTest__Variant_NullType_String_cxx_-Swift.hpp>
 #include <NitroTest/private/Record_swift__String_swift__String-Swift.hpp>
 #include <NitroTest/private/UnsignedScalar-Swift.hpp>
+#include <NitroTest/private/Record_swift__String_swift__Optional_uint64_t_-Swift.hpp>
+#include <NitroTest/private/UnsignedValues-Swift.hpp>
 #include <NitroTest/private/JsStyleStruct-Swift.hpp>
 #include <NitroTest/private/WrappedJsStruct-Swift.hpp>
 #include <NitroTest/private/OptionalWrapper-Swift.hpp>
