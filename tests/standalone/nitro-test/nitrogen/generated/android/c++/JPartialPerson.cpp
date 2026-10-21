@@ -6,8 +6,6 @@
 ///
 
 #include <NitroTest/private/JPartialPerson.hpp>
-#include <string>
-#include <optional>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>

@@ -1,6 +1,5 @@
 import { indent } from '../../utils.js'
 import { getAllTypes } from '../getAllTypes.js'
-import { getKotlinJSIType } from './getKotlinJSIType.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { HybridObjectSpec } from '../HybridObjectSpec.js'
@@ -79,7 +78,7 @@ return ${name.JHybridTSpec}::JavaPart::javaClassStatic();
   const cppMethods = [...propertyDefinitions, ...methodDefinitions]
   const signatureImports = cppMethods.flatMap(({ method }) => method.getRequiredImports('c++'))
   const nativeImports = [
-    ...allTypes.flatMap((type) => getKotlinJSIType(type).getRequiredImports('c++')),
+    ...allTypes.flatMap((type) => wrapKotlinType(type).getRequiredImports('c++')),
     ...signatureImports,
     ...bindings.imports,
   ]

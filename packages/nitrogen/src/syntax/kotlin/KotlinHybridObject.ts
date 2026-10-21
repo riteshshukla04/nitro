@@ -18,18 +18,9 @@ import type { KotlinStaticMethod } from './KotlinStaticMethod.js'
 import type { KotlinStaticProperty } from './KotlinStaticProperty.js'
 import { wrapKotlinType } from './wrapKotlinType.js'
 import { getImportCode } from '../getImportCode.js'
-import { getKotlinNativeType } from './getKotlinNativeType.js'
 import { KotlinHybridObjectType } from './types/KotlinHybridObjectType.js'
 
-export function createKotlinHybridObject(publicSpec: HybridObjectSpec<'kotlin'>): SourceFile[] {
-  const nativeProperties = publicSpec.properties.map((property) => {
-    const nativeType = getKotlinNativeType(property.type, publicSpec.config)
-    return new Property(property.name, nativeType, property.isReadonly)
-  })
-  const spec: HybridObjectSpec<'kotlin'> = {
-    ...publicSpec,
-    properties: nativeProperties,
-  }
+export function createKotlinHybridObject(spec: HybridObjectSpec<'kotlin'>): SourceFile[] {
   const hybridObject = new KotlinHybridObjectType(new HybridObjectType(spec))
   const name = getHybridObjectName(spec.name)
   const properties = spec.properties.map(getKotlinPropertyCode).join('\n\n')
@@ -154,7 +145,7 @@ abstract class ${name.HybridTSpec}: ${supertypes} {
   // 3. Create enums or structs in Kotlin
   const nativeTypes = getAllTypes(spec)
   const kotlinTypes = nativeTypes.map((type) => wrapKotlinType(type))
-  const extraFiles = [...nativeTypes.flatMap((type) => type.getExtraFiles()), ...kotlinTypes.flatMap((type) => type.getExtraFiles())]
+  const extraFiles = kotlinTypes.flatMap((type) => type.getExtraFiles())
 
   const files: SourceFile[] = []
   files.push({
@@ -167,7 +158,7 @@ abstract class ${name.HybridTSpec}: ${supertypes} {
   files.push(...cppFiles)
   files.push(...extraFiles)
   if (spec.isHybridView) {
-    files.push(...createKotlinHybridViewManager(publicSpec))
+    files.push(...createKotlinHybridViewManager(spec))
   }
 
   return files

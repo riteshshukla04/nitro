@@ -4,8 +4,7 @@ import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import type { GetCodeOptions, Type } from '../../types/Type.js'
 import { VariantType } from '../../types/VariantType.js'
 import { createKotlinVariant } from '../KotlinVariant.js'
-import { createKotlinFallbackVariant } from '../KotlinFallbackVariant.js'
-import { combineKotlinCppConverters, type KotlinCppConverter } from '../KotlinConverter.js'
+import type { KotlinCppConverter } from '../KotlinConverter.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
 import { getTypeAs } from '../../types/getTypeAs.js'
 import { KotlinCxxVariantType } from './KotlinCxxVariantType.js'
@@ -22,7 +21,7 @@ export interface KotlinVariantCase {
 export class KotlinVariantType extends VariantType implements KotlinType {
   override readonly variants: KotlinType[]
   readonly kotlinCases: KotlinVariantCase[]
-  readonly jniValueKind = 'wrapper'
+  readonly jniValueKind = 'object'
   readonly needsKotlinConversion = false
 
   constructor(
@@ -48,26 +47,7 @@ export class KotlinVariantType extends VariantType implements KotlinType {
     return `J${this.name}`
   }
 
-  private get canConvertDirectly(): boolean {
-    return this.variants.every((variant) => variant.jniValueKind === 'primitive' || variant.getJSIType?.() != null)
-  }
-
-  getCppConverterDependencies(): KotlinCppConverter {
-    const dependencies = this.variants.map((variant, index) => {
-      const original = this.type.variants[index]
-      if (original == null) throw new Error('Mismatched variant case count')
-      return variant.getCppConverter?.(original)
-    })
-    return combineKotlinCppConverters(dependencies)
-  }
-
-  getJSIType(): this | undefined {
-    if (!this.canConvertDirectly) return undefined
-    return this
-  }
-
-  getCppConverter(cppType: Type): KotlinCppConverter | undefined {
-    if (!this.canConvertDirectly) return undefined
+  getCppConverter(cppType: Type): KotlinCppConverter {
     return new KotlinCxxVariantType(getTypeAs(cppType, VariantType), this).getConverter()
   }
 
@@ -76,7 +56,6 @@ export class KotlinVariantType extends VariantType implements KotlinType {
       case 'kotlin':
         return value
       case 'c++': {
-        if (!this.canConvertDirectly) return from === 'c++' ? `${this.jniName}::fromCpp(${value})` : `${value}->toCpp()`
         const cppType = this.type.getCode('c++', { context: 'value' })
         const jniType = this.getCode('c++', { context: 'value' })
         const converter = `JNIConverter<${cppType}, ${jniType}>`
@@ -113,13 +92,6 @@ export class KotlinVariantType extends VariantType implements KotlinType {
 
   override getExtraFiles(): SourceFile[] {
     if (this.config.isExternalConfig) return []
-    if (!this.canConvertDirectly) {
-      return [
-        ...this.variants.flatMap((variant) => variant.getExtraFiles()),
-        ...this.getCppConverterDependencies().files,
-        ...createKotlinFallbackVariant(this),
-      ]
-    }
     return [...this.variants.flatMap((v) => v.getExtraFiles()), ...createKotlinVariant(this)]
   }
 
@@ -127,7 +99,6 @@ export class KotlinVariantType extends VariantType implements KotlinType {
     const imports: SourceImport[] = []
     switch (language) {
       case 'c++':
-        if (!this.canConvertDirectly) imports.push(...this.type.getRequiredImports(language), ...this.getCppConverterDependencies().imports)
         imports.push({
           language: language,
           declaration: this.config.getCxxHeader(`${this.jniName}.hpp`, 'private'),

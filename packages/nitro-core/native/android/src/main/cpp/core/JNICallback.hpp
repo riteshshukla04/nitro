@@ -2,7 +2,6 @@
 
 #include "JNICallable.hpp"
 #include "JNIConverter+GlobalRef.hpp"
-#include "JNIConverter+Primitives.hpp"
 #include "JSIConverter+JNIGlobalRef.hpp"
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
@@ -47,23 +46,6 @@ template <>
 struct JNIRetainedValue<void> {
   using Type = void;
   using Local = void;
-};
-
-// JNI carries unsigned Long bits in a signed jlong.
-template <>
-struct JNIRetainedValue<uint64_t> {
-  using Type = uint64_t;
-  using Borrowed = jlong;
-  using Local = jlong;
-  static Type retain(jlong value) {
-    return JNIConverter<uint64_t, jlong>::fromJNI(value);
-  }
-  static jlong borrow(Type value) {
-    return JNIConverter<uint64_t, jlong>::toJNI(value);
-  }
-  static jlong toLocal(Type value) {
-    return borrow(value);
-  }
 };
 
 template <typename Signature>

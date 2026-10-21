@@ -14,7 +14,7 @@ export class KotlinCxxPromiseType extends KotlinCxxType {
 
   getConverter(): KotlinCppConverter {
     const dependencies = combineKotlinCppConverters([
-      this.kotlinPromiseType.resultingType.getCppConverter?.(this.cppPromiseType.resultingType),
+      this.kotlinPromiseType.resultingType.getCppConverter(this.cppPromiseType.resultingType),
     ])
     return {
       files: dependencies.files,

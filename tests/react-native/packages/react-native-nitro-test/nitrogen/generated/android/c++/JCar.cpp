@@ -11,17 +11,12 @@
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
-#include <NitroTest/private/PersonKotlin.hpp>
-#include <optional>
 #include <NitroTest/private/JPerson.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
-#include <vector>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
-#include <string>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
-#include <variant>
 #include <NitroTest/private/JVariant_Double_String.hpp>
 #include <NitroModules/PropNameIDCache.hpp>
 #include <NitroModules/JSIHelpers.hpp>

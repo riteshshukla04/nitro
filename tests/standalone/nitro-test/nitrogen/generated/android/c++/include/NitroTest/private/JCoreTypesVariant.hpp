@@ -18,7 +18,6 @@
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JWrappedJsStruct.hpp>
-#include <NitroModules/Promise.hpp>
 #include <NitroModules/JNIConverter+Promise.hpp>
 #include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroModules/AnyJSON.hpp>
@@ -44,7 +43,7 @@ namespace margelo::nitro::test {
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/CoreTypesVariant;";
     using Cases = std::tuple<JCoreTypesVariant_impl::First, JCoreTypesVariant_impl::Second, JCoreTypesVariant_impl::Third, JCoreTypesVariant_impl::Fourth, JCoreTypesVariant_impl::Fifth>;
 #ifdef NITRO_DEBUG
-    static constexpr auto diagnosticName = "variant<ArrayBuffer, margelo::nitro::Callback<void(double /* value */)>, margelo::nitro::test::WrappedJsStructKotlin, Promise<double>, AnyJSON>";
+    static constexpr auto diagnosticName = "variant<ArrayBuffer, margelo::nitro::Callback<void(double /* value */)>, margelo::nitro::test::WrappedJsStruct, Promise<double>, AnyJSON>";
 #else
     static constexpr auto diagnosticName = "variant<...>";
 #endif

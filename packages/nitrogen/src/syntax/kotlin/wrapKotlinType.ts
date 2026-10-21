@@ -8,7 +8,6 @@ import { OptionalType } from '../types/OptionalType.js'
 import { PromiseType } from '../types/PromiseType.js'
 import { RecordType } from '../types/RecordType.js'
 import { StructType } from '../types/StructType.js'
-import { TupleType } from '../types/TupleType.js'
 import type { Type } from '../types/Type.js'
 import { VariantType } from '../types/VariantType.js'
 import { KotlinArrayBufferType } from './types/KotlinArrayBufferType.js'
@@ -29,7 +28,6 @@ import { KotlinStringType } from './types/KotlinStringType.js'
 import { KotlinStructType } from './types/KotlinStructType.js'
 import type { KotlinType, KotlinTypeOptions } from './types/KotlinType.js'
 import { KotlinUInt64Type } from './types/KotlinUInt64Type.js'
-import { KotlinUnsupportedType } from './types/KotlinUnsupportedType.js'
 import { KotlinVariantType } from './types/KotlinVariantType.js'
 import { KotlinVoidType } from './types/KotlinVoidType.js'
 
@@ -74,18 +72,8 @@ export function wrapKotlinType(type: Type, options: KotlinTypeOptions = {}): Kot
       return new KotlinRecordType(getTypeAs(type, RecordType), options)
     case 'promise':
       return new KotlinPromiseType(getTypeAs(type, PromiseType), options)
-    case 'tuple': {
-      const tuple = getTypeAs(type, TupleType)
-      return new KotlinUnsupportedType(
-        type,
-        tuple.itemTypes.map((item) => wrapKotlinType(item))
-      )
-    }
     case 'any-json':
       return new KotlinAnyJSONType()
-    case 'custom-type':
-    case 'hybrid-object-base':
-      return new KotlinUnsupportedType(type, [])
     default:
       throw new Error(`Kotlin interop for ${type.kind} is not yet implemented`)
   }

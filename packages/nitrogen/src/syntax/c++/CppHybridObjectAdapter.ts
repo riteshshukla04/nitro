@@ -1,5 +1,4 @@
-import { getKotlinJSIType } from '../kotlin/getKotlinJSIType.js'
-import { getKotlinNativeType } from '../kotlin/getKotlinNativeType.js'
+import { wrapKotlinType } from '../kotlin/wrapKotlinType.js'
 import { NitroConfig } from '../../config/NitroConfig.js'
 import type { Platform } from '../../getPlatformSpecs.js'
 import { indent } from '../../utils.js'
@@ -183,7 +182,7 @@ export function createCppHybridObjectAdapter(spec: HybridObjectSpec, platform: P
           const converter = getKotlinConverter({
             cppType: parameter.type,
             context: 'parameter-type',
-            kotlinType: getKotlinJSIType(getKotlinNativeType(parameter.type, spec.config), { config: spec.config }),
+            kotlinType: wrapKotlinType(parameter.type, { config: spec.config }),
           })
           return `${converter}::toJNI(${parameter.type.escapedName})`
         }
@@ -216,7 +215,7 @@ return ${converter}::fromSwift(__result);
       case 'kotlin': {
         const converter = getKotlinConverter({
           cppType: method.returnType,
-          kotlinType: getKotlinJSIType(getKotlinNativeType(method.returnType, spec.config), { config: spec.config }),
+          kotlinType: wrapKotlinType(method.returnType, { config: spec.config }),
         })
         return `
 auto __result = ${call};

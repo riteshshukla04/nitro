@@ -274,10 +274,8 @@ export const cases = {
     'bounceExternalVariant(number) throws': (testObject) => {
       // Debug diagnostics name the native representation used by each API.
       let nativeObjectType: string
-      if (isSwift(testObject)) {
+      if (isSwift(testObject) || isKotlin(testObject)) {
         nativeObjectType = 'std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>'
-      } else if (isKotlin(testObject)) {
-        nativeObjectType = 'std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>'
       } else {
         nativeObjectType = 'margelo::nitro::test::adapters::NitroTestExternal::HybridSomeExternalObjectSpecCxx'
       }

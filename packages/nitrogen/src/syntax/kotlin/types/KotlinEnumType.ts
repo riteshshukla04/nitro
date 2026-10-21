@@ -9,7 +9,7 @@ import { getKotlinConverter, type KotlinCppConverter } from '../KotlinConverter.
 import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinEnumType extends EnumType implements KotlinType {
-  readonly jniValueKind = 'wrapper'
+  readonly jniValueKind = 'object'
   readonly needsKotlinConversion = false
 
   constructor(
@@ -21,10 +21,6 @@ export class KotlinEnumType extends EnumType implements KotlinType {
 
   getCppConverter(cppType: Type): KotlinCppConverter {
     return new KotlinCxxEnumType(cppType, this).getConverter()
-  }
-
-  getJSIType(): this {
-    return this
   }
 
   get jniName(): string {

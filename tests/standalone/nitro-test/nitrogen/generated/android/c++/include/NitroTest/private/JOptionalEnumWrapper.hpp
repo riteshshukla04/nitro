@@ -9,12 +9,10 @@
 
 #include <fbjni/fbjni.h>
 #include <NitroModules/JSIConverter.hpp>
-#include <optional>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
-#include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 
 namespace margelo::nitro::test {

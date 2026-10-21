@@ -39,14 +39,14 @@ return ${jniClass}::create(${toJNIFields.join(', ')});
     const kotlinToCppConverterCode = `
 return ${cppCode}(${fromJNIFields.join(', ')});
 `.trim()
-    const dependencies = fields.map(({ cpp, kotlin }) => kotlin.getCppConverter?.(cpp))
+    const dependencies = fields.map(({ cpp, kotlin }) => kotlin.getCppConverter(cpp))
     return createKotlinCxxValueConverter({
       name: cppType.cppName,
       cppType: cppType,
       kotlinType: this.kotlinType,
       toJNI: cppToKotlinConverterCode,
       fromJNI: kotlinToCppConverterCode,
-      dependencies: dependencies.filter((dependency) => dependency != null),
+      dependencies: dependencies,
     })
   }
 }

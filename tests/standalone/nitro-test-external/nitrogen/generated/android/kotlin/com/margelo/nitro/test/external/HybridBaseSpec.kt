@@ -45,7 +45,7 @@ abstract class HybridBaseSpec: HybridObject() {
 
   @DoNotStrip
   @Keep
-  private fun mapSize_cxx(size: Size, callback: Callback_SizeKotlin_SizeKotlin): Promise<Size> {
+  private fun mapSize_cxx(size: Size, callback: Callback_Size_Size): Promise<Size> {
     val __result = mapSize(size, callback)
     return __result
   }

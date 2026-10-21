@@ -13,7 +13,7 @@ export class KotlinCxxArrayType extends KotlinCxxType {
   }
 
   getConverter(): KotlinCppConverter {
-    const dependencies = combineKotlinCppConverters([this.kotlinArrayType.itemType.getCppConverter?.(this.cppArrayType.itemType)])
+    const dependencies = combineKotlinCppConverters([this.kotlinArrayType.itemType.getCppConverter(this.cppArrayType.itemType)])
     return {
       files: dependencies.files,
       imports: [

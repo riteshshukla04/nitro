@@ -4,11 +4,11 @@ import { getHybridObjectName } from '../../getHybridObjectName.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { HybridObjectType } from '../../types/HybridObjectType.js'
 import type { KotlinCppConverter } from '../KotlinConverter.js'
-import { KotlinCxxHybridObjectReferenceType } from './KotlinCxxHybridObjectReferenceType.js'
+import { KotlinCxxHybridObjectType } from './KotlinCxxHybridObjectType.js'
 import { getJniReferenceCode, type JNINativeRegistration, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinHybridObjectType extends HybridObjectType implements KotlinType {
-  readonly jniValueKind = 'wrapper'
+  readonly jniValueKind = 'object'
   readonly needsKotlinConversion = false
 
   constructor(readonly type: HybridObjectType) {
@@ -32,12 +32,9 @@ export class KotlinHybridObjectType extends HybridObjectType implements KotlinTy
     }
     return name.JHybridTSpec
   }
-  getJSIType(): this {
-    return this
-  }
 
   getCppConverter(cppType: Type): KotlinCppConverter {
-    return new KotlinCxxHybridObjectReferenceType(cppType, this).getConverter()
+    return new KotlinCxxHybridObjectType(cppType, this).getConverter()
   }
 
   override getCode(language: Language, options: GetCodeOptions): string {

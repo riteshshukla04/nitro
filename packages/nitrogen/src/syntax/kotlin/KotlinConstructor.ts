@@ -3,7 +3,7 @@ import type { HybridObjectSpec } from '../HybridObjectSpec.js'
 import { StaticMethod } from '../StaticMethod.js'
 import { getHybridObjectName } from '../getHybridObjectName.js'
 import { HybridObjectType } from '../types/HybridObjectType.js'
-import { KotlinCxxHybridObjectType } from './types/KotlinCxxHybridObjectType.js'
+import { KotlinConstructorResultType } from './types/KotlinConstructorResultType.js'
 import {
   createCppJniCallBody,
   createKotlinBridgeBody,
@@ -31,7 +31,7 @@ export class KotlinConstructor extends Constructor {
   private readonly callable: KotlinMethodInfo
 
   constructor({ spec, constructor }: KotlinConstructorOptions) {
-    const returnType = new KotlinCxxHybridObjectType(new HybridObjectType(spec))
+    const returnType = new KotlinConstructorResultType(new HybridObjectType(spec))
     const nativeFactory = constructor.toStaticMethod(returnType)
     const callable = prepareKotlinMethod(nativeFactory, { directReturn: false })
     const parameters = callable.parameters.map((parameter) => parameter.kotlin)

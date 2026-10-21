@@ -9,15 +9,11 @@ import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './K
 
 /** JSON crosses JNI as its serialized representation. */
 export class KotlinAnyJSONType extends AnyJSONType implements KotlinType {
-  readonly jniValueKind = 'wrapper'
+  readonly jniValueKind = 'object'
   readonly needsKotlinConversion = false
 
   getCppConverter(cppType: Type): KotlinCppConverter {
     return new KotlinCxxAnyJSONType(cppType, this).getConverter()
-  }
-
-  getJSIType(): this {
-    return this
   }
 
   override getCode(language: Language, options: GetCodeOptions): string {

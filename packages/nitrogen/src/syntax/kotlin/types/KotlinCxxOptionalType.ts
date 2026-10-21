@@ -14,7 +14,7 @@ export class KotlinCxxOptionalType extends KotlinCxxType {
 
   getConverter(): KotlinCppConverter {
     const dependencies = combineKotlinCppConverters([
-      this.kotlinOptionalType.wrappingType.getCppConverter?.(this.cppOptionalType.wrappingType),
+      this.kotlinOptionalType.wrappingType.getCppConverter(this.cppOptionalType.wrappingType),
     ])
     return {
       files: dependencies.files,

@@ -14,7 +14,6 @@
 #include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 #include <NitroTest/Person.hpp>
 #include <optional>
-#include <NitroTest/private/PersonKotlin.hpp>
 #include <NitroTest/private/JPerson.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>

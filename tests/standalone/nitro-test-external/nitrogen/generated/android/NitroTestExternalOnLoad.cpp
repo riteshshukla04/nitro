@@ -8,14 +8,14 @@
 #include <NitroTestExternal/private/NitroTestExternalOnLoad.hpp>
 #include <NitroModules/HybridClassRegistry.hpp>
 #include <NitroTestExternal/private/JHybridBaseSpec.hpp>
-#include <NitroTestExternal/private/JCallback_SizeKotlin_SizeKotlin.hpp>
+#include <NitroTestExternal/private/JCallback_Size_Size.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 #include <NitroTestExternal/HybridCppValueSourceSpec.hpp>
 
 namespace margelo::nitro::test::external {
   void registerAllNatives() {
     margelo::nitro::test::external::JHybridBaseSpec::CxxPart::registerNatives();
-    margelo::nitro::test::external::JCallback_SizeKotlin_SizeKotlin_cxx::registerNatives();
+    margelo::nitro::test::external::JCallback_Size_Size_cxx::registerNatives();
     margelo::nitro::test::external::JHybridSomeExternalObjectSpec::CxxPart::registerNatives();
 
     HybridClassRegistry::registerHybridClass("test.external.Base", JHybridBaseSpec::Class::get());

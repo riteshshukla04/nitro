@@ -16,7 +16,6 @@
 #include <NitroTest/private/JColorScheme.hpp>
 #include <NitroTest/private/JCallback_void.hpp>
 #include <NitroModules/JNIConverter+Callback.hpp>
-#include <optional>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+HybridObject.hpp>

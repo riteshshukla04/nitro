@@ -13,7 +13,6 @@ target_include_directories(NitroTest PRIVATE
 )
 target_sources(NitroTest PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/NitroTestOnLoad.cpp"
-  "${CMAKE_CURRENT_LIST_DIR}/../android/c++/CarKotlin.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/ColorScheme+Kotlin+NitroTest.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/HybridBenchmarkObjectCppSpecClass.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JCallback_double.cpp"
@@ -27,7 +26,6 @@ target_sources(NitroTest PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JPowertrain.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JVariant_Boolean_DoubleArray_Array_String__Double_String.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JVariant_Double_String.cpp"
-  "${CMAKE_CURRENT_LIST_DIR}/../android/c++/PersonKotlin.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/views/JHybridRecyclableTestViewStateUpdater.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/views/JHybridTestViewStateUpdater.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/Car.cpp"

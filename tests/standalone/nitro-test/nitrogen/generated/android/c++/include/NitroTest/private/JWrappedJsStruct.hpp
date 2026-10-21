@@ -10,8 +10,6 @@
 #include <fbjni/fbjni.h>
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroTest/private/JJsStyleStruct.hpp>
-#include <NitroTest/private/JsStyleStructKotlin.hpp>
-#include <vector>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
 

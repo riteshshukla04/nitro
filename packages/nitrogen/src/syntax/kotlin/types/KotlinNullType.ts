@@ -7,12 +7,8 @@ import { KotlinCxxNullType } from './KotlinCxxNullType.js'
 import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinNullType extends NullType implements KotlinType {
-  readonly jniValueKind = 'wrapper'
+  readonly jniValueKind = 'object'
   readonly needsKotlinConversion = false
-
-  getJSIType(): this {
-    return this
-  }
 
   getCppConverter(cppType: Type): KotlinCppConverter {
     return new KotlinCxxNullType(cppType, this).getConverter()

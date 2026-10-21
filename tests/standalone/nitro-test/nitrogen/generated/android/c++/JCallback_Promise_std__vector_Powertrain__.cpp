@@ -6,14 +6,11 @@
 ///
 
 #include <NitroTest/private/JCallback_Promise_std__vector_Powertrain__.hpp>
-#include <NitroTest/Powertrain.hpp>
-#include <vector>
-#include <NitroModules/Promise.hpp>
-#include <NitroModules/JNIConverter+Promise.hpp>
-#include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <NitroModules/JNIConverter+Promise.hpp>
+#include <NitroModules/JSIConverter+JTypedPromise.hpp>
 
 namespace margelo::nitro::test {
 

@@ -1,3 +1,4 @@
+import { convertJniValue, getJniCode } from './types/KotlinType.js'
 import { capitalizeName, indent } from '../../utils.js'
 import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
@@ -141,25 +142,12 @@ sealed class ${kotlinName} private constructor(@DoNotStrip private val index: In
   const cppCases = variant.kotlinCases.map(({ label, type }, index) => {
     const innerName = capitalizeName(label)
     const descriptor = config.getAndroidPackage('c++/jni', `${kotlinName}$${innerName}`)
-    const jniParameter = type.getCode('c++', { context: 'parameter' })
-    const jniField = type.getCode('c++', { context: 'property' })
-    const jniReturn = type.getCode('c++', { context: 'return' })
-    let valueType: string
-    let parameterType: string
-    let createValue: string
-    let extractedValue: string
-    if (type.getJSIType?.() == null && type.jniValueKind === 'primitive') {
-      // Some scalar JSI values have different semantics from their JNI ABI.
-      valueType = type.getCode('c++', { context: 'value', representation: 'jsi' })
-      parameterType = type.getCode('c++', { context: 'parameter', representation: 'jsi' })
-      createValue = type.convert('value', { from: 'c++', to: 'kotlin', in: 'c++' })
-      extractedValue = type.convert('getFieldValue(field)', { from: 'kotlin', to: 'c++', in: 'c++' })
-    } else {
-      valueType = jniReturn
-      parameterType = jniParameter
-      createValue = 'value'
-      extractedValue = 'getFieldValue(field)'
-    }
+    const jniParameter = getJniCode(type, { context: 'parameter' })
+    const jniField = getJniCode(type, { context: 'property' })
+    const valueType = type.getCode('c++', { context: 'return' })
+    const parameterType = type.getCode('c++', { context: 'parameter' })
+    const createValue = convertJniValue(type, 'value', 'to-jni')
+    const extractedValue = convertJniValue(type, 'getFieldValue(field)', 'from-jni')
     const declaration = `
 class ${innerName} final : public jni::JavaClass<${innerName}, ${jniName}> {
 public:

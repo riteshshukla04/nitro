@@ -14,7 +14,6 @@ import { Property } from './syntax/Property.js'
 import { StaticProperty } from './syntax/StaticProperty.js'
 import { InstanceMethod } from './syntax/InstanceMethod.js'
 import { HybridObjectType } from './syntax/types/HybridObjectType.js'
-import { KotlinCxxHybridObjectType } from './syntax/kotlin/types/KotlinCxxHybridObjectType.js'
 import { getHybridObjectName } from './syntax/getHybridObjectName.js'
 import { StaticMethod } from './syntax/StaticMethod.js'
 import { Constructor } from './syntax/Constructor.js'
@@ -206,13 +205,12 @@ export function getHybridObjectSpec(
 
   let constructor: Constructor | undefined
   if (constructorParameters != null) {
-    let constructedType = new HybridObjectType(
+    const constructedType = new HybridObjectType(
       name,
       platforms,
       bases.map((base) => new HybridObjectType(base)),
       config
     )
-    if (target.language === 'kotlin') constructedType = new KotlinCxxHybridObjectType(constructedType)
     constructor = new Constructor(getHybridObjectName(name).HybridTSpec, constructedType, constructorParameters)
   }
 

@@ -7,8 +7,6 @@
 
 #include <NitroTest/private/JWrappedJsStruct.hpp>
 #include <NitroTest/private/JJsStyleStruct.hpp>
-#include <NitroTest/private/JsStyleStructKotlin.hpp>
-#include <vector>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
 #include <NitroModules/PropNameIDCache.hpp>

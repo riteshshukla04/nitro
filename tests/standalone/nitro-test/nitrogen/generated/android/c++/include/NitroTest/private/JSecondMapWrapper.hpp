@@ -9,8 +9,6 @@
 
 #include <fbjni/fbjni.h>
 #include <NitroModules/JSIConverter.hpp>
-#include <string>
-#include <unordered_map>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Map.hpp>

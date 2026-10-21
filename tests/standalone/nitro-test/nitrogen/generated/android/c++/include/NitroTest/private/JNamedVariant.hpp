@@ -29,7 +29,7 @@ namespace margelo::nitro::test {
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/NamedVariant;";
     using Cases = std::tuple<JNamedVariant_impl::First, JNamedVariant_impl::Second>;
 #ifdef NITRO_DEBUG
-    static constexpr auto diagnosticName = "variant<std::string, margelo::nitro::test::CarKotlin>";
+    static constexpr auto diagnosticName = "variant<std::string, margelo::nitro::test::Car>";
 #else
     static constexpr auto diagnosticName = "variant<...>";
 #endif

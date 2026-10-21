@@ -1,3 +1,4 @@
+import { convertJniValue, getJniCode } from './types/KotlinType.js'
 import { indent } from '../../utils.js'
 import { createFileMetadataString, isNotDuplicate } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
@@ -149,24 +150,23 @@ class ${name}_java(private val callback: ${lambdaSignature}): ${name} {
   const jniClassDescriptor = callbackType.config.getAndroidPackage('c++/jni', `${name}_cxx`)
   const returnType = callbackType.returnType
   const cxxNamespace = callbackType.config.getCxxNamespace('c++')
-  const valueReturnType = returnType.getCode('c++', { context: 'value', fullyQualified: true, representation: 'jsi' })
-  const valueParameters = callbackType.parameters.map((p) =>
-    p.type.getCode('c++', { context: 'value', fullyQualified: true, representation: 'jsi' })
-  )
+  const valueReturnType = returnType.getCode('c++', { context: 'value', fullyQualified: true })
+  const valueParameters = callbackType.parameters.map((p) => p.type.getCode('c++', { context: 'value', fullyQualified: true }))
   const valueSignature = `${valueReturnType}(${valueParameters.join(', ')})`
   const retainedReturnType = `JNIRetainedValue<${valueReturnType}>::Type`
   const retainedParameters = callbackType.parameters.map((p) => {
-    const type = p.type.getCode('c++', { context: 'value', fullyQualified: true, representation: 'jsi' })
+    const type = p.type.getCode('c++', { context: 'value', fullyQualified: true })
     return `JNIRetainedValue<${type}>::Type ${p.escapedName}`
   })
-  const nativeParams = callbackType.parameters.map((p) => `${p.getCode('c++', { context: 'parameter' })} ${p.escapedName}`)
-  const paramsForward = callbackType.parameters.map((p) => p.escapedName)
+  const nativeParams = callbackType.parameters.map((p) => `${getJniCode(p, { context: 'parameter' })} ${p.escapedName}`)
+  const paramsForward = callbackType.parameters.map((p) => convertJniValue(p, p.escapedName, 'from-jni'))
   const jniParamsForward = callbackType.parameters.map((p) => {
-    const type = p.type.getCode('c++', { context: 'value', fullyQualified: true, representation: 'jsi' })
-    return `JNIRetainedValue<${type}>::borrow(${p.escapedName})`
+    const type = p.type.getCode('c++', { context: 'value', fullyQualified: true })
+    const value = `JNIRetainedValue<${type}>::borrow(${p.escapedName})`
+    return convertJniValue(p, value, 'to-jni')
   })
-  const jniReturnType = returnType.getCode('c++', { context: 'return' })
-  const jniParamTypes = callbackType.parameters.map((p) => p.getCode('c++', { context: 'parameter' }))
+  const jniReturnType = getJniCode(returnType, { context: 'return' })
+  const jniParamTypes = callbackType.parameters.map((p) => getJniCode(p, { context: 'parameter' }))
   const jniSignature = `${jniReturnType}(${jniParamTypes.join(', ')})`
   let invokeCode: string
   if (returnType.kind === 'void') {
@@ -176,9 +176,10 @@ __method(${argumentsCode});
 `.trim()
   } else {
     const argumentsCode = ['self()', ...jniParamsForward].join(', ')
+    const result = convertJniValue(returnType, 'result', 'from-jni')
     invokeCode = `
 auto result = __method(${argumentsCode});
-return JNIRetainedValue<${valueReturnType}>::retain(result);
+return JNIRetainedValue<${valueReturnType}>::retain(${result});
 `.trim()
   }
   const imports = [...returnType.getRequiredImports('c++'), ...callbackType.parameters.flatMap((p) => p.getRequiredImports('c++'))]
@@ -229,6 +230,7 @@ namespace ${cxxNamespace} {
 } // namespace ${cxxNamespace}
 `.trim()
 
+  const invokeResult = convertJniValue(returnType, `_state.invoke(${paramsForward.join(', ')})`, 'to-jni')
   const fbjniImplementationCode = `
 ${createFileMetadataString(`${jniName}.cpp`)}
 
@@ -246,7 +248,7 @@ namespace ${cxxNamespace} {
   }
 
   ${jniReturnType} ${jniName}_cxx::invoke_cxx(${nativeParams.join(', ')}) {
-    return _state.invoke(${paramsForward.join(', ')});
+    return ${invokeResult};
   }
 
   void ${jniName}_cxx::registerNatives() {

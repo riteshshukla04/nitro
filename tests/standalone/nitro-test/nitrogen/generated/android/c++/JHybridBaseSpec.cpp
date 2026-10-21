@@ -10,14 +10,12 @@
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JSize.hpp>
 #include <NitroTest/private/JSizeUnit.hpp>
-#include <NitroTest/private/SizeKotlin.hpp>
-#include <NitroModules/Promise.hpp>
 #include <NitroModules/JNIConverter+Promise.hpp>
 #include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
-#include <NitroTest/private/JCallback_SizeKotlin_SizeKotlin.hpp>
+#include <NitroTest/private/JCallback_Size_Size.hpp>
 #include <NitroModules/JNIConverter+Callback.hpp>
 #include <memory>
 
@@ -108,8 +106,8 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, unit);
     return __result;
   }
-  jni::local_ref<JTypedPromise<jni::local_ref<JSize>>> JHybridBaseSpec::mapSize(const jni::local_ref<JSize>& size, const jni::local_ref<margelo::nitro::test::JCallback_SizeKotlin_SizeKotlin>& callback) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JTypedPromise<jni::local_ref<JSize>>>(jni::alias_ref<JSize> /* size */, jni::alias_ref<margelo::nitro::test::JCallback_SizeKotlin_SizeKotlin> /* callback */)>("mapSize_cxx");
+  jni::local_ref<JTypedPromise<jni::local_ref<JSize>>> JHybridBaseSpec::mapSize(const jni::local_ref<JSize>& size, const jni::local_ref<margelo::nitro::test::JCallback_Size_Size>& callback) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JTypedPromise<jni::local_ref<JSize>>>(jni::alias_ref<JSize> /* size */, jni::alias_ref<margelo::nitro::test::JCallback_Size_Size> /* callback */)>("mapSize_cxx");
     auto __result = __method(_javaPart, CxxPart::getClass(), size, callback);
     return __result;
   }

@@ -2,7 +2,6 @@ import type { HybridObjectSpec } from '../syntax/HybridObjectSpec.js'
 import type { SourceFile } from '../syntax/SourceFile.js'
 import { getAllTypes } from '../syntax/getAllTypes.js'
 import { getReferencedTypes } from '../syntax/getReferencedTypes.js'
-import { getKotlinNativeType } from '../syntax/kotlin/getKotlinNativeType.js'
 import { KotlinHybridObjectType } from '../syntax/kotlin/types/KotlinHybridObjectType.js'
 import type { KotlinType } from '../syntax/kotlin/types/KotlinType.js'
 import { wrapKotlinType } from '../syntax/kotlin/wrapKotlinType.js'
@@ -20,16 +19,14 @@ function getKotlinTypes(specs: readonly HybridObjectSpec[]): KotlinType[] {
     switch (spec.language) {
       case 'kotlin': {
         const baseTypes = getKotlinTypes(spec.baseTypes)
-        let hybridObject: KotlinHybridObjectType
+        let hybridObject: KotlinType
         if (spec.isHybridView) {
           hybridObject = new KotlinHybridViewType(spec)
         } else {
           hybridObject = new KotlinHybridObjectType(new HybridObjectType(spec))
         }
-        // Fabric props start as public C++ types. JNI uses the Kotlin projection.
-        const cppTypes = getAllTypes(spec).map((type) => getKotlinNativeType(type, spec.config))
-        const referencedTypes = cppTypes.flatMap(getReferencedTypes)
-        const kotlinTypes = referencedTypes.map((type) => wrapKotlinType(type))
+        const referencedTypes = getAllTypes(spec).flatMap(getReferencedTypes)
+        const kotlinTypes = referencedTypes.map((type) => wrapKotlinType(type, { config: spec.config }))
         return [...baseTypes, hybridObject, ...kotlinTypes]
       }
       case 'c++':

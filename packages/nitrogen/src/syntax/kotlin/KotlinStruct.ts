@@ -3,6 +3,7 @@ import { createFileMetadataString } from '../helpers.js'
 import type { SourceFile } from '../SourceFile.js'
 import type { KotlinStructType } from './types/KotlinStructType.js'
 import { getImportsCode } from '../getImportCode.js'
+import { convertJniValue, getJniCode } from './types/KotlinType.js'
 
 export function createKotlinStruct(structType: KotlinStructType): SourceFile[] {
   const publicType = structType.type
@@ -111,54 +112,48 @@ data class ${structType.structName}(
     const type = property.getCode('c++', { context: 'parameter' })
     return `${type} ${property.escapedName}`
   })
-  const parameterTypes = structType.properties.map((property) => property.getCode('c++', { context: 'parameter' }))
-  const argumentsList = structType.properties.map((property) => property.escapedName)
+  const parameterTypes = structType.properties.map((property) => getJniCode(property, { context: 'parameter' }))
+  const argumentsList = structType.properties.map((property) => convertJniValue(property, property.escapedName, 'to-jni'))
   const getters = structType.properties.map((property) => {
     const returnType = property.getCode('c++', { context: 'return' })
-    const signatureType = property.getCode('c++', { context: 'property' })
+    const signatureType = getJniCode(property, { context: 'property' })
     const name = capitalizeName(property.escapedName)
+    const methodResult = convertJniValue(property, 'method(this->self())', 'from-jni')
+    const fieldResult = convertJniValue(property, 'getFieldValue(field)', 'from-jni')
     if (property.needsKotlinConversion) {
       return `
 ${returnType} get${name}() const {
   static const auto method = javaClassStatic()->getMethod<${signatureType}()>("get${name}_cxx");
-  return method(this->self());
+  return ${methodResult};
 }
 `.trim()
     }
     return `
 ${returnType} get${name}() const {
   static const auto field = javaClassStatic()->getField<${signatureType}>("${property.escapedName}");
-  return getFieldValue(field);
+  return ${fieldResult};
 }
 `.trim()
   })
-  let jsiDeclaration = ''
-  let jsiImplementation = ''
-  if (structType.getJSIType() != null) {
-    const jniClass = structType.getCode('c++', { context: 'type-argument', fullyQualified: true })
-    const nativeType = `jni::local_ref<${jniClass}>`
-    const propertyConverters = structType.properties.map((property) => {
-      const jsiType = property.type.getJSIType?.()
-      if (jsiType == null && property.type.jniValueKind !== 'primitive') {
-        throw new Error(`Missing direct JNI conversion for ${structType.structName}.${property.name}`)
-      }
-      const type = property.type.getCode('c++', { context: 'value', fullyQualified: true, representation: 'jsi' })
-      return { property: property, converter: `JSIConverter<${type}>`, needsConversion: jsiType == null }
-    })
-    const fromJSIArguments = propertyConverters.map(({ property, converter, needsConversion }) => {
-      const value = `${converter}::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "${property.name}")))`
-      return needsConversion ? property.convert(value, { from: 'c++', to: 'kotlin', in: 'c++' }) : value
-    })
-    const toJSIFields = propertyConverters.map(({ property, converter, needsConversion }) => {
-      const getter = `value->get${capitalizeName(property.escapedName)}()`
-      const value = needsConversion ? property.convert(getter, { from: 'kotlin', to: 'c++', in: 'c++' }) : getter
-      return `object.setProperty(runtime, PropNameIDCache::get(runtime, "${property.name}"), ${converter}::toJSI(runtime, ${value}));`
-    })
-    const checks = propertyConverters.map(
-      ({ property, converter }) =>
-        `${converter}::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "${property.name}")))`
-    )
-    jsiDeclaration = `
+  const jniClass = structType.getCode('c++', { context: 'type-argument', fullyQualified: true })
+  const nativeType = `jni::local_ref<${jniClass}>`
+  const propertyConverters = structType.properties.map((property) => {
+    const type = property.type.getCode('c++', { context: 'value', fullyQualified: true })
+    return { property: property, converter: `JSIConverter<${type}>` }
+  })
+  const fromJSIArguments = propertyConverters.map(
+    ({ property, converter }) =>
+      `${converter}::fromJSI(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "${property.name}")))`
+  )
+  const toJSIFields = propertyConverters.map(({ property, converter }) => {
+    const getter = `value->get${capitalizeName(property.escapedName)}()`
+    return `object.setProperty(runtime, PropNameIDCache::get(runtime, "${property.name}"), ${converter}::toJSI(runtime, ${getter}));`
+  })
+  const checks = propertyConverters.map(
+    ({ property, converter }) =>
+      `${converter}::canConvert(runtime, object.getProperty(runtime, PropNameIDCache::get(runtime, "${property.name}")))`
+  )
+  const jsiDeclaration = `
 namespace margelo::nitro {
 
   namespace jni = facebook::jni;
@@ -173,7 +168,7 @@ namespace margelo::nitro {
 
 } // namespace margelo::nitro
 `.trim()
-    jsiImplementation = `
+  const jsiImplementation = `
 namespace margelo::nitro {
 
   ${nativeType} JSIConverter<${nativeType}>::fromJSI(jsi::Runtime& runtime, const jsi::Value& value) {
@@ -196,7 +191,6 @@ namespace margelo::nitro {
 
 } // namespace margelo::nitro
 `.trim()
-  }
   const fbjniCode = `
 ${createFileMetadataString(`${structType.jniName}.hpp`)}
 

@@ -3,12 +3,14 @@ import type { SourceImport } from '../../SourceFile.js'
 import type { Type } from '../../types/Type.js'
 import { UInt64Type } from '../../types/UInt64Type.js'
 import type { KotlinCppConverter } from '../KotlinConverter.js'
-import { KotlinCxxPrimitiveType } from './KotlinCxxPrimitiveType.js'
+import { KotlinCxxUInt64Type } from './KotlinCxxUInt64Type.js'
+import { getKotlinConverter } from '../KotlinConverter.js'
 import {
   getJniPrimitiveCode,
   type GetKotlinCodeOptions,
   type JniValueKind,
   type KotlinConversion,
+  type JniValueDirection,
   type KotlinType,
   type KotlinTypeOptions,
 } from './KotlinType.js'
@@ -24,28 +26,36 @@ export class KotlinUInt64Type extends UInt64Type implements KotlinType {
   }
 
   get jniValueKind(): JniValueKind {
-    return this.boxed ? 'wrapper' : 'primitive'
-  }
-
-  getJSIType(): this | undefined {
-    // A raw jlong also represents signed Int64. Keep UInt64 as a native scalar.
-    if (!this.boxed) return undefined
-    return this
+    return this.boxed ? 'object' : 'primitive'
   }
 
   getCppConverter(cppType: Type): KotlinCppConverter {
-    return new KotlinCxxPrimitiveType(cppType, this).getConverter()
+    return new KotlinCxxUInt64Type(cppType, this).getConverter()
   }
 
   override getCode(language: Language, options: GetKotlinCodeOptions): string {
     switch (language) {
       case 'c++':
-        if (options.representation === 'jsi' && !this.boxed) return super.getCode(language, options)
-        return getJniPrimitiveCode('jlong', options, { boxedType: 'JUInt64', boxed: this.boxed })
+        if (!this.boxed) return super.getCode(language, options)
+        return this.getJniCode(options)
       case 'kotlin':
         return 'Long'
       case 'swift':
         return super.getCode(language, options)
+    }
+  }
+
+  getJniCode(options: GetKotlinCodeOptions): string {
+    return getJniPrimitiveCode('jlong', options, { boxedType: 'JUInt64', boxed: this.boxed })
+  }
+
+  convertJniValue(value: string, direction: JniValueDirection): string {
+    if (this.boxed) return value
+    switch (direction) {
+      case 'to-jni':
+        return `JNIConverter<uint64_t, jlong>::toJNI(${value})`
+      case 'from-jni':
+        return `JNIConverter<uint64_t, jlong>::fromJNI(${value})`
     }
   }
 
@@ -54,8 +64,7 @@ export class KotlinUInt64Type extends UInt64Type implements KotlinType {
       case 'kotlin':
         return conversion.from === 'kotlin' ? `${value}.toLong()` : `${value}.toULong()`
       case 'c++': {
-        const jniType = this.getCode('c++', { context: 'value' })
-        const converter = `JNIConverter<uint64_t, ${jniType}>`
+        const converter = getKotlinConverter({ cppType: new UInt64Type(), kotlinType: this })
         switch (conversion.from) {
           case 'c++':
             return `${converter}::toJNI(${value})`
@@ -70,8 +79,10 @@ export class KotlinUInt64Type extends UInt64Type implements KotlinType {
     const imports = super.getRequiredImports()
     switch (language) {
       case 'c++':
+        if (this.boxed) {
+          imports.push({ language: language, declaration: { header: 'NitroModules/JUInt64.hpp', space: 'system' } })
+        }
         imports.push(
-          { language: language, declaration: { header: 'NitroModules/JUInt64.hpp', space: 'system' } },
           { language: language, declaration: { header: 'NitroModules/JNIConverter+Primitives.hpp', space: 'system' } },
           { language: language, declaration: { header: 'NitroModules/JSIConverter+JNIPrimitives.hpp', space: 'system' } }
         )

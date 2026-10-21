@@ -9,10 +9,6 @@
 
 #include <fbjni/fbjni.h>
 #include <NitroModules/JSIConverter.hpp>
-#include <NitroModules/Callback.hpp>
-#include <functional>
-#include <variant>
-#include <optional>
 #include <NitroTest/private/JVariant_______Unit_Double.hpp>
 #include <NitroTest/private/JCallback_void.hpp>
 #include <NitroModules/JNIConverter+Callback.hpp>

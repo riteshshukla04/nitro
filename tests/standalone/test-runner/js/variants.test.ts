@@ -7,7 +7,6 @@ import { type Car, OldEnum, type Powertrain, WeirdNumbersEnum, type WrappedJsStr
 
 import { TEST_CAR, TEST_CAR_2, TEST_PERSON } from './utils/fixtures'
 import { debugOnly, deferred } from './utils/helpers'
-import { isKotlin, type TestObject } from './utils/testObjects'
 
 const BASE = new Base()
 
@@ -239,22 +238,20 @@ export const cases = {
     },
 
     'getVariantObjects(...) throws for a string': (testObject) => {
-      const structSuffix = isKotlin(testObject) ? 'Kotlin' : ''
       expect(() =>
         // @ts-expect-error
         testObject.getVariantObjects('some-string')
       ).to.throw(
-        `${testObject.constructor.name}.getVariantObjects(...): Cannot convert "some-string" to any type in ${debugOnly(`variant<margelo::nitro::test::Person${structSuffix}, margelo::nitro::test::Car${structSuffix}>!`)}`
+        `${testObject.constructor.name}.getVariantObjects(...): Cannot convert "some-string" to any type in ${debugOnly(`variant<margelo::nitro::test::Person, margelo::nitro::test::Car>!`)}`
       )
     },
 
     'getVariantObjects(...) throws for a wrong object': (testObject) => {
-      const structSuffix = isKotlin(testObject) ? 'Kotlin' : ''
       expect(() =>
         // @ts-expect-error
         testObject.getVariantObjects({ someValue: 55 })
       ).to.throw(
-        `${testObject.constructor.name}.getVariantObjects(...): Cannot convert "[object Object]" to any type in ${debugOnly(`variant<margelo::nitro::test::Person${structSuffix}, margelo::nitro::test::Car${structSuffix}>!`)}`
+        `${testObject.constructor.name}.getVariantObjects(...): Cannot convert "[object Object]" to any type in ${debugOnly(`variant<margelo::nitro::test::Person, margelo::nitro::test::Car>!`)}`
       )
     },
 
@@ -445,12 +442,11 @@ export const cases = {
     },
 
     'bounceVariantUnionEnum(...) throws for a differently cased Powertrain': (testObject) => {
-      const structSuffix = isKotlin(testObject) ? 'Kotlin' : ''
       expect(() =>
         // @ts-expect-error
         testObject.bounceVariantUnionEnum('GAS')
       ).to.throw(
-        `${testObject.constructor.name}.bounceVariantUnionEnum(...): Cannot convert "GAS" to any type in ${debugOnly(`variant<margelo::nitro::test::Powertrain, margelo::nitro::test::Car${structSuffix}>!`)}`
+        `${testObject.constructor.name}.bounceVariantUnionEnum(...): Cannot convert "GAS" to any type in ${debugOnly(`variant<margelo::nitro::test::Powertrain, margelo::nitro::test::Car>!`)}`
       )
     },
 
@@ -519,12 +515,11 @@ export const cases = {
     },
 
     'passNamedVariant(...) throws for a number': (testObject) => {
-      const structSuffix = isKotlin(testObject) ? 'Kotlin' : ''
       expect(() =>
         // @ts-expect-error
         testObject.passNamedVariant(55)
       ).to.throw(
-        `${testObject.constructor.name}.passNamedVariant(...): Cannot convert "55" to any type in ${debugOnly(`variant<std::string, margelo::nitro::test::Car${structSuffix}>!`)}`
+        `${testObject.constructor.name}.passNamedVariant(...): Cannot convert "55" to any type in ${debugOnly(`variant<std::string, margelo::nitro::test::Car>!`)}`
       )
     },
 

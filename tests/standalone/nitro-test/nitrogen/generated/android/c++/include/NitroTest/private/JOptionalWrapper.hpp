@@ -10,12 +10,10 @@
 #include <fbjni/fbjni.h>
 #include <NitroModules/JSIConverter.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
-#include <optional>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
-#include <string>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 

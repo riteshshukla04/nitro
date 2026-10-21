@@ -4,16 +4,15 @@ import type { GetCodeOptions, Type } from '../../types/Type.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import { StructType } from '../../types/StructType.js'
 import { createKotlinStruct } from '../KotlinStruct.js'
-import { createKotlinFallbackStruct } from '../KotlinFallbackStruct.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
 import { KotlinNamedType } from './KotlinNamedType.js'
 import { KotlinCxxStructType } from './KotlinCxxStructType.js'
-import { combineKotlinCppConverters, getKotlinConverter, type KotlinCppConverter } from '../KotlinConverter.js'
+import { getKotlinConverter, type KotlinCppConverter } from '../KotlinConverter.js'
 import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinStructType extends StructType implements KotlinType {
   override readonly properties: KotlinNamedType[]
-  readonly jniValueKind = 'wrapper'
+  readonly jniValueKind = 'object'
   readonly needsKotlinConversion = false
 
   constructor(
@@ -25,27 +24,8 @@ export class KotlinStructType extends StructType implements KotlinType {
     this.properties = properties
   }
 
-  getCppConverter(cppType: Type): KotlinCppConverter | undefined {
-    if (!this.canConvertDirectly) return undefined
+  getCppConverter(cppType: Type): KotlinCppConverter {
     return new KotlinCxxStructType(cppType, this).getConverter()
-  }
-
-  private get canConvertDirectly(): boolean {
-    return this.properties.every((property) => property.type.jniValueKind === 'primitive' || property.type.getJSIType?.() != null)
-  }
-
-  getCppConverterDependencies(): KotlinCppConverter {
-    const dependencies = this.properties.map((property, index) => {
-      const original = this.type.properties[index]
-      if (original == null) throw new Error('Mismatched struct property count')
-      return property.type.getCppConverter?.(original)
-    })
-    return combineKotlinCppConverters(dependencies)
-  }
-
-  getJSIType(): this | undefined {
-    if (!this.canConvertDirectly) return undefined
-    return this
   }
 
   get jniName(): string {
@@ -57,7 +37,6 @@ export class KotlinStructType extends StructType implements KotlinType {
       case 'kotlin':
         return value
       case 'c++':
-        if (!this.canConvertDirectly) return from === 'c++' ? `${this.jniName}::fromCpp(${value})` : `${value}->toCpp()`
         switch (from) {
           case 'c++':
             return `${getKotlinConverter({ cppType: this.type, kotlinType: this })}::toJNI(${value})`
@@ -81,23 +60,13 @@ export class KotlinStructType extends StructType implements KotlinType {
 
   override getExtraFiles(): SourceFile[] {
     if (this.config.isExternalConfig) return []
-    if (!this.canConvertDirectly) {
-      return [
-        ...this.properties.flatMap((property) => property.getExtraFiles()),
-        ...this.getCppConverterDependencies().files,
-        ...createKotlinFallbackStruct(this),
-      ]
-    }
     return [...this.properties.flatMap((p) => p.getExtraFiles()), ...createKotlinStruct(this)]
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
     switch (language) {
-      case 'c++': {
-        const imports: SourceImport[] = [{ language: 'c++', declaration: this.config.getCxxHeader(`${this.jniName}.hpp`, 'private') }]
-        if (!this.canConvertDirectly) imports.push(...this.type.getRequiredImports(language), ...this.getCppConverterDependencies().imports)
-        return imports
-      }
+      case 'c++':
+        return [{ language: 'c++', declaration: this.config.getCxxHeader(`${this.jniName}.hpp`, 'private') }]
       case 'kotlin':
         if (this.config.isExternalConfig) {
           return [{ language: 'kotlin', name: `${this.config.getAndroidPackage('java/kotlin')}.${this.structName}` }]

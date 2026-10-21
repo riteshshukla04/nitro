@@ -16,10 +16,10 @@ export class KotlinCxxCallbackType extends KotlinCxxType {
     const parameters = this.cppCallbackType.parameters.map((parameter, index) => {
       const kotlinParameter = this.kotlinCallbackType.parameters[index]
       if (kotlinParameter == null) throw new Error('Mismatched callback parameter count')
-      return kotlinParameter.type.getCppConverter?.(parameter)
+      return kotlinParameter.type.getCppConverter(parameter)
     })
     const dependencies = combineKotlinCppConverters([
-      this.kotlinCallbackType.returnType.getCppConverter?.(this.cppCallbackType.returnType),
+      this.kotlinCallbackType.returnType.getCppConverter(this.cppCallbackType.returnType),
       ...parameters,
     ])
     return {

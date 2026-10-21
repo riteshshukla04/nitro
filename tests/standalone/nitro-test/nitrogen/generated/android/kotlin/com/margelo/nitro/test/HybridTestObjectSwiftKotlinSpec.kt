@@ -272,7 +272,7 @@ abstract class HybridTestObjectSwiftKotlinSpec: HybridObject() {
 
   @DoNotStrip
   @Keep
-  private fun callNestedStructCallback_cxx(value: Array<Array<Person?>>, callback: Callback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___): Array<Array<Person?>> {
+  private fun callNestedStructCallback_cxx(value: Array<Array<Person?>>, callback: Callback_std__vector_std__vector_std__optional_Person____std__vector_std__vector_std__optional_Person___): Array<Array<Person?>> {
     val __result = callNestedStructCallback(value, callback)
     return __result
   }
@@ -766,7 +766,7 @@ abstract class HybridTestObjectSwiftKotlinSpec: HybridObject() {
 
   @DoNotStrip
   @Keep
-  private fun createExternalVariantFromFunc_cxx(factory: Callback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_): com.margelo.nitro.test.external.HybridSomeExternalObjectSpec {
+  private fun createExternalVariantFromFunc_cxx(factory: Callback_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_): com.margelo.nitro.test.external.HybridSomeExternalObjectSpec {
     val __result = createExternalVariantFromFunc(factory)
     return __result
   }

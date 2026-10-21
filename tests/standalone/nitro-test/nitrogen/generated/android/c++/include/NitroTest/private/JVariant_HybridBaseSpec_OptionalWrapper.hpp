@@ -30,7 +30,7 @@ namespace margelo::nitro::test {
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_HybridBaseSpec_OptionalWrapper;";
     using Cases = std::tuple<JVariant_HybridBaseSpec_OptionalWrapper_impl::First, JVariant_HybridBaseSpec_OptionalWrapper_impl::Second>;
 #ifdef NITRO_DEBUG
-    static constexpr auto diagnosticName = "variant<std::shared_ptr<margelo::nitro::test::JHybridBaseSpec>, margelo::nitro::test::OptionalWrapperKotlin>";
+    static constexpr auto diagnosticName = "variant<std::shared_ptr<margelo::nitro::test::HybridBaseSpec>, margelo::nitro::test::OptionalWrapper>";
 #else
     static constexpr auto diagnosticName = "variant<...>";
 #endif

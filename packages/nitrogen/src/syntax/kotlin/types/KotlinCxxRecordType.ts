@@ -14,8 +14,8 @@ export class KotlinCxxRecordType extends KotlinCxxType {
 
   getConverter(): KotlinCppConverter {
     const dependencies = combineKotlinCppConverters([
-      this.kotlinRecordType.keyType.getCppConverter?.(this.cppRecordType.keyType),
-      this.kotlinRecordType.valueType.getCppConverter?.(this.cppRecordType.valueType),
+      this.kotlinRecordType.keyType.getCppConverter(this.cppRecordType.keyType),
+      this.kotlinRecordType.valueType.getCppConverter(this.cppRecordType.valueType),
     ])
     return {
       files: dependencies.files,

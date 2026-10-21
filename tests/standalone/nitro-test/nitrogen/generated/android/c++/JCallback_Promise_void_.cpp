@@ -6,7 +6,6 @@
 ///
 
 #include <NitroTest/private/JCallback_Promise_void_.hpp>
-#include <NitroModules/Promise.hpp>
 #include <NitroModules/JNIConverter+Promise.hpp>
 #include <NitroModules/JSIConverter+JTypedPromise.hpp>
 

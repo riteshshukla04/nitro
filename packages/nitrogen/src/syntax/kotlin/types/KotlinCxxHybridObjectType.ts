@@ -1,59 +1,101 @@
-import type { Language } from '../../../getPlatformSpecs.js'
-import { getForwardDeclaration } from '../../c++/getForwardDeclaration.js'
+import { NitroConfig } from '../../../config/NitroConfig.js'
+import { ForeignHybridObjectType } from '../../c++/ForeignHybridObjectType.js'
+import { getCppHybridObjectAdapterNames } from '../../c++/CppHybridObjectAdapterNames.js'
 import { getHybridObjectName } from '../../getHybridObjectName.js'
+import { getImportsCode } from '../../getImportCode.js'
+import { createFileMetadataString } from '../../helpers.js'
 import type { SourceImport } from '../../SourceFile.js'
-import { HybridObjectType, type GetHybridObjectCodeOptions } from '../../types/HybridObjectType.js'
+import type { Type } from '../../types/Type.js'
+import { HybridObjectType } from '../../types/HybridObjectType.js'
+import { getTypeAs } from '../../types/getTypeAs.js'
+import { getKotlinConverter, type KotlinCppConverter } from '../KotlinConverter.js'
+import { KotlinCxxType } from './KotlinCxxType.js'
+import type { KotlinHybridObjectType } from './KotlinHybridObjectType.js'
 
-/** Private C++ representation used by Kotlin's JSI/JNI fallback bridge. */
-export class KotlinCxxHybridObjectType extends HybridObjectType {
-  constructor(type: HybridObjectType) {
-    super(type.hybridObjectName, type.platforms, type.baseTypes, type.sourceConfig)
+/** Native C++ handles convert to the existing Java peer without changing object identity. */
+export class KotlinCxxHybridObjectType extends KotlinCxxType {
+  constructor(
+    cppType: Type,
+    readonly kotlinObjectType: KotlinHybridObjectType
+  ) {
+    super(cppType, kotlinObjectType)
   }
 
-  override getCode(language: Language, options: GetHybridObjectCodeOptions): string {
-    switch (language) {
-      case 'c++': {
-        // The fallback C++ signature still belongs to a Kotlin API.
-        super.getCode('kotlin', options)
-        const { JHybridTSpec } = getHybridObjectName(this.hybridObjectName)
-        const fullyQualified = options.fullyQualified ?? this.sourceConfig.isExternalConfig
-        let className: string
-        if (fullyQualified) {
-          className = this.sourceConfig.getCxxNamespace('c++', JHybridTSpec)
-        } else {
-          className = JHybridTSpec
-        }
-        const pointer = options.mode === 'weak' ? 'std::weak_ptr' : 'std::shared_ptr'
-        const code = `${pointer}<${className}>`
-        return options.context === 'parameter' ? `const ${code}&` : code
-      }
-      default:
-        return super.getCode(language, options)
+  getConverter(): KotlinCppConverter {
+    const runtimeImport: SourceImport = {
+      language: 'c++',
+      declaration: { header: 'NitroModules/JNIConverter+HybridObject.hpp', space: 'system' },
     }
+    const imports = [...this.cppType.getRequiredImports('c++'), ...this.kotlinType.getRequiredImports('c++'), runtimeImport]
+    const cppType = getTypeAs(this.cppType, HybridObjectType)
+    if (!(cppType instanceof ForeignHybridObjectType)) return { files: [], imports: imports }
+
+    const adapter = getCppHybridObjectAdapterNames(cppType)
+    const fileName = `${adapter.fileName}+JNI`
+    const ownHeader = NitroConfig.current.getCxxHeader(`${fileName}.hpp`, 'private')
+    const name = getHybridObjectName(this.kotlinObjectType.hybridObjectName)
+    const bridge = this.kotlinObjectType.sourceConfig.getCxxNamespace('c++', name.JHybridTSpec)
+    const cppCode = this.cppType.getCode('c++', { context: 'value', fullyQualified: true })
+    const jniCode = this.kotlinType.getCode('c++', { context: 'value', fullyQualified: true })
+    const aliasCode = this.kotlinType.getCode('c++', { context: 'parameter', fullyQualified: true })
+    const converter = getKotlinConverter({ cppType: this.cppType, kotlinType: this.kotlinType })
+    const nativeConverter = `JNIConverter<std::shared_ptr<${bridge}>, ${jniCode}>`
+    const declarationIncludes = getImportsCode(imports, 'declaration')
+    const implementationIncludes = getImportsCode(
+      [{ language: 'c++', declaration: ownHeader }, ...imports, { language: 'c++', declaration: { header: 'stdexcept', space: 'system' } }],
+      'implementation'
+    )
+    const headerCode = `
+${createFileMetadataString(`${fileName}.hpp`)}
+
+#pragma once
+
+${declarationIncludes}
+
+namespace margelo::nitro {
+
+  template <>
+  struct ${converter} final {
+    static ${jniCode} toJNI(const ${cppCode}& value);
+    static ${cppCode} fromJNI(${aliasCode} value);
+  };
+
+} // namespace margelo::nitro
+`.trim()
+    const implementationCode = `
+${createFileMetadataString(`${fileName}.cpp`)}
+
+${implementationIncludes}
+
+namespace margelo::nitro {
+
+  ${jniCode} ${converter}::toJNI(const ${cppCode}& value) {
+    auto object = std::dynamic_pointer_cast<${bridge}>(value.getNativeObject());
+    if (object == nullptr) [[unlikely]] {
+      throw std::invalid_argument("Cannot convert ${this.kotlinObjectType.hybridObjectName} to its Kotlin implementation.");
+    }
+    return ${nativeConverter}::toJNI(object);
   }
 
-  override getCppHeader(): { header: string; space: 'user' | 'system' } {
-    const { JHybridTSpec } = getHybridObjectName(this.hybridObjectName)
-    return this.sourceConfig.getCxxHeader(`${JHybridTSpec}.hpp`, 'private')
+  ${cppCode} ${converter}::fromJNI(${aliasCode} value) {
+    return ${adapter.qualifiedName}::fromNative(${nativeConverter}::fromJNI(value));
   }
 
-  override getRequiredImports(language: Language): SourceImport[] {
-    switch (language) {
-      case 'c++': {
-        const { JHybridTSpec } = getHybridObjectName(this.hybridObjectName)
-        return [
-          { language: 'c++', declaration: { header: 'memory', space: 'system' } },
-          { language: 'c++', declaration: { header: 'NitroModules/JNIConverter+HybridObject.hpp', space: 'system' } },
-          {
-            language: 'c++',
-            declaration: { forwardDeclaration: getForwardDeclaration('class', JHybridTSpec, this.sourceConfig.getCxxNamespace('c++')) },
-            implementation: this.getCppHeader(),
-          },
-        ]
-      }
-      case 'kotlin':
-      case 'swift':
-        return super.getRequiredImports(language)
+} // namespace margelo::nitro
+`.trim()
+    return {
+      imports: [...imports, { language: 'c++', declaration: ownHeader }],
+      files: [
+        {
+          name: `${fileName}.hpp`,
+          content: headerCode,
+          language: 'c++',
+          platform: 'android',
+          subdirectory: [],
+          headerVisibility: 'private',
+        },
+        { name: `${fileName}.cpp`, content: implementationCode, language: 'c++', platform: 'android', subdirectory: [] },
+      ],
     }
   }
 }

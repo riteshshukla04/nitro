@@ -16,7 +16,7 @@ export class KotlinCxxVariantType extends KotlinCxxType {
     const childConverters = this.cppVariantType.variants.map((cppType, index) => {
       const kotlinType = this.kotlinVariantType.variants[index]
       if (kotlinType == null) throw new Error(`Missing Kotlin case ${index} in ${this.kotlinVariantType.name}.`)
-      return kotlinType.getCppConverter?.(cppType)
+      return kotlinType.getCppConverter(cppType)
     })
     const dependencies = combineKotlinCppConverters(childConverters)
     return {

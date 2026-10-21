@@ -30,7 +30,7 @@ namespace margelo::nitro::test {
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Variant_HybridTestObjectSwiftKotlinSpec_Person;";
     using Cases = std::tuple<JVariant_HybridTestObjectSwiftKotlinSpec_Person_impl::First, JVariant_HybridTestObjectSwiftKotlinSpec_Person_impl::Second>;
 #ifdef NITRO_DEBUG
-    static constexpr auto diagnosticName = "variant<std::shared_ptr<margelo::nitro::test::JHybridTestObjectSwiftKotlinSpec>, margelo::nitro::test::PersonKotlin>";
+    static constexpr auto diagnosticName = "variant<std::shared_ptr<margelo::nitro::test::HybridTestObjectSwiftKotlinSpec>, margelo::nitro::test::Person>";
 #else
     static constexpr auto diagnosticName = "variant<...>";
 #endif

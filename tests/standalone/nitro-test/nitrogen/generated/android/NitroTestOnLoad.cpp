@@ -8,7 +8,7 @@
 #include <NitroTest/private/NitroTestOnLoad.hpp>
 #include <NitroModules/HybridClassRegistry.hpp>
 #include <NitroTest/private/JHybridBaseSpec.hpp>
-#include <NitroTest/private/JCallback_SizeKotlin_SizeKotlin.hpp>
+#include <NitroTest/private/JCallback_Size_Size.hpp>
 #include <NitroTest/private/JHybridChildSpec.hpp>
 #include <NitroTest/private/JHybridGrandchildSpec.hpp>
 #include <NitroTest/private/JHybridPlatformObjectSpec.hpp>
@@ -20,7 +20,7 @@
 #include <NitroTest/private/JCallback_int64_t_int64_t.hpp>
 #include <NitroTest/private/JCallback_void_std__vector_Powertrain_.hpp>
 #include <NitroTest/private/JCallback_Promise_std__vector_Powertrain__.hpp>
-#include <NitroTest/private/JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___.hpp>
+#include <NitroTest/private/JCallback_std__vector_std__vector_std__optional_Person____std__vector_std__vector_std__optional_Person___.hpp>
 #include <NitroTest/private/JCallback_double_double.hpp>
 #include <NitroTest/private/JCallback_Promise_void_.hpp>
 #include <NitroTest/private/JCallback_void_std__optional_double_.hpp>
@@ -29,7 +29,7 @@
 #include <NitroTest/private/JCallback_void_std__string.hpp>
 #include <NitroTest/private/JCallback_void_std__exception_ptr.hpp>
 #include <NitroTest/private/JCallback_std__string.hpp>
-#include <NitroTest/private/JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_.hpp>
+#include <NitroTest/private/JCallback_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec_.hpp>
 #include <NitroTest/HybridCppBaseSpec.hpp>
 #include <NitroTest/HybridCppChildSpec.hpp>
 #include <NitroTest/HybridCppGrandchildSpec.hpp>
@@ -38,7 +38,7 @@
 namespace margelo::nitro::test {
   void registerAllNatives() {
     margelo::nitro::test::JHybridBaseSpec::CxxPart::registerNatives();
-    margelo::nitro::test::JCallback_SizeKotlin_SizeKotlin_cxx::registerNatives();
+    margelo::nitro::test::JCallback_Size_Size_cxx::registerNatives();
     margelo::nitro::test::JHybridChildSpec::CxxPart::registerNatives();
     margelo::nitro::test::JHybridGrandchildSpec::CxxPart::registerNatives();
     margelo::nitro::test::JHybridPlatformObjectSpec::CxxPart::registerNatives();
@@ -50,7 +50,7 @@ namespace margelo::nitro::test {
     margelo::nitro::test::JCallback_int64_t_int64_t_cxx::registerNatives();
     margelo::nitro::test::JCallback_void_std__vector_Powertrain__cxx::registerNatives();
     margelo::nitro::test::JCallback_Promise_std__vector_Powertrain___cxx::registerNatives();
-    margelo::nitro::test::JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin____cxx::registerNatives();
+    margelo::nitro::test::JCallback_std__vector_std__vector_std__optional_Person____std__vector_std__vector_std__optional_Person____cxx::registerNatives();
     margelo::nitro::test::JCallback_double_double_cxx::registerNatives();
     margelo::nitro::test::JCallback_Promise_void__cxx::registerNatives();
     margelo::nitro::test::JCallback_void_std__optional_double__cxx::registerNatives();
@@ -59,7 +59,7 @@ namespace margelo::nitro::test {
     margelo::nitro::test::JCallback_void_std__string_cxx::registerNatives();
     margelo::nitro::test::JCallback_void_std__exception_ptr_cxx::registerNatives();
     margelo::nitro::test::JCallback_std__string_cxx::registerNatives();
-    margelo::nitro::test::JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec__cxx::registerNatives();
+    margelo::nitro::test::JCallback_std__shared_ptr_margelo__nitro__test__external__HybridSomeExternalObjectSpec__cxx::registerNatives();
 
     HybridClassRegistry::registerHybridClass("test.Base", JHybridBaseSpec::Class::get());
     HybridClassRegistry::registerHybridClass("test.Child", JHybridChildSpec::Class::get());

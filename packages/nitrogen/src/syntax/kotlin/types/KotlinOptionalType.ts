@@ -24,26 +24,13 @@ export class KotlinOptionalType extends OptionalType implements KotlinType {
   get jniValueKind(): JniValueKind {
     return this.wrappingType.jniValueKind
   }
-  private get canConvertDirectly(): boolean {
-    return this.wrappingType.jniValueKind === 'wrapper' && this.wrappingType.getJSIType?.() != null
-  }
 
-  getJSIType(): this | undefined {
-    if (!this.canConvertDirectly) return undefined
-    return this
-  }
-
-  getCppConverter(cppType: Type): KotlinCppConverter | undefined {
-    if (!this.canConvertDirectly) return undefined
+  getCppConverter(cppType: Type): KotlinCppConverter {
     return new KotlinCxxOptionalType(getTypeAs(cppType, OptionalType), this).getConverter()
   }
 
   get needsKotlinConversion(): boolean {
     return this.wrappingType.needsKotlinConversion
-  }
-  get fromCppReturnType(): string | undefined {
-    if (this.canConvertDirectly) return undefined
-    return this.wrappingType.fromCppReturnType
   }
   /** Callbacks cross JNI as named interfaces, which need no braces. */
   override get needsBraces(): boolean {
@@ -58,26 +45,14 @@ export class KotlinOptionalType extends OptionalType implements KotlinType {
         return `${value}?.let { ${wrappedValue} }`
       }
       case 'c++': {
-        if (this.canConvertDirectly) {
-          const cppType = this.type.getCode('c++', { context: 'value' })
-          const jniType = this.getCode('c++', { context: 'value' })
-          const converter = `JNIConverter<${cppType}, ${jniType}>`
-          switch (conversion.from) {
-            case 'c++':
-              return `${converter}::toJNI(${value})`
-            case 'kotlin':
-              return `${converter}::fromJNI(${value})`
-          }
-        }
+        const cppType = this.type.getCode('c++', { context: 'value' })
+        const jniType = this.getCode('c++', { context: 'value' })
+        const converter = `JNIConverter<${cppType}, ${jniType}>`
         switch (conversion.from) {
-          case 'c++': {
-            const jniValue = this.wrappingType.convert(`${value}.value()`, conversion)
-            return `${value}.has_value() ? ${jniValue} : nullptr`
-          }
-          case 'kotlin': {
-            const cppValue = this.wrappingType.convert(value, conversion)
-            return `${value} != nullptr ? std::make_optional(${cppValue}) : std::nullopt`
-          }
+          case 'c++':
+            return `${converter}::toJNI(${value})`
+          case 'kotlin':
+            return `${converter}::fromJNI(${value})`
         }
       }
     }
@@ -86,7 +61,6 @@ export class KotlinOptionalType extends OptionalType implements KotlinType {
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++': {
-        if (!this.canConvertDirectly) return this.wrappingType.getCode(language, options)
         const wrapping = this.wrappingType.getCode(language, { ...options, context: 'type-argument' })
         return getJniReferenceCode(`JOptional<${wrapping}>`, options)
       }
@@ -96,18 +70,17 @@ export class KotlinOptionalType extends OptionalType implements KotlinType {
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
-    const imports = [...this.type.getRequiredImports(language), ...this.wrappingType.getRequiredImports(language)]
+    const imports = this.wrappingType.getRequiredImports(language)
     switch (language) {
       case 'c++':
-        if (this.canConvertDirectly) {
-          imports.push(
-            { language: language, declaration: { header: 'NitroModules/JNIConverter+Optional.hpp', space: 'system' } },
-            { language: language, declaration: { header: 'NitroModules/JSIConverter+JOptional.hpp', space: 'system' } }
-          )
-        }
+        imports.push(
+          { language: language, declaration: { header: 'NitroModules/JNIConverter+Optional.hpp', space: 'system' } },
+          { language: language, declaration: { header: 'NitroModules/JSIConverter+JOptional.hpp', space: 'system' } }
+        )
         break
       case 'kotlin':
       case 'swift':
+        imports.push(...this.type.getRequiredImports(language))
         break
     }
     return imports

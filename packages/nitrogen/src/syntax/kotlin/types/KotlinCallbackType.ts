@@ -25,7 +25,7 @@ import {
 export class KotlinCallbackType extends CallbackType implements KotlinType {
   override readonly returnType: KotlinType
   override readonly parameters: KotlinNamedType[]
-  readonly jniValueKind = 'wrapper'
+  readonly jniValueKind = 'object'
   readonly needsKotlinConversion = true
 
   constructor(
@@ -69,10 +69,6 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     }
   }
 
-  getJSIType(): Type | undefined {
-    return this
-  }
-
   getCppConverter(cppType: Type): KotlinCppConverter {
     return new KotlinCxxCallbackType(getTypeAs(cppType, CallbackType), this).getConverter()
   }
@@ -81,7 +77,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     switch (language) {
       case 'c++': {
         const jniClass = this.config.getCxxNamespace('c++', this.jniName)
-        if (options.representation === 'jsi' && this.isInline) {
+        if (this.isBorrowed(options)) {
           // Kotlin can retain the callback, but JS Inline calls must stay synchronous.
           return getJniReferenceCode(`margelo::nitro::JInlineCallback<${jniClass}>`, options)
         }
@@ -92,6 +88,11 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
       default:
         return super.getCode(language, options)
     }
+  }
+
+  getJniCode(options: GetKotlinCodeOptions): string {
+    const jniClass = this.config.getCxxNamespace('c++', this.jniName)
+    return getJniReferenceCode(jniClass, options)
   }
 
   getJniNativeRegistrations(): readonly JNINativeRegistration[] {

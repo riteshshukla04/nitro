@@ -31,7 +31,7 @@ namespace margelo::nitro::test {
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/StringOrExternal;";
     using Cases = std::tuple<JStringOrExternal_impl::First, JStringOrExternal_impl::Second>;
 #ifdef NITRO_DEBUG
-    static constexpr auto diagnosticName = "variant<std::shared_ptr<margelo::nitro::test::external::JHybridSomeExternalObjectSpec>, std::string>";
+    static constexpr auto diagnosticName = "variant<std::shared_ptr<margelo::nitro::test::external::HybridSomeExternalObjectSpec>, std::string>";
 #else
     static constexpr auto diagnosticName = "variant<...>";
 #endif
