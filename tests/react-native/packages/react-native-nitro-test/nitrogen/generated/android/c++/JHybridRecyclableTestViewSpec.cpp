@@ -9,6 +9,8 @@
 #include <optional>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 
 namespace margelo::nitro::test {
 
@@ -74,14 +76,14 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jboolean /* isBlue */)>("setBlue");
     __method(_javaPart, CxxPart::getClass(), isBlue);
   }
-  std::optional<double> JHybridRecyclableTestViewSpec::getNativeDefaultValue() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JDouble>()>("getNativeDefaultValue");
+  jni::local_ref<JOptional<jni::JDouble>> JHybridRecyclableTestViewSpec::getNativeDefaultValue() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOptional<jni::JDouble>>()>("getNativeDefaultValue");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return __result != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result)) : std::nullopt;
+    return __result;
   }
-  void JHybridRecyclableTestViewSpec::setNativeDefaultValue(const std::optional<double>& nativeDefaultValue) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<jni::JDouble> /* nativeDefaultValue */)>("setNativeDefaultValue");
-    __method(_javaPart, CxxPart::getClass(), nativeDefaultValue.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(nativeDefaultValue.value()) : nullptr);
+  void JHybridRecyclableTestViewSpec::setNativeDefaultValue(const jni::local_ref<JOptional<jni::JDouble>>& nativeDefaultValue) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JOptional<jni::JDouble>> /* nativeDefaultValue */)>("setNativeDefaultValue");
+    __method(_javaPart, CxxPart::getClass(), nativeDefaultValue);
   }
 
   // Methods

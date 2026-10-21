@@ -21,6 +21,8 @@
 #include <optional>
 #include <NitroTest/private/JPerson.hpp>
 #include <vector>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <NitroTest/private/JVariant_Double_String.hpp>

@@ -23,6 +23,8 @@
 #include <NitroTest/private/JPowertrain.hpp>
 #include <optional>
 #include <vector>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 #include <string>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>

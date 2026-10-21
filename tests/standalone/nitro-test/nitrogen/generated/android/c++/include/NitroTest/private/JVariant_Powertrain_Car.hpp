@@ -23,6 +23,8 @@
 #include <optional>
 #include <NitroTest/private/JPerson.hpp>
 #include <vector>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 #include <string>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>

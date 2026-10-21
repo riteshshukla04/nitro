@@ -8,8 +8,10 @@
 #include <NitroTest/private/views/JHybridRecyclableTestViewStateUpdater.hpp>
 #include <NitroTest/private/views/HybridRecyclableTestViewComponent.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
-#include <NitroModules/JNIConverter.hpp>
 #include <optional>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <react/fabric/StateWrapperImpl.h>
 #include <stdexcept>
@@ -74,7 +76,7 @@ void JHybridRecyclableTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::
     if (oldProps == nullptr
           ? newProps->nativeDefaultValue.isProvided()
           : !newProps->nativeDefaultValue.hasSameValue(oldProps->nativeDefaultValue)) {
-      hybridView->setNativeDefaultValue(JNIConverter<std::optional<double>, std::optional<double>>::toJNI(newProps->nativeDefaultValue.get()));
+      hybridView->setNativeDefaultValue(JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(newProps->nativeDefaultValue.get()));
     }
 
     if (oldProps == nullptr

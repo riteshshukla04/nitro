@@ -13,6 +13,9 @@
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <optional>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/NitroDefines.hpp>
 #include <react/fabric/StateWrapperImpl.h>
 #include <stdexcept>
@@ -97,7 +100,7 @@ void JHybridTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /*
     if (oldProps == nullptr
           ? newProps->nativeDefaultValue.isProvided()
           : !newProps->nativeDefaultValue.hasSameValue(oldProps->nativeDefaultValue)) {
-      hybridView->setNativeDefaultValue(JNIConverter<std::optional<double>, std::optional<double>>::toJNI(newProps->nativeDefaultValue.get()));
+      hybridView->setNativeDefaultValue(JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(newProps->nativeDefaultValue.get()));
     }
 
     if (oldProps == nullptr

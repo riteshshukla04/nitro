@@ -12,6 +12,8 @@
 #include <optional>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 
@@ -19,24 +21,24 @@ namespace margelo::nitro::test {
 
   PartialPersonKotlin JPartialPerson::toCpp() const {
     static const auto clazz = javaClassStatic();
-    static const auto fieldName = clazz->getField<jni::JString>("name");
-    jni::local_ref<jni::JString> name = this->getFieldValue(fieldName);
-    static const auto fieldAge = clazz->getField<jni::JDouble>("age");
-    jni::local_ref<jni::JDouble> age = this->getFieldValue(fieldAge);
+    static const auto fieldName = clazz->getField<JOptional<jni::JString>>("name");
+    jni::local_ref<JOptional<jni::JString>> name = this->getFieldValue(fieldName);
+    static const auto fieldAge = clazz->getField<JOptional<jni::JDouble>>("age");
+    jni::local_ref<JOptional<jni::JDouble>> age = this->getFieldValue(fieldAge);
     return PartialPersonKotlin(
-      name != nullptr ? std::make_optional(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(name)) : std::nullopt,
-      age != nullptr ? std::make_optional(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(age)) : std::nullopt
+      JNIConverter<std::optional<std::string>, jni::local_ref<JOptional<jni::JString>>>::fromJNI(name),
+      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(age)
     );
   }
 
   jni::local_ref<JPartialPerson::javaobject> JPartialPerson::fromCpp(const PartialPersonKotlin& value) {
-    using JSignature = JPartialPerson(jni::alias_ref<jni::JString>, jni::alias_ref<jni::JDouble>);
+    using JSignature = JPartialPerson(jni::alias_ref<JOptional<jni::JString>>, jni::alias_ref<JOptional<jni::JDouble>>);
     static const auto clazz = javaClassStatic();
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      value.name.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.name.value()) : nullptr,
-      value.age.has_value() ? JNIConverter<double, jni::local_ref<jni::JDouble>>::toJNI(value.age.value()) : nullptr
+      JNIConverter<std::optional<std::string>, jni::local_ref<JOptional<jni::JString>>>::toJNI(value.name),
+      JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(value.age)
     );
   }
 

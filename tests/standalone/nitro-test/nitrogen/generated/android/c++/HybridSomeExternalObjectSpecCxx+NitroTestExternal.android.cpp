@@ -17,6 +17,11 @@
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroTestExternal/private/OptionalPrimitivesHolderKotlin.hpp>
 #include <NitroTest/private/OptionalPrimitivesHolder+Kotlin+NitroTestExternal.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/JUInt64.hpp>
 
 namespace margelo::nitro::test::adapters::NitroTestExternal {
 
@@ -45,7 +50,7 @@ namespace margelo::nitro::test::adapters::NitroTestExternal {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call SomeExternalObject.createOptionalPrimitivesHolder on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->createOptionalPrimitivesHolder(JNIConverter<std::optional<double>, std::optional<double>>::toJNI(optionalNumber), JNIConverter<std::optional<bool>, std::optional<bool>>::toJNI(optionalBoolean), JNIConverter<std::optional<uint64_t>, std::optional<uint64_t>>::toJNI(optionalUInt64), JNIConverter<std::optional<int64_t>, std::optional<int64_t>>::toJNI(optionalInt64));
+    auto __result = __implementation->createOptionalPrimitivesHolder(JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::toJNI(optionalNumber), JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::toJNI(optionalBoolean), JNIConverter<std::optional<uint64_t>, jni::local_ref<JOptional<JUInt64>>>::toJNI(optionalUInt64), JNIConverter<std::optional<int64_t>, jni::local_ref<JOptional<jni::JLong>>>::toJNI(optionalInt64));
     return JNIConverter<margelo::nitro::test::OptionalPrimitivesHolder, margelo::nitro::test::external::OptionalPrimitivesHolderKotlin>::fromJNI(__result);
   }
 

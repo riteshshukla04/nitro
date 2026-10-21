@@ -13,6 +13,8 @@
 #include <optional>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 
 namespace margelo::nitro::test {
 
@@ -57,8 +59,8 @@ namespace margelo::nitro::test {
     // Properties
     jboolean getIsBlue();
     void setIsBlue(jboolean isBlue);
-    std::optional<double> getNativeDefaultValue();
-    void setNativeDefaultValue(const std::optional<double>& nativeDefaultValue);
+    jni::local_ref<JOptional<jni::JDouble>> getNativeDefaultValue();
+    void setNativeDefaultValue(const jni::local_ref<JOptional<jni::JDouble>>& nativeDefaultValue);
 
   public:
     // Methods

@@ -23,6 +23,8 @@
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 #include <NitroTest/private/JCar.hpp>
@@ -166,9 +168,9 @@ namespace margelo::nitro::test {
       return __map;
     }(__result);
   }
-  jni::local_ref<jni::JString> JHybridBenchmarkObjectSwiftKotlinSpec::tryOptionalParams(jdouble num, jboolean boo, const std::optional<std::string>& str) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(jdouble /* num */, jboolean /* boo */, jni::alias_ref<jni::JString> /* str */)>("tryOptionalParams");
-    auto __result = __method(_javaPart, CxxPart::getClass(), num, boo, str.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(str.value()) : nullptr);
+  jni::local_ref<jni::JString> JHybridBenchmarkObjectSwiftKotlinSpec::tryOptionalParams(jdouble num, jboolean boo, const jni::local_ref<JOptional<jni::JString>>& str) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(jdouble /* num */, jboolean /* boo */, jni::alias_ref<JOptional<jni::JString>> /* str */)>("tryOptionalParams");
+    auto __result = __method(_javaPart, CxxPart::getClass(), num, boo, str);
     return __result;
   }
   std::variant<double, std::string> JHybridBenchmarkObjectSwiftKotlinSpec::passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either) {

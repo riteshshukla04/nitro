@@ -18,6 +18,8 @@
 #include <optional>
 #include <NitroTest/private/JPerson.hpp>
 #include <vector>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 #include <string>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
@@ -42,10 +44,10 @@ namespace margelo::nitro::test {
     jni::local_ref<JPerson> driver = this->getFieldValue(fieldDriver);
     static const auto fieldPassengers = clazz->getField<jni::JArrayClass<JPerson>>("passengers");
     jni::local_ref<jni::JArrayClass<JPerson>> passengers = this->getFieldValue(fieldPassengers);
-    static const auto fieldIsFast = clazz->getField<jni::JBoolean>("isFast");
-    jni::local_ref<jni::JBoolean> isFast = this->getFieldValue(fieldIsFast);
-    static const auto fieldFavouriteTrack = clazz->getField<jni::JString>("favouriteTrack");
-    jni::local_ref<jni::JString> favouriteTrack = this->getFieldValue(fieldFavouriteTrack);
+    static const auto fieldIsFast = clazz->getField<JOptional<jni::JBoolean>>("isFast");
+    jni::local_ref<JOptional<jni::JBoolean>> isFast = this->getFieldValue(fieldIsFast);
+    static const auto fieldFavouriteTrack = clazz->getField<JOptional<jni::JString>>("favouriteTrack");
+    jni::local_ref<JOptional<jni::JString>> favouriteTrack = this->getFieldValue(fieldFavouriteTrack);
     static const auto fieldPerformanceScores = clazz->getField<jni::JArrayDouble>("performanceScores");
     jni::local_ref<jni::JArrayDouble> performanceScores = this->getFieldValue(fieldPerformanceScores);
     static const auto fieldSomeVariant = clazz->getField<JVariant_Double_String>("someVariant");
@@ -67,15 +69,15 @@ namespace margelo::nitro::test {
         }
         return __vector;
       }(passengers),
-      isFast != nullptr ? std::make_optional(JNIConverter<bool, jni::local_ref<jni::JBoolean>>::fromJNI(isFast)) : std::nullopt,
-      favouriteTrack != nullptr ? std::make_optional(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(favouriteTrack)) : std::nullopt,
+      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::fromJNI(isFast),
+      JNIConverter<std::optional<std::string>, jni::local_ref<JOptional<jni::JString>>>::fromJNI(favouriteTrack),
       JNIConverter<std::vector<double>, jni::local_ref<jni::JArrayDouble>>::fromJNI(performanceScores),
       someVariant != nullptr ? std::make_optional(someVariant->toCpp()) : std::nullopt
     );
   }
 
   jni::local_ref<JCar::javaobject> JCar::fromCpp(const CarKotlin& value) {
-    using JSignature = JCar(jdouble, jni::alias_ref<jni::JString>, jni::alias_ref<jni::JString>, jdouble, jni::alias_ref<JPowertrain>, jni::alias_ref<JPerson>, jni::alias_ref<jni::JArrayClass<JPerson>>, jni::alias_ref<jni::JBoolean>, jni::alias_ref<jni::JString>, jni::alias_ref<jni::JArrayDouble>, jni::alias_ref<JVariant_Double_String>);
+    using JSignature = JCar(jdouble, jni::alias_ref<jni::JString>, jni::alias_ref<jni::JString>, jdouble, jni::alias_ref<JPowertrain>, jni::alias_ref<JPerson>, jni::alias_ref<jni::JArrayClass<JPerson>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JString>>, jni::alias_ref<jni::JArrayDouble>, jni::alias_ref<JVariant_Double_String>);
     static const auto clazz = javaClassStatic();
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
@@ -96,8 +98,8 @@ namespace margelo::nitro::test {
         }
         return __array;
       }(value.passengers),
-      value.isFast.has_value() ? JNIConverter<bool, jni::local_ref<jni::JBoolean>>::toJNI(value.isFast.value()) : nullptr,
-      value.favouriteTrack.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.favouriteTrack.value()) : nullptr,
+      JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::toJNI(value.isFast),
+      JNIConverter<std::optional<std::string>, jni::local_ref<JOptional<jni::JString>>>::toJNI(value.favouriteTrack),
       JNIConverter<std::vector<double>, jni::local_ref<jni::JArrayDouble>>::toJNI(value.performanceScores),
       value.someVariant.has_value() ? JVariant_Double_String::fromCpp(value.someVariant.value()) : nullptr
     );

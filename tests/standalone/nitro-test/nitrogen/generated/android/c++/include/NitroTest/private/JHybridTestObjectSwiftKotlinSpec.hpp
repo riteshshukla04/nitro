@@ -56,6 +56,8 @@ namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; 
 #include <NitroModules/JSIConverter+JString.hpp>
 #include <NitroModules/JNIConverter+Null.hpp>
 #include <NitroModules/JSIConverter+JNull.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <NitroModules/JAnyJSON.hpp>
@@ -120,10 +122,10 @@ namespace margelo::nitro::test {
     void setUint64Value(uint64_t uint64Value);
     jni::local_ref<JNull> getNullValue();
     void setNullValue(const jni::local_ref<JNull>& nullValue);
-    std::optional<std::string> getOptionalString();
-    void setOptionalString(const std::optional<std::string>& optionalString);
-    std::optional<std::string> getStringOrUndefined();
-    void setStringOrUndefined(const std::optional<std::string>& stringOrUndefined);
+    jni::local_ref<JOptional<jni::JString>> getOptionalString();
+    void setOptionalString(const jni::local_ref<JOptional<jni::JString>>& optionalString);
+    jni::local_ref<JOptional<jni::JString>> getStringOrUndefined();
+    void setStringOrUndefined(const jni::local_ref<JOptional<jni::JString>>& stringOrUndefined);
     std::variant<nitro::NullType, std::string> getStringOrNull();
     void setStringOrNull(const std::variant<nitro::NullType, std::string>& stringOrNull);
     std::optional<std::vector<std::string>> getOptionalArray();
@@ -194,10 +196,10 @@ namespace margelo::nitro::test {
     jdouble funcThatThrows();
     Promise<void> funcThatThrowsBeforePromise();
     void throwError(const jni::local_ref<jni::JThrowable>& error);
-    jni::local_ref<jni::JString> tryOptionalParams(jdouble num, jboolean boo, const std::optional<std::string>& str);
-    jni::local_ref<jni::JString> tryMiddleParam(jdouble num, const std::optional<bool>& boo, const jni::local_ref<jni::JString>& str);
+    jni::local_ref<jni::JString> tryOptionalParams(jdouble num, jboolean boo, const jni::local_ref<JOptional<jni::JString>>& str);
+    jni::local_ref<jni::JString> tryMiddleParam(jdouble num, const jni::local_ref<JOptional<jni::JBoolean>>& boo, const jni::local_ref<jni::JString>& str);
     std::optional<Powertrain> tryOptionalEnum(const std::optional<Powertrain>& value);
-    jboolean tryTrailingOptional(jdouble num, const jni::local_ref<jni::JString>& str, const std::optional<bool>& boo);
+    jboolean tryTrailingOptional(jdouble num, const jni::local_ref<jni::JString>& str, const jni::local_ref<JOptional<jni::JBoolean>>& boo);
     jlong calculateFibonacciSync(jdouble value);
     Promise<int64_t> calculateFibonacciAsync(jdouble value);
     Promise<void> wait(jdouble seconds);
@@ -217,7 +219,7 @@ namespace margelo::nitro::test {
     jdouble callInlineCallbackWithValue(jdouble value, const InlineCallback<double(double /* value */)>& callback);
     Promise<void> callCallbackThatReturnsPromiseVoid(const Callback<Promise<void>()>& callback);
     void callAll(const Callback<void()>& first, const Callback<void()>& second, const Callback<void()>& third);
-    void callWithOptional(const std::optional<double>& value, const Callback<void(const std::optional<double>& /* maybe */)>& callback);
+    void callWithOptional(const jni::local_ref<JOptional<jni::JDouble>>& value, const Callback<void(const std::optional<double>& /* maybe */)>& callback);
     Promise<double> callSumUpNTimes(const Callback<double()>& callback, jdouble n);
     Promise<double> callbackAsyncPromise(const Callback<Promise<double>()>& callback);
     Promise<ArrayBuffer> callbackAsyncPromiseBuffer(const Callback<Promise<ArrayBuffer>()>& callback);

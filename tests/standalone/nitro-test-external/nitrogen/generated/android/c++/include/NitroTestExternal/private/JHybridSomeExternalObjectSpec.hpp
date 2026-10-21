@@ -15,6 +15,11 @@
 #include <optional>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroModules/JNIConverter+Optional.hpp>
+#include <NitroModules/JSIConverter+JOptional.hpp>
+#include <NitroModules/JUInt64.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 
 namespace margelo::nitro::test::external {
@@ -63,7 +68,7 @@ namespace margelo::nitro::test::external {
   public:
     // Methods
     jni::local_ref<jni::JString> getValue();
-    OptionalPrimitivesHolderKotlin createOptionalPrimitivesHolder(const std::optional<double>& optionalNumber, const std::optional<bool>& optionalBoolean, const std::optional<uint64_t>& optionalUInt64, const std::optional<int64_t>& optionalInt64);
+    OptionalPrimitivesHolderKotlin createOptionalPrimitivesHolder(const jni::local_ref<JOptional<jni::JDouble>>& optionalNumber, const jni::local_ref<JOptional<jni::JBoolean>>& optionalBoolean, const jni::local_ref<JOptional<JUInt64>>& optionalUInt64, const jni::local_ref<JOptional<jni::JLong>>& optionalInt64);
 
   public:
     // Constructor and static members
