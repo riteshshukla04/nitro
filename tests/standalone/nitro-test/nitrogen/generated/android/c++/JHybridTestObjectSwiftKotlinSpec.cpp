@@ -88,7 +88,8 @@
 #include <exception>
 #include <NitroModules/JNIConverter+Error.hpp>
 #include <NitroModules/JSIConverter+JThrowable.hpp>
-#include <NitroModules/InlineCallback.hpp>
+#include <NitroModules/JSIConverter+JInlineCallback.hpp>
+#include <NitroTest/private/JCallback_double_double.hpp>
 #include <NitroTest/private/JCallback_Promise_void_.hpp>
 #include <NitroTest/private/JCallback_void_std__optional_double_.hpp>
 #include <NitroTest/private/JCallback_Promise_double_.hpp>
@@ -101,7 +102,6 @@
 #include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
 #include <NitroTest/private/JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_.hpp>
 #include <NitroModules/JUInt64.hpp>
-#include <NitroTest/private/JCallback_double_double.hpp>
 
 namespace margelo::nitro::test {
 
@@ -807,13 +807,13 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<margelo::nitro::test::JCallback_void> /* callback */)>("callCallback_cxx");
     __method(_javaPart, CxxPart::getClass(), callback);
   }
-  void JHybridTestObjectSwiftKotlinSpec::callInlineCallback(const InlineCallback<void()>& callback) {
+  void JHybridTestObjectSwiftKotlinSpec::callInlineCallback(const jni::local_ref<margelo::nitro::JInlineCallback<margelo::nitro::test::JCallback_void>>& callback) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<margelo::nitro::test::JCallback_void> /* callback */)>("callInlineCallback_cxx");
-    __method(_javaPart, CxxPart::getClass(), JNIConverter<margelo::nitro::InlineCallback<void()>, jni::local_ref<margelo::nitro::test::JCallback_void>>::toJNI(callback));
+    __method(_javaPart, CxxPart::getClass(), callback);
   }
-  jdouble JHybridTestObjectSwiftKotlinSpec::callInlineCallbackWithValue(jdouble value, const InlineCallback<double(double /* value */)>& callback) {
+  jdouble JHybridTestObjectSwiftKotlinSpec::callInlineCallbackWithValue(jdouble value, const jni::local_ref<margelo::nitro::JInlineCallback<margelo::nitro::test::JCallback_double_double>>& callback) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jdouble(jdouble /* value */, jni::alias_ref<margelo::nitro::test::JCallback_double_double> /* callback */)>("callInlineCallbackWithValue_cxx");
-    auto __result = __method(_javaPart, CxxPart::getClass(), value, JNIConverter<margelo::nitro::InlineCallback<double(double /* value */)>, jni::local_ref<margelo::nitro::test::JCallback_double_double>>::toJNI(callback));
+    auto __result = __method(_javaPart, CxxPart::getClass(), value, callback);
     return __result;
   }
   jni::local_ref<JTypedPromise<void>> JHybridTestObjectSwiftKotlinSpec::callCallbackThatReturnsPromiseVoid(const jni::local_ref<margelo::nitro::test::JCallback_Promise_void_>& callback) {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "JInlineCallback.hpp"
 #include "JNICallback.hpp"
 
 namespace margelo::nitro {
@@ -61,6 +62,25 @@ struct JNIConverter<InlineCallback<CppResult(CppArgs...)>, jni::local_ref<JavaCa
 
   static Cpp fromJNI(jni::alias_ref<JavaCallback> value) {
     return JNICallbackConverter<Cpp, NativeCallback>::fromJNI(getJNICallback<JavaCallback>(value));
+  }
+};
+
+template <typename CppResult, typename... CppArgs, typename JavaCallback>
+struct JNIConverter<InlineCallback<CppResult(CppArgs...)>, jni::local_ref<JInlineCallback<JavaCallback>>> {
+  using Cpp = InlineCallback<CppResult(CppArgs...)>;
+  using Java = JInlineCallback<JavaCallback>;
+
+  static jni::local_ref<Java> toJNI(const Cpp& value) {
+    auto result = JNIConverter<Cpp, jni::local_ref<JavaCallback>>::toJNI(value);
+    auto raw = result.release();
+    auto object = reinterpret_cast<typename Java::javaobject>(raw);
+    return jni::adopt_local(object);
+  }
+
+  static Cpp fromJNI(jni::alias_ref<Java> value) {
+    auto object = jni::static_ref_cast<jni::JObject>(value);
+    auto callback = jni::static_ref_cast<JavaCallback>(object);
+    return JNIConverter<Cpp, jni::local_ref<JavaCallback>>::fromJNI(callback);
   }
 };
 

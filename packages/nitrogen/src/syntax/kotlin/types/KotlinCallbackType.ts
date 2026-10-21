@@ -50,7 +50,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     return `J${this.specializationName}`
   }
 
-  convert(value: string, { from, in: language, context = 'value' }: KotlinConversion): string {
+  convert(value: string, { from, in: language }: KotlinConversion): string {
     switch (language) {
       case 'kotlin':
         if (from === 'kotlin') {
@@ -58,7 +58,7 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
         }
         return value
       case 'c++': {
-        const converter = getKotlinConverter({ cppType: this.type, context: context, kotlinType: this })
+        const converter = getKotlinConverter({ cppType: this.type, kotlinType: this })
         switch (from) {
           case 'c++':
             return `${converter}::toJNI(${value})`
@@ -70,7 +70,6 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
   }
 
   getJSIType(): Type | undefined {
-    if (this.isInline) return undefined
     return this
   }
 
@@ -82,6 +81,10 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
     switch (language) {
       case 'c++': {
         const jniClass = this.config.getCxxNamespace('c++', this.jniName)
+        if (options.representation === 'jsi' && this.isInline) {
+          // Kotlin can retain the callback, but JS Inline calls must stay synchronous.
+          return getJniReferenceCode(`margelo::nitro::JInlineCallback<${jniClass}>`, options)
+        }
         return getJniReferenceCode(jniClass, options)
       }
       case 'kotlin':
@@ -139,6 +142,12 @@ export class KotlinCallbackType extends CallbackType implements KotlinType {
             },
           }
         )
+        if (this.isInline) {
+          imports.push({
+            language: language,
+            declaration: { header: 'NitroModules/JSIConverter+JInlineCallback.hpp', space: 'system' },
+          })
+        }
         break
     }
     imports.push(...this.returnType.getRequiredImports(language), ...this.parameters.flatMap((p) => p.getRequiredImports(language)))

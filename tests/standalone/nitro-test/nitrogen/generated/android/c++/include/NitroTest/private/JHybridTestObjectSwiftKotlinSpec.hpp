@@ -97,7 +97,8 @@ namespace margelo::nitro::test { class JHybridChildSpec; }
 #include <exception>
 #include <NitroModules/JNIConverter+Error.hpp>
 #include <NitroModules/JSIConverter+JThrowable.hpp>
-#include <NitroModules/InlineCallback.hpp>
+#include <NitroModules/JSIConverter+JInlineCallback.hpp>
+#include <NitroTest/private/JCallback_double_double.hpp>
 #include <NitroTest/private/JCallback_Promise_void_.hpp>
 #include <NitroTest/private/JCallback_void_std__optional_double_.hpp>
 #include <NitroTest/private/JCallback_Promise_double_.hpp>
@@ -254,8 +255,8 @@ namespace margelo::nitro::test {
     jni::local_ref<JTypedPromise<jni::local_ref<JCar>>> awaitAndGetComplexPromise(const jni::local_ref<JTypedPromise<jni::local_ref<JCar>>>& promise);
     jni::local_ref<JTypedPromise<void>> awaitPromise(const jni::local_ref<JTypedPromise<void>>& promise);
     void callCallback(const jni::local_ref<margelo::nitro::test::JCallback_void>& callback);
-    void callInlineCallback(const InlineCallback<void()>& callback);
-    jdouble callInlineCallbackWithValue(jdouble value, const InlineCallback<double(double /* value */)>& callback);
+    void callInlineCallback(const jni::local_ref<margelo::nitro::JInlineCallback<margelo::nitro::test::JCallback_void>>& callback);
+    jdouble callInlineCallbackWithValue(jdouble value, const jni::local_ref<margelo::nitro::JInlineCallback<margelo::nitro::test::JCallback_double_double>>& callback);
     jni::local_ref<JTypedPromise<void>> callCallbackThatReturnsPromiseVoid(const jni::local_ref<margelo::nitro::test::JCallback_Promise_void_>& callback);
     void callAll(const jni::local_ref<margelo::nitro::test::JCallback_void>& first, const jni::local_ref<margelo::nitro::test::JCallback_void>& second, const jni::local_ref<margelo::nitro::test::JCallback_void>& third);
     void callWithOptional(const jni::local_ref<JOptional<jni::JDouble>>& value, const jni::local_ref<margelo::nitro::test::JCallback_void_std__optional_double_>& callback);
