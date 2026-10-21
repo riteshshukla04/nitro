@@ -10,12 +10,14 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Error.hpp>
+#include <NitroModules/JSIConverter+JThrowable.hpp>
 
 namespace margelo::nitro::test {
 
   void JCallback_void_std__exception_ptr::invoke(const std::exception_ptr& error) const {
     static const auto __method = javaClassStatic()->getMethod<void(jni::alias_ref<jni::JThrowable> /* error */)>("invoke_jni");
-    __method(self(), jni::getJavaExceptionForCppException(error));
+    __method(self(), JNIConverter<std::exception_ptr, jni::local_ref<jni::JThrowable>>::toJNI(error));
   }
 
   jni::local_ref<JCallback_void_std__exception_ptr::javaobject> JCallback_void_std__exception_ptr_cxx::fromCpp(const Callback<void(const std::exception_ptr& /* error */)>& callback) {
@@ -28,9 +30,9 @@ namespace margelo::nitro::test {
 
   void JCallback_void_std__exception_ptr_cxx::invoke_cxx(jni::alias_ref<jni::JThrowable> error) {
     if (_isInline) {
-      _callback.callSync(std::make_exception_ptr(jni::JniException(error)));
+      _callback.callSync(JNIConverter<std::exception_ptr, jni::local_ref<jni::JThrowable>>::fromJNI(error));
     } else {
-      _callback.callAndForget(std::make_exception_ptr(jni::JniException(error)));
+      _callback.callAndForget(JNIConverter<std::exception_ptr, jni::local_ref<jni::JThrowable>>::fromJNI(error));
     }
   }
 

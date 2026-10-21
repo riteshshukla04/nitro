@@ -45,6 +45,8 @@
 #include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+AnyJSON.hpp>
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
+#include <NitroModules/JNIConverter+Error.hpp>
+#include <NitroModules/JSIConverter+JThrowable.hpp>
 #include <NitroModules/JNull.hpp>
 #include <NitroTest/private/JVariant_NullType_String.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
@@ -1291,9 +1293,9 @@ namespace margelo::nitro::test {
       return __promise;
     }();
   }
-  void JHybridTestObjectSwiftKotlinSpec::throwError(const std::exception_ptr& error) {
+  void JHybridTestObjectSwiftKotlinSpec::throwError(const jni::local_ref<jni::JThrowable>& error) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<jni::JThrowable> /* error */)>("throwError");
-    __method(_javaPart, CxxPart::getClass(), jni::getJavaExceptionForCppException(error));
+    __method(_javaPart, CxxPart::getClass(), error);
   }
   jni::local_ref<jni::JString> JHybridTestObjectSwiftKotlinSpec::tryOptionalParams(double num, bool boo, const std::optional<std::string>& str) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>(double /* num */, jboolean /* boo */, jni::alias_ref<jni::JString> /* str */)>("tryOptionalParams");

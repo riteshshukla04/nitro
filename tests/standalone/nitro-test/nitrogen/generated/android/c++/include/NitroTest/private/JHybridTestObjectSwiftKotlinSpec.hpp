@@ -55,6 +55,8 @@ namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; 
 #include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+AnyJSON.hpp>
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
+#include <NitroModules/JNIConverter+Error.hpp>
+#include <NitroModules/JSIConverter+JThrowable.hpp>
 #include <NitroTest/private/JHybridTestObjectSwiftKotlinSpec.hpp>
 
 namespace margelo::nitro::test {
@@ -183,7 +185,7 @@ namespace margelo::nitro::test {
     std::unordered_map<std::string, std::string> extractMap(const MapWrapperKotlin& mapWrapper);
     double funcThatThrows();
     Promise<void> funcThatThrowsBeforePromise();
-    void throwError(const std::exception_ptr& error);
+    void throwError(const jni::local_ref<jni::JThrowable>& error);
     jni::local_ref<jni::JString> tryOptionalParams(double num, bool boo, const std::optional<std::string>& str);
     jni::local_ref<jni::JString> tryMiddleParam(double num, const std::optional<bool>& boo, const jni::local_ref<jni::JString>& str);
     std::optional<Powertrain> tryOptionalEnum(const std::optional<Powertrain>& value);

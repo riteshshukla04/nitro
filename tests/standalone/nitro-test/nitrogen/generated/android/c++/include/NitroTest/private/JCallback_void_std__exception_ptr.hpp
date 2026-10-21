@@ -14,6 +14,8 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
+#include <NitroModules/JNIConverter+Error.hpp>
+#include <NitroModules/JSIConverter+JThrowable.hpp>
 
 namespace margelo::nitro::test {
 
