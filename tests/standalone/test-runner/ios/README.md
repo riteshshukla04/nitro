@@ -56,7 +56,7 @@ bun tests/standalone/test-runner/ios/run.mjs --help
 case, which can be rerun individually in Xcode. A failed case is recorded as an issue with its file-qualified name. New exported tests in
 `js/**/*.test.ts` need no Swift changes. Missing, invalid, empty or duplicate manifest entries fail discovery.
 
-The Swift tests await an operation queue limited to two concurrent test files. Each file runs its cases in one Hermes runtime and executes
+The Swift tests await an operation queue limited to four concurrent test files. Each file runs its cases in one Hermes runtime and executes
 JavaScript and callbacks on its owning worker. This keeps Swift's cooperative executor available for `Promise.async` completions. The shared
 Xcode scheme and command-line runner set `LIBDISPATCH_COOPERATIVE_POOL_STRICT=1` in the test process so the concurrent native Promise case
 runs with one cooperative worker.
@@ -66,7 +66,7 @@ The `static-properties` cases write shared native storage. They run in order in 
 The Objective-C++ bridge converts a failed assertion or native exception into a Swift error. Handwritten tests check error propagation,
 cached bytecode with fresh runtime state, cases of a file sharing one runtime, a fresh runtime after a failed or timed out case, per-case
 timeout overrides, independent setup and execution budgets, and timeouts for unresolved promises, synchronous loops, and endless microtask
-chains. A concurrency contract submits three tests and makes the first two initialized runtimes meet, checking overlap, the two-worker
+chains. A concurrency contract submits five tests and makes the first four initialized runtimes meet, checking overlap, the four-worker
 limit, isolated globals, and Swift Promise callbacks. The automatically discovered TypeScript cases check HybridObject behavior.
 
 `--sanitizer` accepts `none` (the default), `address` (ASan), or `thread` (TSan). CI runs all three modes. Xcode instruments the C++,

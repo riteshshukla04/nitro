@@ -140,7 +140,7 @@ const argumentsForTests = [
   '-parallel-testing-enabled',
   'YES',
   // Swift Testing runs cases concurrently inside this one test process.
-  // RuntimeTests.swift bounds native execution to two workers.
+  // RuntimeTests.swift runs at most four test files at once.
   '-parallel-testing-worker-count',
   '1',
   'CODE_SIGNING_ALLOWED=NO',

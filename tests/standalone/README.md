@@ -143,7 +143,7 @@ runtime belongs in its own file. On Android, each case still creates its own run
 its bytecode by source contents. Each runtime evaluates that bytecode with fresh globals and native objects. Compilation happens before the
 JS deadlines; Hermes' watchdog cannot interrupt the native compiler.
 
-The native thread owns the runtime and pumps its dispatcher. On iOS, an operation queue runs at most two test files at once while Swift
+The native thread owns the runtime and pumps its dispatcher. On iOS, an operation queue runs at most four test files at once while Swift
 awaits continuations. This leaves Swift's cooperative executor free to run `Promise.async` tasks that the JavaScript case awaits. The iOS
 runner restricts the cooperative pool to one worker so the concurrent native Promise test checks this behavior. Native work runs on
 background threads; its callbacks are queued back to the runtime's owning thread. When the microtask queue is empty, the dispatcher sleeps

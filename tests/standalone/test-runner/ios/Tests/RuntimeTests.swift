@@ -15,7 +15,7 @@ private var testResources: Bundle {
 private func makeRuntimeQueue() -> OperationQueue {
   let queue = OperationQueue()
   queue.name = "com.margelo.nitro.tests.runtime"
-  queue.maxConcurrentOperationCount = 2
+  queue.maxConcurrentOperationCount = 4
   return queue
 }
 
@@ -228,12 +228,13 @@ struct RuntimeTests {
         if (value !== 55n) throw new Error('callback reached the wrong runtime');
       };
       """
-    let runs = ConcurrentRuns()
     // A queue like the shared one, so test files running on that queue cannot
-    // keep the rendezvous pair apart.
+    // keep the overlapping runs apart.
     let queue = makeRuntimeQueue()
+    let workers = queue.maxConcurrentOperationCount
+    let runs = ConcurrentRuns(workers: workers)
     await withCheckedContinuation { continuation in
-      let operations = (0..<3).map { index in
+      let operations = (0...workers).map { index in
         BlockOperation {
           let failure = NitroRunTest(source, "parallel-runtime-\(index)", 10_000) {
             runs.started(index)
@@ -246,8 +247,8 @@ struct RuntimeTests {
       queue.addOperations(operations, waitUntilFinished: false)
     }
     let result = runs.result
-    #expect(result.overlapped, "Two initialized Hermes runtimes must meet before either test runs")
-    #expect(result.peak == 2, "The third native test must wait for a worker")
+    #expect(result.overlapped, "\(workers) initialized Hermes runtimes must meet before any test runs")
+    #expect(result.peak == workers, "The extra native test must wait for a worker")
     #expect(result.failures.isEmpty, "\(result.failures)")
   }
 
@@ -352,9 +353,10 @@ struct RuntimeTests {
   }
 }
 
-// Protect observations shared by the two native workers. The deadline only
-// makes a serialization regression fail instead of hanging the test process.
+// Protect observations shared by the native workers. The deadline only makes a
+// serialization regression fail instead of hanging the test process.
 private final class ConcurrentRuns: @unchecked Sendable {
+  private let workers: Int
   private let condition = NSCondition()
   private var active: Set<Int> = []
   private var startedCount = 0
@@ -362,6 +364,11 @@ private final class ConcurrentRuns: @unchecked Sendable {
   private var peak = 0
   private var overlapped = true
   private var failures: [String] = []
+
+  /// Expects `workers` runs to overlap, plus one more that waits for a worker.
+  init(workers: Int) {
+    self.workers = workers
+  }
 
   func started(_ index: Int) {
     condition.lock()
@@ -371,7 +378,7 @@ private final class ConcurrentRuns: @unchecked Sendable {
     peak = max(peak, active.count)
     condition.broadcast()
     let deadline = Date().addingTimeInterval(10)
-    while startedCount < 2 {
+    while startedCount < workers {
       if !condition.wait(until: deadline) {
         overlapped = false
         break
@@ -385,12 +392,12 @@ private final class ConcurrentRuns: @unchecked Sendable {
     active.remove(index)
     finishedCount += 1
     if let failure { failures.append(failure) }
-    return finishedCount == 3
+    return finishedCount == workers + 1
   }
 
   var result: (overlapped: Bool, peak: Int, failures: [String]) {
     condition.lock()
     defer { condition.unlock() }
-    return (overlapped && startedCount == 3, peak, failures)
+    return (overlapped && startedCount == workers + 1, peak, failures)
   }
 }
