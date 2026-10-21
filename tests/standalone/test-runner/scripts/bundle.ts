@@ -35,7 +35,9 @@ for (const [index, file] of files.entries()) {
   const source = program.getSourceFile(`${root}js/${file}`)!
   const module = checker.getSymbolAtLocation(source)
   if (module === undefined) throw new Error(`No exported tests in ${file}`)
-  imports.push(`import * as suite${index} from ${JSON.stringify(`../js/${file}`)};`)
+  // `require` makes the bundler wrap each test module in a lazy initializer, so
+  // a runtime only evaluates the files whose cases it runs.
+  imports.push(`const suite${index} = () => require(${JSON.stringify(`../js/${file}`)});`)
   const exports = checker.getExportsOfModule(module).sort((a, b) => a.name.localeCompare(b.name))
   let count = 0
   const prefix = file.replace(/\.test\.ts$/, '')
@@ -66,7 +68,7 @@ for (const [index, file] of files.entries()) {
         requireTest(checker.getTypeOfSymbolAtLocation(test, source), `${file}: ${test.name}`)
         const name = `${prefix}.${test.name}`
         names.push(name)
-        entries.push(`${JSON.stringify(name)}: suite${index}.cases[${JSON.stringify(test.name)}]`)
+        entries.push(`${JSON.stringify(name)}: () => suite${index}().cases[${JSON.stringify(test.name)}]`)
         count++
       }
       continue
@@ -75,7 +77,7 @@ for (const [index, file] of files.entries()) {
     requireTest(type, `${file}: export ${symbol.name}`)
     const name = `${prefix}.${symbol.name}`
     names.push(name)
-    entries.push(`${JSON.stringify(name)}: suite${index}[${JSON.stringify(symbol.name)}]`)
+    entries.push(`${JSON.stringify(name)}: () => suite${index}()[${JSON.stringify(symbol.name)}]`)
     count++
   }
   if (count === 0) throw new Error(`No exported tests in ${file}`)

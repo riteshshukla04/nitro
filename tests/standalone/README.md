@@ -140,8 +140,9 @@ of the file in order. Destroying the runtime afterwards also checks that Nitro r
 the runner runs the native callbacks and microtasks that case already queued, so their errors fail that case and not the next one. A failed
 case may leave work behind, so the cases after it get a fresh runtime. Cases of a file share module-level state; a case that needs its own
 runtime belongs in its own file. On Android, each case still creates its own runtime. The runner eagerly compiles the bundle once and caches
-its bytecode by source contents. Each runtime evaluates that bytecode with fresh globals and native objects. Compilation happens before the
-JS deadlines; Hermes' watchdog cannot interrupt the native compiler.
+its bytecode by source contents. Each runtime evaluates that bytecode with fresh globals and native objects. Test modules initialize lazily,
+so a runtime only evaluates the test files whose cases it runs, plus their imports. Compilation happens before the JS deadlines; Hermes'
+watchdog cannot interrupt the native compiler.
 
 The native thread owns the runtime and pumps its dispatcher. On iOS, an operation queue runs at most four test files at once while Swift
 awaits continuations. This leaves Swift's cooperative executor free to run `Promise.async` tasks that the JavaScript case awaits. The iOS
