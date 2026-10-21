@@ -42,12 +42,13 @@
 #include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Null.hpp>
+#include <NitroModules/JSIConverter+JNull.hpp>
 #include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+AnyJSON.hpp>
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+Error.hpp>
 #include <NitroModules/JSIConverter+JThrowable.hpp>
-#include <NitroModules/JNull.hpp>
 #include <NitroTest/private/JVariant_NullType_String.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <NitroTest/private/JOldEnum.hpp>
@@ -368,14 +369,14 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jlong /* uint64Value */)>("setUint64Value_cxx");
     __method(_javaPart, CxxPart::getClass(), uint64Value);
   }
-  nitro::NullType JHybridTestObjectSwiftKotlinSpec::getNullValue() {
+  jni::local_ref<JNull> JHybridTestObjectSwiftKotlinSpec::getNullValue() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JNull>()>("getNullValue");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return nitro::null;
+    return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setNullValue(nitro::NullType nullValue) {
+  void JHybridTestObjectSwiftKotlinSpec::setNullValue(const jni::local_ref<JNull>& nullValue) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JNull> /* nullValue */)>("setNullValue");
-    __method(_javaPart, CxxPart::getClass(), JNull::null());
+    __method(_javaPart, CxxPart::getClass(), nullValue);
   }
   std::optional<std::string> JHybridTestObjectSwiftKotlinSpec::getOptionalString() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JString>()>("getOptionalString");
@@ -564,10 +565,10 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(double /* num */, jni::alias_ref<jni::JString> /* str */, jboolean /* boo */)>("multipleArguments");
     __method(_javaPart, CxxPart::getClass(), num, str, boo);
   }
-  nitro::NullType JHybridTestObjectSwiftKotlinSpec::bounceNull(nitro::NullType value) {
+  jni::local_ref<JNull> JHybridTestObjectSwiftKotlinSpec::bounceNull(const jni::local_ref<JNull>& value) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JNull>(jni::alias_ref<JNull> /* value */)>("bounceNull");
-    auto __result = __method(_javaPart, CxxPart::getClass(), JNull::null());
-    return nitro::null;
+    auto __result = __method(_javaPart, CxxPart::getClass(), value);
+    return __result;
   }
   std::vector<std::string> JHybridTestObjectSwiftKotlinSpec::bounceStrings(const std::vector<std::string>& array) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JArrayClass<jni::JString>>(jni::alias_ref<jni::JArrayClass<jni::JString>> /* array */)>("bounceStrings");

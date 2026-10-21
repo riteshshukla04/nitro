@@ -52,6 +52,8 @@ namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; 
 #include <NitroTest/HardwareBufferFormat.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+Null.hpp>
+#include <NitroModules/JSIConverter+JNull.hpp>
 #include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+AnyJSON.hpp>
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
@@ -110,8 +112,8 @@ namespace margelo::nitro::test {
     void setInt64Value(int64_t int64Value);
     uint64_t getUint64Value();
     void setUint64Value(uint64_t uint64Value);
-    nitro::NullType getNullValue();
-    void setNullValue(nitro::NullType nullValue);
+    jni::local_ref<JNull> getNullValue();
+    void setNullValue(const jni::local_ref<JNull>& nullValue);
     std::optional<std::string> getOptionalString();
     void setOptionalString(const std::optional<std::string>& optionalString);
     std::optional<std::string> getStringOrUndefined();
@@ -150,7 +152,7 @@ namespace margelo::nitro::test {
     double addNumbers(double a, double b);
     jni::local_ref<jni::JString> addStrings(const jni::local_ref<jni::JString>& a, const jni::local_ref<jni::JString>& b);
     void multipleArguments(double num, const jni::local_ref<jni::JString>& str, bool boo);
-    nitro::NullType bounceNull(nitro::NullType value);
+    jni::local_ref<JNull> bounceNull(const jni::local_ref<JNull>& value);
     std::vector<std::string> bounceStrings(const std::vector<std::string>& array);
     std::vector<double> bounceNumbers(const std::vector<double>& array);
     std::vector<PersonKotlin> bounceStructs(const std::vector<PersonKotlin>& array);

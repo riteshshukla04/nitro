@@ -9,7 +9,8 @@
 #include <NitroModules/Null.hpp>
 #include <string>
 #include <variant>
-#include <NitroModules/JNull.hpp>
+#include <NitroModules/JNIConverter+Null.hpp>
+#include <NitroModules/JSIConverter+JNull.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 
@@ -26,7 +27,7 @@ namespace margelo::nitro::test {
 
   jni::local_ref<JVariant_NullType_String> JVariant_NullType_String::fromCpp(const std::variant<nitro::NullType, std::string>& variant) {
     switch (variant.index()) {
-      case 0: return create_0(JNull::null());
+      case 0: return create_0(JNIConverter<NullType, jni::local_ref<JNull>>::toJNI(std::get<0>(variant)));
       case 1: return create_1(JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
@@ -49,7 +50,7 @@ namespace margelo::nitro::test {
     if (isInstanceOf(JVariant_NullType_String_impl::First::javaClassStatic())) {
       // It's a `nitro::NullType`
       auto jniValue = static_cast<const JVariant_NullType_String_impl::First*>(this)->getValue();
-      return nitro::null;
+      return JNIConverter<NullType, jni::local_ref<JNull>>::fromJNI(jniValue);
     } else if (isInstanceOf(JVariant_NullType_String_impl::Second::javaClassStatic())) {
       // It's a `std::string`
       auto jniValue = static_cast<const JVariant_NullType_String_impl::Second*>(this)->getValue();

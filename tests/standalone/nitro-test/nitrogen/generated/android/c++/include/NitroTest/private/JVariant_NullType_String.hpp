@@ -13,7 +13,8 @@
 #include <NitroModules/Null.hpp>
 #include <string>
 #include <variant>
-#include <NitroModules/JNull.hpp>
+#include <NitroModules/JNIConverter+Null.hpp>
+#include <NitroModules/JSIConverter+JNull.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
 

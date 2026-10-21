@@ -1,18 +1,29 @@
 import type { Language } from '../../../getPlatformSpecs.js'
-import type { GetCodeOptions } from '../../types/Type.js'
+import type { GetCodeOptions, Type } from '../../types/Type.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { NullType } from '../../types/NullType.js'
+import type { KotlinCppConverter } from '../KotlinConverter.js'
+import { KotlinCxxNullType } from './KotlinCxxNullType.js'
 import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinNullType extends NullType implements KotlinType {
   readonly jniValueKind = 'wrapper'
   readonly needsKotlinConversion = false
 
+  getJSIType(): this {
+    return this
+  }
+
+  getCppConverter(cppType: Type): KotlinCppConverter {
+    return new KotlinCxxNullType(cppType, this).getConverter()
+  }
+
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
         return getJniReferenceCode('JNull', options)
-      default:
+      case 'kotlin':
+      case 'swift':
         return super.getCode(language, options)
     }
   }
@@ -24,9 +35,9 @@ export class KotlinNullType extends NullType implements KotlinType {
       case 'c++':
         switch (from) {
           case 'c++':
-            return `JNull::null()`
+            return `JNIConverter<NullType, jni::local_ref<JNull>>::toJNI(${value})`
           case 'kotlin':
-            return `nitro::null`
+            return `JNIConverter<NullType, jni::local_ref<JNull>>::fromJNI(${value})`
         }
     }
   }
@@ -35,10 +46,13 @@ export class KotlinNullType extends NullType implements KotlinType {
     const imports = super.getRequiredImports(language)
     switch (language) {
       case 'c++':
-        imports.push({
-          language: language,
-          declaration: { header: 'NitroModules/JNull.hpp', space: 'system' },
-        })
+        imports.push(
+          { language: language, declaration: { header: 'NitroModules/JNIConverter+Null.hpp', space: 'system' } },
+          { language: language, declaration: { header: 'NitroModules/JSIConverter+JNull.hpp', space: 'system' } }
+        )
+        break
+      case 'kotlin':
+      case 'swift':
         break
     }
     return imports
