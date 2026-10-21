@@ -14,10 +14,8 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <optional>
-#include <NitroModules/JPromise.hpp>
-#include <NitroModules/JNISharedPtr.hpp>
-#include <NitroModules/JUnit.hpp>
+#include <NitroModules/JNIConverter+Promise.hpp>
+#include <NitroModules/JSIConverter+JTypedPromise.hpp>
 
 namespace margelo::nitro::test {
 
@@ -50,7 +48,7 @@ namespace margelo::nitro::test {
     /**
      * Invokes the C++ `Callback<...>` this `JCallback_Promise_void__cxx` instance holds.
      */
-    jni::local_ref<JPromise::javaobject> invoke_cxx();
+    jni::local_ref<JTypedPromise<void>> invoke_cxx();
 
   public:
     [[nodiscard]]

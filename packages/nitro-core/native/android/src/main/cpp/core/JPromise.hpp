@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include "JNIConverter+Error.hpp"
 #include <NitroModules/Promise.hpp>
 #include <exception>
 #include <fbjni/fbjni.h>
 #include <functional>
-#include <optional>
 #include <utility>
 
 namespace margelo::nitro {
@@ -36,7 +36,7 @@ struct JOnRejectedCallback : public jni::JavaClass<JOnRejectedCallback> {
 
 /**
  * JNI wrapper around the shared C++ Promise.
- * Calls require an attached calling thread. Destruction attaches as needed.
+ * Calls and destruction require an attached calling thread.
  */
 class JPromise final : public jni::HybridClass<JPromise> {
 public:
@@ -62,34 +62,29 @@ public:
   }
 
 public:
-  ~JPromise() override {
-    // Destroy stored JNI references and notify pending listeners while attached.
-    jni::ThreadScope::WithClassLoader([&]() { _promise.reset(); });
-  }
-
-public:
   void resolve(jni::alias_ref<jni::JObject> result) {
-    const auto promise = *_promise;
-    promise.resolve(jni::make_global(result));
+    _promise.resolve(jni::make_global(result));
   }
   void reject(jni::alias_ref<jni::JThrowable> error) {
-    const auto promise = *_promise;
-    promise.reject(std::make_exception_ptr(jni::JniException(error)));
+    _promise.reject(JNIConverter<std::exception_ptr, jni::local_ref<jni::JThrowable>>::fromJNI(error));
   }
   void reject(std::exception_ptr error) {
-    const auto promise = *_promise;
-    promise.reject(std::move(error));
+    _promise.reject(std::move(error));
   }
 
 public:
   void addOnResolvedListener(OnResolvedFunc onResolved) {
-    const auto promise = *_promise;
-    promise.addOnResolvedListener([onResolved = std::move(onResolved)](const ResultType& result) { onResolved(result); });
+    _promise.addOnResolvedListener([onResolved = std::move(onResolved)](const ResultType& result) { onResolved(result); });
   }
   void addOnRejectedListener(OnRejectedFunc onRejected) {
-    const auto promise = *_promise;
-    promise.addOnRejectedListener(
-        [onRejected = std::move(onRejected)](const std::exception_ptr& error) { onRejected(getJavaException(error)); });
+    _promise.addOnRejectedListener([onRejected = std::move(onRejected)](const std::exception_ptr& error) {
+      onRejected(JNIConverter<std::exception_ptr, jni::local_ref<jni::JThrowable>>::toJNI(error));
+    });
+  }
+
+  /** Borrow the shared state while this JNI owner is alive. Wiring listeners requires an attached thread. */
+  const Promise<ResultType>& getPromise() const {
+    return _promise;
   }
 
 private:
@@ -97,30 +92,12 @@ private:
     reject(error);
   }
   void addOnResolvedListenerJava(jni::alias_ref<JOnResolvedCallback> callback) {
-    addOnResolvedListener([callback = jni::make_global(callback)](auto result) { callback->onResolved(result); });
+    _promise.addOnResolvedListener([callback = jni::make_global(callback)](const ResultType& result) { callback->onResolved(result); });
   }
   void addOnRejectedListenerJava(jni::alias_ref<JOnRejectedCallback> callback) {
-    addOnRejectedListener([callback = jni::make_global(callback)](auto error) { callback->onRejected(error); });
-  }
-
-private:
-  static jni::local_ref<jni::JThrowable> getJavaException(const std::exception_ptr& error) {
-    try {
-      std::rethrow_exception(error);
-    } catch (const jni::JniException& exception) {
-      // fbjni's generic conversion consumes JniException's throwable. Keep it for subsequent listeners.
-      return exception.getThrowable();
-    } catch (const std::nested_exception& exception) {
-      // fbjni also consumes nested JniException causes. Preserve them when converting this shared error.
-      const auto* nativeException = dynamic_cast<const std::exception*>(&exception);
-      auto javaException = jni::JCppException::create(nativeException != nullptr ? nativeException->what() : "Nested C++ exception");
-      if (const auto cause = exception.nested_ptr()) {
-        javaException->initCause(getJavaException(cause));
-      }
-      return javaException;
-    } catch (...) {
-      return jni::getJavaExceptionForCppException(error);
-    }
+    _promise.addOnRejectedListener([callback = jni::make_global(callback)](const std::exception_ptr& error) {
+      callback->onRejected(JNIConverter<std::exception_ptr, jni::local_ref<jni::JThrowable>>::toJNI(error));
+    });
   }
 
 private:
@@ -129,7 +106,7 @@ private:
 private:
   friend HybridBase;
   using HybridBase::HybridBase;
-  std::optional<Promise<ResultType>> _promise = Promise<ResultType>::pending();
+  Promise<ResultType> _promise = Promise<ResultType>::pending();
 
 public:
   static void registerNatives() {

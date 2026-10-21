@@ -52,7 +52,7 @@ namespace margelo::nitro::test {
     /**
      * Invokes the C++ `Callback<...>` this `JCallback_Promise_std__vector_Powertrain___cxx` instance holds.
      */
-    jni::local_ref<JPromise::javaobject> invoke_cxx();
+    jni::local_ref<JPromise::JavaPart> invoke_cxx();
 
   public:
     [[nodiscard]]

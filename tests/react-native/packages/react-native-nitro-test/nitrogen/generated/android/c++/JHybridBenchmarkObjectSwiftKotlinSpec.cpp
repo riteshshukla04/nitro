@@ -25,6 +25,8 @@
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 #include <NitroModules/Promise.hpp>
+#include <NitroModules/JNIConverter+Promise.hpp>
+#include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <optional>
 #include <NitroModules/JNIConverter+Optional.hpp>
 #include <NitroModules/JSIConverter+JOptional.hpp>
@@ -37,8 +39,6 @@
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <NitroTest/private/JPerson.hpp>
 #include <NitroTest/private/JVariant_Double_String.hpp>
-#include <NitroModules/JPromise.hpp>
-#include <NitroModules/JNISharedPtr.hpp>
 #include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
 #include <NitroTest/private/JCallback_double.hpp>
@@ -185,51 +185,15 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), JCallback_double_cxx::fromCpp(callback));
     return __result;
   }
-  Promise<double> JHybridBenchmarkObjectSwiftKotlinSpec::promiseReturnsInstantly() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::javaobject>()>("promiseReturnsInstantly");
+  jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> JHybridBenchmarkObjectSwiftKotlinSpec::promiseReturnsInstantly() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>>()>("promiseReturnsInstantly");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return [&]() {
-      auto __promise = Promise<double>::pending();
-      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
-        std::optional<double> __converted;
-        try {
-          auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
-        } catch (...) {
-          __promise.reject(std::current_exception());
-          return;
-        }
-        __promise.resolve(std::move(*__converted));
-      });
-      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
-        jni::JniException __jniError(__throwable);
-        __promise.reject(std::make_exception_ptr(__jniError));
-      });
-      return __promise;
-    }();
+    return __result;
   }
-  Promise<double> JHybridBenchmarkObjectSwiftKotlinSpec::createPendingPromise() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::javaobject>()>("createPendingPromise");
+  jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>> JHybridBenchmarkObjectSwiftKotlinSpec::createPendingPromise() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JTypedPromise<jni::local_ref<jni::JDouble>>>()>("createPendingPromise");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return [&]() {
-      auto __promise = Promise<double>::pending();
-      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
-        std::optional<double> __converted;
-        try {
-          auto __result = jni::static_ref_cast<jni::JDouble>(__boxedResult);
-          __converted.emplace(JNIConverter<double, jni::local_ref<jni::JDouble>>::fromJNI(__result));
-        } catch (...) {
-          __promise.reject(std::current_exception());
-          return;
-        }
-        __promise.resolve(std::move(*__converted));
-      });
-      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
-        jni::JniException __jniError(__throwable);
-        __promise.reject(std::make_exception_ptr(__jniError));
-      });
-      return __promise;
-    }();
+    return __result;
   }
   void JHybridBenchmarkObjectSwiftKotlinSpec::resolvePendingPromiseOnWorker() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void()>("resolvePendingPromiseOnWorker");

@@ -10,27 +10,15 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <optional>
-#include <NitroModules/JPromise.hpp>
-#include <NitroModules/JNISharedPtr.hpp>
-#include <NitroModules/JUnit.hpp>
+#include <NitroModules/JNIConverter+Promise.hpp>
+#include <NitroModules/JSIConverter+JTypedPromise.hpp>
 
 namespace margelo::nitro::test {
 
   Promise<void> JCallback_Promise_void_::invoke() const {
-    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>()>("invoke_jni");
+    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JTypedPromise<void>>()>("invoke_jni");
     auto __result = __method(self());
-    return [&]() {
-      auto __promise = Promise<void>::pending();
-      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& /* unit */) {
-        __promise.resolve();
-      });
-      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
-        jni::JniException __jniError(__throwable);
-        __promise.reject(std::make_exception_ptr(__jniError));
-      });
-      return __promise;
-    }();
+    return JNIConverter<Promise<void>, jni::local_ref<JTypedPromise<void>>>::fromJNI(__result);
   }
 
   jni::local_ref<JCallback_Promise_void_::javaobject> JCallback_Promise_void__cxx::fromCpp(const Callback<Promise<void>()>& callback) {
@@ -41,23 +29,9 @@ namespace margelo::nitro::test {
     return newObjectCxxArgs(callback.escape(), true);
   }
 
-  jni::local_ref<JPromise::javaobject> JCallback_Promise_void__cxx::invoke_cxx() {
+  jni::local_ref<JTypedPromise<void>> JCallback_Promise_void__cxx::invoke_cxx() {
     Promise<void> __result = _callback.callSync();
-    return [&]() {
-      jni::local_ref<JPromise::javaobject> __localPromise = JPromise::create();
-      auto __promise = JNISharedPtr::make_shared_from_jni<JPromise>(jni::make_global(__localPromise));
-      __result.addOnResolvedListener([=]() {
-        jni::ThreadScope::WithClassLoader([&] {
-          __promise->resolve(JUnit::instance());
-        });
-      });
-      __result.addOnRejectedListener([=](const std::exception_ptr& __error) {
-        jni::ThreadScope::WithClassLoader([&] {
-          __promise->reject(__error);
-        });
-      });
-      return __localPromise;
-    }();
+    return JNIConverter<Promise<void>, jni::local_ref<JTypedPromise<void>>>::toJNI(__result);
   }
 
   void JCallback_Promise_void__cxx::registerNatives() {

@@ -1,14 +1,17 @@
 import type { Language } from '../../../getPlatformSpecs.js'
-import type { GetCodeOptions } from '../../types/Type.js'
+import type { GetCodeOptions, Type } from '../../types/Type.js'
 import { indent } from '../../../utils.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { PromiseType } from '../../types/PromiseType.js'
+import { getTypeAs } from '../../types/getTypeAs.js'
+import type { KotlinCppConverter } from '../KotlinConverter.js'
+import { KotlinCxxPromiseType } from './KotlinCxxPromiseType.js'
 import { wrapKotlinType } from '../wrapKotlinType.js'
 import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinPromiseType extends PromiseType implements KotlinType {
   override readonly resultingType: KotlinType
-  readonly jniValueKind = 'pointer'
+  readonly jniValueKind = 'wrapper'
   get needsKotlinConversion(): boolean {
     return this.resultingType.needsKotlinConversion
   }
@@ -18,6 +21,20 @@ export class KotlinPromiseType extends PromiseType implements KotlinType {
     const resultingType = wrapKotlinType(type.resultingType, { boxed: true })
     super(resultingType)
     this.resultingType = resultingType
+  }
+
+  private get canConvertDirectly(): boolean {
+    return this.resultingType.kind === 'void' || this.resultingType.getJSIType?.() != null
+  }
+
+  getJSIType(): this | undefined {
+    if (!this.canConvertDirectly) return undefined
+    return this
+  }
+
+  getCppConverter(cppType: Type): KotlinCppConverter | undefined {
+    if (!this.canConvertDirectly) return undefined
+    return new KotlinCxxPromiseType(getTypeAs(cppType, PromiseType), this).getConverter()
   }
 
   convert(value: string, conversion: KotlinConversion): string {
@@ -32,6 +49,17 @@ export class KotlinPromiseType extends PromiseType implements KotlinType {
         return `${value}.let { __source -> Promise<${resultType}>().also { __promise -> __source.then { __result -> __promise.resolve(${result}) }.catch { __promise.reject(it) } } }`
       }
       case 'c++':
+        if (this.canConvertDirectly) {
+          const cppType = this.type.getCode('c++', { context: 'value' })
+          const jniType = this.getCode('c++', { context: 'value' })
+          const converter = `JNIConverter<${cppType}, ${jniType}>`
+          switch (conversion.from) {
+            case 'c++':
+              return `${converter}::toJNI(${value})`
+            case 'kotlin':
+              return `${converter}::fromJNI(${value})`
+          }
+        }
         switch (conversion.from) {
           case 'c++':
             return this.getCppToJniCode(value)
@@ -80,7 +108,7 @@ ${value}.addOnResolvedListener([=](const ${resolvingType}& __result) {
     }
     return `
 [&]() {
-  jni::local_ref<JPromise::javaobject> __localPromise = JPromise::create();
+  jni::local_ref<JPromise::JavaPart> __localPromise = JPromise::create();
   auto __promise = JNISharedPtr::make_shared_from_jni<JPromise>(jni::make_global(__localPromise));
   ${indent(resolveListenerCode, '  ')}
   ${value}.addOnRejectedListener([=](const std::exception_ptr& __error) {
@@ -142,11 +170,14 @@ ${value}->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>&
   }
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
-      case 'c++':
-        return getJniReferenceCode('JPromise::javaobject', options)
+      case 'c++': {
+        if (!this.canConvertDirectly) return getJniReferenceCode('JPromise::JavaPart', options)
+        const result = this.resultingType.getCode(language, { ...options, context: 'value' })
+        return getJniReferenceCode(`JTypedPromise<${result}>`, options)
+      }
       case 'kotlin':
         return super.getCode(language, options)
-      default:
+      case 'swift':
         return super.getCode(language, options)
     }
   }
@@ -155,6 +186,13 @@ ${value}->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>&
     const imports = this.type.getRequiredImports(language)
     switch (language) {
       case 'c++':
+        if (this.canConvertDirectly) {
+          imports.push(
+            { language: language, declaration: { header: 'NitroModules/JNIConverter+Promise.hpp', space: 'system' } },
+            { language: language, declaration: { header: 'NitroModules/JSIConverter+JTypedPromise.hpp', space: 'system' } }
+          )
+          break
+        }
         imports.push(
           { language: language, declaration: { header: 'optional', space: 'system' } },
           {

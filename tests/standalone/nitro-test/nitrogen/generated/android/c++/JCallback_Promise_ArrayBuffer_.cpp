@@ -11,36 +11,17 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <optional>
-#include <NitroModules/JPromise.hpp>
-#include <NitroModules/JNISharedPtr.hpp>
+#include <NitroModules/JNIConverter+Promise.hpp>
+#include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 
 namespace margelo::nitro::test {
 
   Promise<ArrayBuffer> JCallback_Promise_ArrayBuffer_::invoke() const {
-    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>()>("invoke_jni");
+    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>()>("invoke_jni");
     auto __result = __method(self());
-    return [&]() {
-      auto __promise = Promise<ArrayBuffer>::pending();
-      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
-        std::optional<ArrayBuffer> __converted;
-        try {
-          auto __result = jni::static_ref_cast<JArrayBuffer::JavaPart>(__boxedResult);
-          __converted.emplace(JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::fromJNI(__result));
-        } catch (...) {
-          __promise.reject(std::current_exception());
-          return;
-        }
-        __promise.resolve(std::move(*__converted));
-      });
-      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
-        jni::JniException __jniError(__throwable);
-        __promise.reject(std::make_exception_ptr(__jniError));
-      });
-      return __promise;
-    }();
+    return JNIConverter<Promise<ArrayBuffer>, jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>>::fromJNI(__result);
   }
 
   jni::local_ref<JCallback_Promise_ArrayBuffer_::javaobject> JCallback_Promise_ArrayBuffer__cxx::fromCpp(const Callback<Promise<ArrayBuffer>()>& callback) {
@@ -51,30 +32,9 @@ namespace margelo::nitro::test {
     return newObjectCxxArgs(callback.escape(), true);
   }
 
-  jni::local_ref<JPromise::javaobject> JCallback_Promise_ArrayBuffer__cxx::invoke_cxx() {
+  jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>> JCallback_Promise_ArrayBuffer__cxx::invoke_cxx() {
     Promise<ArrayBuffer> __result = _callback.callSync();
-    return [&]() {
-      jni::local_ref<JPromise::javaobject> __localPromise = JPromise::create();
-      auto __promise = JNISharedPtr::make_shared_from_jni<JPromise>(jni::make_global(__localPromise));
-      __result.addOnResolvedListener([=](const ArrayBuffer& __result) {
-        jni::ThreadScope::WithClassLoader([&] {
-          std::optional<jni::local_ref<JArrayBuffer::JavaPart>> __converted;
-          try {
-            __converted.emplace(JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::toJNI(__result));
-          } catch (...) {
-            __promise->reject(std::current_exception());
-            return;
-          }
-          __promise->resolve(*__converted);
-        });
-      });
-      __result.addOnRejectedListener([=](const std::exception_ptr& __error) {
-        jni::ThreadScope::WithClassLoader([&] {
-          __promise->reject(__error);
-        });
-      });
-      return __localPromise;
-    }();
+    return JNIConverter<Promise<ArrayBuffer>, jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>>>::toJNI(__result);
   }
 
   void JCallback_Promise_ArrayBuffer__cxx::registerNatives() {

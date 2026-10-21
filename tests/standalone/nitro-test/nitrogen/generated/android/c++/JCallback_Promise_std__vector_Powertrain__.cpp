@@ -20,7 +20,7 @@
 namespace margelo::nitro::test {
 
   Promise<std::vector<Powertrain>> JCallback_Promise_std__vector_Powertrain__::invoke() const {
-    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>()>("invoke_jni");
+    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JPromise::JavaPart>()>("invoke_jni");
     auto __result = __method(self());
     return [&]() {
       auto __promise = Promise<std::vector<Powertrain>>::pending();
@@ -60,10 +60,10 @@ namespace margelo::nitro::test {
     return newObjectCxxArgs(callback.escape(), true);
   }
 
-  jni::local_ref<JPromise::javaobject> JCallback_Promise_std__vector_Powertrain___cxx::invoke_cxx() {
+  jni::local_ref<JPromise::JavaPart> JCallback_Promise_std__vector_Powertrain___cxx::invoke_cxx() {
     Promise<std::vector<Powertrain>> __result = _callback.callSync();
     return [&]() {
-      jni::local_ref<JPromise::javaobject> __localPromise = JPromise::create();
+      jni::local_ref<JPromise::JavaPart> __localPromise = JPromise::create();
       auto __promise = JNISharedPtr::make_shared_from_jni<JPromise>(jni::make_global(__localPromise));
       __result.addOnResolvedListener([=](const std::vector<Powertrain>& __result) {
         jni::ThreadScope::WithClassLoader([&] {

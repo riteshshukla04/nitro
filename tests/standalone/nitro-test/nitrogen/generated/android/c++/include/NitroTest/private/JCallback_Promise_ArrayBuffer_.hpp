@@ -15,9 +15,8 @@
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <optional>
-#include <NitroModules/JPromise.hpp>
-#include <NitroModules/JNISharedPtr.hpp>
+#include <NitroModules/JNIConverter+Promise.hpp>
+#include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 
@@ -52,7 +51,7 @@ namespace margelo::nitro::test {
     /**
      * Invokes the C++ `Callback<...>` this `JCallback_Promise_ArrayBuffer__cxx` instance holds.
      */
-    jni::local_ref<JPromise::javaobject> invoke_cxx();
+    jni::local_ref<JTypedPromise<jni::local_ref<JArrayBuffer::JavaPart>>> invoke_cxx();
 
   public:
     [[nodiscard]]
