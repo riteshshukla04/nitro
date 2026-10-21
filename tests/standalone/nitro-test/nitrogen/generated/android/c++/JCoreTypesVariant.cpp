@@ -13,7 +13,8 @@
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/AnyJSON.hpp>
 #include <variant>
-#include <NitroModules/JArrayBuffer.hpp>
+#include <NitroModules/JNIConverter+ArrayBuffer.hpp>
+#include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 #include <NitroTest/private/JCallback_void_double.hpp>
 #include <NitroModules/JNICallable.hpp>
 #include <NitroTest/private/JWrappedJsStruct.hpp>
@@ -28,8 +29,8 @@
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
 
 namespace margelo::nitro::test {
-  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant::create_0(jni::alias_ref<JArrayBuffer::javaobject> value) {
-    static const auto method = javaClassStatic()->getStaticMethod<JCoreTypesVariant(jni::alias_ref<JArrayBuffer::javaobject>)>("fromCpp_0");
+  jni::local_ref<JCoreTypesVariant> JCoreTypesVariant::create_0(jni::alias_ref<JArrayBuffer::JavaPart> value) {
+    static const auto method = javaClassStatic()->getStaticMethod<JCoreTypesVariant(jni::alias_ref<JArrayBuffer::JavaPart>)>("fromCpp_0");
     return method(javaClassStatic(), value);
   }
 
@@ -55,7 +56,7 @@ namespace margelo::nitro::test {
 
   jni::local_ref<JCoreTypesVariant> JCoreTypesVariant::fromCpp(const std::variant<ArrayBuffer, Callback<void(double /* value */)>, WrappedJsStructKotlin, Promise<double>, AnyJSON>& variant) {
     switch (variant.index()) {
-      case 0: return create_0(JArrayBuffer::wrap(std::get<0>(variant)));
+      case 0: return create_0(JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::toJNI(std::get<0>(variant)));
       case 1: return create_1(JCallback_void_double_cxx::fromCpp(std::get<1>(variant)));
       case 2: return create_2(JWrappedJsStruct::fromCpp(std::get<2>(variant)));
       case 3: return create_3([&]() {
@@ -85,8 +86,8 @@ namespace margelo::nitro::test {
     }
   }
 
-  jni::local_ref<JArrayBuffer::javaobject> JCoreTypesVariant_impl::First::getValue() const {
-    static const auto field = javaClassStatic()->getField<JArrayBuffer::javaobject>("value");
+  jni::local_ref<JArrayBuffer::JavaPart> JCoreTypesVariant_impl::First::getValue() const {
+    static const auto field = javaClassStatic()->getField<JArrayBuffer::JavaPart>("value");
     return getFieldValue(field);
   }
 
@@ -117,7 +118,7 @@ namespace margelo::nitro::test {
     if (isInstanceOf(JCoreTypesVariant_impl::First::javaClassStatic())) {
       // It's a `ArrayBuffer`
       auto jniValue = static_cast<const JCoreTypesVariant_impl::First*>(this)->getValue();
-      return jniValue->cthis()->getArrayBuffer();
+      return JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::fromJNI(jniValue);
     } else if (isInstanceOf(JCoreTypesVariant_impl::Second::javaClassStatic())) {
       // It's a `Callback<void(double /* value */)>`
       auto jniValue = static_cast<const JCoreTypesVariant_impl::Second*>(this)->getValue();

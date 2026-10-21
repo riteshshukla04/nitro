@@ -25,6 +25,8 @@ namespace margelo::nitro::test { class JHybridBenchmarkObjectSwiftKotlinSpec; }
 #include <functional>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+ArrayBuffer.hpp>
+#include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 #include <NitroTest/private/JHybridBenchmarkObjectSwiftKotlinSpec.hpp>
 
 namespace margelo::nitro::test {
@@ -82,8 +84,8 @@ namespace margelo::nitro::test {
     std::unordered_map<std::string, double> bounceSimpleMap(const std::unordered_map<std::string, double>& map);
     jni::local_ref<jni::JString> tryOptionalParams(double num, bool boo, const std::optional<std::string>& str);
     std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either);
-    ArrayBuffer bounceArrayBuffer(const ArrayBuffer& buffer);
-    ArrayBuffer copyBuffer(const ArrayBuffer& buffer);
+    jni::local_ref<JArrayBuffer::JavaPart> bounceArrayBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
+    jni::local_ref<JArrayBuffer::JavaPart> copyBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
     double callbackSync(const Callback<double()>& callback);
     Promise<double> promiseReturnsInstantly();
     Promise<double> createPendingPromise();

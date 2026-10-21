@@ -14,7 +14,8 @@
 #include <optional>
 #include <NitroModules/JPromise.hpp>
 #include <NitroModules/JNISharedPtr.hpp>
-#include <NitroModules/JArrayBuffer.hpp>
+#include <NitroModules/JNIConverter+ArrayBuffer.hpp>
+#include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 
 namespace margelo::nitro::test {
 
@@ -26,8 +27,8 @@ namespace margelo::nitro::test {
       __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
         std::optional<ArrayBuffer> __converted;
         try {
-          auto __result = jni::static_ref_cast<JArrayBuffer::javaobject>(__boxedResult);
-          __converted.emplace(__result->cthis()->getArrayBuffer());
+          auto __result = jni::static_ref_cast<JArrayBuffer::JavaPart>(__boxedResult);
+          __converted.emplace(JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::fromJNI(__result));
         } catch (...) {
           __promise.reject(std::current_exception());
           return;
@@ -57,9 +58,9 @@ namespace margelo::nitro::test {
       auto __promise = JNISharedPtr::make_shared_from_jni<JPromise>(jni::make_global(__localPromise));
       __result.addOnResolvedListener([=](const ArrayBuffer& __result) {
         jni::ThreadScope::WithClassLoader([&] {
-          std::optional<jni::local_ref<JArrayBuffer::javaobject>> __converted;
+          std::optional<jni::local_ref<JArrayBuffer::JavaPart>> __converted;
           try {
-            __converted.emplace(JArrayBuffer::wrap(__result));
+            __converted.emplace(JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::toJNI(__result));
           } catch (...) {
             __promise->reject(std::current_exception());
             return;

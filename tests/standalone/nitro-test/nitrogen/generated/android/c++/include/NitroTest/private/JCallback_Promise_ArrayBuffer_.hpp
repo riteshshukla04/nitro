@@ -18,7 +18,8 @@
 #include <optional>
 #include <NitroModules/JPromise.hpp>
 #include <NitroModules/JNISharedPtr.hpp>
-#include <NitroModules/JArrayBuffer.hpp>
+#include <NitroModules/JNIConverter+ArrayBuffer.hpp>
+#include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 
 namespace margelo::nitro::test {
 

@@ -10,7 +10,8 @@
 #include <NitroTest/private/OptionalWrapperKotlin.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <optional>
-#include <NitroModules/JArrayBuffer.hpp>
+#include <NitroModules/JNIConverter+ArrayBuffer.hpp>
+#include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 #include <string>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
@@ -19,23 +20,23 @@ namespace margelo::nitro::test {
 
   OptionalWrapperKotlin JOptionalWrapper::toCpp() const {
     static const auto clazz = javaClassStatic();
-    static const auto fieldOptionalArrayBuffer = clazz->getField<JArrayBuffer::javaobject>("optionalArrayBuffer");
-    jni::local_ref<JArrayBuffer::javaobject> optionalArrayBuffer = this->getFieldValue(fieldOptionalArrayBuffer);
+    static const auto fieldOptionalArrayBuffer = clazz->getField<JArrayBuffer::JavaPart>("optionalArrayBuffer");
+    jni::local_ref<JArrayBuffer::JavaPart> optionalArrayBuffer = this->getFieldValue(fieldOptionalArrayBuffer);
     static const auto fieldOptionalString = clazz->getField<jni::JString>("optionalString");
     jni::local_ref<jni::JString> optionalString = this->getFieldValue(fieldOptionalString);
     return OptionalWrapperKotlin(
-      optionalArrayBuffer != nullptr ? std::make_optional(optionalArrayBuffer->cthis()->getArrayBuffer()) : std::nullopt,
+      optionalArrayBuffer != nullptr ? std::make_optional(JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::fromJNI(optionalArrayBuffer)) : std::nullopt,
       optionalString != nullptr ? std::make_optional(JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(optionalString)) : std::nullopt
     );
   }
 
   jni::local_ref<JOptionalWrapper::javaobject> JOptionalWrapper::fromCpp(const OptionalWrapperKotlin& value) {
-    using JSignature = JOptionalWrapper(jni::alias_ref<JArrayBuffer::javaobject>, jni::alias_ref<jni::JString>);
+    using JSignature = JOptionalWrapper(jni::alias_ref<JArrayBuffer::JavaPart>, jni::alias_ref<jni::JString>);
     static const auto clazz = javaClassStatic();
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
       clazz,
-      value.optionalArrayBuffer.has_value() ? JArrayBuffer::wrap(value.optionalArrayBuffer.value()) : nullptr,
+      value.optionalArrayBuffer.has_value() ? JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::toJNI(value.optionalArrayBuffer.value()) : nullptr,
       value.optionalString.has_value() ? JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.optionalString.value()) : nullptr
     );
   }

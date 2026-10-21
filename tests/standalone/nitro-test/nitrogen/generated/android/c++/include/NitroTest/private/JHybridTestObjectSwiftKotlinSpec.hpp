@@ -59,6 +59,8 @@ namespace margelo::nitro::test::external { class JHybridSomeExternalObjectSpec; 
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+Error.hpp>
 #include <NitroModules/JSIConverter+JThrowable.hpp>
+#include <NitroModules/JNIConverter+ArrayBuffer.hpp>
+#include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 #include <NitroTest/private/JHybridTestObjectSwiftKotlinSpec.hpp>
 
 namespace margelo::nitro::test {
@@ -231,14 +233,14 @@ namespace margelo::nitro::test {
     OptionalWrapperKotlin bounceOptionalWrapper(const OptionalWrapperKotlin& wrapper);
     OptionalCallbackKotlin bounceOptionalCallback(const OptionalCallbackKotlin& value);
     std::optional<OptionalEnumWrapperKotlin> bounceOptionalEnumStruct(const std::optional<OptionalEnumWrapperKotlin>& value);
-    ArrayBuffer createArrayBuffer();
-    ArrayBuffer createArrayBufferFromNativeBuffer(bool copy);
-    ArrayBuffer createHardwareBuffer(double width, double height, double layers, HardwareBufferFormat format);
-    ArrayBuffer copyBuffer(const ArrayBuffer& buffer);
-    double getBufferLastItem(const ArrayBuffer& buffer);
-    void setAllValuesTo(const ArrayBuffer& buffer, double value);
+    jni::local_ref<JArrayBuffer::JavaPart> createArrayBuffer();
+    jni::local_ref<JArrayBuffer::JavaPart> createArrayBufferFromNativeBuffer(bool copy);
+    jni::local_ref<JArrayBuffer::JavaPart> createHardwareBuffer(double width, double height, double layers, HardwareBufferFormat format);
+    jni::local_ref<JArrayBuffer::JavaPart> copyBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
+    double getBufferLastItem(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
+    void setAllValuesTo(const jni::local_ref<JArrayBuffer::JavaPart>& buffer, double value);
     Promise<ArrayBuffer> createArrayBufferAsync();
-    ArrayBuffer bounceArrayBuffer(const ArrayBuffer& buffer);
+    jni::local_ref<JArrayBuffer::JavaPart> bounceArrayBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer);
     std::variant<double, std::string> passVariant(const std::variant<bool, std::vector<double>, std::vector<std::string>, double, std::string>& either);
     std::variant<OldEnum, bool> getVariantEnum(const std::variant<OldEnum, bool>& variant);
     std::variant<Powertrain, CarKotlin> bounceVariantUnionEnum(const std::variant<Powertrain, CarKotlin>& variant);

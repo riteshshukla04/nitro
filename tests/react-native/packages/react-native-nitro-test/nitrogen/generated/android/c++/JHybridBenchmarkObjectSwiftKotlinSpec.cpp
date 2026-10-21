@@ -19,13 +19,14 @@
 #include <functional>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
+#include <NitroModules/JNIConverter+ArrayBuffer.hpp>
+#include <NitroModules/JSIConverter+JArrayBuffer.hpp>
 #include <NitroTest/private/JCar.hpp>
 #include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <NitroTest/private/JPerson.hpp>
 #include <NitroTest/private/JVariant_Double_String.hpp>
-#include <NitroModules/JArrayBuffer.hpp>
 #include <NitroModules/JPromise.hpp>
 #include <NitroModules/JNISharedPtr.hpp>
 #include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
@@ -181,15 +182,15 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), JVariant_Boolean_DoubleArray_Array_String__Double_String::fromCpp(either));
     return __result->toCpp();
   }
-  ArrayBuffer JHybridBenchmarkObjectSwiftKotlinSpec::bounceArrayBuffer(const ArrayBuffer& buffer) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JArrayBuffer::javaobject>(jni::alias_ref<JArrayBuffer::javaobject> /* buffer */)>("bounceArrayBuffer");
-    auto __result = __method(_javaPart, CxxPart::getClass(), JArrayBuffer::wrap(buffer));
-    return __result->cthis()->getArrayBuffer();
+  jni::local_ref<JArrayBuffer::JavaPart> JHybridBenchmarkObjectSwiftKotlinSpec::bounceArrayBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JArrayBuffer::JavaPart>(jni::alias_ref<JArrayBuffer::JavaPart> /* buffer */)>("bounceArrayBuffer");
+    auto __result = __method(_javaPart, CxxPart::getClass(), buffer);
+    return __result;
   }
-  ArrayBuffer JHybridBenchmarkObjectSwiftKotlinSpec::copyBuffer(const ArrayBuffer& buffer) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JArrayBuffer::javaobject>(jni::alias_ref<JArrayBuffer::javaobject> /* buffer */)>("copyBuffer");
-    auto __result = __method(_javaPart, CxxPart::getClass(), JArrayBuffer::wrap(buffer));
-    return __result->cthis()->getArrayBuffer();
+  jni::local_ref<JArrayBuffer::JavaPart> JHybridBenchmarkObjectSwiftKotlinSpec::copyBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JArrayBuffer::JavaPart>(jni::alias_ref<JArrayBuffer::JavaPart> /* buffer */)>("copyBuffer");
+    auto __result = __method(_javaPart, CxxPart::getClass(), buffer);
+    return __result;
   }
   double JHybridBenchmarkObjectSwiftKotlinSpec::callbackSync(const Callback<double()>& callback) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<double(jni::alias_ref<JCallback_double::javaobject> /* callback */)>("callbackSync_cxx");

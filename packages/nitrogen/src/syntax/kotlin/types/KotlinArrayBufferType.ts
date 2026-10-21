@@ -1,18 +1,29 @@
 import type { Language } from '../../../getPlatformSpecs.js'
-import type { GetCodeOptions } from '../../types/Type.js'
+import type { GetCodeOptions, Type } from '../../types/Type.js'
 import type { SourceImport } from '../../SourceFile.js'
 import { ArrayBufferType } from '../../types/ArrayBufferType.js'
+import type { KotlinCppConverter } from '../KotlinConverter.js'
+import { KotlinCxxArrayBufferType } from './KotlinCxxArrayBufferType.js'
 import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinArrayBufferType extends ArrayBufferType implements KotlinType {
-  readonly jniValueKind = 'pointer'
+  readonly jniValueKind = 'wrapper'
   readonly needsKotlinConversion = false
+
+  getJSIType(): this {
+    return this
+  }
+
+  getCppConverter(cppType: Type): KotlinCppConverter {
+    return new KotlinCxxArrayBufferType(cppType, this).getConverter()
+  }
 
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
       case 'c++':
-        return getJniReferenceCode('JArrayBuffer::javaobject', options)
-      default:
+        return getJniReferenceCode('JArrayBuffer::JavaPart', options)
+      case 'kotlin':
+      case 'swift':
         return super.getCode(language, options)
     }
   }
@@ -24,9 +35,9 @@ export class KotlinArrayBufferType extends ArrayBufferType implements KotlinType
       case 'c++':
         switch (from) {
           case 'c++':
-            return `JArrayBuffer::wrap(${value})`
+            return `JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::toJNI(${value})`
           case 'kotlin':
-            return `${value}->cthis()->getArrayBuffer()`
+            return `JNIConverter<ArrayBuffer, jni::local_ref<JArrayBuffer::JavaPart>>::fromJNI(${value})`
         }
     }
   }
@@ -35,13 +46,13 @@ export class KotlinArrayBufferType extends ArrayBufferType implements KotlinType
     const imports = super.getRequiredImports(language)
     switch (language) {
       case 'c++':
-        imports.push({
-          language: language,
-          declaration: {
-            header: 'NitroModules/JArrayBuffer.hpp',
-            space: 'system',
-          },
-        })
+        imports.push(
+          { language: language, declaration: { header: 'NitroModules/JNIConverter+ArrayBuffer.hpp', space: 'system' } },
+          { language: language, declaration: { header: 'NitroModules/JSIConverter+JArrayBuffer.hpp', space: 'system' } }
+        )
+        break
+      case 'kotlin':
+      case 'swift':
         break
     }
     return imports
