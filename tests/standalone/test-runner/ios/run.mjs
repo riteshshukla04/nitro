@@ -223,10 +223,8 @@ let lastChild
 let status = await xcodebuild(['build-for-testing', ...buildSettings])
 console.log(`Built for testing after ${elapsed()}`)
 if (status === 0 && simulator) {
-  // Xcode can start tests while a fresh simulator is still migrating data.
-  // Finish booting before starting the test watchdogs.
-  run('xcrun', ['simctl', 'bootstatus', simulator, '-b'])
-  console.log(`Simulator booted after ${elapsed()}`)
+  // EXPERIMENT: xcodebuild boots the simulator itself, after it started up.
+  console.log(`Simulator left for xcodebuild to boot after ${elapsed()}`)
 }
 if (status === 0) {
   // DIAGNOSTIC: where xcodebuild test-without-building spends its time.
