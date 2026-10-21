@@ -10,8 +10,8 @@
 #include <NitroTest/private/SizeKotlin.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTest/SizeUnit.hpp>
 #include <NitroTest/private/JSizeUnit.hpp>
+#include <NitroTest/private/SizeUnit+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
 
@@ -26,7 +26,7 @@ namespace margelo::nitro::test {
     return SizeKotlin(
       JNIConverter<double, jdouble>::fromJNI(width),
       JNIConverter<double, jdouble>::fromJNI(height),
-      unit->toCpp()
+      JNIConverter<margelo::nitro::test::SizeUnit, jni::local_ref<margelo::nitro::test::JSizeUnit>>::fromJNI(unit)
     );
   }
 
@@ -38,7 +38,7 @@ namespace margelo::nitro::test {
       clazz,
       JNIConverter<double, jdouble>::toJNI(value.width),
       JNIConverter<double, jdouble>::toJNI(value.height),
-      JSizeUnit::fromCpp(value.unit)
+      JNIConverter<margelo::nitro::test::SizeUnit, jni::local_ref<margelo::nitro::test::JSizeUnit>>::toJNI(value.unit)
     );
   }
 

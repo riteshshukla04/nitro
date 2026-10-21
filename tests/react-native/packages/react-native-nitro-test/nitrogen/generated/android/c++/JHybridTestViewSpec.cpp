@@ -8,7 +8,7 @@
 #include <NitroTest/private/JHybridTestViewSpec.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTest/ColorScheme.hpp>
+#include <NitroTest/private/JColorScheme.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <optional>
@@ -16,7 +16,6 @@
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
-#include <NitroTest/private/JColorScheme.hpp>
 #include <NitroTest/private/JCallback_void.hpp>
 #include <NitroModules/JNICallable.hpp>
 
@@ -107,14 +106,14 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jlong /* int64Value */)>("setInt64Value");
     __method(_javaPart, CxxPart::getClass(), int64Value);
   }
-  ColorScheme JHybridTestViewSpec::getColorScheme() {
+  jni::local_ref<JColorScheme> JHybridTestViewSpec::getColorScheme() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JColorScheme>()>("getColorScheme");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return __result->toCpp();
+    return __result;
   }
-  void JHybridTestViewSpec::setColorScheme(ColorScheme colorScheme) {
+  void JHybridTestViewSpec::setColorScheme(const jni::local_ref<JColorScheme>& colorScheme) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JColorScheme> /* colorScheme */)>("setColorScheme");
-    __method(_javaPart, CxxPart::getClass(), JColorScheme::fromCpp(colorScheme));
+    __method(_javaPart, CxxPart::getClass(), colorScheme);
   }
   Callback<void()> JHybridTestViewSpec::getSomeCallback() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JCallback_void::javaobject>()>("getSomeCallback_cxx");

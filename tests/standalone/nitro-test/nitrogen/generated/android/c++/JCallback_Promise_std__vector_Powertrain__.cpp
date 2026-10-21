@@ -9,47 +9,22 @@
 #include <NitroTest/Powertrain.hpp>
 #include <vector>
 #include <NitroModules/Promise.hpp>
+#include <NitroModules/JNIConverter+Promise.hpp>
+#include <NitroModules/JSIConverter+JTypedPromise.hpp>
+#include <NitroTest/private/JPowertrain.hpp>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <optional>
-#include <NitroModules/JPromise.hpp>
-#include <NitroModules/JNISharedPtr.hpp>
-#include <NitroTest/private/JPowertrain.hpp>
 
 namespace margelo::nitro::test {
 
   Promise<std::vector<Powertrain>> JCallback_Promise_std__vector_Powertrain__::invoke() const {
-    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JPromise::JavaPart>()>("invoke_jni");
+    static const auto __method = javaClassStatic()->getMethod<jni::local_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>>()>("invoke_jni");
     auto __result = __method(self());
-    return [&]() {
-      auto __promise = Promise<std::vector<Powertrain>>::pending();
-      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
-        std::optional<std::vector<Powertrain>> __converted;
-        try {
-          auto __result = jni::static_ref_cast<jni::JArrayClass<JPowertrain>>(__boxedResult);
-          __converted.emplace([&](auto&& __input) {
-            size_t __size = __input->size();
-            std::vector<Powertrain> __vector;
-            __vector.reserve(__size);
-            for (size_t __i = 0; __i < __size; __i++) {
-              auto __element = __input->getElement(__i);
-              __vector.push_back(__element->toCpp());
-            }
-            return __vector;
-          }(__result));
-        } catch (...) {
-          __promise.reject(std::current_exception());
-          return;
-        }
-        __promise.resolve(std::move(*__converted));
-      });
-      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
-        jni::JniException __jniError(__throwable);
-        __promise.reject(std::make_exception_ptr(__jniError));
-      });
-      return __promise;
-    }();
+    return JNIConverter<Promise<std::vector<Powertrain>>, jni::local_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>>>::fromJNI(__result);
   }
 
   jni::local_ref<JCallback_Promise_std__vector_Powertrain__::javaobject> JCallback_Promise_std__vector_Powertrain___cxx::fromCpp(const Callback<Promise<std::vector<Powertrain>>()>& callback) {
@@ -60,39 +35,9 @@ namespace margelo::nitro::test {
     return newObjectCxxArgs(callback.escape(), true);
   }
 
-  jni::local_ref<JPromise::JavaPart> JCallback_Promise_std__vector_Powertrain___cxx::invoke_cxx() {
+  jni::local_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>> JCallback_Promise_std__vector_Powertrain___cxx::invoke_cxx() {
     Promise<std::vector<Powertrain>> __result = _callback.callSync();
-    return [&]() {
-      jni::local_ref<JPromise::JavaPart> __localPromise = JPromise::create();
-      auto __promise = JNISharedPtr::make_shared_from_jni<JPromise>(jni::make_global(__localPromise));
-      __result.addOnResolvedListener([=](const std::vector<Powertrain>& __result) {
-        jni::ThreadScope::WithClassLoader([&] {
-          std::optional<jni::local_ref<jni::JArrayClass<JPowertrain>>> __converted;
-          try {
-            __converted.emplace([&](auto&& __input) {
-              size_t __size = __input.size();
-              jni::local_ref<jni::JArrayClass<JPowertrain>> __array = jni::JArrayClass<JPowertrain>::newArray(__size);
-              for (size_t __i = 0; __i < __size; __i++) {
-                const auto& __element = __input[__i];
-                auto __elementJni = JPowertrain::fromCpp(__element);
-                __array->setElement(__i, *__elementJni);
-              }
-              return __array;
-            }(__result));
-          } catch (...) {
-            __promise->reject(std::current_exception());
-            return;
-          }
-          __promise->resolve(*__converted);
-        });
-      });
-      __result.addOnRejectedListener([=](const std::exception_ptr& __error) {
-        jni::ThreadScope::WithClassLoader([&] {
-          __promise->reject(__error);
-        });
-      });
-      return __localPromise;
-    }();
+    return JNIConverter<Promise<std::vector<Powertrain>>, jni::local_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>>>::toJNI(__result);
   }
 
   void JCallback_Promise_std__vector_Powertrain___cxx::registerNatives() {

@@ -21,6 +21,7 @@
 #include <NitroModules/JNIConverter.hpp>
 #include <NitroTest/private/SizeKotlin.hpp>
 #include <NitroTest/private/Size+Kotlin+NitroTest.hpp>
+#include <NitroTest/private/SizeUnit+Kotlin+NitroTest.hpp>
 #include <NitroTestExternal/private/JHybridSomeExternalObjectSpec.hpp>
 #include <NitroTest/private/HybridSomeExternalObjectSpecCxx+NitroTestExternal+JNI.hpp>
 
@@ -60,8 +61,8 @@ namespace margelo::nitro::test {
     if (__implementation == nullptr) [[unlikely]] {
       throw std::invalid_argument("Cannot call Base.bounceSizeUnit on an empty or incompatible C++ adapter.");
     }
-    auto __result = __implementation->bounceSizeUnit(JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::toJNI(unit));
-    return JNIConverter<margelo::nitro::test::SizeUnit, margelo::nitro::test::SizeUnit>::fromJNI(__result);
+    auto __result = __implementation->bounceSizeUnit(JNIConverter<margelo::nitro::test::SizeUnit, jni::local_ref<margelo::nitro::test::JSizeUnit>>::toJNI(unit));
+    return JNIConverter<margelo::nitro::test::SizeUnit, jni::local_ref<margelo::nitro::test::JSizeUnit>>::fromJNI(__result);
   }
 
   Promise<margelo::nitro::test::Size> HybridBaseSpecCxx::mapSize(const Size& size, const Callback<Size(const Size& /* size */)>& callback) const {

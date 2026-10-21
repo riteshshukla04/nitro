@@ -8,54 +8,58 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/OldEnum.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <stdexcept>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ enum "OldEnum" and the Kotlin enum "OldEnum".
-   */
+  /** JNI access to the Kotlin enum OldEnum. */
   struct JOldEnum final : public jni::JavaClass<JOldEnum> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/OldEnum;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based enum to the C++ enum OldEnum.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    OldEnum toCpp() const {
-      static const auto clazz = javaClassStatic();
-      static const auto fieldOrdinal = clazz->getField<int>("value");
-      int ordinal = this->getFieldValue(fieldOrdinal);
-      return static_cast<OldEnum>(ordinal);
+    int32_t value() const {
+      static const auto field = javaClassStatic()->getField<jint>("value");
+      return getFieldValue(field);
     }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based enum with the given C++ enum's value.
-     */
-    [[maybe_unused]]
-    static jni::alias_ref<JOldEnum> fromCpp(OldEnum value) {
+    static jni::local_ref<JOldEnum> fromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
-        case OldEnum::FIRST:
-          static const auto fieldFIRST = clazz->getStaticField<JOldEnum>("FIRST");
-          return clazz->getStaticFieldValue(fieldFIRST);
-        case OldEnum::SECOND:
-          static const auto fieldSECOND = clazz->getStaticField<JOldEnum>("SECOND");
-          return clazz->getStaticFieldValue(fieldSECOND);
-        case OldEnum::THIRD:
-          static const auto fieldTHIRD = clazz->getStaticField<JOldEnum>("THIRD");
-          return clazz->getStaticFieldValue(fieldTHIRD);
-        default:
-          std::string stringValue = std::to_string(static_cast<int>(value));
-          throw std::invalid_argument("Invalid enum value (" + stringValue + "!");
+        case 0: {
+          static const auto field_FIRST = clazz->getStaticField<JOldEnum>("FIRST");
+          static const auto instance_FIRST = jni::make_global(clazz->getStaticFieldValue(field_FIRST));
+          return jni::make_local(instance_FIRST);
+        }
+        case 1: {
+          static const auto field_SECOND = clazz->getStaticField<JOldEnum>("SECOND");
+          static const auto instance_SECOND = jni::make_global(clazz->getStaticFieldValue(field_SECOND));
+          return jni::make_local(instance_SECOND);
+        }
+        case 2: {
+          static const auto field_THIRD = clazz->getStaticField<JOldEnum>("THIRD");
+          static const auto instance_THIRD = jni::make_global(clazz->getStaticFieldValue(field_THIRD));
+          return jni::make_local(instance_THIRD);
+        }
+        default: [[unlikely]]
+          throw std::invalid_argument("Invalid OldEnum value: " + std::to_string(value));
       }
     }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JOldEnum>> {
+    static jni::local_ref<margelo::nitro::test::JOldEnum> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JOldEnum> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

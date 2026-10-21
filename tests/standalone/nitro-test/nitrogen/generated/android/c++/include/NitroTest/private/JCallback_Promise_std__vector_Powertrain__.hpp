@@ -13,13 +13,15 @@
 #include <NitroTest/Powertrain.hpp>
 #include <vector>
 #include <NitroModules/Promise.hpp>
+#include <NitroModules/JNIConverter+Promise.hpp>
+#include <NitroModules/JSIConverter+JTypedPromise.hpp>
+#include <NitroTest/private/JPowertrain.hpp>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <optional>
-#include <NitroModules/JPromise.hpp>
-#include <NitroModules/JNISharedPtr.hpp>
-#include <NitroTest/private/JPowertrain.hpp>
 
 namespace margelo::nitro::test {
 
@@ -52,7 +54,7 @@ namespace margelo::nitro::test {
     /**
      * Invokes the C++ `Callback<...>` this `JCallback_Promise_std__vector_Powertrain___cxx` instance holds.
      */
-    jni::local_ref<JPromise::JavaPart> invoke_cxx();
+    jni::local_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>> invoke_cxx();
 
   public:
     [[nodiscard]]

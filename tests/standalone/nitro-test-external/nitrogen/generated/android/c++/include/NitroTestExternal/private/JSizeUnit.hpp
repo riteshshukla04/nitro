@@ -8,51 +8,53 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTestExternal/SizeUnit.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <stdexcept>
 
 namespace margelo::nitro::test::external {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ enum "SizeUnit" and the Kotlin enum "SizeUnit".
-   */
+  /** JNI access to the Kotlin enum SizeUnit. */
   struct JSizeUnit final : public jni::JavaClass<JSizeUnit> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/external/SizeUnit;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based enum to the C++ enum SizeUnit.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    SizeUnit toCpp() const {
-      static const auto clazz = javaClassStatic();
-      static const auto fieldOrdinal = clazz->getField<int>("value");
-      int ordinal = this->getFieldValue(fieldOrdinal);
-      return static_cast<SizeUnit>(ordinal);
+    int32_t value() const {
+      static const auto field = javaClassStatic()->getField<jint>("value");
+      return getFieldValue(field);
     }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based enum with the given C++ enum's value.
-     */
-    [[maybe_unused]]
-    static jni::alias_ref<JSizeUnit> fromCpp(SizeUnit value) {
+    static jni::local_ref<JSizeUnit> fromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
-        case SizeUnit::PIXELS:
-          static const auto fieldPIXELS = clazz->getStaticField<JSizeUnit>("PIXELS");
-          return clazz->getStaticFieldValue(fieldPIXELS);
-        case SizeUnit::NORMALIZED:
-          static const auto fieldNORMALIZED = clazz->getStaticField<JSizeUnit>("NORMALIZED");
-          return clazz->getStaticFieldValue(fieldNORMALIZED);
-        default:
-          std::string stringValue = std::to_string(static_cast<int>(value));
-          throw std::invalid_argument("Invalid enum value (" + stringValue + "!");
+        case 10: {
+          static const auto field_PIXELS = clazz->getStaticField<JSizeUnit>("PIXELS");
+          static const auto instance_PIXELS = jni::make_global(clazz->getStaticFieldValue(field_PIXELS));
+          return jni::make_local(instance_PIXELS);
+        }
+        case 20: {
+          static const auto field_NORMALIZED = clazz->getStaticField<JSizeUnit>("NORMALIZED");
+          static const auto instance_NORMALIZED = jni::make_global(clazz->getStaticFieldValue(field_NORMALIZED));
+          return jni::make_local(instance_NORMALIZED);
+        }
+        default: [[unlikely]]
+          throw std::invalid_argument("Invalid SizeUnit value: " + std::to_string(value));
       }
     }
   };
 
 } // namespace margelo::nitro::test::external
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::external::JSizeUnit>> {
+    static jni::local_ref<margelo::nitro::test::external::JSizeUnit> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::external::JSizeUnit> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

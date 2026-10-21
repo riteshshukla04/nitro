@@ -8,51 +8,53 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/ColorScheme.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <stdexcept>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ enum "ColorScheme" and the Kotlin enum "ColorScheme".
-   */
+  /** JNI access to the Kotlin enum ColorScheme. */
   struct JColorScheme final : public jni::JavaClass<JColorScheme> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/ColorScheme;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based enum to the C++ enum ColorScheme.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    ColorScheme toCpp() const {
-      static const auto clazz = javaClassStatic();
-      static const auto fieldOrdinal = clazz->getField<int>("value");
-      int ordinal = this->getFieldValue(fieldOrdinal);
-      return static_cast<ColorScheme>(ordinal);
+    int32_t value() const {
+      static const auto field = javaClassStatic()->getField<jint>("value");
+      return getFieldValue(field);
     }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based enum with the given C++ enum's value.
-     */
-    [[maybe_unused]]
-    static jni::alias_ref<JColorScheme> fromCpp(ColorScheme value) {
+    static jni::local_ref<JColorScheme> fromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
-        case ColorScheme::LIGHT:
-          static const auto fieldLIGHT = clazz->getStaticField<JColorScheme>("LIGHT");
-          return clazz->getStaticFieldValue(fieldLIGHT);
-        case ColorScheme::DARK:
-          static const auto fieldDARK = clazz->getStaticField<JColorScheme>("DARK");
-          return clazz->getStaticFieldValue(fieldDARK);
-        default:
-          std::string stringValue = std::to_string(static_cast<int>(value));
-          throw std::invalid_argument("Invalid enum value (" + stringValue + "!");
+        case 0: {
+          static const auto field_LIGHT = clazz->getStaticField<JColorScheme>("LIGHT");
+          static const auto instance_LIGHT = jni::make_global(clazz->getStaticFieldValue(field_LIGHT));
+          return jni::make_local(instance_LIGHT);
+        }
+        case 1: {
+          static const auto field_DARK = clazz->getStaticField<JColorScheme>("DARK");
+          static const auto instance_DARK = jni::make_global(clazz->getStaticFieldValue(field_DARK));
+          return jni::make_local(instance_DARK);
+        }
+        default: [[unlikely]]
+          throw std::invalid_argument("Invalid ColorScheme value: " + std::to_string(value));
       }
     }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JColorScheme>> {
+    static jni::local_ref<margelo::nitro::test::JColorScheme> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JColorScheme> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

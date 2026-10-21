@@ -14,7 +14,6 @@
 #include <NitroTest/private/JCar.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <optional>

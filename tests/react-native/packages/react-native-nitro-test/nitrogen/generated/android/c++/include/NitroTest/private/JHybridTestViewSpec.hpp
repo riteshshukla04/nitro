@@ -13,7 +13,7 @@
 #include <NitroTest/private/JHybridTestViewSpecJavaPart.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTest/ColorScheme.hpp>
+#include <NitroTest/private/JColorScheme.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <optional>
@@ -66,8 +66,8 @@ namespace margelo::nitro::test {
     void setHasBeenCalled(jboolean hasBeenCalled);
     jlong getInt64Value();
     void setInt64Value(jlong int64Value);
-    ColorScheme getColorScheme();
-    void setColorScheme(ColorScheme colorScheme);
+    jni::local_ref<JColorScheme> getColorScheme();
+    void setColorScheme(const jni::local_ref<JColorScheme>& colorScheme);
     Callback<void()> getSomeCallback();
     void setSomeCallback(const Callback<void()>& someCallback);
     jni::local_ref<JOptional<jni::JDouble>> getNativeDefaultValue();

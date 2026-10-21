@@ -19,8 +19,10 @@ target_sources(NitroTestExternal PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JHybridSomeExternalObjectSpec.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JOptionalPrimitivesHolder.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JSize.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/../android/c++/JSizeUnit.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/OptionalPrimitivesHolderKotlin.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../android/c++/SizeKotlin.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/../android/c++/SizeUnit+Kotlin+NitroTestExternal.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/CppOnlyValue.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/../shared/c++/HybridCppValueSourceSpec.cpp"
 )

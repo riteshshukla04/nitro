@@ -8,54 +8,58 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/WeirdNumbersEnum.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <stdexcept>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ enum "WeirdNumbersEnum" and the Kotlin enum "WeirdNumbersEnum".
-   */
+  /** JNI access to the Kotlin enum WeirdNumbersEnum. */
   struct JWeirdNumbersEnum final : public jni::JavaClass<JWeirdNumbersEnum> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/WeirdNumbersEnum;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based enum to the C++ enum WeirdNumbersEnum.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    WeirdNumbersEnum toCpp() const {
-      static const auto clazz = javaClassStatic();
-      static const auto fieldOrdinal = clazz->getField<int>("value");
-      int ordinal = this->getFieldValue(fieldOrdinal);
-      return static_cast<WeirdNumbersEnum>(ordinal);
+    int32_t value() const {
+      static const auto field = javaClassStatic()->getField<jint>("value");
+      return getFieldValue(field);
     }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based enum with the given C++ enum's value.
-     */
-    [[maybe_unused]]
-    static jni::alias_ref<JWeirdNumbersEnum> fromCpp(WeirdNumbersEnum value) {
+    static jni::local_ref<JWeirdNumbersEnum> fromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
-        case WeirdNumbersEnum::A:
-          static const auto fieldA = clazz->getStaticField<JWeirdNumbersEnum>("A");
-          return clazz->getStaticFieldValue(fieldA);
-        case WeirdNumbersEnum::B:
-          static const auto fieldB = clazz->getStaticField<JWeirdNumbersEnum>("B");
-          return clazz->getStaticFieldValue(fieldB);
-        case WeirdNumbersEnum::C:
-          static const auto fieldC = clazz->getStaticField<JWeirdNumbersEnum>("C");
-          return clazz->getStaticFieldValue(fieldC);
-        default:
-          std::string stringValue = std::to_string(static_cast<int>(value));
-          throw std::invalid_argument("Invalid enum value (" + stringValue + "!");
+        case 0: {
+          static const auto field_A = clazz->getStaticField<JWeirdNumbersEnum>("A");
+          static const auto instance_A = jni::make_global(clazz->getStaticFieldValue(field_A));
+          return jni::make_local(instance_A);
+        }
+        case 32: {
+          static const auto field_B = clazz->getStaticField<JWeirdNumbersEnum>("B");
+          static const auto instance_B = jni::make_global(clazz->getStaticFieldValue(field_B));
+          return jni::make_local(instance_B);
+        }
+        case 64: {
+          static const auto field_C = clazz->getStaticField<JWeirdNumbersEnum>("C");
+          static const auto instance_C = jni::make_global(clazz->getStaticFieldValue(field_C));
+          return jni::make_local(instance_C);
+        }
+        default: [[unlikely]]
+          throw std::invalid_argument("Invalid WeirdNumbersEnum value: " + std::to_string(value));
       }
     }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JWeirdNumbersEnum>> {
+    static jni::local_ref<margelo::nitro::test::JWeirdNumbersEnum> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JWeirdNumbersEnum> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

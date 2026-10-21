@@ -8,54 +8,58 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/Powertrain.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <stdexcept>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ enum "Powertrain" and the Kotlin enum "Powertrain".
-   */
+  /** JNI access to the Kotlin enum Powertrain. */
   struct JPowertrain final : public jni::JavaClass<JPowertrain> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/Powertrain;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based enum to the C++ enum Powertrain.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    Powertrain toCpp() const {
-      static const auto clazz = javaClassStatic();
-      static const auto fieldOrdinal = clazz->getField<int>("value");
-      int ordinal = this->getFieldValue(fieldOrdinal);
-      return static_cast<Powertrain>(ordinal);
+    int32_t value() const {
+      static const auto field = javaClassStatic()->getField<jint>("value");
+      return getFieldValue(field);
     }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based enum with the given C++ enum's value.
-     */
-    [[maybe_unused]]
-    static jni::alias_ref<JPowertrain> fromCpp(Powertrain value) {
+    static jni::local_ref<JPowertrain> fromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
-        case Powertrain::ELECTRIC:
-          static const auto fieldELECTRIC = clazz->getStaticField<JPowertrain>("ELECTRIC");
-          return clazz->getStaticFieldValue(fieldELECTRIC);
-        case Powertrain::GAS:
-          static const auto fieldGAS = clazz->getStaticField<JPowertrain>("GAS");
-          return clazz->getStaticFieldValue(fieldGAS);
-        case Powertrain::HYBRID:
-          static const auto fieldHYBRID = clazz->getStaticField<JPowertrain>("HYBRID");
-          return clazz->getStaticFieldValue(fieldHYBRID);
-        default:
-          std::string stringValue = std::to_string(static_cast<int>(value));
-          throw std::invalid_argument("Invalid enum value (" + stringValue + "!");
+        case 0: {
+          static const auto field_ELECTRIC = clazz->getStaticField<JPowertrain>("ELECTRIC");
+          static const auto instance_ELECTRIC = jni::make_global(clazz->getStaticFieldValue(field_ELECTRIC));
+          return jni::make_local(instance_ELECTRIC);
+        }
+        case 1: {
+          static const auto field_GAS = clazz->getStaticField<JPowertrain>("GAS");
+          static const auto instance_GAS = jni::make_global(clazz->getStaticFieldValue(field_GAS));
+          return jni::make_local(instance_GAS);
+        }
+        case 2: {
+          static const auto field_HYBRID = clazz->getStaticField<JPowertrain>("HYBRID");
+          static const auto instance_HYBRID = jni::make_global(clazz->getStaticFieldValue(field_HYBRID));
+          return jni::make_local(instance_HYBRID);
+        }
+        default: [[unlikely]]
+          throw std::invalid_argument("Invalid Powertrain value: " + std::to_string(value));
       }
     }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JPowertrain>> {
+    static jni::local_ref<margelo::nitro::test::JPowertrain> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JPowertrain> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

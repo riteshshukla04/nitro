@@ -11,6 +11,7 @@
 #include <NitroTest/private/JOldEnum.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroTest/private/OldEnum+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
   jni::local_ref<JVariant_OldEnum_Boolean> JVariant_OldEnum_Boolean::create_0(jni::alias_ref<JOldEnum> value) {
@@ -25,7 +26,7 @@ namespace margelo::nitro::test {
 
   jni::local_ref<JVariant_OldEnum_Boolean> JVariant_OldEnum_Boolean::fromCpp(const std::variant<OldEnum, bool>& variant) {
     switch (variant.index()) {
-      case 0: return create_0(JOldEnum::fromCpp(std::get<0>(variant)));
+      case 0: return create_0(JNIConverter<margelo::nitro::test::OldEnum, jni::local_ref<margelo::nitro::test::JOldEnum>>::toJNI(std::get<0>(variant)));
       case 1: return create_1(JNIConverter<bool, jboolean>::toJNI(std::get<1>(variant)));
       default: throw std::invalid_argument("Variant holds unknown index! (" + std::to_string(variant.index()) + ")");
     }
@@ -48,7 +49,7 @@ namespace margelo::nitro::test {
     if (isInstanceOf(JVariant_OldEnum_Boolean_impl::First::javaClassStatic())) {
       // It's a `OldEnum`
       auto jniValue = static_cast<const JVariant_OldEnum_Boolean_impl::First*>(this)->getValue();
-      return jniValue->toCpp();
+      return JNIConverter<margelo::nitro::test::OldEnum, jni::local_ref<margelo::nitro::test::JOldEnum>>::fromJNI(jniValue);
     } else if (isInstanceOf(JVariant_OldEnum_Boolean_impl::Second::javaClassStatic())) {
       // It's a `bool`
       auto jniValue = static_cast<const JVariant_OldEnum_Boolean_impl::Second*>(this)->getValue();

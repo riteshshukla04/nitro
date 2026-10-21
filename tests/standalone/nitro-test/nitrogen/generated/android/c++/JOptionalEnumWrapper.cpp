@@ -15,6 +15,7 @@
 #include <NitroModules/JSIConverter+JOptional.hpp>
 #include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
+#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
 
@@ -48,14 +49,14 @@ namespace margelo::nitro::test {
     jni::local_ref<JOptional<jni::JBoolean>> shouldRetry = this->getFieldValue(fieldShouldRetry);
     static const auto fieldVerbose = clazz->getField<JOptional<jni::JBoolean>>("verbose");
     jni::local_ref<JOptional<jni::JBoolean>> verbose = this->getFieldValue(fieldVerbose);
-    static const auto fieldTier = clazz->getField<JPowertrain>("tier");
-    jni::local_ref<JPowertrain> tier = this->getFieldValue(fieldTier);
-    static const auto fieldRegion = clazz->getField<JPowertrain>("region");
-    jni::local_ref<JPowertrain> region = this->getFieldValue(fieldRegion);
-    static const auto fieldStage = clazz->getField<JPowertrain>("stage");
-    jni::local_ref<JPowertrain> stage = this->getFieldValue(fieldStage);
-    static const auto fieldTone = clazz->getField<JPowertrain>("tone");
-    jni::local_ref<JPowertrain> tone = this->getFieldValue(fieldTone);
+    static const auto fieldTier = clazz->getField<JOptional<JPowertrain>>("tier");
+    jni::local_ref<JOptional<JPowertrain>> tier = this->getFieldValue(fieldTier);
+    static const auto fieldRegion = clazz->getField<JOptional<JPowertrain>>("region");
+    jni::local_ref<JOptional<JPowertrain>> region = this->getFieldValue(fieldRegion);
+    static const auto fieldStage = clazz->getField<JOptional<JPowertrain>>("stage");
+    jni::local_ref<JOptional<JPowertrain>> stage = this->getFieldValue(fieldStage);
+    static const auto fieldTone = clazz->getField<JOptional<JPowertrain>>("tone");
+    jni::local_ref<JOptional<JPowertrain>> tone = this->getFieldValue(fieldTone);
     return OptionalEnumWrapperKotlin(
       JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(count),
       JNIConverter<std::optional<double>, jni::local_ref<JOptional<jni::JDouble>>>::fromJNI(weight),
@@ -71,15 +72,15 @@ namespace margelo::nitro::test {
       JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::fromJNI(shouldBuffer),
       JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::fromJNI(shouldRetry),
       JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::fromJNI(verbose),
-      tier != nullptr ? std::make_optional(tier->toCpp()) : std::nullopt,
-      region != nullptr ? std::make_optional(region->toCpp()) : std::nullopt,
-      stage != nullptr ? std::make_optional(stage->toCpp()) : std::nullopt,
-      tone != nullptr ? std::make_optional(tone->toCpp()) : std::nullopt
+      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::fromJNI(tier),
+      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::fromJNI(region),
+      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::fromJNI(stage),
+      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::fromJNI(tone)
     );
   }
 
   jni::local_ref<JOptionalEnumWrapper::javaobject> JOptionalEnumWrapper::fromCpp(const OptionalEnumWrapperKotlin& value) {
-    using JSignature = JOptionalEnumWrapper(jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JPowertrain>, jni::alias_ref<JPowertrain>, jni::alias_ref<JPowertrain>, jni::alias_ref<JPowertrain>);
+    using JSignature = JOptionalEnumWrapper(jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JDouble>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<jni::JBoolean>>, jni::alias_ref<JOptional<JPowertrain>>, jni::alias_ref<JOptional<JPowertrain>>, jni::alias_ref<JOptional<JPowertrain>>, jni::alias_ref<JOptional<JPowertrain>>);
     static const auto clazz = javaClassStatic();
     static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
     return create(
@@ -98,10 +99,10 @@ namespace margelo::nitro::test {
       JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::toJNI(value.shouldBuffer),
       JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::toJNI(value.shouldRetry),
       JNIConverter<std::optional<bool>, jni::local_ref<JOptional<jni::JBoolean>>>::toJNI(value.verbose),
-      value.tier.has_value() ? JPowertrain::fromCpp(value.tier.value()) : nullptr,
-      value.region.has_value() ? JPowertrain::fromCpp(value.region.value()) : nullptr,
-      value.stage.has_value() ? JPowertrain::fromCpp(value.stage.value()) : nullptr,
-      value.tone.has_value() ? JPowertrain::fromCpp(value.tone.value()) : nullptr
+      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::toJNI(value.tier),
+      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::toJNI(value.region),
+      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::toJNI(value.stage),
+      JNIConverter<std::optional<Powertrain>, jni::local_ref<JOptional<JPowertrain>>>::toJNI(value.tone)
     );
   }
 

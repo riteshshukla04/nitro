@@ -8,8 +8,8 @@
 #include <NitroTest/private/views/JHybridTestViewStateUpdater.hpp>
 #include <NitroTest/private/views/HybridTestViewComponent.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
+#include <NitroTest/private/ColorScheme+Kotlin+NitroTest.hpp>
 #include <NitroModules/JNIConverter.hpp>
-#include <NitroTest/ColorScheme.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <optional>
@@ -90,7 +90,7 @@ void JHybridTestViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /*
     if (oldProps == nullptr
           ? newProps->colorScheme.isProvided()
           : !newProps->colorScheme.hasSameValue(oldProps->colorScheme)) {
-      hybridView->setColorScheme(JNIConverter<margelo::nitro::test::ColorScheme, margelo::nitro::test::ColorScheme>::toJNI(newProps->colorScheme.get()));
+      hybridView->setColorScheme(JNIConverter<margelo::nitro::test::ColorScheme, jni::local_ref<margelo::nitro::test::JColorScheme>>::toJNI(newProps->colorScheme.get()));
     }
     if (oldProps == nullptr
           ? newProps->someCallback.isProvided()

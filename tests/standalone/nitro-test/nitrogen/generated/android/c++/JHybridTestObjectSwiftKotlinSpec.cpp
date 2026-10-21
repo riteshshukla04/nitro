@@ -22,8 +22,11 @@
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JArrayClass.hpp>
 #include <NitroTest/Powertrain.hpp>
+#include <NitroTest/private/JPowertrain.hpp>
 #include <NitroTest/OldEnum.hpp>
+#include <NitroTest/private/JOldEnum.hpp>
 #include <NitroTest/TruckPowertrain.hpp>
+#include <NitroTest/private/JTruckPowertrain.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
@@ -33,13 +36,13 @@
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <NitroTest/private/PartialPersonKotlin.hpp>
 #include <NitroModules/Promise.hpp>
+#include <NitroModules/JNIConverter+Promise.hpp>
+#include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroTest/private/JHybridChildSpec.hpp>
 #include <NitroModules/AnyJSON.hpp>
 #include <NitroModules/JAnyJSON.hpp>
 #include <NitroModules/JNIConverter+AnyJSON.hpp>
 #include <NitroModules/JSIConverter+JAnyJSON.hpp>
-#include <NitroModules/JNIConverter+Promise.hpp>
-#include <NitroModules/JSIConverter+JTypedPromise.hpp>
 #include <NitroModules/ArrayBuffer.hpp>
 #include <NitroModules/JNIConverter+ArrayBuffer.hpp>
 #include <NitroModules/JSIConverter+JArrayBuffer.hpp>
@@ -63,22 +66,19 @@
 #include <NitroModules/JSIConverter+JThrowable.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <NitroTest/private/JsStyleStructKotlin.hpp>
-#include <NitroTest/HardwareBufferFormat.hpp>
+#include <NitroTest/private/JHardwareBufferFormat.hpp>
 #include <NitroModules/JUInt64.hpp>
 #include <NitroTest/private/JVariant_NullType_String.hpp>
-#include <NitroTest/private/JPowertrain.hpp>
-#include <NitroTest/private/JOldEnum.hpp>
-#include <NitroTest/private/JTruckPowertrain.hpp>
 #include <NitroTest/private/JCallback_void_double.hpp>
 #include <NitroModules/JNICallable.hpp>
 #include <NitroTest/private/JVariant_Double_String.hpp>
 #include <NitroTest/private/JPerson.hpp>
 #include <NitroTest/private/JPartialPerson.hpp>
 #include <NitroTest/private/JCallback_std__vector_Powertrain__std__vector_Powertrain_.hpp>
-#include <NitroModules/JPromise.hpp>
-#include <NitroModules/JNISharedPtr.hpp>
 #include <NitroTest/private/JCallback_void.hpp>
 #include <NitroTest/private/JVariant_Boolean_Double.hpp>
+#include <NitroModules/JPromise.hpp>
+#include <NitroModules/JNISharedPtr.hpp>
 #include <NitroTest/private/JCar.hpp>
 #include <NitroTest/private/JWrappedJsStruct.hpp>
 #include <NitroTest/private/JJsStyleStruct.hpp>
@@ -99,7 +99,6 @@
 #include <NitroTest/private/JExternalObjectStruct.hpp>
 #include <NitroTest/private/JStringOrExternal.hpp>
 #include <NitroTest/private/JCppOnlyValue.hpp>
-#include <NitroTest/CppOnlyValueKind.hpp>
 #include <NitroTest/private/JCppOnlyValueKind.hpp>
 #include <NitroTest/private/JVariant_HybridTestObjectSwiftKotlinSpec_Person.hpp>
 #include <NitroTest/private/JCallback_void_std__vector_Powertrain_.hpp>
@@ -116,7 +115,6 @@
 #include <NitroTest/private/JCallback_void_std__string.hpp>
 #include <NitroTest/private/JCallback_void_std__exception_ptr.hpp>
 #include <NitroTest/private/JCallback_std__string.hpp>
-#include <NitroTest/private/JHardwareBufferFormat.hpp>
 #include <NitroTest/private/JVariant_Boolean_DoubleArray_Array_String__Double_String.hpp>
 #include <NitroTest/private/JCallback_std__shared_ptr_margelo__nitro__test__external__JHybridSomeExternalObjectSpec_.hpp>
 
@@ -428,32 +426,32 @@ namespace margelo::nitro::test {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JOptional<jni::JArrayClass<jni::JString>>> /* optionalArray */)>("setOptionalArray");
     __method(_javaPart, CxxPart::getClass(), optionalArray);
   }
-  std::optional<Powertrain> JHybridTestObjectSwiftKotlinSpec::getOptionalEnum() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPowertrain>()>("getOptionalEnum");
+  jni::local_ref<JOptional<JPowertrain>> JHybridTestObjectSwiftKotlinSpec::getOptionalEnum() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOptional<JPowertrain>>()>("getOptionalEnum");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return __result != nullptr ? std::make_optional(__result->toCpp()) : std::nullopt;
+    return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setOptionalEnum(const std::optional<Powertrain>& optionalEnum) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JPowertrain> /* optionalEnum */)>("setOptionalEnum");
-    __method(_javaPart, CxxPart::getClass(), optionalEnum.has_value() ? JPowertrain::fromCpp(optionalEnum.value()) : nullptr);
+  void JHybridTestObjectSwiftKotlinSpec::setOptionalEnum(const jni::local_ref<JOptional<JPowertrain>>& optionalEnum) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JOptional<JPowertrain>> /* optionalEnum */)>("setOptionalEnum");
+    __method(_javaPart, CxxPart::getClass(), optionalEnum);
   }
-  std::optional<OldEnum> JHybridTestObjectSwiftKotlinSpec::getOptionalOldEnum() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOldEnum>()>("getOptionalOldEnum");
+  jni::local_ref<JOptional<JOldEnum>> JHybridTestObjectSwiftKotlinSpec::getOptionalOldEnum() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOptional<JOldEnum>>()>("getOptionalOldEnum");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return __result != nullptr ? std::make_optional(__result->toCpp()) : std::nullopt;
+    return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setOptionalOldEnum(const std::optional<OldEnum>& optionalOldEnum) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JOldEnum> /* optionalOldEnum */)>("setOptionalOldEnum");
-    __method(_javaPart, CxxPart::getClass(), optionalOldEnum.has_value() ? JOldEnum::fromCpp(optionalOldEnum.value()) : nullptr);
+  void JHybridTestObjectSwiftKotlinSpec::setOptionalOldEnum(const jni::local_ref<JOptional<JOldEnum>>& optionalOldEnum) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JOptional<JOldEnum>> /* optionalOldEnum */)>("setOptionalOldEnum");
+    __method(_javaPart, CxxPart::getClass(), optionalOldEnum);
   }
-  std::optional<TruckPowertrain> JHybridTestObjectSwiftKotlinSpec::getOptionalEnumPlusOne() {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JTruckPowertrain>()>("getOptionalEnumPlusOne");
+  jni::local_ref<JOptional<JTruckPowertrain>> JHybridTestObjectSwiftKotlinSpec::getOptionalEnumPlusOne() {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOptional<JTruckPowertrain>>()>("getOptionalEnumPlusOne");
     auto __result = __method(_javaPart, CxxPart::getClass());
-    return __result != nullptr ? std::make_optional(__result->toCpp()) : std::nullopt;
+    return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::setOptionalEnumPlusOne(const std::optional<TruckPowertrain>& optionalEnumPlusOne) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JTruckPowertrain> /* optionalEnumPlusOne */)>("setOptionalEnumPlusOne");
-    __method(_javaPart, CxxPart::getClass(), optionalEnumPlusOne.has_value() ? JTruckPowertrain::fromCpp(optionalEnumPlusOne.value()) : nullptr);
+  void JHybridTestObjectSwiftKotlinSpec::setOptionalEnumPlusOne(const jni::local_ref<JOptional<JTruckPowertrain>>& optionalEnumPlusOne) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<JOptional<JTruckPowertrain>> /* optionalEnumPlusOne */)>("setOptionalEnumPlusOne");
+    __method(_javaPart, CxxPart::getClass(), optionalEnumPlusOne);
   }
   std::optional<Callback<void(double /* value */)>> JHybridTestObjectSwiftKotlinSpec::getOptionalCallback() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JCallback_void_double::javaobject>()>("getOptionalCallback_cxx");
@@ -659,64 +657,19 @@ namespace margelo::nitro::test {
     }(cars));
     return __result;
   }
-  std::vector<Powertrain> JHybridTestObjectSwiftKotlinSpec::bounceEnums(const std::vector<Powertrain>& array) {
+  jni::local_ref<jni::JArrayClass<JPowertrain>> JHybridTestObjectSwiftKotlinSpec::bounceEnums(const jni::local_ref<jni::JArrayClass<JPowertrain>>& array) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JArrayClass<JPowertrain>>(jni::alias_ref<jni::JArrayClass<JPowertrain>> /* array */)>("bounceEnums");
-    auto __result = __method(_javaPart, CxxPart::getClass(), [&](auto&& __input) {
-      size_t __size = __input.size();
-      jni::local_ref<jni::JArrayClass<JPowertrain>> __array = jni::JArrayClass<JPowertrain>::newArray(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        const auto& __element = __input[__i];
-        auto __elementJni = JPowertrain::fromCpp(__element);
-        __array->setElement(__i, *__elementJni);
-      }
-      return __array;
-    }(array));
-    return [&](auto&& __input) {
-      size_t __size = __input->size();
-      std::vector<Powertrain> __vector;
-      __vector.reserve(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        auto __element = __input->getElement(__i);
-        __vector.push_back(__element->toCpp());
-      }
-      return __vector;
-    }(__result);
+    auto __result = __method(_javaPart, CxxPart::getClass(), array);
+    return __result;
   }
-  void JHybridTestObjectSwiftKotlinSpec::complexEnumCallback(const std::vector<Powertrain>& array, const Callback<void(const std::vector<Powertrain>& /* array */)>& callback) {
+  void JHybridTestObjectSwiftKotlinSpec::complexEnumCallback(const jni::local_ref<jni::JArrayClass<JPowertrain>>& array, const Callback<void(const std::vector<Powertrain>& /* array */)>& callback) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<void(jni::alias_ref<jni::JArrayClass<JPowertrain>> /* array */, jni::alias_ref<JCallback_void_std__vector_Powertrain_::javaobject> /* callback */)>("complexEnumCallback_cxx");
-    __method(_javaPart, CxxPart::getClass(), [&](auto&& __input) {
-      size_t __size = __input.size();
-      jni::local_ref<jni::JArrayClass<JPowertrain>> __array = jni::JArrayClass<JPowertrain>::newArray(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        const auto& __element = __input[__i];
-        auto __elementJni = JPowertrain::fromCpp(__element);
-        __array->setElement(__i, *__elementJni);
-      }
-      return __array;
-    }(array), JCallback_void_std__vector_Powertrain__cxx::fromCpp(callback));
+    __method(_javaPart, CxxPart::getClass(), array, JCallback_void_std__vector_Powertrain__cxx::fromCpp(callback));
   }
-  std::vector<Powertrain> JHybridTestObjectSwiftKotlinSpec::callEnumArrayCallback(const std::vector<Powertrain>& array, const Callback<std::vector<Powertrain>(const std::vector<Powertrain>& /* array */)>& callback) {
+  jni::local_ref<jni::JArrayClass<JPowertrain>> JHybridTestObjectSwiftKotlinSpec::callEnumArrayCallback(const jni::local_ref<jni::JArrayClass<JPowertrain>>& array, const Callback<std::vector<Powertrain>(const std::vector<Powertrain>& /* array */)>& callback) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JArrayClass<JPowertrain>>(jni::alias_ref<jni::JArrayClass<JPowertrain>> /* array */, jni::alias_ref<JCallback_std__vector_Powertrain__std__vector_Powertrain_::javaobject> /* callback */)>("callEnumArrayCallback_cxx");
-    auto __result = __method(_javaPart, CxxPart::getClass(), [&](auto&& __input) {
-      size_t __size = __input.size();
-      jni::local_ref<jni::JArrayClass<JPowertrain>> __array = jni::JArrayClass<JPowertrain>::newArray(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        const auto& __element = __input[__i];
-        auto __elementJni = JPowertrain::fromCpp(__element);
-        __array->setElement(__i, *__elementJni);
-      }
-      return __array;
-    }(array), JCallback_std__vector_Powertrain__std__vector_Powertrain__cxx::fromCpp(callback));
-    return [&](auto&& __input) {
-      size_t __size = __input->size();
-      std::vector<Powertrain> __vector;
-      __vector.reserve(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        auto __element = __input->getElement(__i);
-        __vector.push_back(__element->toCpp());
-      }
-      return __vector;
-    }(__result);
+    auto __result = __method(_javaPart, CxxPart::getClass(), array, JCallback_std__vector_Powertrain__std__vector_Powertrain__cxx::fromCpp(callback));
+    return __result;
   }
   Callback<std::vector<Powertrain>(const std::vector<Powertrain>& /* array */)> JHybridTestObjectSwiftKotlinSpec::getEnumArrayCallback() {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JCallback_std__vector_Powertrain__std__vector_Powertrain_::javaobject>()>("getEnumArrayCallback_cxx");
@@ -731,99 +684,15 @@ namespace margelo::nitro::test {
       }
     }();
   }
-  Promise<std::vector<Powertrain>> JHybridTestObjectSwiftKotlinSpec::callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::JavaPart>(jni::alias_ref<JCallback_Promise_std__vector_Powertrain__::javaobject> /* callback */)>("callEnumArrayPromiseCallback_cxx");
+  jni::local_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>> JHybridTestObjectSwiftKotlinSpec::callEnumArrayPromiseCallback(const Callback<Promise<std::vector<Powertrain>>()>& callback) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>>(jni::alias_ref<JCallback_Promise_std__vector_Powertrain__::javaobject> /* callback */)>("callEnumArrayPromiseCallback_cxx");
     auto __result = __method(_javaPart, CxxPart::getClass(), JCallback_Promise_std__vector_Powertrain___cxx::fromCpp(callback));
-    return [&]() {
-      auto __promise = Promise<std::vector<Powertrain>>::pending();
-      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
-        std::optional<std::vector<Powertrain>> __converted;
-        try {
-          auto __result = jni::static_ref_cast<jni::JArrayClass<JPowertrain>>(__boxedResult);
-          __converted.emplace([&](auto&& __input) {
-            size_t __size = __input->size();
-            std::vector<Powertrain> __vector;
-            __vector.reserve(__size);
-            for (size_t __i = 0; __i < __size; __i++) {
-              auto __element = __input->getElement(__i);
-              __vector.push_back(__element->toCpp());
-            }
-            return __vector;
-          }(__result));
-        } catch (...) {
-          __promise.reject(std::current_exception());
-          return;
-        }
-        __promise.resolve(std::move(*__converted));
-      });
-      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
-        jni::JniException __jniError(__throwable);
-        __promise.reject(std::make_exception_ptr(__jniError));
-      });
-      return __promise;
-    }();
+    return __result;
   }
-  Promise<std::vector<Powertrain>> JHybridTestObjectSwiftKotlinSpec::awaitEnumArrayPromise(const Promise<std::vector<Powertrain>>& promise) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::JavaPart>(jni::alias_ref<JPromise::JavaPart> /* promise */)>("awaitEnumArrayPromise");
-    auto __result = __method(_javaPart, CxxPart::getClass(), [&]() {
-      jni::local_ref<JPromise::JavaPart> __localPromise = JPromise::create();
-      auto __promise = JNISharedPtr::make_shared_from_jni<JPromise>(jni::make_global(__localPromise));
-      promise.addOnResolvedListener([=](const std::vector<Powertrain>& __result) {
-        jni::ThreadScope::WithClassLoader([&] {
-          std::optional<jni::local_ref<jni::JArrayClass<JPowertrain>>> __converted;
-          try {
-            __converted.emplace([&](auto&& __input) {
-              size_t __size = __input.size();
-              jni::local_ref<jni::JArrayClass<JPowertrain>> __array = jni::JArrayClass<JPowertrain>::newArray(__size);
-              for (size_t __i = 0; __i < __size; __i++) {
-                const auto& __element = __input[__i];
-                auto __elementJni = JPowertrain::fromCpp(__element);
-                __array->setElement(__i, *__elementJni);
-              }
-              return __array;
-            }(__result));
-          } catch (...) {
-            __promise->reject(std::current_exception());
-            return;
-          }
-          __promise->resolve(*__converted);
-        });
-      });
-      promise.addOnRejectedListener([=](const std::exception_ptr& __error) {
-        jni::ThreadScope::WithClassLoader([&] {
-          __promise->reject(__error);
-        });
-      });
-      return __localPromise;
-    }());
-    return [&]() {
-      auto __promise = Promise<std::vector<Powertrain>>::pending();
-      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
-        std::optional<std::vector<Powertrain>> __converted;
-        try {
-          auto __result = jni::static_ref_cast<jni::JArrayClass<JPowertrain>>(__boxedResult);
-          __converted.emplace([&](auto&& __input) {
-            size_t __size = __input->size();
-            std::vector<Powertrain> __vector;
-            __vector.reserve(__size);
-            for (size_t __i = 0; __i < __size; __i++) {
-              auto __element = __input->getElement(__i);
-              __vector.push_back(__element->toCpp());
-            }
-            return __vector;
-          }(__result));
-        } catch (...) {
-          __promise.reject(std::current_exception());
-          return;
-        }
-        __promise.resolve(std::move(*__converted));
-      });
-      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
-        jni::JniException __jniError(__throwable);
-        __promise.reject(std::make_exception_ptr(__jniError));
-      });
-      return __promise;
-    }();
+  jni::local_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>> JHybridTestObjectSwiftKotlinSpec::awaitEnumArrayPromise(const jni::local_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>>& promise) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>>(jni::alias_ref<JTypedPromise<jni::local_ref<jni::JArrayClass<JPowertrain>>>> /* promise */)>("awaitEnumArrayPromise");
+    auto __result = __method(_javaPart, CxxPart::getClass(), promise);
+    return __result;
   }
   std::vector<std::vector<std::optional<PersonKotlin>>> JHybridTestObjectSwiftKotlinSpec::callNestedStructCallback(const std::vector<std::vector<std::optional<PersonKotlin>>>& value, const Callback<std::vector<std::vector<std::optional<PersonKotlin>>>(const std::vector<std::vector<std::optional<PersonKotlin>>>& /* value */)>& callback) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<jni::JArrayClass<jni::JArrayClass<JPerson>>>(jni::alias_ref<jni::JArrayClass<jni::JArrayClass<JPerson>>> /* value */, jni::alias_ref<JCallback_std__vector_std__vector_std__optional_PersonKotlin____std__vector_std__vector_std__optional_PersonKotlin___::javaobject> /* callback */)>("callNestedStructCallback_cxx");
@@ -1086,10 +955,10 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), num, boo, str);
     return __result;
   }
-  std::optional<Powertrain> JHybridTestObjectSwiftKotlinSpec::tryOptionalEnum(const std::optional<Powertrain>& value) {
-    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPowertrain>(jni::alias_ref<JPowertrain> /* value */)>("tryOptionalEnum");
-    auto __result = __method(_javaPart, CxxPart::getClass(), value.has_value() ? JPowertrain::fromCpp(value.value()) : nullptr);
-    return __result != nullptr ? std::make_optional(__result->toCpp()) : std::nullopt;
+  jni::local_ref<JOptional<JPowertrain>> JHybridTestObjectSwiftKotlinSpec::tryOptionalEnum(const jni::local_ref<JOptional<JPowertrain>>& value) {
+    static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JOptional<JPowertrain>>(jni::alias_ref<JOptional<JPowertrain>> /* value */)>("tryOptionalEnum");
+    auto __result = __method(_javaPart, CxxPart::getClass(), value);
+    return __result;
   }
   jboolean JHybridTestObjectSwiftKotlinSpec::tryTrailingOptional(jdouble num, const jni::local_ref<jni::JString>& str, const jni::local_ref<JOptional<jni::JBoolean>>& boo) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jboolean(jdouble /* num */, jni::alias_ref<jni::JString> /* str */, jni::alias_ref<JOptional<jni::JBoolean>> /* boo */)>("tryTrailingOptional");
@@ -1348,9 +1217,9 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, CxxPart::getClass(), copy);
     return __result;
   }
-  jni::local_ref<JArrayBuffer::JavaPart> JHybridTestObjectSwiftKotlinSpec::createHardwareBuffer(jdouble width, jdouble height, jdouble layers, HardwareBufferFormat format) {
+  jni::local_ref<JArrayBuffer::JavaPart> JHybridTestObjectSwiftKotlinSpec::createHardwareBuffer(jdouble width, jdouble height, jdouble layers, const jni::local_ref<JHardwareBufferFormat>& format) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JArrayBuffer::JavaPart>(jdouble /* width */, jdouble /* height */, jdouble /* layers */, jni::alias_ref<JHardwareBufferFormat> /* format */)>("createHardwareBuffer");
-    auto __result = __method(_javaPart, CxxPart::getClass(), width, height, layers, JHardwareBufferFormat::fromCpp(format));
+    auto __result = __method(_javaPart, CxxPart::getClass(), width, height, layers, format);
     return __result;
   }
   jni::local_ref<JArrayBuffer::JavaPart> JHybridTestObjectSwiftKotlinSpec::copyBuffer(const jni::local_ref<JArrayBuffer::JavaPart>& buffer) {

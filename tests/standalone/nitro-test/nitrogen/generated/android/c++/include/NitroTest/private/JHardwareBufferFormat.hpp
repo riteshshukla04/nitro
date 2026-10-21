@@ -8,57 +8,63 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/HardwareBufferFormat.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <stdexcept>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ enum "HardwareBufferFormat" and the Kotlin enum "HardwareBufferFormat".
-   */
+  /** JNI access to the Kotlin enum HardwareBufferFormat. */
   struct JHardwareBufferFormat final : public jni::JavaClass<JHardwareBufferFormat> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/HardwareBufferFormat;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based enum to the C++ enum HardwareBufferFormat.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    HardwareBufferFormat toCpp() const {
-      static const auto clazz = javaClassStatic();
-      static const auto fieldOrdinal = clazz->getField<int>("value");
-      int ordinal = this->getFieldValue(fieldOrdinal);
-      return static_cast<HardwareBufferFormat>(ordinal);
+    int32_t value() const {
+      static const auto field = javaClassStatic()->getField<jint>("value");
+      return getFieldValue(field);
     }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based enum with the given C++ enum's value.
-     */
-    [[maybe_unused]]
-    static jni::alias_ref<JHardwareBufferFormat> fromCpp(HardwareBufferFormat value) {
+    static jni::local_ref<JHardwareBufferFormat> fromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
-        case HardwareBufferFormat::RGBA_8888:
-          static const auto fieldRGBA_8888 = clazz->getStaticField<JHardwareBufferFormat>("RGBA_8888");
-          return clazz->getStaticFieldValue(fieldRGBA_8888);
-        case HardwareBufferFormat::RGB_565:
-          static const auto fieldRGB_565 = clazz->getStaticField<JHardwareBufferFormat>("RGB_565");
-          return clazz->getStaticFieldValue(fieldRGB_565);
-        case HardwareBufferFormat::RGBA_FP16:
-          static const auto fieldRGBA_FP16 = clazz->getStaticField<JHardwareBufferFormat>("RGBA_FP16");
-          return clazz->getStaticFieldValue(fieldRGBA_FP16);
-        case HardwareBufferFormat::BLOB:
-          static const auto fieldBLOB = clazz->getStaticField<JHardwareBufferFormat>("BLOB");
-          return clazz->getStaticFieldValue(fieldBLOB);
-        default:
-          std::string stringValue = std::to_string(static_cast<int>(value));
-          throw std::invalid_argument("Invalid enum value (" + stringValue + "!");
+        case 0: {
+          static const auto field_RGBA_8888 = clazz->getStaticField<JHardwareBufferFormat>("RGBA_8888");
+          static const auto instance_RGBA_8888 = jni::make_global(clazz->getStaticFieldValue(field_RGBA_8888));
+          return jni::make_local(instance_RGBA_8888);
+        }
+        case 1: {
+          static const auto field_RGB_565 = clazz->getStaticField<JHardwareBufferFormat>("RGB_565");
+          static const auto instance_RGB_565 = jni::make_global(clazz->getStaticFieldValue(field_RGB_565));
+          return jni::make_local(instance_RGB_565);
+        }
+        case 2: {
+          static const auto field_RGBA_FP16 = clazz->getStaticField<JHardwareBufferFormat>("RGBA_FP16");
+          static const auto instance_RGBA_FP16 = jni::make_global(clazz->getStaticFieldValue(field_RGBA_FP16));
+          return jni::make_local(instance_RGBA_FP16);
+        }
+        case 3: {
+          static const auto field_BLOB = clazz->getStaticField<JHardwareBufferFormat>("BLOB");
+          static const auto instance_BLOB = jni::make_global(clazz->getStaticFieldValue(field_BLOB));
+          return jni::make_local(instance_BLOB);
+        }
+        default: [[unlikely]]
+          throw std::invalid_argument("Invalid HardwareBufferFormat value: " + std::to_string(value));
       }
     }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JHardwareBufferFormat>> {
+    static jni::local_ref<margelo::nitro::test::JHardwareBufferFormat> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JHardwareBufferFormat> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

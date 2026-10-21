@@ -9,7 +9,7 @@
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/SizeKotlin.hpp>
-#include <NitroTest/SizeUnit.hpp>
+#include <NitroTest/private/JSizeUnit.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/JNIConverter+HybridObject.hpp>
 #include <NitroModules/JSIConverter+JHybridObject.hpp>
@@ -18,7 +18,6 @@
 #include <functional>
 #include <memory>
 #include <NitroTest/private/JSize.hpp>
-#include <NitroTest/private/JSizeUnit.hpp>
 #include <optional>
 #include <NitroModules/JPromise.hpp>
 #include <NitroModules/JNISharedPtr.hpp>
@@ -107,10 +106,10 @@ namespace margelo::nitro::test {
     auto __result = __method(_javaPart, JSize::fromCpp(size));
     return __result->toCpp();
   }
-  SizeUnit JHybridBaseSpec::bounceSizeUnit(SizeUnit unit) {
+  jni::local_ref<JSizeUnit> JHybridBaseSpec::bounceSizeUnit(const jni::local_ref<JSizeUnit>& unit) {
     static const auto __method = CxxPart::getClass()->getMethod<jni::local_ref<JSizeUnit>(jni::alias_ref<JSizeUnit> /* unit */)>("bounceSizeUnit");
-    auto __result = __method(_javaPart, JSizeUnit::fromCpp(unit));
-    return __result->toCpp();
+    auto __result = __method(_javaPart, unit);
+    return __result;
   }
   Promise<SizeKotlin> JHybridBaseSpec::mapSize(const SizeKotlin& size, const Callback<SizeKotlin(const SizeKotlin& /* size */)>& callback) {
     static const auto __method = CxxPart::getClass()->getNonvirtualMethod<jni::local_ref<JPromise::JavaPart>(jni::alias_ref<JSize> /* size */, jni::alias_ref<JCallback_SizeKotlin_SizeKotlin::javaobject> /* callback */)>("mapSize_cxx");

@@ -12,10 +12,13 @@
 
 #include <NitroTest/Powertrain.hpp>
 #include <vector>
+#include <NitroTest/private/JPowertrain.hpp>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <NitroTest/private/JPowertrain.hpp>
 
 namespace margelo::nitro::test {
 

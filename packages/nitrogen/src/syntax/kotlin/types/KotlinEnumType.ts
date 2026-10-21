@@ -1,9 +1,11 @@
 import { NitroConfig } from '../../../config/NitroConfig.js'
 import type { Language } from '../../../getPlatformSpecs.js'
-import type { GetCodeOptions } from '../../types/Type.js'
+import type { GetCodeOptions, Type } from '../../types/Type.js'
 import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import { EnumType } from '../../types/EnumType.js'
 import { createKotlinEnum } from '../KotlinEnum.js'
+import { KotlinCxxEnumType } from './KotlinCxxEnumType.js'
+import { getKotlinConverter, type KotlinCppConverter } from '../KotlinConverter.js'
 import { getJniReferenceCode, type KotlinConversion, type KotlinType } from './KotlinType.js'
 
 export class KotlinEnumType extends EnumType implements KotlinType {
@@ -17,14 +19,25 @@ export class KotlinEnumType extends EnumType implements KotlinType {
     super(type)
   }
 
+  getCppConverter(cppType: Type): KotlinCppConverter {
+    return new KotlinCxxEnumType(cppType, this).getConverter()
+  }
+
+  getJSIType(): this {
+    return this
+  }
+
   get jniName(): string {
     return `J${this.enumName}`
   }
 
   override getCode(language: Language, options: GetCodeOptions): string {
     switch (language) {
-      case 'c++':
-        return getJniReferenceCode(this.jniName, options)
+      case 'c++': {
+        let name = this.jniName
+        if (options.fullyQualified || this.config.isExternalConfig) name = this.config.getCxxNamespace('c++', name)
+        return getJniReferenceCode(name, options)
+      }
       default:
         return super.getCode(language, options)
     }
@@ -37,27 +50,29 @@ export class KotlinEnumType extends EnumType implements KotlinType {
       case 'c++':
         switch (from) {
           case 'c++':
-            return `${this.jniName}::fromCpp(${value})`
+            return `${getKotlinConverter({ cppType: this.type, kotlinType: this })}::toJNI(${value})`
           case 'kotlin':
-            return `${value}->toCpp()`
+            return `${getKotlinConverter({ cppType: this.type, kotlinType: this })}::fromJNI(${value})`
         }
     }
   }
 
   override getExtraFiles(): SourceFile[] {
+    if (this.config.isExternalConfig) return []
     return createKotlinEnum(this)
   }
 
   override getRequiredImports(language: Language): SourceImport[] {
-    const imports = super.getRequiredImports(language)
     switch (language) {
       case 'c++':
-        imports.push({
-          language: language,
-          declaration: NitroConfig.current.getCxxHeader(`${this.jniName}.hpp`, 'private'),
-        })
-        break
+        return [{ language: 'c++', declaration: this.config.getCxxHeader(`${this.jniName}.hpp`, 'private') }]
+      case 'kotlin':
+        if (this.config.isExternalConfig) {
+          return [{ language: 'kotlin', name: `${this.config.getAndroidPackage('java/kotlin')}.${this.enumName}` }]
+        }
+        return []
+      default:
+        return super.getRequiredImports(language)
     }
-    return imports
   }
 }

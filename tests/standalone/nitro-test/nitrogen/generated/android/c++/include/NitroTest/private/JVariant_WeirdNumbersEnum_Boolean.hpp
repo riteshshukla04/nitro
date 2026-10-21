@@ -15,6 +15,7 @@
 #include <NitroTest/private/JWeirdNumbersEnum.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
+#include <NitroTest/private/WeirdNumbersEnum+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
 

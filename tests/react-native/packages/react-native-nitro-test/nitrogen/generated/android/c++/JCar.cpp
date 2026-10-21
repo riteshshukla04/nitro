@@ -12,7 +12,6 @@
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
-#include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <NitroTest/private/PersonKotlin.hpp>
 #include <optional>
@@ -25,6 +24,7 @@
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <variant>
 #include <NitroTest/private/JVariant_Double_String.hpp>
+#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
 
@@ -57,7 +57,7 @@ namespace margelo::nitro::test {
       JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(make),
       JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(model),
       JNIConverter<double, jdouble>::fromJNI(power),
-      powertrain->toCpp(),
+      JNIConverter<margelo::nitro::test::Powertrain, jni::local_ref<margelo::nitro::test::JPowertrain>>::fromJNI(powertrain),
       driver != nullptr ? std::make_optional(driver->toCpp()) : std::nullopt,
       [&](auto&& __input) {
         size_t __size = __input->size();
@@ -86,7 +86,7 @@ namespace margelo::nitro::test {
       JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.make),
       JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.model),
       JNIConverter<double, jdouble>::toJNI(value.power),
-      JPowertrain::fromCpp(value.powertrain),
+      JNIConverter<margelo::nitro::test::Powertrain, jni::local_ref<margelo::nitro::test::JPowertrain>>::toJNI(value.powertrain),
       value.driver.has_value() ? JPerson::fromCpp(value.driver.value()) : nullptr,
       [&](auto&& __input) {
         size_t __size = __input.size();

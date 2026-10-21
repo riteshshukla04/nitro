@@ -10,8 +10,8 @@
 #include <NitroTest/private/CppOnlyValueKotlin.hpp>
 #include <NitroModules/JNIConverter+String.hpp>
 #include <NitroModules/JSIConverter+JString.hpp>
-#include <NitroTest/CppOnlyValueKind.hpp>
 #include <NitroTest/private/JCppOnlyValueKind.hpp>
+#include <NitroTest/private/CppOnlyValueKind+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
 
@@ -23,7 +23,7 @@ namespace margelo::nitro::test {
     jni::local_ref<JCppOnlyValueKind> kind = this->getFieldValue(fieldKind);
     return CppOnlyValueKotlin(
       JNIConverter<std::string, jni::local_ref<jni::JString>>::fromJNI(label),
-      kind->toCpp()
+      JNIConverter<margelo::nitro::test::CppOnlyValueKind, jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>>::fromJNI(kind)
     );
   }
 
@@ -34,7 +34,7 @@ namespace margelo::nitro::test {
     return create(
       clazz,
       JNIConverter<std::string, jni::local_ref<jni::JString>>::toJNI(value.label),
-      JCppOnlyValueKind::fromCpp(value.kind)
+      JNIConverter<margelo::nitro::test::CppOnlyValueKind, jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>>::toJNI(value.kind)
     );
   }
 

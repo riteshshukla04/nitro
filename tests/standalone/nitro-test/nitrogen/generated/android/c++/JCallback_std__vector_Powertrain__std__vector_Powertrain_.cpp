@@ -8,35 +8,20 @@
 #include <NitroTest/private/JCallback_std__vector_Powertrain__std__vector_Powertrain_.hpp>
 #include <NitroTest/Powertrain.hpp>
 #include <vector>
+#include <NitroTest/private/JPowertrain.hpp>
+#include <NitroModules/JNIConverter+Array.hpp>
+#include <NitroModules/JSIConverter+JArrayClass.hpp>
+#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 #include <NitroModules/Callback.hpp>
 #include <NitroModules/InlineCallback.hpp>
 #include <functional>
-#include <NitroTest/private/JPowertrain.hpp>
 
 namespace margelo::nitro::test {
 
   std::vector<Powertrain> JCallback_std__vector_Powertrain__std__vector_Powertrain_::invoke(const std::vector<Powertrain>& array) const {
     static const auto __method = javaClassStatic()->getMethod<jni::local_ref<jni::JArrayClass<JPowertrain>>(jni::alias_ref<jni::JArrayClass<JPowertrain>> /* array */)>("invoke_jni");
-    auto __result = __method(self(), [&](auto&& __input) {
-      size_t __size = __input.size();
-      jni::local_ref<jni::JArrayClass<JPowertrain>> __array = jni::JArrayClass<JPowertrain>::newArray(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        const auto& __element = __input[__i];
-        auto __elementJni = JPowertrain::fromCpp(__element);
-        __array->setElement(__i, *__elementJni);
-      }
-      return __array;
-    }(array));
-    return [&](auto&& __input) {
-      size_t __size = __input->size();
-      std::vector<Powertrain> __vector;
-      __vector.reserve(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        auto __element = __input->getElement(__i);
-        __vector.push_back(__element->toCpp());
-      }
-      return __vector;
-    }(__result);
+    auto __result = __method(self(), JNIConverter<std::vector<Powertrain>, jni::local_ref<jni::JArrayClass<JPowertrain>>>::toJNI(array));
+    return JNIConverter<std::vector<Powertrain>, jni::local_ref<jni::JArrayClass<JPowertrain>>>::fromJNI(__result);
   }
 
   jni::local_ref<JCallback_std__vector_Powertrain__std__vector_Powertrain_::javaobject> JCallback_std__vector_Powertrain__std__vector_Powertrain__cxx::fromCpp(const Callback<std::vector<Powertrain>(const std::vector<Powertrain>& /* array */)>& callback) {
@@ -48,26 +33,8 @@ namespace margelo::nitro::test {
   }
 
   jni::local_ref<jni::JArrayClass<JPowertrain>> JCallback_std__vector_Powertrain__std__vector_Powertrain__cxx::invoke_cxx(jni::alias_ref<jni::JArrayClass<JPowertrain>> array) {
-    std::vector<Powertrain> __result = _callback.callSync([&](auto&& __input) {
-      size_t __size = __input->size();
-      std::vector<Powertrain> __vector;
-      __vector.reserve(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        auto __element = __input->getElement(__i);
-        __vector.push_back(__element->toCpp());
-      }
-      return __vector;
-    }(array));
-    return [&](auto&& __input) {
-      size_t __size = __input.size();
-      jni::local_ref<jni::JArrayClass<JPowertrain>> __array = jni::JArrayClass<JPowertrain>::newArray(__size);
-      for (size_t __i = 0; __i < __size; __i++) {
-        const auto& __element = __input[__i];
-        auto __elementJni = JPowertrain::fromCpp(__element);
-        __array->setElement(__i, *__elementJni);
-      }
-      return __array;
-    }(__result);
+    std::vector<Powertrain> __result = _callback.callSync(JNIConverter<std::vector<Powertrain>, jni::local_ref<jni::JArrayClass<JPowertrain>>>::fromJNI(array));
+    return JNIConverter<std::vector<Powertrain>, jni::local_ref<jni::JArrayClass<JPowertrain>>>::toJNI(__result);
   }
 
   void JCallback_std__vector_Powertrain__std__vector_Powertrain__cxx::registerNatives() {

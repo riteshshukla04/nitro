@@ -13,7 +13,6 @@
 #include <NitroTest/private/JSize.hpp>
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
-#include <NitroTest/SizeUnit.hpp>
 #include <NitroTest/private/JSizeUnit.hpp>
 
 namespace margelo::nitro::test {

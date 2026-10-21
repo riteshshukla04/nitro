@@ -1,7 +1,7 @@
 import { NitroConfig } from '../../config/NitroConfig.js'
 import { ArrayType } from '../types/ArrayType.js'
 import { EnumType } from '../types/EnumType.js'
-import { KotlinCxxEnumType } from './types/KotlinCxxEnumType.js'
+import { KotlinFallbackEnumType } from './types/KotlinFallbackEnumType.js'
 import { CallbackType } from '../types/CallbackType.js'
 import { HybridObjectType } from '../types/HybridObjectType.js'
 import { NamedWrappingType } from '../types/NamedWrappingType.js'
@@ -20,8 +20,9 @@ export function getKotlinNativeType(type: Type, config: NitroConfig = NitroConfi
   if (type instanceof NamedWrappingType) {
     return new NamedWrappingType(type.name, getKotlinNativeType(type.type, config))
   }
-  if (type instanceof KotlinCxxHybridObjectType || type instanceof KotlinCxxStructType || type instanceof KotlinCxxEnumType) return type
-  if (type instanceof EnumType) return new KotlinCxxEnumType(type, config)
+  if (type instanceof KotlinCxxHybridObjectType || type instanceof KotlinCxxStructType || type instanceof KotlinFallbackEnumType)
+    return type
+  if (type instanceof EnumType) return new KotlinFallbackEnumType(type, config)
   if (type instanceof HybridObjectType) return new KotlinCxxHybridObjectType(type)
   if (type instanceof StructType) {
     const properties = type.properties.map((property) => new NamedWrappingType(property.name, getKotlinNativeType(property, config)))

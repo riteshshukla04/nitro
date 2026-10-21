@@ -8,57 +8,63 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/TruckPowertrain.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <stdexcept>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ enum "TruckPowertrain" and the Kotlin enum "TruckPowertrain".
-   */
+  /** JNI access to the Kotlin enum TruckPowertrain. */
   struct JTruckPowertrain final : public jni::JavaClass<JTruckPowertrain> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/TruckPowertrain;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based enum to the C++ enum TruckPowertrain.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    TruckPowertrain toCpp() const {
-      static const auto clazz = javaClassStatic();
-      static const auto fieldOrdinal = clazz->getField<int>("value");
-      int ordinal = this->getFieldValue(fieldOrdinal);
-      return static_cast<TruckPowertrain>(ordinal);
+    int32_t value() const {
+      static const auto field = javaClassStatic()->getField<jint>("value");
+      return getFieldValue(field);
     }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based enum with the given C++ enum's value.
-     */
-    [[maybe_unused]]
-    static jni::alias_ref<JTruckPowertrain> fromCpp(TruckPowertrain value) {
+    static jni::local_ref<JTruckPowertrain> fromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
-        case TruckPowertrain::ELECTRIC:
-          static const auto fieldELECTRIC = clazz->getStaticField<JTruckPowertrain>("ELECTRIC");
-          return clazz->getStaticFieldValue(fieldELECTRIC);
-        case TruckPowertrain::GAS:
-          static const auto fieldGAS = clazz->getStaticField<JTruckPowertrain>("GAS");
-          return clazz->getStaticFieldValue(fieldGAS);
-        case TruckPowertrain::HYBRID:
-          static const auto fieldHYBRID = clazz->getStaticField<JTruckPowertrain>("HYBRID");
-          return clazz->getStaticFieldValue(fieldHYBRID);
-        case TruckPowertrain::DIESEL:
-          static const auto fieldDIESEL = clazz->getStaticField<JTruckPowertrain>("DIESEL");
-          return clazz->getStaticFieldValue(fieldDIESEL);
-        default:
-          std::string stringValue = std::to_string(static_cast<int>(value));
-          throw std::invalid_argument("Invalid enum value (" + stringValue + "!");
+        case 0: {
+          static const auto field_ELECTRIC = clazz->getStaticField<JTruckPowertrain>("ELECTRIC");
+          static const auto instance_ELECTRIC = jni::make_global(clazz->getStaticFieldValue(field_ELECTRIC));
+          return jni::make_local(instance_ELECTRIC);
+        }
+        case 1: {
+          static const auto field_GAS = clazz->getStaticField<JTruckPowertrain>("GAS");
+          static const auto instance_GAS = jni::make_global(clazz->getStaticFieldValue(field_GAS));
+          return jni::make_local(instance_GAS);
+        }
+        case 2: {
+          static const auto field_HYBRID = clazz->getStaticField<JTruckPowertrain>("HYBRID");
+          static const auto instance_HYBRID = jni::make_global(clazz->getStaticFieldValue(field_HYBRID));
+          return jni::make_local(instance_HYBRID);
+        }
+        case 3: {
+          static const auto field_DIESEL = clazz->getStaticField<JTruckPowertrain>("DIESEL");
+          static const auto instance_DIESEL = jni::make_global(clazz->getStaticFieldValue(field_DIESEL));
+          return jni::make_local(instance_DIESEL);
+        }
+        default: [[unlikely]]
+          throw std::invalid_argument("Invalid TruckPowertrain value: " + std::to_string(value));
       }
     }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JTruckPowertrain>> {
+    static jni::local_ref<margelo::nitro::test::JTruckPowertrain> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JTruckPowertrain> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro

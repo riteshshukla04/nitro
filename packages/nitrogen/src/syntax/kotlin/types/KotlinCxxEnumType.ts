@@ -1,43 +1,36 @@
-import { NitroConfig } from '../../../config/NitroConfig.js'
-import type { Language } from '../../../getPlatformSpecs.js'
-import type { SourceFile, SourceImport } from '../../SourceFile.js'
 import { EnumType } from '../../types/EnumType.js'
-import type { GetCodeOptions } from '../../types/Type.js'
+import { getTypeAs } from '../../types/getTypeAs.js'
+import type { Type } from '../../types/Type.js'
+import { createKotlinCxxValueConverter } from '../KotlinCxxValueConverter.js'
+import type { KotlinCppConverter } from '../KotlinConverter.js'
+import { KotlinCxxType } from './KotlinCxxType.js'
+import type { KotlinEnumType } from './KotlinEnumType.js'
 
-/** Enum ownership follows the module whose private Kotlin bridge is being called. */
-export class KotlinCxxEnumType extends EnumType {
-  readonly config: NitroConfig
-
-  constructor(type: EnumType, config: NitroConfig = NitroConfig.current) {
-    super(type)
-    this.config = config
+/** On-demand native C++ interop for a Kotlin enum. */
+export class KotlinCxxEnumType extends KotlinCxxType {
+  constructor(
+    cppType: Type,
+    override readonly kotlinType: KotlinEnumType
+  ) {
+    super(cppType, kotlinType)
   }
 
-  override getCode(language: Language, options: GetCodeOptions): string {
-    switch (language) {
-      case 'c++':
-        if (options.fullyQualified || this.config.isExternalConfig) {
-          return this.config.getCxxNamespace('c++', this.enumName)
-        }
-        return super.getCode(language, options)
-      case 'kotlin':
-      case 'swift':
-        return super.getCode(language, options)
-    }
-  }
-
-  override getRequiredImports(language: Language): SourceImport[] {
-    switch (language) {
-      case 'c++':
-        return [{ language: 'c++', declaration: this.config.getCxxHeader(this.declarationFile.name) }]
-      case 'kotlin':
-      case 'swift':
-        return super.getRequiredImports(language)
-    }
-  }
-
-  override getExtraFiles(): SourceFile[] {
-    if (this.config.isExternalConfig) return []
-    return super.getExtraFiles()
+  getConverter(): KotlinCppConverter {
+    const cppType = getTypeAs(this.cppType, EnumType)
+    const cppCode = cppType.getCode('c++', { context: 'value', fullyQualified: true })
+    const jniClass = this.kotlinType.getCode('c++', { context: 'type-argument', fullyQualified: true })
+    const cppToKotlinConverterCode = `
+return ${jniClass}::fromValue(static_cast<int32_t>(value));
+`.trim()
+    const kotlinToCppConverterCode = `
+return static_cast<${cppCode}>(value->value());
+`.trim()
+    return createKotlinCxxValueConverter({
+      name: cppType.enumName,
+      cppType: cppType,
+      kotlinType: this.kotlinType,
+      toJNI: cppToKotlinConverterCode,
+      fromJNI: kotlinToCppConverterCode,
+    })
   }
 }

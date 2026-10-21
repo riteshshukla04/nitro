@@ -14,7 +14,7 @@
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTestExternal/private/SizeKotlin.hpp>
-#include <NitroTestExternal/SizeUnit.hpp>
+#include <NitroTestExternal/private/JSizeUnit.hpp>
 #include <NitroModules/Promise.hpp>
 #include <NitroModules/Callback.hpp>
 #include <functional>
@@ -67,7 +67,7 @@ namespace margelo::nitro::test::external {
   public:
     // Methods
     SizeKotlin bounceSize(const SizeKotlin& size);
-    SizeUnit bounceSizeUnit(SizeUnit unit);
+    jni::local_ref<JSizeUnit> bounceSizeUnit(const jni::local_ref<JSizeUnit>& unit);
     Promise<SizeKotlin> mapSize(const SizeKotlin& size, const Callback<SizeKotlin(const SizeKotlin& /* size */)>& callback);
 
   public:

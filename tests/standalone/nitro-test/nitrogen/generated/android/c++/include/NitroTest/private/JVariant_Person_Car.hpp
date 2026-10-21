@@ -19,7 +19,6 @@
 #include <NitroModules/JNIConverter+Primitives.hpp>
 #include <NitroModules/JSIConverter+JNIPrimitives.hpp>
 #include <NitroTest/private/JCar.hpp>
-#include <NitroTest/Powertrain.hpp>
 #include <NitroTest/private/JPowertrain.hpp>
 #include <optional>
 #include <vector>

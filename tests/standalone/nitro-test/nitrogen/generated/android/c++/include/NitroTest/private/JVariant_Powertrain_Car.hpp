@@ -29,6 +29,7 @@
 #include <NitroModules/JNIConverter+Array.hpp>
 #include <NitroModules/JSIConverter+JPrimitiveArray.hpp>
 #include <NitroTest/private/JVariant_Double_String.hpp>
+#include <NitroTest/private/Powertrain+Kotlin+NitroTest.hpp>
 
 namespace margelo::nitro::test {
 

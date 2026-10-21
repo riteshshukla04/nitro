@@ -8,51 +8,53 @@
 #pragma once
 
 #include <fbjni/fbjni.h>
-#include <NitroTest/CppOnlyValueKind.hpp>
+#include <NitroModules/JSIConverter.hpp>
+#include <stdexcept>
 
 namespace margelo::nitro::test {
 
   namespace jni = facebook::jni;
 
-  /**
-   * The C++ JNI bridge between the C++ enum "CppOnlyValueKind" and the Kotlin enum "CppOnlyValueKind".
-   */
+  /** JNI access to the Kotlin enum CppOnlyValueKind. */
   struct JCppOnlyValueKind final : public jni::JavaClass<JCppOnlyValueKind> {
-  public:
     static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/test/CppOnlyValueKind;";
 
-  public:
-    /**
-     * Convert this Java/Kotlin-based enum to the C++ enum CppOnlyValueKind.
-     */
-    [[maybe_unused]]
-    [[nodiscard]]
-    CppOnlyValueKind toCpp() const {
-      static const auto clazz = javaClassStatic();
-      static const auto fieldOrdinal = clazz->getField<int>("value");
-      int ordinal = this->getFieldValue(fieldOrdinal);
-      return static_cast<CppOnlyValueKind>(ordinal);
+    int32_t value() const {
+      static const auto field = javaClassStatic()->getField<jint>("value");
+      return getFieldValue(field);
     }
 
-  public:
-    /**
-     * Create a Java/Kotlin-based enum with the given C++ enum's value.
-     */
-    [[maybe_unused]]
-    static jni::alias_ref<JCppOnlyValueKind> fromCpp(CppOnlyValueKind value) {
+    static jni::local_ref<JCppOnlyValueKind> fromValue(int32_t value) {
       static const auto clazz = javaClassStatic();
       switch (value) {
-        case CppOnlyValueKind::FIRST:
-          static const auto fieldFIRST = clazz->getStaticField<JCppOnlyValueKind>("FIRST");
-          return clazz->getStaticFieldValue(fieldFIRST);
-        case CppOnlyValueKind::SECOND:
-          static const auto fieldSECOND = clazz->getStaticField<JCppOnlyValueKind>("SECOND");
-          return clazz->getStaticFieldValue(fieldSECOND);
-        default:
-          std::string stringValue = std::to_string(static_cast<int>(value));
-          throw std::invalid_argument("Invalid enum value (" + stringValue + "!");
+        case 0: {
+          static const auto field_FIRST = clazz->getStaticField<JCppOnlyValueKind>("FIRST");
+          static const auto instance_FIRST = jni::make_global(clazz->getStaticFieldValue(field_FIRST));
+          return jni::make_local(instance_FIRST);
+        }
+        case 3: {
+          static const auto field_SECOND = clazz->getStaticField<JCppOnlyValueKind>("SECOND");
+          static const auto instance_SECOND = jni::make_global(clazz->getStaticFieldValue(field_SECOND));
+          return jni::make_local(instance_SECOND);
+        }
+        default: [[unlikely]]
+          throw std::invalid_argument("Invalid CppOnlyValueKind value: " + std::to_string(value));
       }
     }
   };
 
 } // namespace margelo::nitro::test
+
+namespace margelo::nitro {
+
+  namespace jni = facebook::jni;
+  namespace jsi = facebook::jsi;
+
+  template <>
+  struct JSIConverter<jni::local_ref<margelo::nitro::test::JCppOnlyValueKind>> {
+    static jni::local_ref<margelo::nitro::test::JCppOnlyValueKind> fromJSI(jsi::Runtime& runtime, const jsi::Value& value);
+    static jsi::Value toJSI(jsi::Runtime& runtime, jni::alias_ref<margelo::nitro::test::JCppOnlyValueKind> value);
+    static bool canConvert(jsi::Runtime& runtime, const jsi::Value& value);
+  };
+
+} // namespace margelo::nitro
